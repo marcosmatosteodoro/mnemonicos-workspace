@@ -1,0 +1,14 @@
+{
+  "screenVerify": {
+    "defaultRealm": "app",
+    "realms": {
+      "app": {
+        "description": "Aplicação de estudo (mnemonicos-frontend). Hoje é pública — quando a autenticação entrar, preencha loginPath/username/password.",
+        "baseUrl": "http://localhost:3000",
+        "loginPath": null,
+        "username": null,
+        "password": null
+      }
+    }
+  }
+}

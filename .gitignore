@@ -1,0 +1,16 @@
+# Repositórios symlinkados: cada um tem seu próprio .git e é versionado à parte
+mnemonicos-backend
+mnemonicos-frontend
+
+# Rascunho de sessão e artefatos de verificação visual
+thoughts/
+.playwright-mcp/
+
+# Credenciais locais do screen-verify (use keelson.local.example.json como molde)
+keelson.local.json
+
+.DS_Store
+
+# Despejo bruto do Playwright MCP: fica em thoughts/ (artifactsDir da ficha), nunca em docs/
+docs/**/qa-evidencias/**/console-*.log
+docs/**/qa-evidencias/**/snapshot-*

@@ -1,0 +1,62 @@
+{
+  "profile": {
+    "backend": { "lang": "node", "version": "22", "file": "guidelines/project/backend/node-22.md" },
+    "frontend": { "lang": "next", "version": "16", "file": "guidelines/project/frontend/next-16.md" }
+  },
+  "codePaths": {
+    "backend": ["mnemonicos-backend/src", "mnemonicos-backend/prisma", "mnemonicos-backend/api"],
+    "frontend": ["mnemonicos-frontend/src"]
+  },
+  "sensitiveGlobs": [
+    "mnemonicos-backend/src/**",
+    "mnemonicos-backend/prisma/**",
+    "mnemonicos-backend/api/**",
+    "mnemonicos-frontend/src/**",
+    "mnemonicos-backend/.env*",
+    "mnemonicos-frontend/.env*",
+    "keelson.local.json"
+  ],
+  "quality": {
+    "test": "npm --prefix mnemonicos-backend test && npm --prefix mnemonicos-frontend test",
+    "lint": "npm --prefix mnemonicos-backend run lint && npm --prefix mnemonicos-frontend run lint",
+    "typecheck": "npm --prefix mnemonicos-backend run typecheck && npm --prefix mnemonicos-frontend run typecheck",
+    "build": "npm --prefix mnemonicos-backend run build && npm --prefix mnemonicos-frontend run build",
+    "boot": "npm --prefix mnemonicos-backend run dev & npm --prefix mnemonicos-frontend run dev",
+    "mutation": null,
+    "e2e": null
+  },
+  "gates": {
+    "security": true,
+    "review": true,
+    "reviewThreshold": { "files": 2, "lines": 30 },
+    "screenVerify": {
+      "enabled": true,
+      "method": "skill:screen-verify",
+      "artifactsDir": "thoughts/screen-verify"
+    }
+  },
+  "docsRoot": "docs",
+  "commit": {
+    "convention": "conventional",
+    "releaseAutomation": null
+  },
+  "git": {
+    "branchStrategy": "unica",
+    "branchNaming": "slug"
+  },
+  "jira": {
+    "enabled": false,
+    "telemetry": false,
+    "estimate": false,
+    "site": null,
+    "cloudId": null,
+    "projectKey": null,
+    "mode": "create",
+    "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
+    "epicPolicy": "multi-feature",
+    "standaloneParent": null,
+    "transition": "comment",
+    "mapFile": null,
+    "boardId": null
+  }
+}

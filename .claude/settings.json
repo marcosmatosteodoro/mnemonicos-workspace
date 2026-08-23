@@ -1,0 +1,3 @@
+{
+  "claudeMdExcludes": ["**/mnemonicos-backend/**", "**/mnemonicos-frontend/**"]
+}
