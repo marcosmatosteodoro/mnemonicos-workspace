@@ -92,12 +92,47 @@ Leia o README do papel antes de codar:
 
 `guidelines/project/lessons.md` recebe lição só de **erro que aconteceu aqui**.
 
+## Rodar noutra máquina (dedicada a este projeto)
+
+É o cenário previsto: uma máquina apontada 100% para este produto, com a conta Atlassian
+**deste** projeto — não a corporativa.
+
+```bash
+git clone <remote-deste-workspace> mnemonicos-workspace
+cd mnemonicos-workspace
+git clone git@github.com:marcosmatosteodoro/mnemonicos-backend.git  ../mnemonicos-backend
+git clone git@github.com:marcosmatosteodoro/mnemonicos-frontend.git ../mnemonicos-frontend
+./start.sh          # aceita os defaults dos symlinks (as pastas irmãs)
+```
+
+Depois, dentro da pasta:
+
+1. `claude` e então `/mcp` — conclua o OAuth do conector **atlassian com a conta deste
+   projeto**. É esse passo que não dá para adiantar aqui: o conector desta máquina está
+   autenticado na conta corporativa, e os ids do Jira só existem depois do login certo.
+2. `/keelson:init` — gera os perfis de linguagem (ver acima).
+3. Ligar o Jira — [docs/_meta/README.md](docs/_meta/README.md) traz a ordem de medição.
+
 ## Tracker (Jira)
 
-**Desligado** (`jira.enabled: false`). O ciclo roda sem tracker; SPEC, PLAN e TASKs vivem
-em `docs/`. Para ligar, os ids têm de ser **medidos na instância** — nunca herdados de
-outro workspace, sob pena de escrever os cards deste produto no board do projeto alheio.
-Passo a passo em [docs/_meta/README.md](docs/_meta/README.md).
+**Desligado** (`jira.enabled: false`), e é o estado correto por enquanto: `cloudId`,
+`projectKey`, `boardId` e os ids de `issueType` existem por instância *e por projeto*, e
+só podem ser lidos de um conector autenticado na conta certa. Enquanto isso, o ciclo roda
+sem tracker — épico → histórias → subtarefas vivem em `docs/` e nada bloqueia.
+
+🔴 **Tripwire:** se `jira.site` ou `jira.cloudId` desta ficha algum dia aparecer com
+`autoavaliar.atlassian.net` ou `c58a7785-1d06-4c7a-a5ed-d2734bbb1b69`, está errado — esse
+é o Jira **corporativo** de outro produto, e o keelson criaria os épicos e histórias deste
+projeto no board `NOVA`. Os valores certos vêm da conta deste projeto, medidos conforme
+[docs/_meta/README.md](docs/_meta/README.md).
+
+## Design system do frontend
+
+Ainda não existe, por opção: um arquétipo de tela extraído de zero telas seria molde
+inventado. As regras de estilo que já valem estão em
+[guidelines/project/frontend/README.md](guidelines/project/frontend/README.md) (tokens no
+`@theme`, sem `tailwind.config.js`). O design system e a skill que o mantém serão criados
+para este projeto quando houver tela real de onde extrair o molde.
 
 ## Git deste repositório
 

@@ -21,10 +21,17 @@ vivem em `docs/<slug>/` e nenhuma issue é criada. Para ligar, os valores abaixo
 herdada faria o keelson escrever os épicos e histórias deste produto no board do projeto
 alheio, e isso não é um erro que se descobre rápido.
 
-Estado em 2026-08-23: o conector MCP Atlassian desta máquina tem **um único site
-autenticado** — `autoavaliar.atlassian.net` (corporativo), onde **não existe** projeto de
-mnemônicos. Ou seja: falta um projeto Jira para este produto. Enquanto faltar, a ficha
-fica desligada — e é isso que impede o acidente descrito acima.
+Estado em 2026-08-23: o conector MCP Atlassian **desta** máquina tem um único site
+autenticado — `autoavaliar.atlassian.net` (corporativo), onde não existe projeto de
+mnemônicos. A conta Atlassian deste produto é outra, e o plano é operá-lo numa máquina
+dedicada. Ou seja: os ids só podem ser medidos **de lá**, depois do OAuth na conta certa
+(`/mcp` numa sessão interativa) — não há como adiantá-los aqui, e chutá-los é pior que
+deixar desligado.
+
+🔴 **Nunca** preencha `site`/`cloudId` com `autoavaliar.atlassian.net` /
+`c58a7785-1d06-4c7a-a5ed-d2734bbb1b69`. É o Jira corporativo de outro produto; o keelson
+criaria os épicos e histórias deste projeto no board `NOVA`. Se você está vendo esses
+valores nesta ficha, alguém copiou config de outro workspace.
 
 Ordem de medição, quando houver projeto:
 
