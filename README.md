@@ -115,16 +115,29 @@ Depois, dentro da pasta:
 
 ## Tracker (Jira)
 
-**Desligado** (`jira.enabled: false`), e é o estado correto por enquanto: `cloudId`,
-`projectKey`, `boardId` e os ids de `issueType` existem por instância *e por projeto*, e
-só podem ser lidos de um conector autenticado na conta certa. Enquanto isso, o ciclo roda
-sem tracker — épico → histórias → subtarefas vivem em `docs/` e nada bloqueia.
+O projeto existe: **`KAN`** em `mp-consultoria.atlassian.net`, board `2`. Site, `cloudId`,
+`projectKey`, `boardId` e `mapFile` já estão na ficha.
 
-🔴 **Tripwire:** se `jira.site` ou `jira.cloudId` desta ficha algum dia aparecer com
-`autoavaliar.atlassian.net` ou `c58a7785-1d06-4c7a-a5ed-d2734bbb1b69`, está errado — esse
-é o Jira **corporativo** de outro produto, e o keelson criaria os épicos e histórias deste
-projeto no board `NOVA`. Os valores certos vêm da conta deste projeto, medidos conforme
-[docs/_meta/README.md](docs/_meta/README.md).
+**Ainda `enabled: false`**, e de propósito: faltam os ids de `issueType`, que são por
+projeto e só saem do `createmeta` de um conector autorizado neste site. O sync é
+*best-effort* e não bloqueia o ciclo — então ligar incompleto produz **falha silenciosa a
+cada gancho**, que é pior que desligado, porque parece ligado.
+
+Faltam exatamente dois passos, ambos na máquina dedicada:
+
+1. `/mcp` numa sessão interativa → OAuth do conector atlassian na conta que enxerga
+   `mp-consultoria` (o conector desta máquina só tem grant para o corporativo).
+2. Medir os ids de `issueType` (e as transições, se for usar `transition: "auto"`).
+
+Passo a passo com os comandos exatos: [docs/_meta/jira.KAN.md](docs/_meta/jira.KAN.md).
+Até então o ciclo roda sem tracker — épico → histórias → subtarefas vivem em `docs/` e
+nada bloqueia.
+
+🔴 **Tripwire:** os valores certos são `mp-consultoria.atlassian.net` /
+`455dadeb-0906-4adf-9500-c9bfb2b979bd` / `KAN`. Se algum dia aparecerem
+`autoavaliar.atlassian.net` ou `c58a7785-1d06-4c7a-a5ed-d2734bbb1b69` nesta ficha, alguém
+colou config do `b2b-workspace` — e o keelson criaria os épicos e histórias deste produto
+no board `NOVA`, do Jira corporativo de outro produto.
 
 ## Design system do frontend
 

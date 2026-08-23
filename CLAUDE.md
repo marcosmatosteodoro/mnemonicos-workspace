@@ -69,16 +69,23 @@ repo, leia o README do guideline correspondente:
 - **Escopo mínimo** nos dois repos: seguir as convenções do módulo tocado; sem refactor
   em massa sem pedido.
 
-## Tracker (Jira) — ainda NÃO configurado
+## Tracker (Jira) — projeto definido, sync ainda desligado
 
-`jira.enabled` está **`false`** na ficha, de propósito, e o ciclo roda sem tracker: SPEC,
+O projeto é **`KAN`** em `mp-consultoria.atlassian.net`, board `2`. Site, `cloudId`,
+`projectKey`, `boardId` e `mapFile` já estão na ficha; o mapa é
+[docs/_meta/jira.KAN.md](docs/_meta/jira.KAN.md).
+
+`jira.enabled` continua **`false`** porque os ids de `issueType` são `null` — eles são por
+projeto e exigem `createmeta` de um conector autorizado neste site. **Ligar antes de medir
+é pior que deixar desligado**: o sync é best-effort e não bloqueia o ciclo, então falha
+incompleta não aparece, ela só não acontece. Enquanto isso o ciclo roda sem tracker: SPEC,
 PLAN e TASKs vivem em `docs/` e nenhuma issue é criada.
 
-**Não copie a configuração de outro workspace para cá.** `cloudId`, `projectKey`,
-`boardId` e os ids de `issueType` são específicos da instância *e do projeto*; herdados de
-outro lugar, o keelson escreveria épicos e histórias deste produto **no board do outro
-projeto**. Antes de ligar, ver [docs/_meta/README.md](docs/_meta/README.md), que traz o
-que precisa ser medido e em que ordem.
+🔴 **Não copie configuração de tracker de outro workspace para cá.** Os valores certos são
+`mp-consultoria.atlassian.net` / `455dadeb-0906-4adf-9500-c9bfb2b979bd` / `KAN`. Ver
+`autoavaliar.atlassian.net` ou `c58a7785-…` nesta ficha significa que alguém colou config
+do `b2b-workspace` — e o keelson passaria a criar os épicos e histórias deste produto no
+board `NOVA`, de outro produto.
 
 Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-key"` exige
 `jira.enabled: true` e o self-check do `/keelson:init` reprova a combinação.

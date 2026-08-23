@@ -65,9 +65,9 @@
     "enabled": false,
     "telemetry": false,
     "estimate": false,
-    "site": null,
-    "cloudId": null,
-    "projectKey": null,
+    "site": "https://mp-consultoria.atlassian.net/",
+    "cloudId": "455dadeb-0906-4adf-9500-c9bfb2b979bd",
+    "projectKey": "KAN",
     "mode": "create",
     "issueType": {
       "spec": null,
@@ -78,7 +78,7 @@
     "epicPolicy": "multi-feature",
     "standaloneParent": null,
     "transition": "comment",
-    "mapFile": null,
-    "boardId": null
+    "mapFile": "docs/_meta/jira.KAN.md",
+    "boardId": 2
   }
 }
