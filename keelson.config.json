@@ -1,11 +1,25 @@
 {
   "profile": {
-    "backend": { "lang": "node", "version": "22", "file": "guidelines/project/backend/node-22.md" },
-    "frontend": { "lang": "next", "version": "16", "file": "guidelines/project/frontend/next-16.md" }
+    "backend": {
+      "lang": "node",
+      "version": "22",
+      "file": "plugin:backend/none.md"
+    },
+    "frontend": {
+      "lang": "next",
+      "version": "16",
+      "file": "plugin:frontend/none.md"
+    }
   },
   "codePaths": {
-    "backend": ["mnemonicos-backend/src", "mnemonicos-backend/prisma", "mnemonicos-backend/api"],
-    "frontend": ["mnemonicos-frontend/src"]
+    "backend": [
+      "mnemonicos-backend/src",
+      "mnemonicos-backend/prisma",
+      "mnemonicos-backend/api"
+    ],
+    "frontend": [
+      "mnemonicos-frontend/src"
+    ]
   },
   "sensitiveGlobs": [
     "mnemonicos-backend/src/**",
@@ -28,7 +42,10 @@
   "gates": {
     "security": true,
     "review": true,
-    "reviewThreshold": { "files": 2, "lines": 30 },
+    "reviewThreshold": {
+      "files": 2,
+      "lines": 30
+    },
     "screenVerify": {
       "enabled": true,
       "method": "skill:screen-verify",
@@ -52,7 +69,12 @@
     "cloudId": null,
     "projectKey": null,
     "mode": "create",
-    "issueType": { "spec": null, "feature": null, "task": null, "standalone": null },
+    "issueType": {
+      "spec": null,
+      "feature": null,
+      "task": null,
+      "standalone": null
+    },
     "epicPolicy": "multi-feature",
     "standaloneParent": null,
     "transition": "comment",

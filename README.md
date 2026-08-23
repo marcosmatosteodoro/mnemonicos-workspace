@@ -38,6 +38,27 @@ O script faz os setups abaixo, sem repetir o que já estiver pronto:
 Erros aparecem em vermelho; sucessos, em verde. Ao final, avisa se `keelson.local.json`
 não existir — use `keelson.local.example.json` como molde.
 
+### Primeiro comando: `/keelson:init`
+
+Abra o Claude Code **nesta pasta** (não na pasta pai — o `init` escreve na raiz do projeto
+da sessão) e rode:
+
+```
+/keelson:init
+```
+
+O que falta e só ele resolve: **gerar os perfis de linguagem** deste projeto
+(`guidelines/project/backend/node-22.md` e `guidelines/project/frontend/next-16.md`, via
+agent `staff-engineer`) e gravar o caminho deles em `profile.<role>.file`. Até isso
+acontecer, a ficha aponta para o fallback embarcado do plugin (`plugin:*/none.md`) — nada
+quebra, mas o ciclo roda sem perfil de linguagem, com as guidelines de projeto carregando
+sozinhas o rigor.
+
+O `init` é **idempotente e preservador**: completa e repara, nunca destrói. Ele mantém a
+ficha que já está aqui (comandos de qualidade, `sensitiveGlobs`, gates, Jira desligado) e
+preenche o que falta. Rodá-lo de novo também é o caminho de migração quando o plugin
+atualizar.
+
 ## Como trabalhar
 
 Modo padrão é o ciclo keelson autônomo: descreva a demanda em linguagem natural e o ciclo

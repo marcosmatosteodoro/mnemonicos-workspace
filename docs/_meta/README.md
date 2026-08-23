@@ -3,6 +3,15 @@
 Aqui vive o que é **configuração do processo**, não artefato de demanda. Hoje só há este
 documento; o mapa do tracker nasce quando o tracker for ligado.
 
+## Pendência conhecida: perfis de linguagem
+
+`profile.backend.file` e `profile.frontend.file` apontam para o fallback embarcado do
+plugin (`plugin:backend/none.md`, `plugin:frontend/none.md`). Os perfis próprios deste
+projeto — `guidelines/project/backend/node-22.md` e
+`guidelines/project/frontend/next-16.md` — são gerados pelo `/keelson:init` rodado **numa
+sessão aberta na raiz do workspace**, via agent `staff-engineer`. Enquanto não existirem,
+o rigor vem só de `guidelines/project/`.
+
 ## Ligar o Jira — o que medir, e em que ordem
 
 `jira.enabled` está `false` na ficha. O ciclo keelson roda sem tracker: SPEC, PLAN e TASKs
