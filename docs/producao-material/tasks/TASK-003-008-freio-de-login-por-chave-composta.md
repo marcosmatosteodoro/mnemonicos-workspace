@@ -18,7 +18,7 @@
 
 ## Dependências
 
-- **Depende de**: TASK-003-003
+- **Depende de**: TASK-003-003, TASK-003-016
 - **Bloqueia**: TASK-003-009
 
 ## Contexto
@@ -33,6 +33,7 @@ COMP-003-009 / DEC-003-006 / NFR-002-006 / A-002-020. Dois freios `express-rate-
   - (b) por origem: `keyGenerator` = `req.ip`, limite frouxo (default 30 / 15 min);
   - ambos `skip: () => isTest`, `standardHeaders`, resposta 429 com `Retry-After`, `handler` que chama `recordAuthEvent({ type: 'login.throttled', ... })`. Sem `store` compartilhado (dívida conhecida — TRISK-003-001). Limiares default afináveis por `env`.
 - `mnemonicos-backend/tests/integration/login-rate-limit.test.ts` (o `skip` de teste é desligado nesse arquivo para exercitar o freio).
+- Meio de execução dos `*.integration.test.ts` desta TASK: o harness de TASK-003-016 — config `jest.integration.config.ts`, helper `tests/integration/db.ts` (`testPrisma` + `resetDb()` no `beforeEach`), comando `npm --prefix mnemonicos-backend run test:integration`.
 
 ### Não inclui
 - Montar os limiters na rota `POST /auth/login` (TASK-003-009).

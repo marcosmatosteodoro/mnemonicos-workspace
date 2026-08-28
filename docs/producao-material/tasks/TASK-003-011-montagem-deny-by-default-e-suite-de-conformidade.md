@@ -17,7 +17,7 @@
 
 ## Dependências
 
-- **Depende de**: TASK-003-007, TASK-003-009, TASK-003-010
+- **Depende de**: TASK-003-007, TASK-003-009, TASK-003-010, TASK-003-016
 - **Bloqueia**: nenhuma
 
 ## Contexto
@@ -31,6 +31,7 @@ COMP-003-016 + COMP-003-019, DEC-003-005, §1.3 da SPEC (métrica de sucesso) e 
 ### Inclui
 - `mnemonicos-backend/src/http/routes.ts` — `apiRoutes` monta nesta ordem: `healthRoutes` (público); rotas públicas de `authRoutes` (`/auth/login`, `/auth/refresh`); `apiRoutes.use(requireAuth)`; então `authRoutes` protegidas com `requireRole('EDITOR','ADMIN')` (`/auth/logout`, `/auth/change-password`, `/auth/me`), `usersRoutes` com `requireRole('ADMIN')`, `disciplinesRoutes` com `requireRole('EDITOR','ADMIN')`. `/disciplines` passa a exigir sessão **e** declaração de papel (A-002-019; SPEC §4.1.9). Ordem conferida em `createApp()`.
 - `mnemonicos-backend/tests/integration/route-authz-matrix.test.ts` — deriva a lista de rotas de `apiRoutes.stack` (Express 5 removeu `app._router`); para cada caminho ∉ `PUBLIC_PATH_ALLOWLIST`: 401 sem cookie; para cada caminho sob `requireRole('ADMIN')`: 403 com sessão de `EDITOR`; o caso da rota fictícia montada **depois** de `requireAuth` e **sem** `requireRole` roda **com sessão de EDITOR** e espera **403** (não 401) — falha fechada por ausência de declaração em `ROUTE_ROLES` (AC-002-014). Assert de snapshot: `PUBLIC_PATH_ALLOWLIST` é **exatamente** `['/health','/health/db','/auth/login','/auth/refresh']` (crescer exige mudança deliberada). Assert global: nenhum handler montado que crie `User` (`prisma.user.create` ou o service de criação) está fora de um router com `requireRole('ADMIN')` registrado em `ROUTE_ROLES` (AC-002-018, além de `usersRoutes`). Oráculo capaz de falhar: remover `requireAuth` da montagem, ou remover a declaração de `/disciplines` de `ROUTE_ROLES`, torna o teste vermelho.
+- Meio de execução dos `*.integration.test.ts` desta TASK: o harness de TASK-003-016 — config `jest.integration.config.ts`, helper `tests/integration/db.ts` (`testPrisma` + `resetDb()` no `beforeEach`), comando `npm --prefix mnemonicos-backend run test:integration`.
 
 ### Não inclui
 - Os middlewares em si (TASK-003-007).

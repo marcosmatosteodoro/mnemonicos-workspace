@@ -17,7 +17,7 @@
 
 ## Dependências
 
-- **Depende de**: TASK-003-006, TASK-003-008, TASK-003-001, TASK-003-007
+- **Depende de**: TASK-003-006, TASK-003-008, TASK-003-001, TASK-003-007, TASK-003-016
 - **Bloqueia**: TASK-003-011, TASK-003-013
 
 ## Contexto
@@ -41,6 +41,7 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
 - Opções de cookie da DEC-003-004 (definidas nesta TASK): `mnemo_access` (`path '/'`, `httpOnly`, `sameSite: 'lax'`, `secure: env.COOKIE_SECURE`, `maxAge` = `AUTH_ACCESS_TTL_MINUTES`); `mnemo_refresh` (`path '/api/v1/auth'`, demais flags iguais, `maxAge` = `AUTH_REFRESH_TTL_DAYS`). Sem assinatura de cookie.
 - `mnemonicos-backend/src/app.ts` — montar `cookie-parser` antes de `apiRoutes`.
 - `mnemonicos-backend/tests/integration/auth.routes.test.ts`.
+- Meio de execução dos `*.integration.test.ts` desta TASK: o harness de TASK-003-016 — config `jest.integration.config.ts`, helper `tests/integration/db.ts` (`testPrisma` + `resetDb()` no `beforeEach`), comando `npm --prefix mnemonicos-backend run test:integration`.
 
 ### Não inclui
 - A regra de sessão (`login`/`refresh`/`logout`/... — TASK-003-006).

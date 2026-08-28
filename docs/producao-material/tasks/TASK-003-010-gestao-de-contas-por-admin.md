@@ -18,7 +18,7 @@
 
 ## Dependências
 
-- **Depende de**: TASK-003-003, TASK-003-006, TASK-003-007
+- **Depende de**: TASK-003-003, TASK-003-006, TASK-003-007, TASK-003-016
 - **Bloqueia**: TASK-003-011, TASK-003-013
 
 ## Contexto
@@ -32,6 +32,7 @@ COMP-003-013/014/015, DEC-003-007, §4 (fluxo de gestão) do PLAN. Módulo `src/
 - `mnemonicos-backend/src/modules/users/users.service.ts` — `createInternalUser(input): Promise<SessionUser>` (`hashPassword`; `data` campo a campo; violação de unique → `ConflictError`, sem alterar a conta existente); `listInternalUsers(query): Promise<Paginated<UserListItem>>` (`select` explícito `id,email,name,role,disabledAt` → `status: 'active'|'disabled'`; **nunca** `passwordHash` nem `sessions`); `disableUser(id)` (alvo ADMIN e `count(role=ADMIN, disabledAt=null) <= 1` → `ConflictError`; senão `disabledAt = now` **e** `revokeAllSessions(id)` em transação); `resetUserPassword(id, password)` (`hashPassword`; grava; `revokeAllSessions(id)`). Toda resposta é montada campo a campo (`select` explícito), nunca a entidade Prisma crua; nenhuma função devolve `passwordHash` ou valor de token.
 - `mnemonicos-backend/src/modules/users/users.routes.ts` — `usersRoutes: Router` com `usersRoutes.use(requireRole('ADMIN'))` no topo: `GET /users`, `POST /users`, `PATCH /users/:id/disable`, `POST /users/:id/reset-password`. Sem rota de registro público. Sem `try/catch`.
 - `mnemonicos-backend/tests/integration/users.test.ts`.
+- Meio de execução dos `*.integration.test.ts` desta TASK: o harness de TASK-003-016 — config `jest.integration.config.ts`, helper `tests/integration/db.ts` (`testPrisma` + `resetDb()` no `beforeEach`), comando `npm --prefix mnemonicos-backend run test:integration`.
 
 ### Não inclui
 - A montagem de `usersRoutes` em `routes.ts` e a suíte de conformidade (TASK-003-011).

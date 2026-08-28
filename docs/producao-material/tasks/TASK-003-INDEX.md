@@ -1,19 +1,19 @@
 # Índice de tarefas do PLAN-003
 
-**Total de tasks**: 15
+**Total de tasks**: 16
 **Tamanho dominante**: medium
 **Convenções aplicadas**: branch única do épico `feat/producao-material-mnemora-studio` (estratégia `unica` — todas as fatias entram nela); Conventional Commits (sem automação de release); backend Jest 30 + ts-jest + supertest (`mnemonicos-backend/tests/{unit,integration}/`, env fictícia em `tests/setup-env.ts`); frontend Jest 30 via `next/jest` + Testing Library (`mnemonicos-frontend/`); `gates.security: true`; `gates.screenVerify` ativo (Playwright MCP) nas TASKs de tela (014, 015).
 
 ## Status agregado
 
-- Todo: 15
+- Todo: 16
 - In Progress: 0
 - Done: 0
 - Blocked: 0
 
 ## Ordem de execução (waves)
 
-### Wave 1 (paralelizável — fundação)
+### Wave 1 (fundação)
 - [ ] TASK-003-001 ⏸ Todo — Declarar as novas variáveis de ambiente da fatia (chore)
 - [ ] TASK-003-002 ⏸ Todo — Migração aditiva `add_session_and_user_disabled`
 - [ ] TASK-003-005 ⏸ Todo — Tipos de domínio espelhados nos dois repos
@@ -21,6 +21,7 @@
 ### Wave 2 (depende da Wave 1)
 - [ ] TASK-003-003 ⏸ Todo — Libs de cripto e auditoria (`password`, `tokens`, `audit`)
 - [ ] TASK-003-004 ⏸ Todo — Lógica pura de rotação de sessão (`session-rotation.ts`)
+- [ ] TASK-003-016 ⏸ Todo — Harness de teste de integração com banco (furo no plano, depende de 002)
 
 ### Wave 3 (depende da Wave 2)
 - [ ] TASK-003-006 ⏸ Todo — Serviço de autenticação (`auth.service.ts` + `auth.schema.ts`)

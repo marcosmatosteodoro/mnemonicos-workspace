@@ -7,7 +7,8 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: In Progress
+**Data início**: 2026-08-28T15:58:39-03:00
 
 ## Convenções (do projeto)
 
@@ -18,7 +19,7 @@
 ## Dependências
 
 - **Depende de**: nenhuma
-- **Bloqueia**: TASK-003-004, TASK-003-006, TASK-003-012
+- **Bloqueia**: TASK-003-004, TASK-003-006, TASK-003-012, TASK-003-016
 
 ## Contexto
 

@@ -18,7 +18,7 @@
 
 ## Dependências
 
-- **Depende de**: TASK-003-002, TASK-003-003
+- **Depende de**: TASK-003-002, TASK-003-003, TASK-003-016
 - **Bloqueia**: nenhuma
 
 ## Contexto
@@ -30,6 +30,7 @@ COMP-003-018 / DEC-003-008 / FR-002-021 / AC-002-023 / A-002-010. `prisma/seed.t
 ### Inclui
 - `mnemonicos-backend/prisma/seed.ts` — no `main()` (antes ou depois do seed de conteúdo): se `env.SEED_ADMIN_EMAIL` **e** `env.SEED_ADMIN_PASSWORD` presentes **e** `count(User, role=ADMIN) === 0` → `prisma.user.create` com `role: 'ADMIN'`, `passwordHash` de `hashPassword`. Config parcial (só uma das duas) → tratada como ausente. Ausentes → `console.log` informativo e segue sem criar. Nenhuma senha embutida.
 - `mnemonicos-backend/tests/integration/seed.test.ts` — exercita a rotina de seed do ADMIN isolada (`seedAdmin()` ou equivalente exportado).
+- Meio de execução dos `*.integration.test.ts` desta TASK: o harness de TASK-003-016 — config `jest.integration.config.ts`, helper `tests/integration/db.ts` (`testPrisma` + `resetDb()` no `beforeEach`), comando `npm --prefix mnemonicos-backend run test:integration`.
 
 ### Não inclui
 - Criação de contas por rota (TASK-003-010).

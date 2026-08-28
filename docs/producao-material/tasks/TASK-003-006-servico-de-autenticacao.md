@@ -18,7 +18,7 @@
 
 ## Dependências
 
-- **Depende de**: TASK-003-002, TASK-003-003, TASK-003-004, TASK-003-005
+- **Depende de**: TASK-003-002, TASK-003-003, TASK-003-004, TASK-003-005, TASK-003-016
 - **Bloqueia**: TASK-003-007, TASK-003-009, TASK-003-010
 
 ## Contexto
@@ -37,6 +37,7 @@ COMP-003-008 / COMP-003-007, DEC-003-002 (token opaco com estado no servidor), D
   - `revokeAllSessions(userId): Promise<void>` — usado por desativação e reset (TASK-003-010).
 - `mnemonicos-backend/src/modules/auth/auth.schema.ts` — `loginSchema` (`email` `z.email()` normalizado minúsculas/trim; `password` `z.string().min(1)`), `changePasswordSchema` (`currentPassword` `z.string().min(1)`; `newPassword` `z.string().min(12)`). Consumo por `z.infer`, nunca `req.body` direto.
 - `mnemonicos-backend/tests/integration/auth.service.test.ts` (+ unit onde couber).
+- Meio de execução dos `*.integration.test.ts` desta TASK: o harness de TASK-003-016 — config `jest.integration.config.ts`, helper `tests/integration/db.ts` (`testPrisma` + `resetDb()` no `beforeEach`), comando `npm --prefix mnemonicos-backend run test:integration`.
 
 ### Não inclui
 - As rotas HTTP / cookies / verificação de `Origin`/`Host` (TASK-003-009).

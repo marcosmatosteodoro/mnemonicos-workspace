@@ -256,6 +256,12 @@ Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificaç
 **Interface pública**: `layout.tsx` do grupo `(interno)` compõe `InternalShell` (`'use client'`). Usa `useMeQuery`: *em andamento* → estado de carregamento neutro (nó `role="status"`); *sucesso* (sessão válida, papel suficiente) → renderiza `children`; *falha* sem sessão → redireciona para `/login`; *falha* com sessão e papel insuficiente → mensagem "sem permissão" sem o conteúdo. Controle de logout: *em andamento* (desabilitado + progresso), *sucesso* (sessão encerrada no servidor via mutation `logout`, volta ao login), *falha* (mensagem genérica pt-BR, permanece na área interna). O backend é quem nega de fato (FR-002-012).
 **Dependências**: COMP-003-021, COMP-003-022
 
+### COMP-003-025: Harness de teste de integração com banco (`jest.integration.config.ts` + `tests/integration/`)
+**Responsabilidade**: habilitar a camada de teste de integração contra o Postgres real do `docker-compose` local. **Furo no plano descoberto em TASK-003-002**: os "Critérios de pronto" das TASKs de serviço/rota (006/008/009/010/011/012) e o item de DoD assumem testes de integração com Prisma real (`$transaction`, `@unique`/P2002, matriz de rotas com sessão, seed idempotente, fixture de 2 instâncias), mas `tests/setup-env.ts` declara que a suíte não abre conexão e não há `globalSetup`/migrate/teardown. Mockar Prisma em toda a camada tornaria os testes de segurança não-falsificáveis.
+**Realiza**: nenhum
+**Interface pública**: config Jest separada (`testMatch: ['**/*.integration.test.ts']`, `maxWorkers: 1`, `globalSetup`/`globalTeardown`); `tests/setup-env.integration.ts` com `DATABASE_URL`/`DIRECT_URL` → banco `mnemonicos_test`; `tests/integration/global-setup.ts` (cria o banco + `prisma migrate deploy`, idempotente); `tests/integration/db.ts` exporta `testPrisma` e `resetDb()` (TRUNCATE ... RESTART IDENTITY CASCADE); scripts npm `test:integration` (e `test:ci`/`validate` passam a rodar unit **e** integração). A suíte unitária existente segue no `jest.config.ts` antigo, sem rodar `*.integration.test.ts`.
+**Dependências**: COMP-003-002
+
 ## 4. Fluxos principais
 
 **Login.** `POST /auth/login` → `loginRateLimiters` (conta + origem) → `loginSchema.parse` → `auth.service.login`: acha `User` por e-mail, `verifyPassword`, confere `disabledAt IS NULL`; qualquer falha → `UnauthorizedError` genérico + auditoria de falha. Sucesso → cria `Session` (`familyId` novo; `accessToken`/`refreshToken` de `generateToken`, guardados como `hashToken`; `accessExpiresAt = now + AUTH_ACCESS_TTL_MINUTES`; `refreshExpiresAt = now + AUTH_REFRESH_TTL_DAYS`) + auditoria de sucesso; resposta seta `mnemo_access` e `mnemo_refresh` e devolve `SessionUser`.
@@ -517,6 +523,7 @@ model Session {
 - [ ] Tipos de papel e de usuário de sessão (`USER_ROLES` / `SessionUser`) espelhados em `mnemonicos-backend/src/domain/types.ts` e `mnemonicos-frontend/src/types/domain.ts` **no mesmo diff** (NFR-002-007 / AC-002-025)
 - [ ] `gates.security` (ficha) satisfeito; `gates.screenVerify` fechado para a tela de login e o shell interno
 - [ ] Nenhum valor de senha, credencial de acesso ou token de renovação em log ou em resposta da API (NFR-002-004 / AC-002-024) — verificado por teste
+- [ ] Harness de teste de integração (COMP-003-025) instalado: `npm --prefix mnemonicos-backend run test:integration` verde contra `mnemonicos_test`; a suíte unitária segue verde e sem rodar os `*.integration.test.ts`
 
 ## 10. Não coberto por este PLAN
 
