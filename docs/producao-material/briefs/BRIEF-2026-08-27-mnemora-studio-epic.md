@@ -43,7 +43,7 @@ fora do MVP).
 
 | # | Fatia | Slug de destino | Estado |
 |---|---|---|---|
-| 1 | Acesso interno e papéis de produção | producao-material | pendente |
+| 1 | Acesso interno e papéis de produção | producao-material | em ciclo (docs/producao-material/briefs/BRIEF-002.md) |
 | 2 | Conteúdo bruto, quebra da regra e fonte normativa | producao-material | pendente |
 | 3 | Instrumentação de etapas da fábrica | producao-material | pendente |
 | 4 | Tira mnemônica como sequência de quadros | producao-material | pendente |
