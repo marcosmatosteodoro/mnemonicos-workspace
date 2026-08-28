@@ -6,17 +6,17 @@
 
 ## Status agregado
 
-- Todo: 16
+- Todo: 13
 - In Progress: 0
-- Done: 0
+- Done: 3
 - Blocked: 0
 
 ## Ordem de execução (waves)
 
 ### Wave 1 (fundação)
-- [ ] TASK-003-001 ⏸ Todo — Declarar as novas variáveis de ambiente da fatia (chore)
-- [ ] TASK-003-002 ⏸ Todo — Migração aditiva `add_session_and_user_disabled`
-- [ ] TASK-003-005 ⏸ Todo — Tipos de domínio espelhados nos dois repos
+- [x] TASK-003-001 ✅ Done — Declarar as novas variáveis de ambiente da fatia (chore)
+- [x] TASK-003-002 ✅ Done — Migração aditiva `add_session_and_user_disabled`
+- [x] TASK-003-005 ✅ Done — Tipos de domínio espelhados nos dois repos
 
 ### Wave 2 (depende da Wave 1)
 - [ ] TASK-003-003 ⏸ Todo — Libs de cripto e auditoria (`password`, `tokens`, `audit`)

@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-08-28T11:35:00-03:00
+**Última atualização**: 2026-08-28T20:38:00-03:00
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -20,9 +20,9 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 (vazio até a primeira entrega)
 
 ### Em desenvolvimento
-- Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, 🟡 0/? tasks Done)
-- Autorização por papel deny-by-default no servidor (SPEC-002/FEAT-002-002, PLAN-003, 🟡 0/? tasks Done)
-- Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, 🟡 0/? tasks Done)
+- Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, 🟡 0/5 tasks Done)
+- Autorização por papel deny-by-default no servidor (SPEC-002/FEAT-002-002, PLAN-003, 🟡 0/3 tasks Done)
+- Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, 🟡 0/3 tasks Done)
 
 ### Especificadas, ainda não planejadas
 (nenhuma — SPEC-002 coberta por PLAN-003)
@@ -39,7 +39,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 | ID | Cobre | FRs cobertos | Tasks | Status |
 |----|-------|--------------|-------|--------|
-| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 0/16 ⏸ | Approved |
+| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 3/16 🟡 | Approved |
 
 ## Glossário consolidado
 
@@ -81,7 +81,6 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
-- 2026-08-27: épico decomposto em 11 demandas via /keelson:specify-epic (BRIEF-2026-08-27-mnemora-studio-epic); BRIEF-001 promovido a `decomposto`; MAP.md semeado
 - 2026-08-28: sync Jira (gancho specify, SPEC-002) — issues KAN-7 (Epic) + 3 stories KAN-8/KAN-9/KAN-10; Epic KAN-7 vinculado a KAN-6 por "relates" (parent Epic▸Epic recusado no projeto team-managed KAN)
 - 2026-08-28: SPEC-002 (Acesso interno e papéis de produção, F1 do épico) criada e promovida a `Approved` via /keelson:specify — 3 FEATs, 24 FRs, 29 ACs; PO ESCALOU 1 ponto (troca da própria senha) resolvido pelo default, veto pendente na Entrega
 - 2026-08-28: PLAN-003 criado e promovido a `Approved` via /keelson:plan — 24 componentes, 12 DECs (todas reversíveis), 6 TRISKs; token opaco com estado no servidor (não JWT), model Session com rotação por família, Argon2id via @node-rs/argon2, deny-by-default na montagem
@@ -89,3 +88,4 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 - 2026-08-28: Etapa 3.5 (verificabilidade pré-código) — qa pré-código resolvido (18 achados); PO fixou deny-by-default "por papel" (leitura B): DEC-003-005 emendada com registro central ROUTE_ROLES (rota sem declaração nega 403 mesmo com sessão válida) — custo adicional de F1 pendente de veto do Diretor na entrega
 - 2026-08-28: furo no plano em TASK-003-002 — a suíte de teste do backend não abre conexão com banco (`tests/setup-env.ts` fictício), mas 6 TASKs assumem integração com Prisma real — destino: TASK-003-016 nova (harness de integração, COMP-003-025) na Wave 2, PLAN-003 emendado
 - 2026-08-28: sync Jira pulado (sub-task de TASK-003-016) — `atlassianUserInfo` / `getAccessibleAtlassianResources` retornaram AWS WAF "Human Verification" CAPTCHA em vez de JSON — conector bloqueado nesta execução; reconciliar via /keelson:jira-sync quando voltar (parent-alvo KAN-8)
+- 2026-08-28: Wave 1 do PLAN-003 fechada (TASK-003-001/002/005 Done) — gate 8 reprovou e convergiu em 1 retry (fail-open no COOKIE_SECURE, redação do pino, contrato HMAC); errata propagada ao PLAN e TASKs; 2 lições registradas (pendentes de merge)

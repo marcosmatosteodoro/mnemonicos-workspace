@@ -30,8 +30,8 @@ DEC-003-001 (Argon2id via `@node-rs/argon2`), DEC-003-002 (`JWT_SECRET` vira pep
 
 ### Inclui
 - `mnemonicos-backend/src/lib/password.ts` — `hashPassword(plain: string): Promise<string>`, `verifyPassword(plain: string, hash: string): Promise<boolean>`. Sempre assíncrono (nunca API `*Sync` — §10 do perfil); `memoryCost`/`timeCost`/`parallelism` lidos de `env`; `verifyPassword` devolve `false` em hash malformado — **nunca lança**.
-- `mnemonicos-backend/src/lib/tokens.ts` — `generateToken(): string` (`crypto.randomBytes(32)` → base64url), `hashToken(token: string): string` (`sha256(token + env.JWT_SECRET)`), `tokensMatch(token: string, storedHash: string): boolean` (`crypto.timingSafeEqual` sobre buffers de hash de mesmo tamanho). `Math.random()` proibido.
-- `mnemonicos-backend/src/lib/audit.ts` — `recordAuthEvent(event: AuthAuditEvent): void`; `AuthAuditEvent` união discriminada por `type` (`'login.success' | 'login.failure' | 'login.throttled' | 'token.refresh' | 'token.reuse' | 'logout' | 'authz.denied'`) com `at: Date`, `outcome`, `subject`, `ip: string`, `userAgent?: string`; escreve via `logger.info({ audit: event }, ...)`; payload montado campo a campo, nunca `req.body` cru.
+- `mnemonicos-backend/src/lib/tokens.ts` — `generateToken(): string` (`crypto.randomBytes(32)` → base64url), `hashToken(token: string): string` = `crypto.createHmac('sha256', env.JWT_SECRET).update(token).digest('base64url')` (**HMAC-SHA256**, nunca `sha256(token + pepper)` — errata do gate da Wave 1), `tokensMatch(token: string, storedHash: string): boolean` (`crypto.timingSafeEqual` sobre buffers de hash de mesmo tamanho). `Math.random()` proibido.
+- `mnemonicos-backend/src/lib/audit.ts` — `recordAuthEvent(event: AuthAuditEvent): void`; `AuthAuditEvent` união discriminada por `type` (`'login.success' | 'login.failure' | 'login.throttled' | 'token.refresh' | 'token.reuse' | 'logout' | 'authz.denied'`) com `at: Date`, `outcome`, `subject`, `ip: string`, `userAgent?: string`; escreve via `logger.info({ audit: event }, ...)`; payload montado campo a campo, nunca `req.body` cru. **O evento é objeto plano de um nível** (o `redact` do pino só cobre um nível de aninhamento — gate 8 da Wave 1): nada de sub-objeto dentro de `event`.
 - `mnemonicos-backend/package.json` + `package-lock.json` — `+@node-rs/argon2` (pin exato), `+cookie-parser` (caret), `+@types/cookie-parser` (devDependency).
 - `mnemonicos-backend/tests/unit/password.test.ts`, `tests/unit/tokens.test.ts`, `tests/unit/audit.test.ts`.
 
@@ -46,14 +46,14 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 1. Antes de adicionar `@node-rs/argon2`: conferir downloads, última publicação e ausência de `postinstall` de compilação; pin exato.
 2. `password.ts` — wrapper assíncrono sobre `@node-rs/argon2` com custo de `env`; `verifyPassword` em `try/catch` devolvendo `false`.
-3. `tokens.ts` — `randomBytes` → base64url; `hashToken` com pepper; `tokensMatch` via `timingSafeEqual`.
+3. `tokens.ts` — `randomBytes` → base64url; `hashToken` = `crypto.createHmac('sha256', env.JWT_SECRET)` (HMAC, nunca concatenação); `tokensMatch` via `timingSafeEqual`.
 4. `audit.ts` — construir o objeto de evento campo a campo e emitir por `logger.info`.
 
 ## Critérios de pronto
 
 - [ ] Testes cobrem AC-002-024 (camada de derivação — a senha só existe como saída de função resistente a força bruta, com parâmetros de custo configuráveis) — verificação executável: `npm --prefix mnemonicos-backend test -- password` → `hashPassword('senhaDe12chars!')` devolve string com prefixo `$argon2id$`; `verifyPassword(plain, hash)` → `true`; `verifyPassword('outra', hash)` → `false`; `verifyPassword('x', 'nao-e-hash')` → `false` **sem lançar**; nenhuma chamada a API `*Sync`. `Tests: ≥4 passed`. Fixada antes do código.
 - [ ] Parâmetros de custo vêm de `env` — verificação executável: `npm --prefix mnemonicos-backend test -- password` → com `ARGON2_MEMORY_KIB`/`ARGON2_TIME_COST`/`ARGON2_PARALLELISM` do `setup-env`, o hash gerado decodifica com `m=`/`t=`/`p=` correspondentes. `Tests: ≥1 passed`. Fixada antes do código.
-- [ ] Testes cobrem `generateToken`/`hashToken`/`tokensMatch` (contrato do item — sem AC) — verificação executável: `npm --prefix mnemonicos-backend test -- tokens` → `generateToken()` devolve 43 chars base64url (32 bytes) e dois valores consecutivos distintos; `hashToken(t)` é determinístico e muda quando `env.JWT_SECRET` muda; `tokensMatch(t, hashToken(t))` → `true`, `tokensMatch('x', hashToken(t))` → `false`. `Tests: ≥4 passed`. Fixada antes do código.
+- [ ] Testes cobrem `generateToken`/`hashToken`/`tokensMatch` (contrato do item — sem AC) — verificação executável: `npm --prefix mnemonicos-backend test -- tokens` → `generateToken()` devolve 43 chars base64url (32 bytes) e dois valores consecutivos distintos; `hashToken(t)` é determinístico, **igual ao `crypto.createHmac('sha256', JWT_SECRET).update(t).digest('base64url')` calculado independentemente no teste** (a mutação para `sha256(t + JWT_SECRET)` deixa vermelho), e muda quando `env.JWT_SECRET` muda; `tokensMatch(t, hashToken(t))` → `true`, `tokensMatch('x', hashToken(t))` → `false`. `Tests: ≥4 passed`. Fixada antes do código.
 - [ ] Testes cobrem AC-002-002 / AC-002-024 (camada de auditoria — o evento de falha de autenticação e toda linha emitida pelo emissor não carregam senha nem valor de token) — verificação executável: `npm --prefix mnemonicos-backend test -- audit` → para cada `type` da união, o evento sai por `logger.info` com `at`/`outcome`/`subject`/`ip`; asserção **estrutural** de que o objeto emitido não possui as chaves `password`/`token`/`accessToken`/`refreshToken` (sobre o conjunto de chaves, não substring de prosa). `Tests: ≥3 passed`. Fixada antes do código.
 - [ ] Dependências novas com pin e auditoria limpa — verificação executável: `npm --prefix mnemonicos-backend ci` reproduzível (exit 0); `npm --prefix mnemonicos-backend audit --omit=dev --audit-level=high` → `found 0 vulnerabilities`; `@node-rs/argon2` sem `postinstall` de compilação (conferido em `npm view @node-rs/argon2` / `package-lock.json`). Fixada antes do código.
 - [ ] Sem warnings/lints novos — `npm --prefix mnemonicos-backend run lint` → exit 0 (baseline capturada no início da TASK).
@@ -64,7 +64,7 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 ## Riscos específicos
 
 - TRISK-003-004 / RISK-002-003: dependências novas entram na árvore. `@node-rs/argon2` é binário napi-rs pré-compilado por plataforma (sem node-gyp) — `npm ci` limpo no dev (Windows) e no CI; pin exato; `/keelson:audit` sobre o diff de F1.
-- `JWT_SECRET` passa a ser pepper do `hashToken` (DEC-003-002) — **não** é assinatura JWT.
+- `JWT_SECRET` passa a ser a chave do HMAC em `hashToken` (DEC-003-002) — **não** é assinatura JWT, e **não** é `sha256(token + JWT_SECRET)`.
 - Repos symlinkados (lição de exploração): editar/verificar pelo caminho dentro do link (`mnemonicos-backend/src/...`).
 
 ---

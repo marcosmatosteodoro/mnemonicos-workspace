@@ -9,6 +9,25 @@
 
 <!-- Adicionar lições abaixo desta linha -->
 
+## [Segurança] Flag de segurança booleana vinda de env nunca usa `z.coerce.boolean()`
+
+**Erro:** `COOKIE_SECURE: z.coerce.boolean().default(isProduction)` em `src/config/env.ts`.
+`z.coerce.boolean()` é `Boolean(input)`: `"false"` / `"0"` coagem para `true`, e `""`
+(string vazia — não é `undefined`) coage para `false` **sem** o `.default()` se aplicar.
+Em produção, `COOKIE_SECURE=""` no painel de deploy → cookie de sessão sem `secure`, em
+silêncio (fail-open). Pego no gate 8 da Wave 1 de PLAN-003.
+**Causa:** coerção aplicada por simetria com os campos numéricos vizinhos
+(`z.coerce.number()`), onde é correta. Para boolean a coerção do JS não tem a semântica
+esperada. O teste exercitou só o caminho do default (`delete process.env.X`), nunca o
+caminho com valor fornecido — o defeito era invisível para a suíte.
+**Solução:** booleano de env usa `z.enum(['true','false']).default(<'true'|'false'>).transform(v => v === 'true')`
+— valor inválido derruba o boot (fail-fast do §6.4) em vez de virar `false` silencioso.
+Todo campo de env que governa controle de segurança exige teste do caminho **com valor
+fornecido** (incluindo string vazia), não só do default.
+**Validade:** enquanto o backend validar env com Zod em `src/config/env.ts`.
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
 ## [Exploração] Repos symlinkados não são atravessados por varredura ingênua
 
 **Erro:** o `product-analyst`, na forja do BRIEF-001, afirmou que os diretórios de

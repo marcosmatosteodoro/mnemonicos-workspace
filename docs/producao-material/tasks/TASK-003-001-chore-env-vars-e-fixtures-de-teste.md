@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -27,10 +27,10 @@ DEC-003-009 / COMP-003-001: cookies, TTLs, parâmetros de Argon2id e credenciais
 ## Escopo
 
 ### Inclui
-- `mnemonicos-backend/src/config/env.ts` — acrescenta ao `envSchema`, com os defaults verbatim de COMP-003-001: `COOKIE_SECURE` (`z.coerce.boolean()` default = `isProduction`), `SEED_ADMIN_EMAIL` (`z.string().email().optional()`), `SEED_ADMIN_PASSWORD` (`z.string().min(12).optional()`), `AUTH_ACCESS_TTL_MINUTES` (`z.coerce.number().int().positive().default(15)`), `AUTH_REFRESH_TTL_DAYS` (`.default(7)`), `AUTH_REFRESH_GRACE_SECONDS` (`z.coerce.number().int().nonnegative().default(10)`), `ARGON2_MEMORY_KIB` (`.default(19456)`), `ARGON2_TIME_COST` (`.default(2)`), `ARGON2_PARALLELISM` (`.default(1)`).
+- `mnemonicos-backend/src/config/env.ts` — acrescenta ao `envSchema`, com os defaults de COMP-003-001 **salvo a errata do gate da Wave 1**: `COOKIE_SECURE` (`z.enum(['true','false']).default(NODE_ENV==='production'?'true':'false').transform(v => v === 'true')` — **nunca** `z.coerce.boolean()`, que é fail-open: perfil §6.4), `SEED_ADMIN_EMAIL` (`z.email().optional()` — Zod 4, §11), `SEED_ADMIN_PASSWORD` (`z.string().min(12).optional()`), `AUTH_ACCESS_TTL_MINUTES` (`z.coerce.number().int().positive().default(15)`), `AUTH_REFRESH_TTL_DAYS` (`.default(7)`), `AUTH_REFRESH_GRACE_SECONDS` (`z.coerce.number().int().nonnegative().default(10)`), `ARGON2_MEMORY_KIB` (`.default(19456)`), `ARGON2_TIME_COST` (`.default(2)`), `ARGON2_PARALLELISM` (`.default(1)`).
 - `mnemonicos-backend/.env.example` — cada uma das 9 chaves com placeholder e comentário; nota de que `JWT_EXPIRES_IN` passa a ser config morta após a DEC-003-002 (TRISK-003-006).
 - `mnemonicos-backend/tests/setup-env.ts` — valores fictícios para as chaves novas obrigatórias-por-default (as `.optional()` podem ficar ausentes).
-- `mnemonicos-backend/src/lib/logger.ts` — acrescenta `SEED_ADMIN_PASSWORD` a `redact.paths` (defesa em profundidade).
+- `mnemonicos-backend/src/lib/logger.ts` — `redact.paths` ganha `SEED_ADMIN_PASSWORD` **e as variantes de um nível** `*.JWT_SECRET`, `*.DATABASE_URL`, `*.SEED_ADMIN_PASSWORD`, `*.accessTokenHash`, `*.refreshTokenHash` (o wildcard do pino cobre só um nível — gate 8 da Wave 1).
 
 ### Não inclui
 - Consumo das chaves (`password.ts`/`tokens.ts` — TASK-003-003; opções de cookie — TASK-003-009; seed — TASK-003-012).
@@ -67,26 +67,31 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-28T15:33:00-03:00
+**Data conclusão**: 2026-08-28T20:37:00-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: b0c85e1 · 6c60682 (retry)
 **Jira**: KAN-11
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — Wave 1, sobre o diff acumulado + delta do retry
+**Tentativas**: 2
+**Cobertura final**: n/a (chore de config)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/config/env.ts
+  - mnemonicos-backend/src/lib/logger.ts
+  - mnemonicos-backend/tests/setup-env.ts
+  - mnemonicos-backend/.env.example
+  - mnemonicos-backend/tests/unit/env.test.ts
+  - mnemonicos-backend/tests/unit/logger.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — backend 30/30 (5 suítes)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — code-reviewer, re-review do delta APROVADO
+- [x] ACs verificados — cobertura por critério de pronto (chore, sem AC); crítérios executáveis de COOKIE_SECURE (4 ramos, inclusive '' e inválido sem eco) e redação aninhada do pino provados
+- [x] Segurança (gate 8): aprovado (Wave 1) — security-engineer, re-review do delta APROVADO (achado alta COOKIE_SECURE fail-open resolvido)
+- [x] Comportamento (gate 9): n/a — config de ambiente, sem efeito observável de comportamento (qa)
 
-**Notas**: 
+**Notas**: Retry pelo gate 8+6 da Wave 1: `z.coerce.boolean()` (fail-open) → `z.enum(['true','false']).transform(...)`; `z.email()` (Zod 4); `redact.paths` ganhou as variantes de um nível (`*.JWT_SECRET`/`*.DATABASE_URL`/`*.SEED_ADMIN_PASSWORD`/`*.accessTokenHash`/`*.refreshTokenHash`); casos de teste com valor fornecido e prova de redação aninhada. Lição registrada em guidelines/project/lessons.md + node-22.md §6.4 (pendente de merge). O `Escopo > Inclui` foi realinhado à errata do PLAN.

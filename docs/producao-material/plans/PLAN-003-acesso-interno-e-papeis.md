@@ -67,7 +67,7 @@
 
 F1 liga, pela primeira vez, o modelo `User` e o segredo de sessão que já existem no schema/config a um fluxo de acesso. Três blocos:
 
-1. **Autenticação de sessão (FEAT-002-001).** Módulo `src/modules/auth/`. A credencial de acesso é um **token opaco** de 256 bits em cookie `httpOnly` (`mnemo_access`); um **token de renovação** opaco (cookie `mnemo_refresh`, escopado a `/api/v1/auth`) troca a credencial expirada por uma nova com rotação por família. Ambos são persistidos apenas como hash SHA-256 com pepper numa tabela nova `Session`. A decisão de rotacionar / responder idempotente (janela de graça) / revogar a família (reuso) é uma **função pura sem I/O que recebe `now`** (`session-rotation.ts`), espelhando `scheduler.ts`. Login tem freio de taxa dedicado por chave composta (conta + origem). Todos os eventos (sucesso, falha, bloqueio temporário, decisão de autorização) passam por um emissor de auditoria estruturado sem dado sensível.
+1. **Autenticação de sessão (FEAT-002-001).** Módulo `src/modules/auth/`. A credencial de acesso é um **token opaco** de 256 bits em cookie `httpOnly` (`mnemo_access`); um **token de renovação** opaco (cookie `mnemo_refresh`, escopado a `/api/v1/auth`) troca a credencial expirada por uma nova com rotação por família. Ambos são persistidos apenas como HMAC-SHA256 com pepper (`JWT_SECRET` como chave) numa tabela nova `Session`. A decisão de rotacionar / responder idempotente (janela de graça) / revogar a família (reuso) é uma **função pura sem I/O que recebe `now`** (`session-rotation.ts`), espelhando `scheduler.ts`. Login tem freio de taxa dedicado por chave composta (conta + origem). Todos os eventos (sucesso, falha, bloqueio temporário, decisão de autorização) passam por um emissor de auditoria estruturado sem dado sensível.
 
 2. **Autorização deny-by-default (FEAT-002-002).** `requireAuth` é montado em `apiRoutes` **antes** de qualquer router de módulo, com uma allowlist pública curta por caminho exato (`/health`, `/health/db`, `/auth/login`, `/auth/refresh`). Todo o resto — inclusive `/disciplines` (A-002-019) — exige sessão válida resolvida a cada requisição (consulta indexada por hash de token, confere expiração/revogação e `disabledAt IS NULL`). Resolvida a sessão, o servidor consulta um **registro central de papéis por rota** (`ROUTE_ROLES`): caminho não declarado (nem público) → 403, **mesmo com sessão válida**. Toda rota não-pública declara seu conjunto de papéis via `requireRole(...)` — `requireRole('ADMIN')` nos routers de gestão, `requireRole('EDITOR','ADMIN')` nas rotas apenas autenticadas (`/disciplines`, `/auth/me`, `/auth/logout`, `/auth/change-password`); `STUDENT` fica fora de toda declaração (A-002-015). Uma suíte de integração enumera as rotas montadas e prova 401 sem sessão / 403 com papel insuficiente ou não-declarado para cada uma — é a **fonte de medição** da métrica §1.3.
 
@@ -98,7 +98,8 @@ F1 liga, pela primeira vez, o modelo `User` e o segredo de sessão que já exist
 ### COMP-003-001: Extensão de `src/config/env.ts`
 **Responsabilidade**: declarar e validar (Zod, no boot — *fail fast*) as novas variáveis de ambiente da fatia; nenhuma se torna segredo em log. É insumo de configuração para os componentes de auth, seed e cookie — não decide regra de negócio.
 **Realiza**: nenhum
-**Interface pública**: acrescenta ao `envSchema` — `COOKIE_SECURE` (`z.coerce.boolean()` com default = `isProduction`), `SEED_ADMIN_EMAIL` (`z.string().email().optional()`), `SEED_ADMIN_PASSWORD` (`z.string().min(12).optional()`), `AUTH_ACCESS_TTL_MINUTES` (`z.coerce.number().int().positive().default(15)`), `AUTH_REFRESH_TTL_DAYS` (`z.coerce.number().int().positive().default(7)`), `AUTH_REFRESH_GRACE_SECONDS` (`z.coerce.number().int().nonnegative().default(10)`), `ARGON2_MEMORY_KIB` (`.default(19456)`), `ARGON2_TIME_COST` (`.default(2)`), `ARGON2_PARALLELISM` (`.default(1)`). `.env.example` ganha cada chave com placeholder e comentário. `JWT_SECRET` permanece (vira pepper — DEC-003-002); `JWT_EXPIRES_IN` fica como config morta (TRISK-003-006). Acrescenta `SEED_ADMIN_PASSWORD` ao `redact.paths` de `src/lib/logger.ts` (defesa em profundidade).
+<!-- ERRATA (gate 8 + 6 da Wave 1, 2026-08-28): `COOKIE_SECURE` NÃO usa `z.coerce.boolean()` — coage `"false"`/`"0"` para `true` e `""` para `false` sem aplicar o default (fail-open em produção; perfil §6.4). Forma correta: `z.enum(['true','false']).default(NODE_ENV==='production'?'true':'false').transform(v => v === 'true')`. E-mail: `z.email()` (Zod 4, §11). -->
+**Interface pública**: acrescenta ao `envSchema` — `COOKIE_SECURE` (`z.enum(['true','false']).default(<'true' em produção, senão 'false'>).transform(v => v === 'true')` — nunca `z.coerce.boolean()`), `SEED_ADMIN_EMAIL` (`z.email().optional()`), `SEED_ADMIN_PASSWORD` (`z.string().min(12).optional()`), `AUTH_ACCESS_TTL_MINUTES` (`z.coerce.number().int().positive().default(15)`), `AUTH_REFRESH_TTL_DAYS` (`z.coerce.number().int().positive().default(7)`), `AUTH_REFRESH_GRACE_SECONDS` (`z.coerce.number().int().nonnegative().default(10)`), `ARGON2_MEMORY_KIB` (`.default(19456)`), `ARGON2_TIME_COST` (`.default(2)`), `ARGON2_PARALLELISM` (`.default(1)`). `.env.example` ganha cada chave com placeholder e comentário. `JWT_SECRET` permanece (vira pepper — DEC-003-002); `JWT_EXPIRES_IN` fica como config morta (TRISK-003-006). Acrescenta `SEED_ADMIN_PASSWORD` ao `redact.paths` de `src/lib/logger.ts` (defesa em profundidade).
 **Dependências**: nenhuma
 
 ### COMP-003-002: Schema Prisma + migração `add_session_and_user_disabled`
@@ -116,7 +117,7 @@ F1 liga, pela primeira vez, o modelo `User` e o segredo de sessão que já exist
 ### COMP-003-004: `src/lib/tokens.ts`
 **Responsabilidade**: gerar tokens opacos de alta entropia e compará-los em tempo constante via hash com pepper — o valor em claro nunca é persistido (RISK-002-002). Infra criptográfica consumida pelo service de sessão.
 **Realiza**: nenhum
-**Interface pública**: `generateToken(): string` (`crypto.randomBytes(32)` → base64url), `hashToken(token: string): string` (`sha256(token + env.JWT_SECRET)` — pepper; SHA-256 basta, token já é alta entropia), `tokensMatch(token: string, storedHash: string): boolean` (`crypto.timingSafeEqual` sobre os buffers de hash de mesmo tamanho). `Math.random()` proibido.
+**Interface pública**: `generateToken(): string` (`crypto.randomBytes(32)` → base64url), `hashToken(token: string): string` = `crypto.createHmac('sha256', env.JWT_SECRET).update(token).digest('base64url')` (**HMAC-SHA256** com o pepper como chave — nunca `sha256(token + pepper)`, que é a construção que o HMAC existe para substituir; errata do gate da Wave 1), `tokensMatch(token: string, storedHash: string): boolean` (`crypto.timingSafeEqual` sobre os buffers de hash de mesmo tamanho). `Math.random()` proibido.
 **Dependências**: COMP-003-001
 
 ### COMP-003-005: `src/lib/audit.ts`
@@ -306,7 +307,7 @@ model Session {
 
   familyId         String    // agrupa a cadeia de rotação de um mesmo login (Família de sessão)
 
-  accessTokenHash  String    @unique   // sha256(token + pepper) — nunca o token em claro
+  accessTokenHash  String    @unique   // HMAC-SHA256(token, pepper) — nunca o token em claro
   refreshTokenHash String    @unique
 
   accessExpiresAt  DateTime
@@ -325,7 +326,7 @@ model Session {
 }
 ```
 
-**Notas de modelagem.** Hash = SHA-256 com pepper (token é alta entropia — KDF lento é desnecessário); comparação por `crypto.timingSafeEqual` sobre buffers de hash. Detecção de reuso: `rotatedAt != null` **e** `now - rotatedAt > AUTH_REFRESH_GRACE_SECONDS` → revoga `WHERE familyId`. Revogação em massa por usuário (`WHERE userId`) cobre desativação, reset e troca de senha. `onDelete: Cascade` alinha com o resto do schema, ainda que a exclusão de `User` esteja fora de escopo (§4.2 da SPEC).
+**Notas de modelagem.** Hash de token = **HMAC-SHA256(token, `JWT_SECRET`)** (token é alta entropia — KDF lento é desnecessário; HMAC, nunca `sha256(token + pepper)`); comparação por `crypto.timingSafeEqual` sobre buffers de hash. Detecção de reuso: `rotatedAt != null` **e** `now - rotatedAt > AUTH_REFRESH_GRACE_SECONDS` → revoga `WHERE familyId`. Revogação em massa por usuário (`WHERE userId`) cobre desativação, reset e troca de senha. `onDelete: Cascade` alinha com o resto do schema, ainda que a exclusão de `User` esteja fora de escopo (§4.2 da SPEC).
 
 ## 6. Decisões arquiteturais
 
@@ -343,7 +344,7 @@ model Session {
 
 ### DEC-003-002: Credencial de acesso é token opaco com estado no servidor — não JWT
 **Contexto**: FR-002-007 exige rejeitar uma credencial ainda não expirada quando a sessão foi revogada ou a conta desativada. Isso força uma checagem de estado no servidor a cada requisição autenticada. O perfil §6.5 reconhece que "o desenho de rotação/revogação apropriado ao serverless ainda não existe neste projeto e precisa ser especificado".
-**Decisão**: o cookie de acesso carrega 256 bits de `crypto.randomBytes` (sem conteúdo interpretável). O middleware resolve a sessão por `hashToken` numa consulta indexada (`accessTokenHash @unique`), confere expiração/revogação, junta o `User`, confere `disabledAt IS NULL` e popula `req.auth`. `JWT_SECRET` permanece na `env` como **pepper** do hash de token (`sha256(token + JWT_SECRET)`).
+**Decisão**: o cookie de acesso carrega 256 bits de `crypto.randomBytes` (sem conteúdo interpretável). O middleware resolve a sessão por `hashToken` numa consulta indexada (`accessTokenHash @unique`), confere expiração/revogação, junta o `User`, confere `disabledAt IS NULL` e popula `req.auth`. `JWT_SECRET` permanece na `env` como **pepper** (chave do HMAC) do hash de token (`HMAC-SHA256(token, JWT_SECRET)`).
 **Alternativas consideradas**:
 - JWT HS256 assinado com `JWT_SECRET`, `algorithms: ['HS256']` explícito, descartada porque a consulta de sessão por requisição já é inevitável (FR-002-007): o JWT então acrescenta superfície (confusão de `alg`, verificação de `exp`/`iss`/`aud`) e a dependência `jsonwebtoken`/`jose` **sem** remover a ida ao banco (custo: mais código e mais CVE potencial por zero ganho de statelessness).
 **Consequências**: uma consulta indexada por requisição autenticada (TRISK-003-003) — aceitável para equipe interna de dezenas de usuários. `JWT_EXPIRES_IN` deixa de ser usado (config morta — TRISK-003-006); remoção fora do escopo de F1. Logout e desativação passam a ser reais no servidor sem allowlist/denylist extra.
@@ -423,7 +424,7 @@ model Session {
 
 ### DEC-003-009: Novas variáveis em `src/config/env.ts` (Zod, no boot)
 **Contexto**: cookies, TTLs, parâmetros de Argon2id e credenciais de seed precisam ser configuráveis sem redeploy; o perfil §6.4 veda constante de segredo/config no código e `process.env` espalhado.
-**Decisão**: acrescentar ao `envSchema` as chaves listadas em COMP-003-001, todas com `default` defensável e validação Zod no boot (*fail fast*, só nomes no erro). Nenhuma vira segredo em log (o `redact` do pino cobre `authorization`/`cookie`/`password`/`token`; `SEED_ADMIN_PASSWORD` é acrescentado ao `redact.paths` por defesa em profundidade).
+**Decisão**: acrescentar ao `envSchema` as chaves listadas em COMP-003-001, todas com `default` defensável e validação Zod no boot (*fail fast*, só nomes no erro). **Booleano de env** (`COOKIE_SECURE`) usa `z.enum(['true','false']).transform(…)`, **nunca** `z.coerce.boolean()` (perfil §6.4 — errata do gate da Wave 1). Nenhuma vira segredo em log: além de `authorization`/`cookie`/`password`/`token`, o `redact.paths` do pino ganha as variantes de **um nível** (`*.JWT_SECRET`, `*.DATABASE_URL`, `*.SEED_ADMIN_PASSWORD`, `*.accessTokenHash`, `*.refreshTokenHash`) — o wildcard do pino cobre só um nível de aninhamento, e `log.info({ env })` / `log.info({ session })` são os caminhos reais de vazamento.
 **Alternativas consideradas**:
 - Constantes hardcoded no módulo de auth, descartada porque contraria §6.4 e impede ajuste sem deploy (custo: afinar o custo do Argon2id ou o TTL exigiria release).
 **Consequências**: `.env.example` cresce; `tests/setup-env.ts` ganha valores fictícios para as novas chaves obrigatórias-por-default.

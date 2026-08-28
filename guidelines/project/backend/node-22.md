@@ -425,6 +425,10 @@ pequeno, mas não nulo:
   O erro cita **nomes** de variável, jamais valores.
 - `process.env.X` espalhado pelo código é proibido: importa-se `env` do módulo de config.
   Assim o typecheck garante que a variável existe e o valor já veio coagido/validado.
+- **Booleano de env nunca usa `z.coerce.boolean()`** (= `Boolean(input)`: `"false"`/`"0"` → `true`,
+  `""` → `false` sem aplicar o `.default()`). Use `z.enum(['true','false']).default(<…>).transform(v => v === 'true')`
+  — valor inválido derruba o boot. Campo de env que governa controle de segurança exige teste
+  do caminho **com valor fornecido** (inclusive string vazia), não só do default. (lição da Wave 1 de PLAN-003)
 - `.env` **no `.gitignore`**; `.env.example` só com **placeholders**. Segredo nunca em
   fonte, em log, em mensagem de erro, em query string nem em comentário. Rotacione o valor
   que vazar — remover do histórico não desvaza.

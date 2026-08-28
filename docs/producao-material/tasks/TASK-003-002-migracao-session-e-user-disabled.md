@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 **Data início**: 2026-08-28T15:58:39-03:00
 
 ## Convenções (do projeto)
@@ -71,26 +71,27 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-28T15:58:00-03:00
+**Data conclusão**: 2026-08-28T20:37:00-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: fb2e55b · 7ccad5c (retry)
 **Jira**: KAN-12
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — Wave 1, sobre o diff acumulado + delta do retry
+**Tentativas**: 2
+**Cobertura final**: n/a (substrato de dados)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/prisma/schema.prisma
+  - mnemonicos-backend/prisma/migrations/20260828190018_add_session_and_user_disabled/migration.sql
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — backend 30/30 (não regride)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — code-reviewer, re-review do delta APROVADO
+- [x] ACs verificados — sem AC (Realiza: nenhuma); critérios de pronto: `prisma validate` OK, sem drift, migração aditiva no diff, enum UserRole intocado. **Critério do `@unique` de Session adiado para TASK-003-016 (Wave 2)** — adiamento declarado, não silencioso
+- [x] Segurança (gate 8): aprovado (Wave 1) — security-engineer: migração 100% aditiva, FK CASCADE coerente, só hashes na Session; comentário reescrito para HMAC-SHA256
+- [x] Comportamento (gate 9): n/a — migração/schema, sem efeito observável (qa)
 
-**Notas**: 
+**Notas**: Retry pelo gate 8 da Wave 1: comentário normativo do hash de token `sha256(token+pepper)` → `HMAC-SHA256(token, pepper)`. O contrato foi propagado para PLAN-003 COMP-003-004/§5/DEC-003-002 e TASK-003-003 (errata, pendente de merge). O teste de constraint `@unique` roda em TASK-003-016.

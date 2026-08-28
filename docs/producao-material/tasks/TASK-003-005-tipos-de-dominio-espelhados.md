@@ -7,7 +7,8 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
+**Data início**: 2026-08-28T16:05:00-03:00
 
 ## Convenções (do projeto)
 
@@ -67,26 +68,29 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-28T16:05:00-03:00
+**Data conclusão**: 2026-08-28T20:37:00-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 7506770 · 46a1d5f (be) · 9c02a63 · e783f1e (fe)
 **Jira**: KAN-15
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — Wave 1, sobre o diff acumulado + delta do retry
+**Tentativas**: 2
+**Cobertura final**: n/a
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/domain/types.ts
+  - mnemonicos-backend/tests/unit/domain-types-parity.test.ts
+  - mnemonicos-frontend/src/types/domain.ts
+  - mnemonicos-frontend/tests/types/domain.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — backend 30/30 · frontend 9/9
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — code-reviewer, re-review do delta APROVADO
+- [x] ACs verificados — AC-002-025 (paridade de papéis entre os repos) — teste de paridade no backend + teste no repo frontend que falha sozinho se o espelho divergir (USER_ROLES via jest, forma de SessionUser via tsc)
+- [x] Segurança (gate 8): aprovado (Wave 1) — security-engineer: projeção SessionUser fail-closed (sem passwordHash/token/disabledAt no bundle)
+- [x] Comportamento (gate 9): n/a — tipos de domínio, sem efeito observável (qa)
 
-**Notas**: 
+**Notas**: Retry pelo gate 1/6 da Wave 1: o espelho não tinha rede na suíte do próprio repo frontend → `mnemonicos-frontend/tests/types/domain.test.ts` novo (falsificável sem checkout do backend); `domain-types-parity.test.ts` do backend troca ENOENT cru por erro explicativo. Docblock do teste frontend nomeia o typecheck como oráculo da forma de SessionUser (ajuste menor pendente, não-bloqueante).
