@@ -83,3 +83,4 @@ regra "revisor ≠ autor" (A-010), que precisa de 2+ pessoas com conta.
 
 - Largada (Etapa 0.5): 2026-08-28T10:10:08-0300
 - Etapa 1 (SPEC-002 `Approved`): 2026-08-28T10:41:00-0300
+- Etapa 2 (PLAN-003 `Approved`): 2026-08-28T11:06:00-0300
