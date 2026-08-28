@@ -3,12 +3,12 @@
     "backend": {
       "lang": "node",
       "version": "22",
-      "file": "plugin:backend/none.md"
+      "file": "guidelines/project/backend/node-22.md"
     },
     "frontend": {
       "lang": "next",
       "version": "16",
-      "file": "plugin:frontend/none.md"
+      "file": "guidelines/project/frontend/next-16.md"
     }
   },
   "codePaths": {
