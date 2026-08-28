@@ -1,7 +1,8 @@
 # BRIEF-001: Fábrica interna do material mnemônico
 
 **Slug**: producao-material
-**Status**: pronto
+**Status**: decomposto
+**Épico**: docs/producao-material/briefs/BRIEF-2026-08-27-mnemora-studio-epic.md
 **Data**: 2026-08-23
 **Origem** (versionada, só-leitura — a forja nunca a edita):
 - `docs/producao-material/origin/TAP_Projeto_Material_Mnemonico_Alta_Retencao.pdf` — TAP v1.0, 23/08/2026, status "APROVADO PARA DESENVOLVIMENTO DO MVP" (§9.6).

@@ -62,7 +62,7 @@
     "branchNaming": "slug"
   },
   "jira": {
-    "enabled": false,
+    "enabled": true,
     "telemetry": false,
     "estimate": false,
     "site": "https://mp-consultoria.atlassian.net/",
@@ -70,10 +70,10 @@
     "projectKey": "KAN",
     "mode": "create",
     "issueType": {
-      "spec": null,
-      "feature": null,
-      "task": null,
-      "standalone": null
+      "spec": "10006",
+      "feature": "10009",
+      "task": "10007",
+      "standalone": "10008"
     },
     "epicPolicy": "multi-feature",
     "standaloneParent": null,

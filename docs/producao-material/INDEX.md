@@ -4,7 +4,8 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-08-23T18:57:28-03:00
+**Última atualização**: 2026-08-27T00:00:00-03:00
+**Mapa do território**: MAP.md
 
 ## Resumo
 
@@ -22,7 +23,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 (vazio até /keelson:plan)
 
 ### Especificadas, ainda não planejadas
-(vazio até /keelson:specify — BRIEF-001 está `pronto`, aguardando decomposição em fatias)
+(vazio até /keelson:specify — épico decomposto em 11 fatias via BRIEF-2026-08-27-mnemora-studio-epic; nenhum ciclo largado ainda)
 
 ## SPECs
 
@@ -63,3 +64,4 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 - 2026-08-23 16:55: forja do BRIEF-001 encerrada aguardando produto via /keelson:brief
 - 2026-08-23 18:57: parecer de produto mapeado (Q-06 a Q-09 respondidas); BRIEF-001 promovido a `pronto` via /keelson:brief
+- 2026-08-27: épico decomposto em 11 demandas via /keelson:specify-epic (BRIEF-2026-08-27-mnemora-studio-epic); BRIEF-001 promovido a `decomposto`; MAP.md semeado

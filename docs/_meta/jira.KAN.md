@@ -12,28 +12,14 @@ que não entra está em [README.md](README.md).
 | `projectKey` | `KAN` | Segmento `/projects/KAN/` da URL |
 | `boardId` | `2` | Segmento `/boards/2` da URL |
 
-O `cloudId` veio de uma resolução hostname → cloudId feita pela própria API da Atlassian,
-mas **nenhum dado do projeto foi lido ainda**: o conector desta máquina não tem grant para
-este site (`isn't explicitly granted by the user`). Confirme-o na primeira sessão
-autorizada, com `getAccessibleAtlassianResources`.
+O `cloudId` foi confirmado por `getAccessibleAtlassianResources` em 2026-08-27 — único
+site retornado, bate exatamente com o valor acima. Projeto `KAN` (id `10001`, nome
+"Mnemonicos") confirmado visível nesse cloudId na mesma sessão.
 
-## 🔴 Pendente de medição — sem isto o sync não funciona
+## ✅ `issueType` medido (2026-08-27)
 
-`jira.enabled` está **`false`** na ficha, e é o estado correto: o sync é *best-effort* e
-não bloqueia o ciclo, então config incompleta produz **falha silenciosa a cada gancho** —
-o pior dos dois mundos, porque parece ligado.
-
-### 1. Autorizar o conector para este site
-
-Na máquina dedicada, `/mcp` numa sessão interativa do Claude Code e concluir o OAuth **na
-conta que enxerga `mp-consultoria`**. Prova de que funcionou:
-
-```
-mcp__atlassian__getAccessibleAtlassianResources
-→ deve listar mp-consultoria.atlassian.net com o cloudId acima
-```
-
-### 2. Medir os ids de `issueType`
+`jira.enabled` está **`true`** na ficha desde 2026-08-27, com os quatro papéis preenchidos
+a partir do `createmeta` real do projeto (nunca fixados de cabeça):
 
 ```
 mcp__atlassian__getJiraProjectIssueTypesMetadata
@@ -41,25 +27,23 @@ mcp__atlassian__getJiraProjectIssueTypesMetadata
   projectIdOrKey: KAN
 ```
 
-Mapear os quatro papéis da ficha para os ids devolvidos:
+| Papel na ficha | O que é no ciclo | Tipo medido (pt-BR / en) | Id | hierarchyLevel |
+| --- | --- | --- | --- | --- |
+| `spec` | Épico da SPEC (2+ funcionalidades) | Epic | `10006` | 1 |
+| `feature` | História por funcionalidade | História / Story | `10009` | 0 |
+| `task` | Subtarefa por TASK | Subtask | `10007` | -1 |
+| `standalone` | Brief avulso (mudança pontual) | Tarefa / Task | `10008` | 0 |
 
-| Papel na ficha | O que é no ciclo | Tipo esperado | Id |
-| --- | --- | --- | --- |
-| `spec` | Épico da SPEC (2+ funcionalidades) | Epic | *a medir* |
-| `feature` | História por funcionalidade | Story | *a medir* |
-| `task` | Subtarefa por TASK | Subtask | *a medir* |
-| `standalone` | Brief avulso (mudança pontual) | Task | *a medir* |
+⚠️ `KAN` é *team-managed* (next-gen) — estes ids são **escopados a este projeto**; não
+reaproveitar em outro projeto do mesmo site, mesmo com o mesmo nome de tipo.
 
-**Leia o nome no `createmeta`, nunca fixe o literal** — o mesmo papel tem nomes diferentes
-entre instâncias, e em projeto pt-BR os nomes vêm traduzidos.
+**Epic-raiz criado**: `KAN-6` — "MNEMORA STUDIO — fábrica interna do material mnemônico",
+via `/keelson:specify-epic` (BRIEF-2026-08-27-mnemora-studio-epic.md, slug
+`producao-material`). https://mp-consultoria.atlassian.net/browse/KAN-6
 
-⚠️ `KAN` é a key default do template **Kanban**, que normalmente nasce *team-managed*
-(next-gen). Nesses projetos os ids de tipo são **escopados ao projeto** — não reaproveite
-id visto em outro projeto do mesmo site. Confirme também que Epic existe como tipo próprio:
-sem Epic, `epicPolicy: multi-feature` não tem onde pendurar a SPEC, e a decisão passa a ser
-usar `standaloneParent` ou mudar a política.
+## 🔴 Ainda pendente de medição
 
-### 3. Medir as transições
+### 1. Medir as transições
 
 Os ids de transição **têm de ser medidos card a card**, nunca deduzidos do nome da coluna:
 instância com validator ou post-function recusa transição que "deveria" funcionar.
