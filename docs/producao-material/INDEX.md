@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-08-28T11:05:00-03:00
+**Última atualização**: 2026-08-28T11:35:00-03:00
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -39,7 +39,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 | ID | Cobre | FRs cobertos | Tasks | Status |
 |----|-------|--------------|-------|--------|
-| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 0/? ⏸ | Approved |
+| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 0/15 ⏸ | Approved |
 
 ## Glossário consolidado
 
@@ -85,3 +85,5 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 - 2026-08-28: sync Jira (gancho specify, SPEC-002) — issues KAN-7 (Epic) + 3 stories KAN-8/KAN-9/KAN-10; Epic KAN-7 vinculado a KAN-6 por "relates" (parent Epic▸Epic recusado no projeto team-managed KAN)
 - 2026-08-28: SPEC-002 (Acesso interno e papéis de produção, F1 do épico) criada e promovida a `Approved` via /keelson:specify — 3 FEATs, 24 FRs, 29 ACs; PO ESCALOU 1 ponto (troca da própria senha) resolvido pelo default, veto pendente na Entrega
 - 2026-08-28: PLAN-003 criado e promovido a `Approved` via /keelson:plan — 24 componentes, 12 DECs (todas reversíveis), 6 TRISKs; token opaco com estado no servidor (não JWT), model Session com rotação por família, Argon2id via @node-rs/argon2, deny-by-default na montagem
+- 2026-08-28: PLAN-003 decomposto em 15 TASKs / 7 waves via /keelson:tasks; sync Jira (gancho tasks) — 15 sub-tasks KAN-11..KAN-25 sob KAN-8/KAN-9/KAN-10
+- 2026-08-28: Etapa 3.5 (verificabilidade pré-código) — qa pré-código resolvido (18 achados); PO fixou deny-by-default "por papel" (leitura B): DEC-003-005 emendada com registro central ROUTE_ROLES (rota sem declaração nega 403 mesmo com sessão válida) — custo adicional de F1 pendente de veto do Diretor na entrega

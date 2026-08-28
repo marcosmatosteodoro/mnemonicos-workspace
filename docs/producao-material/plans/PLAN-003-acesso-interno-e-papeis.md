@@ -69,7 +69,7 @@ F1 liga, pela primeira vez, o modelo `User` e o segredo de sessão que já exist
 
 1. **Autenticação de sessão (FEAT-002-001).** Módulo `src/modules/auth/`. A credencial de acesso é um **token opaco** de 256 bits em cookie `httpOnly` (`mnemo_access`); um **token de renovação** opaco (cookie `mnemo_refresh`, escopado a `/api/v1/auth`) troca a credencial expirada por uma nova com rotação por família. Ambos são persistidos apenas como hash SHA-256 com pepper numa tabela nova `Session`. A decisão de rotacionar / responder idempotente (janela de graça) / revogar a família (reuso) é uma **função pura sem I/O que recebe `now`** (`session-rotation.ts`), espelhando `scheduler.ts`. Login tem freio de taxa dedicado por chave composta (conta + origem). Todos os eventos (sucesso, falha, bloqueio temporário, decisão de autorização) passam por um emissor de auditoria estruturado sem dado sensível.
 
-2. **Autorização deny-by-default (FEAT-002-002).** `requireAuth` é montado em `apiRoutes` **antes** de qualquer router de módulo, com uma allowlist pública curta por caminho exato (`/health`, `/health/db`, `/auth/login`, `/auth/refresh`). Todo o resto — inclusive `/disciplines` (A-002-019) — exige sessão válida resolvida a cada requisição (consulta indexada por hash de token, confere expiração/revogação e `disabledAt IS NULL`). `requireRole('ADMIN')` restringe os routers de gestão. Uma suíte de integração enumera as rotas montadas e prova 401 sem sessão / 403 com papel insuficiente para cada uma — é a **fonte de medição** da métrica §1.3.
+2. **Autorização deny-by-default (FEAT-002-002).** `requireAuth` é montado em `apiRoutes` **antes** de qualquer router de módulo, com uma allowlist pública curta por caminho exato (`/health`, `/health/db`, `/auth/login`, `/auth/refresh`). Todo o resto — inclusive `/disciplines` (A-002-019) — exige sessão válida resolvida a cada requisição (consulta indexada por hash de token, confere expiração/revogação e `disabledAt IS NULL`). Resolvida a sessão, o servidor consulta um **registro central de papéis por rota** (`ROUTE_ROLES`): caminho não declarado (nem público) → 403, **mesmo com sessão válida**. Toda rota não-pública declara seu conjunto de papéis via `requireRole(...)` — `requireRole('ADMIN')` nos routers de gestão, `requireRole('EDITOR','ADMIN')` nas rotas apenas autenticadas (`/disciplines`, `/auth/me`, `/auth/logout`, `/auth/change-password`); `STUDENT` fica fora de toda declaração (A-002-015). Uma suíte de integração enumera as rotas montadas e prova 401 sem sessão / 403 com papel insuficiente ou não-declarado para cada uma — é a **fonte de medição** da métrica §1.3.
 
 3. **Provisionamento de contas (FEAT-002-003).** Módulo `src/modules/users/` sob `requireRole('ADMIN')`: criar (papel fixado na criação, `EDITOR` ou `ADMIN`), listar (sem material de senha/token), desativar (marca temporal reversível + revoga sessões + bloqueia autenticação; recusa se zerar ADMINs ativos) e resetar senha (+ revoga sessões). O primeiro ADMIN nasce do `prisma/seed.ts`, a partir de `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD`, sem senha embutida.
 
@@ -128,7 +128,7 @@ F1 liga, pela primeira vez, o modelo `User` e o segredo de sessão que já exist
 ### COMP-003-006: `src/modules/auth/session-rotation.ts`
 **Responsabilidade**: lógica pura sem I/O que, dada a linha de sessão encontrada e `now`, decide o desfecho de uma renovação — rotacionar, responder idempotente na janela de graça, revogar a família por reuso, ou recusar por expiração absoluta. Espelho de `src/modules/review/scheduler.ts`, testável em `tests/unit/`.
 **Realiza**: FR-002-003, FR-002-004, FR-002-005
-**Interface pública**: `decideRefresh(session: SessionRow, now: Date, graceSeconds: number): RefreshDecision`, onde `RefreshDecision` é união discriminada: `{ kind: 'rotate' }` | `{ kind: 'replay-grace' }` (reapresentação dentro da graça → reemitir cookies do sucessor) | `{ kind: 'reuse' }` (token já rotacionado além da graça, ou `revokedAt` setado → revogar família) | `{ kind: 'expired' }` (`refreshExpiresAt < now`). Não toca banco, não lê relógio.
+**Interface pública**: `decideRefresh(session: SessionRow, now: Date, graceSeconds: number): RefreshDecision`, onde `RefreshDecision` é união discriminada: `{ kind: 'rotate' }` | `{ kind: 'replay-grace' }` (reapresentação dentro da graça → reemitir cookies do sucessor) | `{ kind: 'reuse' }` (token já rotacionado além da graça, ou `revokedAt` setado → revogar família) | `{ kind: 'expired' }` (`refreshExpiresAt < now`). Ordem de avaliação dos ramos: **expired → reuse → replay-grace → rotate** (ramos coincidentes seguem essa precedência — expiração absoluta vence a graça). Não toca banco, não lê relógio.
 **Dependências**: nenhuma
 
 ### COMP-003-007: `src/modules/auth/auth.schema.ts`
@@ -143,9 +143,9 @@ F1 liga, pela primeira vez, o modelo `User` e o segredo de sessão que já exist
 **Interface pública** (funções, não classe — §4 do perfil):
 - `login(input: { email; password; ip; userAgent? }): Promise<IssuedSession>` — resolve `User` por e-mail; `verifyPassword`; recusa com `UnauthorizedError` genérico se usuário inexistente **ou** senha errada **ou** `disabledAt != null` (mensagem única — enumeração de contas); em sucesso cria 1 `Session` (`familyId` novo, access+refresh) e registra auditoria de sucesso; em falha, auditoria de falha sem senha/token.
 - `resolveAccessSession(accessToken: string, now: Date): Promise<AuthContext | null>` — busca por `accessTokenHash` (índice único), confere `accessExpiresAt`, `revokedAt IS NULL`, junta `User`, confere `user.disabledAt IS NULL`; devolve `{ userId, role, sessionId }` ou `null`. É o que o middleware chama a cada requisição.
-- `refresh(refreshToken: string, now: Date): Promise<IssuedSession>` — acha a linha por `refreshTokenHash`; delega a `decideRefresh` (COMP-003-006); em `rotate` marca `rotatedAt = now` na linha atual e cria sucessora no mesmo `familyId` **em transação** (`prisma.$transaction`); em `replay-grace` reemite os cookies do sucessor já criado (idempotente); em `reuse` faz `revokedAt = now WHERE familyId` e lança `UnauthorizedError`; em `expired` lança `UnauthorizedError`.
-- `logout(refreshToken: string): Promise<void>` — `revokedAt = now WHERE familyId`; auditoria.
-- `changeOwnPassword(userId, input): Promise<void>` — `verifyPassword` da senha atual (erro → `UnauthorizedError`, sem alterar); `hashPassword` da nova; `revokedAt = now WHERE userId AND id != sessionAtual` (revoga as demais).
+- `refresh(refreshToken: string, now: Date): Promise<IssuedSession>` — acha a linha por `refreshTokenHash`; delega a `decideRefresh` (COMP-003-006); em `rotate` marca `rotatedAt = now` na linha atual e cria sucessora no mesmo `familyId` **em transação** (`prisma.$transaction`); em `replay-grace` reemite os cookies do sucessor já criado (idempotente); em `reuse` faz `revokedAt = now WHERE familyId` e lança `UnauthorizedError`; em `expired` lança `UnauthorizedError`. Token ausente ou linha não encontrada → `UnauthorizedError` genérico (mesma `message` do login inválido), nunca exceção não tratada.
+- `logout(refreshToken: string): Promise<void>` — `revokedAt = now WHERE familyId`; auditoria. Token ausente → no-op silencioso (a rota limpa os cookies).
+- `changeOwnPassword(userId, input): Promise<void>` — `verifyPassword` da senha atual (erro → `UnauthorizedError`, sem alterar); `hashPassword` da nova; `revokedAt = now WHERE userId AND id != sessionAtual` (revoga as demais). `newPassword` igual à atual (e ≥ 12) é aceita — F1 não promete política de reuso de senha.
 - `revokeAllSessions(userId): Promise<void>` — usado por desativação e reset de senha (COMP-003-014).
 Nenhuma função devolve `passwordHash` nem valor de token.
 **Dependências**: COMP-003-002, COMP-003-003, COMP-003-004, COMP-003-005, COMP-003-006, COMP-003-017
@@ -162,22 +162,22 @@ Nenhuma função devolve `passwordHash` nem valor de token.
 **Interface pública**: `authRoutes: Router` —
 - `POST /auth/login` (público; precedido por `loginRateLimiters`) → `login`; em sucesso `res.cookie('mnemo_access', ...)` e `res.cookie('mnemo_refresh', ...)` com as flags da DEC-003-004; corpo de resposta = `SessionUser` (sem token).
 - `POST /auth/refresh` (público) → lê `mnemo_refresh` do cookie, `refresh`; reemite os dois cookies.
-- `POST /auth/logout` (protegido) → `logout`; `res.clearCookie` dos dois.
-- `POST /auth/change-password` (protegido) → `changeOwnPassword` (usa `req.auth`).
-- `GET /auth/me` (protegido) → devolve `SessionUser` da sessão corrente.
+- `POST /auth/logout` (protegido; `requireRole('EDITOR','ADMIN')`) → `logout`; `res.clearCookie` dos dois.
+- `POST /auth/change-password` (protegido; `requireRole('EDITOR','ADMIN')`) → `changeOwnPassword` (usa `req.auth`).
+- `GET /auth/me` (protegido; `requireRole('EDITOR','ADMIN')`) → devolve `SessionUser` da sessão corrente.
 Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificação de `Origin`/`Host` nas rotas POST (Route Handlers não herdam proteção CSRF).
 **Dependências**: COMP-003-001, COMP-003-007, COMP-003-008, COMP-003-009
 
 ### COMP-003-011: `src/http/middlewares/authenticate.ts`
-**Responsabilidade**: `requireAuth` — resolve a sessão a cada requisição no servidor e nega por padrão toda rota fora da allowlist pública; popula `req.auth` a partir da sessão verificada (identidade nunca do parâmetro de rota).
+**Responsabilidade**: `requireAuth` — resolve a sessão a cada requisição no servidor, nega por padrão toda rota fora da allowlist pública e, além disso, consulta `ROUTE_ROLES` e nega o caminho que não declara papel (ausente de `PUBLIC_PATH_ALLOWLIST` **e** de `ROUTE_ROLES` → `ForbiddenError`, com `return`), mesmo para sessão válida; popula `req.auth` a partir da sessão verificada (identidade nunca do parâmetro de rota).
 **Realiza**: FR-002-010, FR-002-012, NFR-002-002
-**Interface pública**: `requireAuth: RequestHandler` — se `req.path` ∈ allowlist (`/health`, `/health/db`, `/auth/login`, `/auth/refresh`) → `next()`; senão lê `mnemo_access`, chama `resolveAccessSession(token, new Date())`; `null` → `return next(new UnauthorizedError())` (o `return` é obrigatório — §6.3); sucesso → popula `req.auth = { userId, role, sessionId }` e `next()`. Falha na resolução nega (fail secure). Tipo `AuthContext` acrescentado à declaração de `Express.Request` (`src/http/express.d.ts` ou equivalente).
+**Interface pública**: `requireAuth: RequestHandler` — se `req.path` ∈ `PUBLIC_PATH_ALLOWLIST` (`/health`, `/health/db`, `/auth/login`, `/auth/refresh`) → `next()`; senão lê `mnemo_access`, chama `resolveAccessSession(token, new Date())`; `null` → `return next(new UnauthorizedError())` (o `return` é obrigatório — §6.3); sessão resolvida mas o padrão de rota **ausente de `ROUTE_ROLES`** → `return next(new ForbiddenError())` (falha fechada — DEC-003-005, mesmo com sessão válida); sucesso → popula `req.auth = { userId, role, sessionId }` e `next()`. Falha na resolução nega (fail secure). Tipo `AuthContext` acrescentado à declaração de `Express.Request` (`src/http/express.d.ts` ou equivalente).
 **Dependências**: COMP-003-005, COMP-003-008
 
 ### COMP-003-012: `src/http/middlewares/authorize.ts`
-**Responsabilidade**: `requireRole(...roles)` — restrição explícita por papel numa rota autenticada, com auditoria da negação e `return` obrigatório após `next(err)`.
+**Responsabilidade**: `requireRole(...roles)` — restrição explícita por papel numa rota autenticada **e forma canônica de declaração**: registra o conjunto de papéis do caminho em `ROUTE_ROLES` (consultado por COMP-003-011 para negar o não-declarado) além de aplicar a checagem 403, com auditoria da negação e `return` obrigatório após `next(err)`.
 **Realiza**: FR-002-011
-**Interface pública**: `requireRole(...roles: UserRole[]): RequestHandler` — sem `req.auth` → `return next(new UnauthorizedError())`; `req.auth.role` fora de `roles` → `recordAuthEvent({ type: 'authz.denied', ... })` e `return next(new ForbiddenError())`; senão `next()`. Sempre com `return` após `next(err)`.
+**Interface pública**: `requireRole(...roles: UserRole[]): RequestHandler` — no registro do router, grava `roles` em `ROUTE_ROLES` sob o caminho correspondente; em runtime: sem `req.auth` → `return next(new UnauthorizedError())`; `req.auth.role` fora de `roles` → `recordAuthEvent({ type: 'authz.denied', ... })` e `return next(new ForbiddenError())`; senão `next()`. Sempre com `return` após `next(err)`.
 **Dependências**: COMP-003-005
 
 ### COMP-003-013: `src/modules/users/users.schema.ts`
@@ -190,7 +190,7 @@ Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificaç
 **Responsabilidade**: regra + Prisma da gestão de contas internas — criar com papel fixado, recusar e-mail duplicado sem alterar a conta existente, listar sem material de senha/token, desativar de forma reversível com marca temporal e revogação de sessões, recusar a operação que zeraria os ADMINs ativos, resetar senha com revogação de sessões.
 **Realiza**: FR-002-014, FR-002-015, FR-002-017, FR-002-018, FR-002-019, FR-002-020
 **Interface pública**:
-- `createInternalUser(input): Promise<SessionUser>` — `hashPassword`; `prisma.user.create` com `data` montado campo a campo; e-mail duplicado (violação de unique) → `ConflictError`, sem alterar a conta existente.
+- `createInternalUser(input): Promise<SessionUser>` — `hashPassword`; `prisma.user.create` com `data` montado campo a campo; e-mail duplicado (violação de unique) → `ConflictError`, sem alterar a conta existente. A resposta é montada campo a campo (`select` explícito), nunca a entidade Prisma crua.
 - `listInternalUsers(query): Promise<Paginated<UserListItem>>` — `select` explícito: `id`, `email`, `name`, `role`, `disabledAt` → mapeado para `status: 'active' | 'disabled'`. **Nunca** `passwordHash` nem relação `sessions`.
 - `disableUser(id): Promise<void>` — se alvo é ADMIN e `count(role=ADMIN, disabledAt=null) <= 1` → `ConflictError` (último ADMIN, FR-002-019); senão `disabledAt = now` **e** `revokeAllSessions(id)` em transação.
 - `resetUserPassword(id, password): Promise<void>` — `hashPassword`; grava; `revokeAllSessions(id)`.
@@ -203,9 +203,9 @@ Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificaç
 **Dependências**: COMP-003-012, COMP-003-013, COMP-003-014
 
 ### COMP-003-016: Montagem em `src/http/routes.ts`
-**Responsabilidade**: ordem de montagem que realiza o deny-by-default — `requireAuth` montado antes dos routers protegidos e depois das rotas públicas, de modo que uma rota adicionada sem declaração de papel nasça negada (falha fechada).
+**Responsabilidade**: a ordem de montagem que realiza o deny-by-default — `requireAuth` montado antes dos routers protegidos e depois das rotas públicas — **e** a garantia de que todo router não-público aplica `requireRole(...)` (declara seus papéis em `ROUTE_ROLES`), de modo que uma rota adicionada sem declaração nasça negada (falha fechada). A realização de NFR-002-001 é **conjunta**: COMP-003-012 registra a declaração, COMP-003-011 nega o caminho não-declarado, COMP-003-016 garante que nenhum router não-público fica sem `requireRole`.
 **Realiza**: NFR-002-001
-**Interface pública**: `apiRoutes` passa a montar, nesta ordem — `healthRoutes` (público); as rotas públicas de `authRoutes` (`/auth/login`, `/auth/refresh`); `apiRoutes.use(requireAuth)`; então `authRoutes` protegidas (`/auth/logout`, `/auth/change-password`, `/auth/me`), `usersRoutes`, `disciplinesRoutes`. `/disciplines` passa a exigir sessão (A-002-019). Ordem conferida em `createApp()` — `app.use(auth)` depois de `app.use(API_PREFIX, apiRoutes)` não protegeria nada (§6.3).
+**Interface pública**: `apiRoutes` passa a montar, nesta ordem — `healthRoutes` (público); as rotas públicas de `authRoutes` (`/auth/login`, `/auth/refresh`); `apiRoutes.use(requireAuth)`; então `authRoutes` protegidas com `requireRole('EDITOR','ADMIN')` (`/auth/logout`, `/auth/change-password`, `/auth/me`), `usersRoutes` com `requireRole('ADMIN')`, `disciplinesRoutes` com `requireRole('EDITOR','ADMIN')`. `/disciplines` passa a exigir sessão **e** declaração de papel (A-002-019; SPEC §4.1.9). Ordem conferida em `createApp()` — `app.use(auth)` depois de `app.use(API_PREFIX, apiRoutes)` não protegeria nada (§6.3).
 **Dependências**: COMP-003-010, COMP-003-011, COMP-003-015
 
 ### COMP-003-017: Extensão de `src/domain/types.ts` (backend)
@@ -217,13 +217,13 @@ Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificaç
 ### COMP-003-018: Extensão de `prisma/seed.ts`
 **Responsabilidade**: criar exatamente um ADMIN inicial a partir de `env`, sem senha embutida, de forma idempotente; terminar sem criar quando as credenciais de bootstrap não estão configuradas.
 **Realiza**: FR-002-021
-**Interface pública**: no `main()`, antes ou depois do seed de conteúdo — se `env.SEED_ADMIN_EMAIL` **e** `env.SEED_ADMIN_PASSWORD` presentes **e** `count(User, role=ADMIN) === 0` → `prisma.user.create` com `role: 'ADMIN'`, `passwordHash` de `hashPassword`. Ausentes → `console.log` informativo e segue sem criar. **Nunca** senha embutida no código.
+**Interface pública**: no `main()`, antes ou depois do seed de conteúdo — se `env.SEED_ADMIN_EMAIL` **e** `env.SEED_ADMIN_PASSWORD` presentes **e** `count(User, role=ADMIN) === 0` → `prisma.user.create` com `role: 'ADMIN'`, `passwordHash` de `hashPassword`. Config parcial (só uma das duas) é tratada como ausente. Ausentes → `console.log` informativo e segue sem criar. **Nunca** senha embutida no código.
 **Dependências**: COMP-003-001, COMP-003-002, COMP-003-003
 
 ### COMP-003-019: `tests/integration/route-authz-matrix.test.ts` (suíte de conformidade)
-**Responsabilidade**: enumerar as rotas montadas na `app` real e provar, para cada não-pública, 401 sem sessão e 403 com papel insuficiente — a suíte que serve de **fonte de medição** da métrica §1.3 (conformidade, verde/vermelha a cada CI). Verificação, não realização de requisito.
+**Responsabilidade**: enumerar as rotas montadas na `app` real e provar, para cada não-pública, 401 sem sessão e 403 com papel insuficiente ou não-declarado — a suíte que serve de **fonte de medição** da métrica §1.3 (conformidade, verde/vermelha a cada CI). Verificação, não realização de requisito.
 **Realiza**: nenhum
-**Interface pública**: teste `supertest` sobre `app`; deriva a lista de rotas da pilha do router (`app._router`/`apiRoutes.stack`); para cada caminho ∉ allowlist pública: espera 401 sem cookie; para os caminhos `requireRole('ADMIN')`: espera 403 com sessão de `EDITOR`. Um caso adicional prova que uma rota fictícia montada sem declaração de papel nasce negada (falha fechada — AC-002-014). Oráculo capaz de falhar: remover `requireAuth` da montagem torna o teste vermelho.
+**Interface pública**: teste `supertest` sobre `app`; deriva a lista de rotas da pilha do router (`apiRoutes.stack` — Express 5 removeu `app._router`); para cada caminho ∉ `PUBLIC_PATH_ALLOWLIST`: espera 401 sem cookie; para os caminhos `requireRole('ADMIN')`: espera 403 com sessão de `EDITOR`. Um caso adicional monta uma rota fictícia **depois** de `requireAuth` e **sem** `requireRole` e prova que ela nasce negada — **403 com sessão válida de EDITOR** (não só 401 sem cookie), falha fechada por ausência de declaração em `ROUTE_ROLES` (AC-002-014). Snapshot: `PUBLIC_PATH_ALLOWLIST` é exatamente os quatro caminhos previstos. Oráculo capaz de falhar: remover `requireAuth` da montagem **ou** remover a declaração de papel de uma rota real (ex.: `/disciplines` de `ROUTE_ROLES`) torna o teste vermelho.
 **Dependências**: COMP-003-016
 
 ### COMP-003-020: Extensão de `mnemonicos-frontend/src/types/domain.ts`
@@ -235,7 +235,7 @@ Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificaç
 ### COMP-003-021: Extensão de `src/store/api.ts` (RTK Query)
 **Responsabilidade**: re-autenticação silenciosa e endpoints de auth/gestão; limpar o cache do usuário anterior no logout/falha de sessão. Camada de acesso à API consumida pelas telas — não é a fronteira de decisão de nenhum requisito.
 **Realiza**: nenhum
-**Interface pública**: `baseQueryWithReauth` envolvendo `fetchBaseQuery` (mantém `credentials: 'include'`) — em 401, dispara **uma** vez `POST /auth/refresh`; sucesso → repete a requisição original; falha → `dispatch(api.util.resetApiState())` e redireciona para `/login` (via `window.location` ou callback injetado). Endpoints novos: `login` (mutation), `logout` (mutation), `changePassword` (mutation), `me` (query — fonte da sessão corrente), `adminListUsers` (query), `adminCreateUser`, `adminDisableUser`, `adminResetPassword` (mutations). `tagTypes` ganha `'SessionUser'` e `'User'`. Nenhum token tocado — tudo em cookie `httpOnly`.
+**Interface pública**: `baseQueryWithReauth` envolvendo `fetchBaseQuery` (mantém `credentials: 'include'`) — em 401, dispara **uma** vez `POST /auth/refresh`; sucesso → repete a requisição original; falha → `dispatch(api.util.resetApiState())` e redireciona para `/login?${SESSION_EXPIRED_PARAM}=expirada` (via `window.location` ou callback injetado). Exporta `export const SESSION_EXPIRED_PARAM = 'sessao'` (valor `expirada`) — símbolo consumido pela tela de login. Endpoints novos: `login` (mutation), `logout` (mutation), `changePassword` (mutation), `me` (query — fonte da sessão corrente), `adminListUsers` (query), `adminCreateUser`, `adminDisableUser`, `adminResetPassword` (mutations). `tagTypes` ganha `'SessionUser'` e `'User'`. Nenhum token tocado — tudo em cookie `httpOnly`.
 **Dependências**: COMP-003-020
 
 ### COMP-003-022: `mnemonicos-frontend/src/proxy.ts` (guard de rota — conveniência)
@@ -247,20 +247,20 @@ Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificaç
 ### COMP-003-023: `src/app/login/page.tsx` + `src/components/login-form.tsx`
 **Responsabilidade**: tela de login com os três estados observáveis (em andamento / sucesso / falha) e mensagem de erro genérica em pt-BR que não aponta campo; identificadores de código em inglês, texto de interface em pt-BR.
 **Realiza**: FR-002-009, NFR-002-009
-**Interface pública**: `page.tsx` (Server Component) compõe o `LoginForm` (`'use client'` — tem estado e evento). Estados: *em andamento* (controle de submissão desabilitado + indicador de progresso), *sucesso* (navega para a área interna), *falha* (mensagem genérica pt-BR — "E-mail ou senha inválidos.", sem distinguir; formulário volta a aceitar entrada; nenhum campo apontado). Consome a mutation `login` de COMP-003-021 via `.unwrap()`.
+**Interface pública**: `page.tsx` (Server Component) compõe o `LoginForm` (`'use client'` — tem estado e evento) e, quando `SESSION_EXPIRED_PARAM` está presente nos search params, renderiza uma mensagem genérica pt-BR de sessão expirada num nó `role="status"`. Estados do form: *em andamento* (controle de submissão desabilitado + indicador de progresso em nó `role="status"` ou `aria-busy` no form), *sucesso* (navega para a área interna), *falha* (mensagem genérica pt-BR — "E-mail ou senha inválidos.", sem distinguir; formulário volta a aceitar entrada; nenhum campo apontado). Consome a mutation `login` de COMP-003-021 via `.unwrap()`.
 **Dependências**: COMP-003-021
 
 ### COMP-003-024: `src/app/(interno)/layout.tsx` + `src/components/internal-shell.tsx`
 **Responsabilidade**: shell da área interna — resolve a sessão (`me`) e reflete os três estados de navegação protegida (carregando neutro / vista renderizada / redirect ou "sem permissão"), e hospeda o controle de logout com seus três estados observáveis.
 **Realiza**: FR-002-013, FR-002-023
-**Interface pública**: `layout.tsx` do grupo `(interno)` compõe `InternalShell` (`'use client'`). Usa `useMeQuery`: *em andamento* → estado de carregamento neutro; *sucesso* (sessão válida, papel suficiente) → renderiza `children`; *falha* sem sessão → redireciona para `/login`; *falha* com sessão e papel insuficiente → mensagem "sem permissão" sem o conteúdo. Controle de logout: *em andamento* (desabilitado + progresso), *sucesso* (sessão encerrada no servidor via mutation `logout`, volta ao login), *falha* (mensagem genérica pt-BR, permanece na área interna). O backend é quem nega de fato (FR-002-012).
+**Interface pública**: `layout.tsx` do grupo `(interno)` compõe `InternalShell` (`'use client'`). Usa `useMeQuery`: *em andamento* → estado de carregamento neutro (nó `role="status"`); *sucesso* (sessão válida, papel suficiente) → renderiza `children`; *falha* sem sessão → redireciona para `/login`; *falha* com sessão e papel insuficiente → mensagem "sem permissão" sem o conteúdo. Controle de logout: *em andamento* (desabilitado + progresso), *sucesso* (sessão encerrada no servidor via mutation `logout`, volta ao login), *falha* (mensagem genérica pt-BR, permanece na área interna). O backend é quem nega de fato (FR-002-012).
 **Dependências**: COMP-003-021, COMP-003-022
 
 ## 4. Fluxos principais
 
 **Login.** `POST /auth/login` → `loginRateLimiters` (conta + origem) → `loginSchema.parse` → `auth.service.login`: acha `User` por e-mail, `verifyPassword`, confere `disabledAt IS NULL`; qualquer falha → `UnauthorizedError` genérico + auditoria de falha. Sucesso → cria `Session` (`familyId` novo; `accessToken`/`refreshToken` de `generateToken`, guardados como `hashToken`; `accessExpiresAt = now + AUTH_ACCESS_TTL_MINUTES`; `refreshExpiresAt = now + AUTH_REFRESH_TTL_DAYS`) + auditoria de sucesso; resposta seta `mnemo_access` e `mnemo_refresh` e devolve `SessionUser`.
 
-**Requisição autenticada.** `requireAuth` (montado antes dos routers protegidos) → caminho na allowlist pública? segue. Senão lê `mnemo_access` → `resolveAccessSession`: consulta por `accessTokenHash`, confere `accessExpiresAt > now`, `revokedAt IS NULL`, `user.disabledAt IS NULL`. Falhou → 401 (mesmo com credencial não expirada, se a sessão foi revogada ou a conta desativada — FR-002-007). OK → `req.auth` populado; `requireRole('ADMIN')` nos routers de gestão decide o 403 + auditoria.
+**Requisição autenticada.** `requireAuth` (montado antes dos routers protegidos) → caminho na allowlist pública? segue. Senão lê `mnemo_access` → `resolveAccessSession`: consulta por `accessTokenHash`, confere `accessExpiresAt > now`, `revokedAt IS NULL`, `user.disabledAt IS NULL`. Falhou → 401 (mesmo com credencial não expirada, se a sessão foi revogada ou a conta desativada — FR-002-007). Sessão OK → o servidor consulta `ROUTE_ROLES` para o padrão do caminho: **ausente** (e não público) → 403 (falha fechada — DEC-003-005), mesmo com sessão válida. Presente → `req.auth` populado; `requireRole(...)` do router (`'ADMIN'` na gestão, `'EDITOR','ADMIN'` nas apenas autenticadas) decide o 403 + auditoria quando o papel não está no conjunto declarado.
 
 **Renovação.** `POST /auth/refresh` → lê `mnemo_refresh` → acha linha por `refreshTokenHash` → `decideRefresh(session, now, AUTH_REFRESH_GRACE_SECONDS)`: `rotate` → transação: `rotatedAt = now` na linha atual + nova `Session` no mesmo `familyId`, reemite cookies; `replay-grace` → reemite os cookies do sucessor já criado (idempotente — renovações concorrentes do SPA não deslogam, AC-002-026); `reuse` → `revokedAt = now WHERE familyId` + 401; `expired` → 401 (exige novo login — FR-002-005).
 
@@ -369,13 +369,17 @@ model Session {
 **Irreversível**: nao
 **Aderência à ficha/perfil**: herdada (aplica §6.5 e NFR-002-008); nomes e paths são específicos deste PLAN
 
-### DEC-003-005: Deny-by-default na montagem
-**Contexto**: NFR-002-001 / AC-002-014 exigem que uma rota nova sem declaração de papel falhe fechada. O perfil §6.3 normatiza autenticação antes do router protegido e ordem de middleware semântica em Express.
-**Decisão**: `requireAuth` é montado em `apiRoutes` **antes** dos routers de módulo, com allowlist pública explícita por caminho exato (`/health`, `/health/db`, `/auth/login`, `/auth/refresh`). Todo o resto exige sessão, inclusive `/disciplines` (A-002-019). `requireRole('ADMIN')` aplicado explicitamente nos routers de gestão. A suíte COMP-003-019 é a prova de conformidade no CI.
+### DEC-003-005: Deny-by-default na montagem — `requireAuth` + registro central de papéis por rota
+**Contexto**: NFR-002-001 / AC-002-014 exigem que uma rota seja inacessível a menos que **declare explicitamente os papéis** que a alcançam; a ausência de declaração nega — inclusive para uma **sessão válida**, não só para o anônimo. O perfil §6.3 normatiza autenticação antes do router protegido e ordem de middleware semântica em Express.
+**Decisão**: dois mecanismos combinados, aditivos.
+1. `requireAuth` montado em `apiRoutes` **antes** dos routers de módulo, com `PUBLIC_PATH_ALLOWLIST` explícita por caminho exato (`/health`, `/health/db`, `/auth/login`, `/auth/refresh`) — nega o anônimo (inalterado).
+2. Um **registro central de papéis por rota** — `ROUTE_ROLES`, ao lado de `PUBLIC_PATH_ALLOWLIST`. Após autenticar, `requireAuth` (ou um passo imediatamente posterior) resolve o padrão de rota correspondente e consulta `ROUTE_ROLES`; caminho **ausente de `PUBLIC_PATH_ALLOWLIST` e de `ROUTE_ROLES`** → `ForbiddenError` (falha fechada), **mesmo com sessão válida**.
+`requireRole(...roles)` permanece como a forma de **declarar**: registra o conjunto de papéis do caminho em `ROUTE_ROLES` e aplica a checagem 403. Toda rota não-pública passa a aplicá-lo, inclusive as permissivas — `requireRole('EDITOR','ADMIN')` em `GET /disciplines` (SPEC §4.1.9), `GET /auth/me`, `POST /auth/logout` e `POST /auth/change-password`. `STUDENT` fica **fora** de toda declaração (A-002-015 — a dormência do papel é verificável, não acidental). `requireRole('ADMIN')` nos routers de gestão. A suíte COMP-003-019 é a prova de conformidade no CI.
 **Alternativas consideradas**:
 - Autenticação opt-in por rota (decorator por handler), descartada porque uma rota nova sem o decorator nasce **aberta** — exatamente o que NFR-002-001 proíbe (custo: falha aberta por omissão, a classe de bug mais cara aqui).
-**Consequências**: qualquer rota futura nasce protegida; expor uma rota pública nova é um ato deliberado (entrada na allowlist). A allowlist precisa ser mantida curta e revisada.
-**Reabrir se**: surgir uma classe legítima de rota pública que não caiba numa allowlist curta por caminho exato.
+- Catch-all após os routers que nega o que não respondeu, descartada porque não alcança o handler que já rodou e respondeu sem `requireRole` (custo: a falha aberta por handler esquecido continua possível — o catch-all só pega quem não casou rota nenhuma, não quem casou e serviu sem checar papel).
+**Consequências**: qualquer rota futura nasce negada até declarar seus papéis em `ROUTE_ROLES` (via `requireRole`) ou entrar em `PUBLIC_PATH_ALLOWLIST` — os dois são atos deliberados. Uma sessão válida sem papel declarado para o caminho recebe 403, não 200. `PUBLIC_PATH_ALLOWLIST` e `ROUTE_ROLES` precisam ser mantidos curtos e revisados; o registro é **por caminho**, não por método HTTP. A realização é **conjunta**: COMP-003-011 nega o não-declarado, COMP-003-012 registra, COMP-003-016 garante que todo router não-público declara.
+**Reabrir se**: surgir uma classe legítima de rota pública que não caiba numa allowlist curta por caminho exato; ou surgir necessidade de papel por método HTTP na mesma rota (hoje o registro é por caminho).
 **Irreversível**: nao
 **Aderência à ficha/perfil**: herdada (aplica §6.3)
 
@@ -403,7 +407,7 @@ model Session {
 
 ### DEC-003-008: Seed do primeiro ADMIN
 **Contexto**: FR-002-021 / AC-002-023 / A-002-010 exigem primeiro ADMIN a partir de `env`, sem senha embutida; `prisma/seed.ts` hoje não cria usuário.
-**Decisão**: `prisma/seed.ts` lê `env.SEED_ADMIN_EMAIL` + `env.SEED_ADMIN_PASSWORD`; se ambos presentes **e** não existe nenhum `User` com `role = ADMIN` → cria um (senha via `src/lib/password.ts`). Ausentes → loga e segue sem criar. `.env.example` ganha as duas chaves com placeholder e comentário. Nunca senha embutida no código.
+**Decisão**: `prisma/seed.ts` lê `env.SEED_ADMIN_EMAIL` + `env.SEED_ADMIN_PASSWORD`; se ambos presentes **e** não existe nenhum `User` com `role = ADMIN` → cria um (senha via `src/lib/password.ts`). Config parcial (só uma das duas) é tratada como ausente. Ausentes → loga e segue sem criar. `.env.example` ganha as duas chaves com placeholder e comentário. Nunca senha embutida no código.
 **Alternativas consideradas**:
 - Script `db:create-admin` interativo à parte, descartada porque `db:setup` (que roda `db:seed`) deixaria o ambiente sem nenhum acesso até alguém rodar o script manualmente (custo: bootstrap quebrado por omissão; o seed é o ponto natural).
 **Consequências**: o seed continua idempotente (a guarda `count(ADMIN) === 0`); em CI/dev sem as vars, nenhum ADMIN é criado — comportamento esperado.
@@ -423,7 +427,7 @@ model Session {
 
 ### DEC-003-010: Frontend — RTK Query com re-autenticação, tipos espelhados
 **Contexto**: AC-002-028 pede renovação silenciosa com repetição única e, na falha, mensagem genérica + ida ao login; NFR-002-007 / AC-002-025 pedem paridade de tipos entre os repos no mesmo diff. O perfil §6.3 exige `resetApiState()` após logout.
-**Decisão**: `src/store/api.ts` ganha `baseQueryWithReauth` (401 → `POST /auth/refresh` **uma** vez → repete; falhou → `resetApiState()` + `/login`) e os endpoints `login`/`logout`/`changePassword`/`me`/`adminListUsers`/`adminCreateUser`/`adminDisableUser`/`adminResetPassword`. `me` (RTK Query) é a **fonte** da sessão corrente; `src/types/domain.ts` ganha `USER_ROLES`/`UserRole`/`SessionUser` espelhados do backend no mesmo diff.
+**Decisão**: `src/store/api.ts` ganha `baseQueryWithReauth` (401 → `POST /auth/refresh` **uma** vez → repete; falhou → `resetApiState()` + `/login?sessao=expirada`) e os endpoints `login`/`logout`/`changePassword`/`me`/`adminListUsers`/`adminCreateUser`/`adminDisableUser`/`adminResetPassword`. `me` (RTK Query) é a **fonte** da sessão corrente; `src/types/domain.ts` ganha `USER_ROLES`/`UserRole`/`SessionUser` espelhados do backend no mesmo diff.
 **Alternativas consideradas**:
 - Um slice do Redux guardando o usuário da sessão, descartada porque duplica estado de servidor — origem da tela mostrando dado velho (perfil §4/§6.5); e o estado do Redux é serializado para o cliente na hidratação (custo: dado de sessão exposto no payload + cache incoerente).
 **Consequências**: nenhuma dependência nova; um slice só-cliente entra apenas se surgir flag efêmera de "resolvendo sessão". `tagTypes` cresce com `'SessionUser'`/`'User'`.
@@ -507,6 +511,7 @@ model Session {
 - [ ] Aderência à ficha/perfil validada (backend `node-22.md`, frontend `next-16.md`; READMEs dos repos)
 - [ ] Todos os 29 ACs cobertos por teste (gate 1 dos quality gates) — inclui prova de 401/403 sem/insuficiente credencial (§6.3 do perfil) e teste de refresh concorrente (AC-002-026)
 - [ ] Métrica da SPEC (§1.3 declara `Fonte de medição`: externa): a **suíte de conformidade de rotas** (COMP-003-019) — teste de integração que enumera as rotas montadas e prova, para cada não-pública, 401 sem sessão e 403 com papel insuficiente — está verde no CI; dono (time de engenharia) e natureza (conformidade, não instrumentação de evento) registrados no INDEX
+- [ ] Toda rota não-pública montada aparece em `ROUTE_ROLES` (ou em `PUBLIC_PATH_ALLOWLIST`); rota em nenhum dos dois → negada — provado pela suíte de conformidade (COMP-003-019)
 - [ ] `npm audit --omit=dev --audit-level=high` limpo no backend após `@node-rs/argon2` e `cookie-parser`
 - [ ] Migração `add_session_and_user_disabled` versionada e presente no diff da TASK, com `prisma generate` executado
 - [ ] Tipos de papel e de usuário de sessão (`USER_ROLES` / `SessionUser`) espelhados em `mnemonicos-backend/src/domain/types.ts` e `mnemonicos-frontend/src/types/domain.ts` **no mesmo diff** (NFR-002-007 / AC-002-025)
