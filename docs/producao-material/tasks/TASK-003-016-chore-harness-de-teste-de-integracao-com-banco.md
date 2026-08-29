@@ -107,7 +107,7 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 **Data conclusão**: 2026-08-28T21:50:00-03:00
 **Branch**: feat/producao-material-mnemora-studio
 **Commit SHA**: 254e00c · f956aec (retry)
-**Jira**: KAN-8 (sub-task não criada — conector Jira caído; reconciliar via /keelson:jira-sync)
+**Jira**: KAN-26
 **Implementado por**: developer
 **Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — Wave 2, diff acumulado + delta do retry, re-review APROVADO
 **Tentativas**: 2

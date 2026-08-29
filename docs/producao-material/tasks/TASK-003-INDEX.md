@@ -120,6 +120,6 @@ aparecem: `Realiza (FRs)` = `nenhuma` (chore ou só NFR via AC), sem FR que deri
 
 | FEAT | TASKs (P = primária) | Done |
 |------|----------------------|------|
-| FEAT-002-001 | TASK-003-004 (P), TASK-003-006 (P), TASK-003-008 (P), TASK-003-014 (P), TASK-003-015 | 0/5 |
+| FEAT-002-001 | TASK-003-004 (P), TASK-003-006 (P), TASK-003-008 (P), TASK-003-014 (P), TASK-003-015 | 3/5 |
 | FEAT-002-002 | TASK-003-007 (P), TASK-003-013 (P), TASK-003-015 (P) | 1/3 |
-| FEAT-002-003 | TASK-003-006, TASK-003-010 (P), TASK-003-012 (P) | 0/3 |
+| FEAT-002-003 | TASK-003-006, TASK-003-010 (P), TASK-003-012 (P) | 2/3 |
