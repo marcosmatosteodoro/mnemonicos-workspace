@@ -26,7 +26,7 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
 
 **EMENDA DEC-003-005 (Wave 4 — vinculante)**: `requireRole` passou a ter a assinatura **`requireRole(method: HttpMethod, path: string, ...roles: UserRole[])`** e a declarar em `ROUTE_ROLES` **na avaliação da chamada** (tempo de montagem), com chave `"<MÉTODO> <caminho>"`. Toda aplicação de `requireRole` nesta TASK usa a assinatura nova, com o **método** e o **caminho completo visto por `requireAuth`** (a partir da raiz de `apiRoutes`: `/auth/logout`, `/auth/change-password`, `/auth/me`) — nunca a grafia relativa nem a assinatura antiga `requireRole('EDITOR','ADMIN')`. `sealRouteRoles()` é chamado por TASK-003-011 na montagem, não aqui.
 
-**Consome (aresta)**: `ACCESS_COOKIE` / `REFRESH_COOKIE` (nomes — TASK-003-007) por nome; `requireRole(method, path, ...roles)` e `ROUTE_ROLES` (TASK-003-007, assinatura da EMENDA Wave 4); `loginRateLimiters` (TASK-003-008); as funções de `auth.service` (TASK-003-006). **Nomeia**: `accessCookieOptions()` / `refreshCookieOptions()` (opções da DEC-003-004), consumidas pelo `logout` e por fatias futuras.
+**Consome (aresta)**: `ACCESS_COOKIE` / `REFRESH_COOKIE` (nomes — TASK-003-007) por nome; `requireRole(method, path, ...roles)` e `ROUTE_ROLES` (TASK-003-007, assinatura da EMENDA Wave 4); `loginRateLimiters` (TASK-003-008); `login`/`refresh`/`logout`/`changeOwnPassword` de `auth.service` (TASK-003-006). **Nomeia**: `accessCookieOptions()` / `refreshCookieOptions()` (opções da DEC-003-004), consumidas pelo `logout` e por fatias futuras; **`getSessionUser`** em `auth.service.ts` (furo no plano da Wave 5 — nasce neste diff, EMENDA em PLAN COMP-003-008).
 
 ## Escopo
 
@@ -37,7 +37,8 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
   - `POST /auth/refresh` (público) → lê `REFRESH_COOKIE` do cookie, `refresh`; reemite os dois cookies.
   - `POST /auth/logout` (protegido; `requireRole('POST', '/auth/logout', 'EDITOR', 'ADMIN')`) → `logout`; `res.clearCookie` dos dois.
   - `POST /auth/change-password` (protegido; `requireRole('POST', '/auth/change-password', 'EDITOR', 'ADMIN')`) → `changeOwnPassword` (usa `req.auth`).
-  - `GET /auth/me` (protegido; `requireRole('GET', '/auth/me', 'EDITOR', 'ADMIN')`) → `SessionUser` da sessão corrente.
+  - `GET /auth/me` (protegido; `requireRole('GET', '/auth/me', 'EDITOR', 'ADMIN')`) → `getSessionUser(req.auth.userId)` → `SessionUser` da sessão corrente; `null` → 401.
+- `mnemonicos-backend/src/modules/auth/auth.service.ts` — **acrescenta** `getSessionUser(userId: string): Promise<SessionUser | null>` (**furo no plano da Wave 5** — `req.auth`/`resolveAccessSession` não carregam `name`/`email`, e o caminho quente não deve carregar; EMENDA em PLAN COMP-003-008/010). `where: { id: userId, disabledAt: null }` — a cláusula **é** a guarda de conta desativada (checklist "Consumidores de sessão do auth.service", README §72–76); `select` **explícito** `{ id, name, email, role }`; **nunca** `passwordHash` nem valor de token. **Não** altera `resolveAccessSession` nem `AuthContext` (lição de perf do gate 10 da Wave 3 — o caminho por requisição segue trim).
   - As rotas protegidas aplicam `requireRole(<método>, <caminho>, 'EDITOR', 'ADMIN')` (importado de TASK-003-007, assinatura da EMENDA Wave 4), declarando `"POST /auth/logout"`, `"POST /auth/change-password"` e `"GET /auth/me"` em `ROUTE_ROLES` **em tempo de montagem**; as públicas (`/auth/login`, `/auth/refresh`) **não** recebem `requireRole` e entram em `PUBLIC_PATH_ALLOWLIST` (item já previsto em TASK-003-007).
   - Middleware local de verificação de `Origin`/`Host` nas rotas POST que mudam estado. Sem `try/catch` (Express 5 encaminha a rejeição).
 - `ACCESS_COOKIE` / `REFRESH_COOKIE` importados de `mnemonicos-backend/src/http/cookies.ts` (TASK-003-007) — nomes **consumidos, nunca redefinidos** aqui.
@@ -47,7 +48,7 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
 - Meio de execução dos `*.integration.test.ts` desta TASK: o harness de TASK-003-016 — config `jest.integration.config.ts`, helper `tests/integration/db.ts` (`testPrisma` + `resetDb()` no `beforeEach`), comando `npm --prefix mnemonicos-backend run test:integration`.
 
 ### Não inclui
-- A regra de sessão (`login`/`refresh`/`logout`/... — TASK-003-006).
+- A regra de sessão (`login`/`refresh`/`logout`/`changeOwnPassword`/`resolveAccessSession`/`decideRefresh` — TASK-003-006) — **exceto** o leitor fino `getSessionUser`, que `GET /auth/me` exige e nasce aqui (furo no plano da Wave 5, EMENDA no PLAN).
 - A ordem de `requireAuth` na montagem de `apiRoutes` e a suíte de conformidade (TASK-003-011).
 - Os middlewares `requireAuth` / `requireRole` em si (TASK-003-007).
 
@@ -56,7 +57,8 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
 Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critérios prevalecem; nunca siga um passo que enfraqueça um critério.
 
 1. `app.ts` — `app.use(cookieParser())` (sem segredo) antes de `apiRoutes`.
-2. `auth.routes.ts` — os 5 endpoints; `requireRole(<método>, <caminho completo>, 'EDITOR', 'ADMIN')` (assinatura da EMENDA Wave 4) nas três protegidas; builders `accessCookieOptions()` / `refreshCookieOptions()` a partir de `env`.
+2. `auth.service.ts` — acrescenta `getSessionUser(userId)` (`where: { id, disabledAt: null }`, `select` explícito `{id,name,email,role}`), sem tocar `resolveAccessSession`/`AuthContext`.
+3. `auth.routes.ts` — os 5 endpoints; `requireRole(<método>, <caminho completo>, 'EDITOR', 'ADMIN')` (assinatura da EMENDA Wave 4) nas três protegidas; `GET /auth/me` → `getSessionUser(req.auth.userId)`; builders `accessCookieOptions()` / `refreshCookieOptions()` a partir de `env`.
 3. Middleware local de `Origin`/`Host` contra `CORS_ORIGINS` nas rotas POST.
 4. Testes de integração sobre a `app` real, asserção estrutural sobre cada `Set-Cookie` e sobre `ROUTE_ROLES`.
 
@@ -68,7 +70,8 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 - [ ] `POST /auth/refresh` reemite os dois cookies; `POST /auth/logout` limpa os dois — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` → refresh válido → 2 `Set-Cookie`; logout → 2 `Set-Cookie` com `Max-Age=0` / `Expires` no passado. `Tests: ≥2 passed`. Fixada antes do código.
 - [ ] Verificação de `Origin`/`Host` nas rotas POST de auth — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` → `POST /auth/login` com `Origin` fora de `CORS_ORIGINS` → 403; com `Origin` da allowlist → segue. `Tests: ≥1 passed`. Fixada antes do código.
 - [ ] `cookie-parser` montado antes de `apiRoutes` — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` → requisição com header `Cookie: mnemo_refresh=...` → o handler de `refresh` enxerga `req.cookies.mnemo_refresh` (não `undefined`; 200/401 conforme validade). `Tests: ≥1 passed`. Fixada antes do código.
-- [ ] `GET /auth/me` devolve `SessionUser` sem token — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` → chaves exatas `{id,name,email,role}`. `Tests: ≥1 passed`. Fixada antes do código.
+- [ ] `GET /auth/me` devolve `SessionUser` sem token — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` → chaves exatas `{id,name,email,role}` (asserção sobre o conjunto de chaves), sem `passwordHash`/`accessToken`/`refreshToken`. `Tests: ≥1 passed`. Fixada antes do código.
+- [ ] `getSessionUser` — leitura fina com guarda de conta desativada (furo no plano da Wave 5) — verificação executável: `npm --prefix mnemonicos-backend test -- auth` → fixture com **duas** contas, uma ativa e uma com `disabledAt != null`: `getSessionUser(ativa.id)` → `{id,name,email,role}` (conjunto exato, sem `passwordHash`); `getSessionUser(desativada.id)` → `null`; a mutação que remove `disabledAt: null` do `where` faz o segundo caso devolver o usuário (vermelho); a mutação que troca o `select` explícito por entidade crua / `include` expõe `passwordHash` (vermelho). `Tests: ≥2 passed`. Fixada antes do código.
 - [ ] Sem warnings/lints novos — `npm --prefix mnemonicos-backend run lint` → exit 0 (baseline capturada no início da TASK).
 - [ ] Padrão de commit respeitado (Conventional Commits).
 - [ ] Aderência à stack/padrões da ficha e do perfil (`node-22.md`, §5 — sem `try/catch` no handler; §6.5 — flags de cookie; README do repo vence em conflito).

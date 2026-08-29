@@ -148,6 +148,8 @@ F1 liga, pela primeira vez, o modelo `User` e o segredo de sessão que já exist
 - `logout(refreshToken: string, ctx: { ip: string; userAgent?: string }): Promise<void>` — `revokedAt = now WHERE familyId`; `recordAuthEvent({ type: 'logout', ip: ctx.ip, ... })`. Token ausente → no-op silencioso (a rota limpa os cookies). O `ctx` supre o indicador de origem obrigatório do evento (NFR-002-005 × `audit.ts` da Wave 2).
 - `changeOwnPassword(userId, input): Promise<void>` — `verifyPassword` da senha atual (erro → `UnauthorizedError`, sem alterar); `hashPassword` da nova; `revokedAt = now WHERE userId AND id != sessionAtual` (revoga as demais). `newPassword` igual à atual (e ≥ 12) é aceita — F1 não promete política de reuso de senha.
 - `revokeAllSessions(userId): Promise<void>` — usado por desativação e reset de senha (COMP-003-014).
+- `getSessionUser(userId: string): Promise<SessionUser | null>` — leitor fino para `GET /auth/me` (COMP-003-010): `where: { id: userId, disabledAt: null }` (a cláusula **é** a guarda de conta desativada — checklist "Consumidores de sessão" do README), `select` explícito `{ id, name, email, role }`, nunca `passwordHash`/token. **Não** toca `resolveAccessSession` nem `AuthContext` — o caminho quente por requisição segue trim (lição de perf do gate 10 da Wave 3).
+<!-- EMENDA Wave 5 (furo no plano de TASK-003-009): `AuthContext`/`resolveAccessSession` carregam só `{userId, role, sessionId}` / `user.{role,disabledAt}`, então `GET /auth/me` não tinha de onde tirar `name`/`email` do `SessionUser`. `getSessionUser` **nasce no diff da TASK-003-009** (COMP-003-008 é de TASK-003-006, já Done — não reaberta). -->
 Nenhuma função devolve `passwordHash` nem valor de token.
 **Dependências**: COMP-003-002, COMP-003-003, COMP-003-004, COMP-003-005, COMP-003-006, COMP-003-017
 
@@ -165,8 +167,9 @@ Nenhuma função devolve `passwordHash` nem valor de token.
 - `POST /auth/refresh` (público) → lê `mnemo_refresh` do cookie, `refresh`; reemite os dois cookies.
 - `POST /auth/logout` (protegido; `requireRole('EDITOR','ADMIN')`) → `logout`; `res.clearCookie` dos dois.
 - `POST /auth/change-password` (protegido; `requireRole('EDITOR','ADMIN')`) → `changeOwnPassword` (usa `req.auth`).
-- `GET /auth/me` (protegido; `requireRole('EDITOR','ADMIN')`) → devolve `SessionUser` da sessão corrente.
+- `GET /auth/me` (protegido; `requireRole('EDITOR','ADMIN')`) → `getSessionUser(req.auth.userId)` (COMP-003-008) → `SessionUser` da sessão corrente; `null` → 401/404.
 Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificação de `Origin`/`Host` nas rotas POST (Route Handlers não herdam proteção CSRF).
+<!-- EMENDA Wave 4+5: (4) `requireRole` tem a assinatura método-aware `requireRole(method: HttpMethod, path: string, ...roles)` — as rotas protegidas declaram `requireRole('POST','/auth/logout','EDITOR','ADMIN')` etc. (ver DEC-003-005 EMENDA). (5) `GET /auth/me` chama o leitor fino `getSessionUser` de COMP-003-008 (nasce no diff de TASK-003-009 — furo no plano). -->
 **Dependências**: COMP-003-001, COMP-003-007, COMP-003-008, COMP-003-009
 
 ### COMP-003-011: `src/http/middlewares/authenticate.ts`
