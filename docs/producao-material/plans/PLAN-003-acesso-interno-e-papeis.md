@@ -148,6 +148,7 @@ F1 liga, pela primeira vez, o modelo `User` e o segredo de sessão que já exist
 - `logout(refreshToken: string, ctx: { ip: string; userAgent?: string }): Promise<void>` — `revokedAt = now WHERE familyId`; `recordAuthEvent({ type: 'logout', ip: ctx.ip, ... })`. Token ausente → no-op silencioso (a rota limpa os cookies). O `ctx` supre o indicador de origem obrigatório do evento (NFR-002-005 × `audit.ts` da Wave 2).
 - `changeOwnPassword(userId, input): Promise<void>` — `verifyPassword` da senha atual (erro → `UnauthorizedError`, sem alterar); `hashPassword` da nova; `revokedAt = now WHERE userId AND id != sessionAtual` (revoga as demais). `newPassword` igual à atual (e ≥ 12) é aceita — F1 não promete política de reuso de senha.
 - `revokeAllSessions(userId): Promise<void>` — usado por desativação e reset de senha (COMP-003-014).
+<!-- EMENDA Wave 5 (retry — gate 7): a revogação "toda sessão viva da conta" é extraída em **`revokeAllSessionsOp(userId, now): Prisma.PrismaPromise<…>`** (ou função que recebe o `tx`), para **compor dentro de `prisma.$transaction`**. Consumidores: `disableUser`, `resetUserPassword` (COMP-003-014) **e** `changeOwnPassword` (as demais sessões). `revokeAllSessions` passa a ser o invólucro que chama `revokeAllSessionsOp`. Nenhum consumidor reimplementa o `session.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt } })`. -->
 - `getSessionUser(userId: string): Promise<SessionUser | null>` — leitor fino para `GET /auth/me` (COMP-003-010): `where: { id: userId, disabledAt: null }` (a cláusula **é** a guarda de conta desativada — checklist "Consumidores de sessão" do README), `select` explícito `{ id, name, email, role }`, nunca `passwordHash`/token. **Não** toca `resolveAccessSession` nem `AuthContext` — o caminho quente por requisição segue trim (lição de perf do gate 10 da Wave 3).
 <!-- EMENDA Wave 5 (furo no plano de TASK-003-009): `AuthContext`/`resolveAccessSession` carregam só `{userId, role, sessionId}` / `user.{role,disabledAt}`, então `GET /auth/me` não tinha de onde tirar `name`/`email` do `SessionUser`. `getSessionUser` **nasce no diff da TASK-003-009** (COMP-003-008 é de TASK-003-006, já Done — não reaberta). -->
 Nenhuma função devolve `passwordHash` nem valor de token.
@@ -189,7 +190,7 @@ Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificaç
 ### COMP-003-013: `src/modules/users/users.schema.ts`
 **Responsabilidade**: schemas Zod da gestão de contas; realiza a recusa de senha com menos de 12 caracteres tanto na criação quanto no reset, e a recusa do papel `STUDENT` na criação.
 **Realiza**: FR-002-022
-**Interface pública**: `createUserSchema` (`email` `z.email()` normalizado, `name` `z.string().trim().min(1)`, `role` `z.enum(['EDITOR','ADMIN'])` — `STUDENT` recusado, A-002-015, `password` `z.string().min(12)`), `resetPasswordSchema` (`password` `z.string().min(12)`), `userIdParamSchema` (`id` `z.uuid()`), `listUsersQuerySchema` (paginação, `.extend()` do padrão de `disciplines.schema.ts`).
+**Interface pública**: `createUserSchema` (`email` `z.email()` normalizado, `name` `z.string().trim().min(1)`, `role` `z.enum(['EDITOR','ADMIN'])` — `STUDENT` recusado, A-002-015, `password` `z.string().min(12)`), `resetPasswordSchema` (`password` `z.string().min(12)`), `userIdParamSchema` (`id` `z.uuid()`), `listUsersQuerySchema` (paginação a partir do padrão de `disciplines.schema.ts` + `search` opcional — filtro por nome ou e-mail, EMENDA Wave 5).
 **Dependências**: nenhuma
 
 ### COMP-003-014: `src/modules/users/users.service.ts`
@@ -197,16 +198,18 @@ Sem `try/catch` (Express 5 encaminha rejeição). Middleware local de verificaç
 **Realiza**: FR-002-014, FR-002-015, FR-002-017, FR-002-018, FR-002-019, FR-002-020
 **Interface pública**:
 - `createInternalUser(input): Promise<SessionUser>` — `hashPassword`; `prisma.user.create` com `data` montado campo a campo; e-mail duplicado (violação de unique) → `ConflictError`, sem alterar a conta existente. A resposta é montada campo a campo (`select` explícito), nunca a entidade Prisma crua.
-- `listInternalUsers(query): Promise<Paginated<UserListItem>>` — `select` explícito: `id`, `email`, `name`, `role`, `disabledAt` → mapeado para `status: 'active' | 'disabled'`. **Nunca** `passwordHash` nem relação `sessions`.
-- `disableUser(id): Promise<void>` — se alvo é ADMIN e `count(role=ADMIN, disabledAt=null) <= 1` → `ConflictError` (último ADMIN, FR-002-019); senão `disabledAt = now` **e** `revokeAllSessions(id)` em transação.
-- `resetUserPassword(id, password): Promise<void>` — `hashPassword`; grava; `revokeAllSessions(id)`.
+- `listInternalUsers(query): Promise<Paginated<UserListItem>>` — `select` explícito: `id`, `email`, `name`, `role`, `disabledAt` → mapeado para `status: 'active' | 'disabled'`. **Nunca** `passwordHash` nem relação `sessions`. `query.search` opcional filtra por **nome OU e-mail** (`contains`, `insensitive`).
+- `disableUser(id): Promise<void>` — se alvo é ADMIN e `count(role=ADMIN, disabledAt=null) <= 1` → `ConflictError` (último ADMIN, FR-002-019); senão `disabledAt = now` **e** revogação das sessões do alvo, em transação.
+- `resetUserPassword(id, password): Promise<void>` — `hashPassword`; grava; revoga as sessões da conta.
+<!-- EMENDA Wave 5 (retry — gate 8, ALTA): a guarda do último ADMIN é **check-then-act** e uma corrida de 2 `disableUser` concorrentes zera os ADMINs ativos (lockout irreversível — reativação está fora de F1). A decisão fecha **na escrita**: `prisma.$transaction(async (tx) => { count DENTRO da tx; <= 1 → ConflictError; update `disabledAt` + `revokeAllSessionsOp` }, { isolationLevel: 'Serializable' })`, capturando a falha de serialização do Postgres (P2034) como `ConflictError` (fail-closed). Alternativa aceitável: `UPDATE ... WHERE ... AND (SELECT count(*) ...) > 1` via `$executeRaw` (template tag) com `rowsAffected === 0` como a recusa. Prova exigida (decisão 4.177): teste de integração com N desativações **concorrentes** do penúltimo ADMIN contra o Postgres real, contando linhas no fim (`count(role=ADMIN, disabledAt=null) >= 1` sempre). Padrão já no repo: `createInternalUser` (P2002), `rotateFamilyTip` (CAS). -->
 **Dependências**: COMP-003-002, COMP-003-003, COMP-003-008, COMP-003-017
 
 ### COMP-003-015: `src/modules/users/users.routes.ts`
 **Responsabilidade**: superfície HTTP da gestão, inteira sob `requireRole('ADMIN')`; mantém a superfície montada livre de qualquer caminho de auto-registro (nenhuma rota de registro público).
 **Realiza**: FR-002-016
-**Interface pública**: `usersRoutes: Router` com `usersRoutes.use(requireRole('ADMIN'))` no topo — `GET /users` (lista), `POST /users` (cria), `PATCH /users/:id/disable`, `POST /users/:id/reset-password`. Sem rota de registro público na superfície montada (FR-002-016 / AC-002-018). Sem `try/catch`.
-**Dependências**: COMP-003-012, COMP-003-013, COMP-003-014
+**Interface pública**: `usersRoutes: Router` com `GET /users` (lista), `POST /users` (cria), `PATCH /users/:id/disable`, `POST /users/:id/reset-password`. Sem rota de registro público na superfície montada (FR-002-016 / AC-002-018). Sem `try/catch`.
+<!-- EMENDA Wave 4+5: (4) `requireRole` é aplicado **por rota** com a assinatura método-aware `requireRole('<MÉTODO>', '<caminho-completo>', 'ADMIN')` — NUNCA `usersRoutes.use(requireRole('ADMIN'))` cego no topo (achado crítico do gate 8 da Wave 4). (5, retry — gate 8): as **3 mutações de estado** (`POST /users`, `PATCH /users/:id/disable`, `POST /users/:id/reset-password`) passam por `verifyOrigin` (exportado de `auth.routes.ts`) — anti-CSRF ausente nelas era lacuna (só `sameSite: 'lax'`). Alternativa: TASK-003-011 monta `verifyOrigin` 1× em `apiRoutes` para todo método que muda estado. -->
+**Dependências**: COMP-003-010, COMP-003-012, COMP-003-013, COMP-003-014
 
 ### COMP-003-016: Montagem em `src/http/routes.ts`
 **Responsabilidade**: a ordem de montagem que realiza o deny-by-default — `requireAuth` montado antes dos routers protegidos e depois das rotas públicas — **e** a garantia de que todo router não-público aplica `requireRole(...)` (declara seus papéis em `ROUTE_ROLES`), de modo que uma rota adicionada sem declaração nasça negada (falha fechada). A realização de NFR-002-001 é **conjunta**: COMP-003-012 registra a declaração, COMP-003-011 nega o caminho não-declarado, COMP-003-016 garante que nenhum router não-público fica sem `requireRole`.
@@ -379,7 +382,8 @@ model Session {
 - Um cookie único (sessão deslizante de 7 dias), descartada porque contraria A-002-003 (credencial curta + refresh rotacionado) e alarga a janela de um cookie de acesso vazado (custo: exposição de credencial de longa duração).
 - Assinar os cookies (`cookie-parser` com secret), descartada porque não agrega sobre um valor de 256 bits já validado por hash no servidor (custo: complexidade e um segredo a mais sem ganho).
 **Consequências**: F1 assume mesmo site (dev local + `CORS_ORIGINS`); cross-domain exigirá `SameSite=None` + `Secure` + token anti-CSRF (TRISK-003-002). `cookie-parser` entra na árvore (TRISK-003-004).
-**Reabrir se**: frontend e backend forem servidos de domínios distintos em produção.
+<!-- EMENDA Wave 5 (retry — gate 8, MEDIA): o alcance da verificação de `Origin`/`Host` é **toda mutação autenticada por cookie**, não só `POST /auth/*`. As 3 mutações de `users/` (`POST /users`, `PATCH /users/:id/disable`, `POST /users/:id/reset-password`) passam a aplicar `verifyOrigin`. O lugar definitivo é a montagem (TASK-003-011): `verifyOrigin` 1× em `apiRoutes` para todo método que muda estado. -->
+**Reabrir se**: frontend e backend forem servidos de domínios distintos em produção; ou surgir uma mutação autenticada por cookie sem `verifyOrigin` na cadeia.
 **Irreversível**: nao
 **Aderência à ficha/perfil**: herdada (aplica §6.5 e NFR-002-008); nomes e paths são específicos deste PLAN
 
