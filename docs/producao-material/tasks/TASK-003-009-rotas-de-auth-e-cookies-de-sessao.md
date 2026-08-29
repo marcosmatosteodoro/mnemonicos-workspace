@@ -39,7 +39,7 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
   - Middleware local de verificação de `Origin`/`Host` nas rotas POST que mudam estado. Sem `try/catch` (Express 5 encaminha a rejeição).
 - `ACCESS_COOKIE` / `REFRESH_COOKIE` importados de `mnemonicos-backend/src/http/cookies.ts` (TASK-003-007) — nomes **consumidos, nunca redefinidos** aqui.
 - Opções de cookie da DEC-003-004 (definidas nesta TASK): `mnemo_access` (`path '/'`, `httpOnly`, `sameSite: 'lax'`, `secure: env.COOKIE_SECURE`, `maxAge` = `AUTH_ACCESS_TTL_MINUTES`); `mnemo_refresh` (`path '/api/v1/auth'`, demais flags iguais, `maxAge` = `AUTH_REFRESH_TTL_DAYS`). Sem assinatura de cookie.
-- `mnemonicos-backend/src/app.ts` — montar `cookie-parser` antes de `apiRoutes`.
+- `mnemonicos-backend/src/app.ts` — montar `cookie-parser` antes de `apiRoutes`, **sem segredo** (`cookieParser()` — o projeto usa token opaco + HMAC no banco, DEC-003-002; cookie assinado criaria um 2º mecanismo de integridade e ativaria o `cookie-signature@1.0.6` transitivo, que compara com `==`). A dependência `cookie-parser` foi adicionada em TASK-003-003; aqui ela é montada.
 - `mnemonicos-backend/tests/integration/auth.routes.test.ts`.
 - Meio de execução dos `*.integration.test.ts` desta TASK: o harness de TASK-003-016 — config `jest.integration.config.ts`, helper `tests/integration/db.ts` (`testPrisma` + `resetDb()` no `beforeEach`), comando `npm --prefix mnemonicos-backend run test:integration`.
 
@@ -52,7 +52,7 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
 
 Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critérios prevalecem; nunca siga um passo que enfraqueça um critério.
 
-1. `app.ts` — `app.use(cookieParser())` antes de `apiRoutes`.
+1. `app.ts` — `app.use(cookieParser())` (sem segredo) antes de `apiRoutes`.
 2. `auth.routes.ts` — os 5 endpoints; `requireRole('EDITOR','ADMIN')` nas três protegidas; builders `accessCookieOptions()` / `refreshCookieOptions()` a partir de `env`.
 3. Middleware local de `Origin`/`Host` contra `CORS_ORIGINS` nas rotas POST.
 4. Testes de integração sobre a `app` real, asserção estrutural sobre cada `Set-Cookie` e sobre `ROUTE_ROLES`.

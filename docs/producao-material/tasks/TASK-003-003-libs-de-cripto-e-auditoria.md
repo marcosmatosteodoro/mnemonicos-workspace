@@ -7,7 +7,8 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
+**Data início**: 2026-08-28T21:01:28-03:00
 
 ## Convenções (do projeto)
 
@@ -73,26 +74,31 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-28T21:01:00-03:00
+**Data conclusão**: 2026-08-28T21:50:00-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 5547fc2 · 98b5256 (retry)
 **Jira**: KAN-13
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — Wave 2, diff acumulado + delta do retry, re-review APROVADO
+**Tentativas**: 2
+**Cobertura final**: n/a
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/lib/password.ts
+  - mnemonicos-backend/src/lib/tokens.ts
+  - mnemonicos-backend/src/lib/audit.ts
+  - mnemonicos-backend/package.json
+  - mnemonicos-backend/package-lock.json
+  - mnemonicos-backend/tests/unit/{password,tokens,audit}.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — unit 68/68 (10 suítes)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — re-review do delta APROVADO
+- [x] ACs verificados — AC-002-024 (senha só como saída de Argon2id, params de env — prova falsificável no retry), AC-002-002 (auditoria sem segredo — conjunto de chaves fechado)
+- [x] Segurança (gate 8): aprovado (Wave 2) — security-engineer, re-review APROVADO
+- [x] Comportamento (gate 9): n/a — infra de cripto/auditoria, sem efeito observável (qa)
 
-**Notas**: 
+**Notas**: @node-rs/argon2@2.1.0 (pin exato, MIT, sem postinstall de compilação), cookie-parser@1.4.7. `npm audit --omit=dev --audit-level=high` → 0 vulnerabilities. Retry pelo gate 1 da Wave 2: prova de que os params de custo vêm de `env` (recarga do módulo sob ARGON2_* distintos; mutação para literal fica vermelha). `hashToken` = HMAC-SHA256 (errata da Wave 1). Notas dobradas nas TASKs 006/009: `.max(200)` no password (DoS no KDF), `token.reuse` no ramo `expired` com rotatedAt/revokedAt. Nota da Wave 3: `cookieParser()` monta sem segredo (cookie-signature transitivo não usado).

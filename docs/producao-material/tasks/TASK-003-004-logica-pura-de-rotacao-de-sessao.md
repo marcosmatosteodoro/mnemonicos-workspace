@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -67,26 +67,27 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-28T21:19:00-03:00
+**Data conclusão**: 2026-08-28T21:50:00-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 0124091 · 5f7cb73 (retry)
 **Jira**: KAN-14
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — Wave 2, diff acumulado + delta do retry, re-review APROVADO
+**Tentativas**: 2
+**Cobertura final**: n/a
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/auth/session-rotation.ts
+  - mnemonicos-backend/tests/unit/session-rotation.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — unit 68/68 (10 suítes) — session-rotation 11/11
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — re-review do delta APROVADO
+- [x] ACs verificados — AC-002-004 (rotate no caminho válido), AC-002-005 (reuso: revogada/rotacionada fora da graça, e revogada×graça — precedência falsificável no retry), AC-002-006 (expiração vence a graça), AC-002-026 (replay-grace na concorrência)
+- [x] Segurança (gate 8): aprovado (Wave 2) — security-engineer, re-review APROVADO
+- [x] Comportamento (gate 9): n/a — lógica pura, sem efeito observável (qa)
 
-**Notas**: 
+**Notas**: `decideRefresh(session, now, graceSeconds)` — função pura sem I/O, espelho de `scheduler.ts`. Precedência `expired → reuse → replay-grace → rotate`. Retry pelo gate 1 da Wave 2: caso discriminante `revokedAt` dentro da graça → `reuse` (a revogação vence); mutante de reordenação agora morre. Nota da Wave 3 (gate 8): em TASK-003-006, o ramo `expired` com `rotatedAt/revokedAt != null` também revoga a família + `token.reuse` (não deixa a família viva do atacante escapar).

@@ -503,7 +503,16 @@ Organização (`roots`: `src` e `tests`):
 |------|------|------|
 | Unitário de regra pura | `tests/unit/<x>.test.ts` | sem mock, sem banco, sem relógio — a função recebe `now` |
 | Integração de rota | `tests/integration/<x>.test.ts` | `supertest` sobre a `app` real (stack HTTP + middlewares de produção) |
-| Env de teste | `tests/setup-env.ts` (`setupFiles`) | valores **fictícios**; nenhum teste lê `.env` |
+| Integração com banco | `tests/*.integration.test.ts` (runner próprio, `--runInBand`, `resetDb()` por `beforeEach`) | Postgres **local** descartável (`mnemonicos_test`); nunca produção |
+| Env de teste | `tests/setup-env.ts` (`setupFiles`) | valores **fictícios**; nenhum teste lê `.env`. O env de integração **deriva** deste (`import './setup-env'` + sobrepõe só as URLs) — nunca copia |
+
+- **Árvore de decisão com precedência declarada** (DEC, comentário, ordem de `if`): teste
+  **um caso por par de ramos que pode coincidir**, não só um por ramo — ordem de avaliação
+  é comportamento do cruzamento, e o mutante que reordena sobrevive a "um caso por ramo".
+  O nome do teste enuncia quem vence. (lição da Wave 2 de PLAN-003)
+- **Infra de teste que faz DDL/`TRUNCATE`** valida o alvo **no módulo que resolve a conexão**
+  (nome do banco == o descartável; host loopback) e **lança na carga** se divergir — nunca
+  `expect()` dentro de um caso, que roda depois da primeira escrita. (lição da Wave 2 de PLAN-003)
 
 **Convenções:**
 
