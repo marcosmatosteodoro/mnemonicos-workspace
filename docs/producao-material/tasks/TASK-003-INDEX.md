@@ -6,9 +6,9 @@
 
 ## Status agregado
 
-- Todo: 7
+- Todo: 6
 - In Progress: 0
-- Done: 9
+- Done: 10
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -29,7 +29,7 @@
 - [x] TASK-003-012 ✅ Done — Seed do primeiro ADMIN a partir de `env`
 
 ### Wave 4 (depende da Wave 3)
-- [ ] TASK-003-007 ⏸ Todo — Middlewares `authenticate` / `authorize` + `Express.Request.auth`
+- [x] TASK-003-007 ✅ Done — Middlewares `authenticate` / `authorize` + `Express.Request.auth`
 
 ### Wave 5 (depende da Wave 4)
 - [ ] TASK-003-009 ⏸ Todo — Rotas de auth + cookies de sessão + `cookie-parser`
@@ -121,5 +121,5 @@ aparecem: `Realiza (FRs)` = `nenhuma` (chore ou só NFR via AC), sem FR que deri
 | FEAT | TASKs (P = primária) | Done |
 |------|----------------------|------|
 | FEAT-002-001 | TASK-003-004 (P), TASK-003-006 (P), TASK-003-008 (P), TASK-003-014 (P), TASK-003-015 | 0/5 |
-| FEAT-002-002 | TASK-003-007 (P), TASK-003-013 (P), TASK-003-015 (P) | 0/3 |
+| FEAT-002-002 | TASK-003-007 (P), TASK-003-013 (P), TASK-003-015 (P) | 1/3 |
 | FEAT-002-003 | TASK-003-006, TASK-003-010 (P), TASK-003-012 (P) | 0/3 |

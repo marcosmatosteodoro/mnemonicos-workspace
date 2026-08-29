@@ -398,6 +398,18 @@ pequeno, mas não nulo:
 - **Deny-by-default na montagem:** o middleware de autenticação/autorização entra **antes**
   do router protegido, e a rota pública é a **exceção declarada**. Rota nova nasce
   protegida; nunca o inverso.
+- **Registro consultado por um guard exige registro completo antes da 1ª requisição.** Se a
+  barreira (`requireAuth`) nega com base num registro central (`ROUTE_ROLES`), a declaração
+  desse registro é ato de **montagem** (avaliação da chamada de `requireRole(method, path,
+  …)`), **nunca** efeito colateral dentro do handler de request — na cadeia Express o guard
+  externo decide antes que o interno tenha rodado uma vez, e o deny-by-default degenera em
+  deny-tudo sem nada falhar. Registro **selado** após o boot. Teste obrigatório: montagem
+  real, sem popular o registro à mão, caminho feliz chega a 200 (ver §7).
+- **"Declarado" não é "autorizado".** O guard compara o **conjunto** de papéis do registro
+  contra o papel da sessão; leitura que devolve "nenhuma permissão exigida" **falha
+  fechada**. Chave do registro inclui o **método HTTP** (`"<MÉTODO> <caminho>"`) — sem isso
+  `DELETE` herda a declaração do `GET`. E quando a chave ganha uma dimensão, **todos** os
+  leitores dela ganham — inclusive a allowlist de exceção pública.
 - **Ordem de middleware é semântica em Express.** `app.use(auth)` registrado **depois** de
   `app.use(API_PREFIX, apiRoutes)` não protege nada — e não falha visivelmente. Confira a
   ordem em `createApp()` a cada rota nova.
@@ -513,6 +525,16 @@ Organização (`roots`: `src` e `tests`):
 - **Infra de teste que faz DDL/`TRUNCATE`** valida o alvo **no módulo que resolve a conexão**
   (nome do banco == o descartável; host loopback) e **lança na carga** se divergir — nunca
   `expect()` dentro de um caso, que roda depois da primeira escrita. (lição da Wave 2 de PLAN-003)
+- **Registro consumido por um middleware anterior na cadeia** (ex.: `ROUTE_ROLES` lido por
+  `requireAuth`): o caminho feliz de **MONTAGEM** é oráculo distinto do caminho feliz de
+  request. Um teste monta a app real (`requireAuth` antes do router, sem popular o registro
+  à mão) e prova o 200 legítimo; o mutante que move a declaração para dentro do handler o
+  mata. (lição da Wave 4 de PLAN-003)
+- **Retry que reescreve um arquivo de teste por mudança de assinatura/contrato** entrega o
+  **inventário antes/depois** dos nomes de `it(...)` (`git show <pai>:<arquivo>` vs. HEAD);
+  cada nome ausente é classificado (renomeado / removido de propósito / **perdido → volta**).
+  Para todo ramo condicional que sobrevive ao retry, o mutante que o neutraliza morre **no
+  delta E no commit pai** — morrer só no pai é regressão de prova. (lição da Wave 4 de PLAN-003)
 
 **Convenções:**
 

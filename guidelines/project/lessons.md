@@ -9,6 +9,104 @@
 
 <!-- Adicionar lições abaixo desta linha -->
 
+## [Arquitetura] Barreira que nega com base num registro exige o registro completo antes da 1ª requisição
+
+**Erro:** o deny-by-default (`ROUTE_ROLES`) era populado por efeito colateral **dentro do
+handler de request** de `requireRole`, mas quem consulta o registro (`requireAuth`) roda
+**antes** dele na cadeia Express. O registro nunca era escrito: `requireAuth` negava todo
+caminho não declarado e o deny-by-default degenerava em **deny-tudo** (ADMIN válido →
+`403 403 403`). 30 asserções verdes não acusaram — toda montagem de teste pré-declarava o
+caminho à mão. Pego no gate 8 + gate 5/7 da Wave 4 (PLAN-003).
+**Causa:** auto-registro por efeito colateral de middleware foi tratado como equivalente a
+registro na montagem. Numa cadeia Express a ordem de execução, do ponto de vista de quem
+**consome** o registro, é o inverso da ordem de declaração: o guard mais externo decide
+antes que o mais interno tenha existido uma vez.
+**Solução:** (1) declaração é ato de **montagem** — `requireRole(method, path, ...roles)`
+declara na avaliação da chamada, nunca dentro do handler; registro **selado** após o boot.
+(2) O caminho feliz de **MONTAGEM** é oráculo distinto do caminho feliz de REQUEST: toda
+TASK que introduz registro/efeito-colateral consumido por um middleware **anterior** na
+cadeia ganha um teste que monta a app real (sem popular o registro à mão) e prova o 200
+legítimo — o mutante que move a escrita para o handler o mata.
+**Validade:** geral (qualquer registro consultado por um passo anterior na cadeia).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] "Declarado" não é "autorizado"; prova de gate de autz exige topologia adversarial
+
+**Erro:** o deny-by-default foi implementado como "o caminho está no registro?"
+(`rolesForPath(path) === undefined`) em vez de "este papel pode este método neste
+caminho?"; `requireAuth` nunca comparava `req.auth.role` com o conjunto. Rota declarada
+`ADMIN` montada sem o guard + sessão EDITOR → passava. A prova do AC usava um caminho
+isolado — a topologia em que o bug não aparece. Gate 8 da Wave 4 (PLAN-003).
+**Causa:** registro de presença confundido com decisão de autorização; o teste do AC
+construiu a topologia mais simples possível, sem rota irmã, sem 2º método, sem rota
+declarada porém desguarnecida.
+**Solução:** (1) toda leitura de permissão devolve o **conjunto** de papéis e o guarda
+compara o papel da sessão contra ele — "declarado" nunca implica "autorizado"; a leitura
+que devolve "nenhuma permissão exigida" **falha fechada**. (2) Prova de gate de autz exige
+a topologia adversarial mínima: rota irmã estática sem guarda ao lado de uma rota com
+`:param`; segundo método HTTP no mesmo caminho; rota declarada porém sem o middleware de
+papel; e o registro não ganha chave após o boot.
+**Validade:** geral (autorização por rota/ação).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Chave de decisão de autz que ganha uma dimensão: todos os leitores ganham, inclusive a allowlist de exceção
+
+**Erro:** ao endurecer o `ROUTE_ROLES` acrescentando a dimensão "método HTTP" à chave
+(`"<MÉTODO> <caminho>"`), a dimensão foi propagada ao registro e ao leitor (`rolesForPath`),
+mas **não** à lista de exceção (`PUBLIC_PATH_ALLOWLIST` / `isPublicPath`), que continuou
+comparando só o caminho — os 4 caminhos públicos dispensam sessão em **qualquer** verbo.
+Hoje inerte (não há rota não-POST em `/auth/login`/`/auth/refresh` nem não-GET em
+`/health*`), por isso nota do gate 8 da Wave 4, não achado.
+**Causa:** a exceção é a superfície mais **larga** da barreira e é a mais fácil de esquecer
+quando a chave da barreira evolui.
+**Solução:** quando a chave de uma decisão de autorização ganha uma dimensão, **todos** os
+leitores dessa decisão ganham a mesma dimensão — inclusive a allowlist de exceção.
+Concretamente: chavear `PUBLIC_PATH_ALLOWLIST` por `"<MÉTODO> <caminho>"` e a suíte de
+conformidade (COMP-003-019 / TASK-003-011) afirmar que cada entrada corresponde a
+exatamente uma rota montada naquele método.
+**Validade:** geral.
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Retry que reescreve arquivo de teste por mudança de assinatura entrega o inventário antes/depois dos `it()`
+
+**Erro:** o retry que mudou a assinatura de `requireRole` reescreveu os dois arquivos de
+teste e perdeu, sem que nada acusasse, o único caso que provava o ramo de omissão da chave
+`userAgent` no evento de auditoria — **enquanto** o delta duplicava esse mesmo ramo para um
+segundo arquivo. O mutante que neutraliza o ramo morria no commit pai e **sobreviveu** no
+delta (regressão de prova). Pego no re-review do gate 1 da Wave 4.
+**Causa:** mudança de assinatura força reescrita ampla do arquivo de teste; a atenção vai
+para os casos **novos** exigidos pelo achado, a suíte fica maior e mais verde, e a
+subtração some. Contagem crescente lê-se como cobertura crescente; nenhuma leitura do diff
+acusa um caso que simplesmente não foi reescrito.
+**Solução:** retry que reescreve arquivo de teste por mudança de assinatura entrega o
+**inventário antes/depois** dos nomes de `it(...)` (`git show <pai>:<arquivo>` vs. HEAD), e
+cada nome ausente é classificado: renomeado (com o substituto citado), removido de
+propósito (com o motivo) ou **perdido** (então volta). Regra de fecho: para todo ramo
+condicional que sobreviva ao retry, o mutante que o neutraliza tem de morrer **no delta E
+no commit pai** — morrer só no pai é regressão de prova.
+**Validade:** geral (qualquer retry que reescreva suíte por mudança de contrato).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] `lint-staged` grava LF com `core.autocrlf=true` → sujeira falsa pós-commit
+
+**Erro:** o hook de pre-commit (`prettier --write` + `eslint --fix` via lint-staged) grava
+os arquivos com fim-de-linha **LF**, mas o checkout usa `core.autocrlf=true`; logo após o
+commit os arquivos reaparecem como ` M` em `git status --porcelain` (conteúdo idêntico,
+`git diff` vazio), exigindo `git checkout --` para reconciliar. Verificações de "árvore
+limpa pós-commit" na closure veem sujeira falsa.
+**Causa:** desalinhamento entre `endOfLine` do prettier / `.gitattributes` / `core.autocrlf`.
+**Solução:** alinhar — `endOfLine: 'lf'` no prettier + `* text=auto eol=lf` em
+`.gitattributes` para os globs de código, ou `core.autocrlf=input` no ambiente. Enquanto
+não alinhado: a closure roda `git checkout --` nos arquivos recém-commitados antes de
+aferir a árvore.
+**Validade:** projeto (toolchain do `mnemonicos-backend`/`-frontend`).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
 ## [Testes] Sonda de investigação não nasce em `tests/**`; contagem de teste declara a árvore
 
 **Erro:** um gate rodou uma sonda de perf (`tests/integration/zz-perf-probe.integration.test.ts`,
@@ -22,13 +120,20 @@ ao PR — **mas roda**. "46/46 limpo" fica indistinguível de "47/47 com um `toB
 junto"; sonda vermelha ou lenta seria atribuída ao código sob revisão.
 **Solução:** (1) sonda/probe de investigação (perf, N+1, comportamento de driver) **não
 nasce em `tests/**`** — vive no scratchpad da sessão e roda por caminho explícito; se
-precisar do harness, nasce já com nome fora do `testMatch`. (2) quem declara contagem de
-teste como evidência de gate declara junto a árvore de onde ela saiu — `git status
+precisar do harness, nasce já com nome fora do `testMatch`. Gate cujo mecanismo de prova
+muta o diff (sonda, mutante, fixture temporária) roda em **`git worktree` isolada**
+(decisão 4.134), e o pacote de contexto da rodada **declara isso no despacho** — não como
+disciplina de limpar depois, que não cobre a janela de leitura. (2) quem declara contagem
+de teste como evidência de gate declara junto a árvore de onde ela saiu — `git status
 --porcelain` vazio (ou o resto, item a item). Contagem sem estado de árvore declarado não é
 evidência reproduzível.
 **Validade:** geral.
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
+**Reincidência:** Wave 3 (`zz-perf-probe`, gate 10) e Wave 4 (`zz-sec-probe`, gate 8
+paralelo) do PLAN-003. Na Wave 4 os revisores já foram despachados com "worktree isolada"
+explícito e cumpriram — a lacuna que resta é no **template de despacho do gate**, não no
+comportamento do revisor (roteada ao `agile-coach`).
 
 ## [Performance] `include`/`select` aninhado de relação não é 1 statement por padrão
 

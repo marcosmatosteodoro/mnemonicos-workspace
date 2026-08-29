@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-08-29T01:35:00-03:00
+**Última atualização**: 2026-08-29T17:12:00-03:00
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -21,7 +21,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 ### Em desenvolvimento
 - Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, 🟡 3/5 tasks Done)
-- Autorização por papel deny-by-default no servidor (SPEC-002/FEAT-002-002, PLAN-003, 🟡 0/3 tasks Done)
+- Autorização por papel deny-by-default no servidor (SPEC-002/FEAT-002-002, PLAN-003, 🟡 1/3 tasks Done)
 - Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, 🟡 2/3 tasks Done)
 
 ### Especificadas, ainda não planejadas
@@ -39,7 +39,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 | ID | Cobre | FRs cobertos | Tasks | Status |
 |----|-------|--------------|-------|--------|
-| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 9/16 🟡 | Approved |
+| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 10/16 🟡 | Approved |
 
 ## Glossário consolidado
 
@@ -90,3 +90,4 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 - 2026-08-29: furo no plano em TASK-003-006 — `refresh`/`logout` emitem eventos de auditoria mas suas assinaturas não recebiam `ip`, obrigatório em `AuthAuditEvent` (audit.ts selado na Wave 2) por NFR-002-005 — destino: `refresh`/`logout` passam a receber `ctx: { ip; userAgent? }` (aditivo; rota passa `req.ip`); PLAN + TASK-003-006/009 emendados
 - 2026-08-29: DEC-003-003 emendada (decisão degrau 1 do Tech Lead, veto na Entrega) — cláusula `replay-grace` idempotente era infeasible sob DEC-003-002 (só hashes persistidos); replay-grace passa a tratar como rotate (nova ponta, sem revogação/token.reuse na graça); cliente serializa o refresh (TASK-003-013)
 - 2026-08-29: Wave 3 do PLAN-003 fechada (TASK-003-006 auth.service, -008 freio de login, -012 seed do 1º ADMIN) — gates 1–10 aprovados após 1 retry de convergência + 1 furo no plano (ctx de origem); 3 lições registradas (pendentes de merge)
+- 2026-08-29: Wave 4 do PLAN-003 fechada (TASK-003-007 middlewares authenticate/authorize + ROUTE_ROLES) — gate 8 APROVADO; gates 1–7 REPROVARAM 1º passe (4 achados críticos de authz: registro populado em request, requireAuth só checava existência, chave sem método, curinga vaza) → retry `ead57a2` fechou os 4; re-review reprovou só gate 1 por regressão de prova (caso de teste perdido na reescrita) → resolvido `b106b84` test-only (teto de convergência 4.88 → decisão autônoma, ao veto do Diretor). DEC-003-005 EMENDA Wave 4 (chave `"<MÉTODO> <caminho>"`, declaração em montagem, `sealRouteRoles`, `requireAuth` piso de autz); resíduo `:param` de irmã estática → critério em TASK-003-011; 4 lições candidatas (pendentes de rota/merge)
