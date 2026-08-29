@@ -121,19 +121,26 @@ junto"; sonda vermelha ou lenta seria atribuída ao código sob revisão.
 **Solução:** (1) sonda/probe de investigação (perf, N+1, comportamento de driver) **não
 nasce em `tests/**`** — vive no scratchpad da sessão e roda por caminho explícito; se
 precisar do harness, nasce já com nome fora do `testMatch`. Gate cujo mecanismo de prova
-muta o diff (sonda, mutante, fixture temporária) roda em **`git worktree` isolada**
-(decisão 4.134), e o pacote de contexto da rodada **declara isso no despacho** — não como
-disciplina de limpar depois, que não cobre a janela de leitura. (2) quem declara contagem
-de teste como evidência de gate declara junto a árvore de onde ela saiu — `git status
+**escreve arquivo** (sonda, probe, mutante, fixture temporária) roda em **`git worktree`
+isolada** (decisão 4.134) — e a worktree isolada **não junta `node_modules` por junction**:
+`npm ci`/`npm install` dentro dela opera no diretório físico compartilhado e poda deps
+(nesta base, `@babel/core` transitivo do `jest-snapshot`, quebrando `test:integration`
+para todos). O pacote de contexto da rodada **declara isso no despacho** — não como
+disciplina de limpar depois, que não cobre a janela de leitura. **Gate nunca roda
+`npm install`/`npm ci` nem edita `package*.json` na árvore principal**; dep de
+instrumentação ausente → reporta o bloqueio, não conserta. (2) quem declara contagem de
+teste como evidência de gate declara junto a árvore de onde ela saiu — `git status
 --porcelain` vazio (ou o resto, item a item). Contagem sem estado de árvore declarado não é
 evidência reproduzível.
 **Validade:** geral.
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0
-**Reincidência:** Wave 3 (`zz-perf-probe`, gate 10) e Wave 4 (`zz-sec-probe`, gate 8
-paralelo) do PLAN-003. Na Wave 4 os revisores já foram despachados com "worktree isolada"
-explícito e cumpriram — a lacuna que resta é no **template de despacho do gate**, não no
-comportamento do revisor (roteada ao `agile-coach`).
+**Contadores:** confirmada 3 · contestada 0
+**Reincidência:** Wave 3 (`zz-perf-probe`, gate 10), Wave 4 (`zz-sec-probe`, gate 8), Wave 5
+(2×: `performance-engineer` fez `npm install` + `@babel/core` no `package.json` da árvore
+principal; e um gate da re-review rodou `npm ci` em worktree com `node_modules` junctionado,
+podando `@babel/core` — `test:integration` quebrou nas duas). Os revisores foram despachados
+com "worktree isolada" explícito e ainda assim; a lacuna é no **template de despacho do
+gate** (junction de `node_modules` + `npm ci` é a variante nova) — roteada ao `agile-coach`.
 
 ## [Performance] `include`/`select` aninhado de relação não é 1 statement por padrão
 
@@ -215,7 +222,36 @@ da decisão (`{ kind: 'expired'; reused: boolean }`). Reincidiu em `auth.service
 `expired ∧ reuse`): apagar o bloco de revogação+auditoria deixava as duas suítes verdes.
 **Validade:** geral (padrão de teste).
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0
+**Contadores:** confirmada 2 · contestada 0
+**Reincidência (gate 1 da Wave 5, `disableUser`):** `disableUser` foi reescrita no retry
+com 3 guards em ordem declarada (`id == null → 404` · `disabledAt != null → no-op` ·
+`role == 'ADMIN' && activeAdmins <= 1 → 409`); o par `disabledAt != null` × `último ADMIN
+ativo` **coincide e é alcançável** (ADMIN já desativado + 1 ADMIN ativo restante) e ficou
+sem caso — o mutante que troca a ordem sobreviveu. Corolário para quem escreve o card:
+função com ≥3 guards em ordem declarada → o "Critério de pronto" **enumera os pares que
+podem coincidir** (com o mutante de reordenação como aceite), nunca "um caso por ramo".
+
+## [Testes] Prova de corrida/exclusão nasce na fronteira da invariante, e o mutante roda pelo comando do critério
+
+**Erro:** o teste de exclusão mútua da guarda do último ADMIN semeou **3 ADMINs e
+desativou os 3** em concorrência, afirmando `count(ativos) >= 1` no fim. O mutante
+check-then-act (`count` fora da transação — perde 1 das 3 corridas) **passou** na suíte:
+2 vitórias já bastam para `>= 1`. Pego no re-review do gate 1 da Wave 5 de PLAN-003; o
+mesmo mutante **matava** o teste rodado isolado com `jest -t "..."`.
+**Causa:** (1) fixture com folga — com N sujeitos e invariante `>= 1`, o teste tolera N−1
+violações do mecanismo; a corrida foi dimensionada por quantidade, não pela **fronteira**
+onde uma única vitória a mais já viola. (2) O mutante nomeado foi rodado com `-t` isolado
+na fixação, e o oráculo de corrida depende do **contexto de execução** (ordem/paralelismo
+das outras specs no arquivo) — mata isolado, sobrevive no arquivo inteiro.
+**Solução:** prova de corrida/limite/cardinalidade-mínima nasce **na fronteira**: para
+`count(ativos) >= 1`, o cenário é o **penúltimo** (exatamente 2 ativos, N concorrentes do
+mesmo alvo) — mesmo raciocínio de "enumerar por DADO ativo" já registrado aqui. E o
+mutante nomeado num "Critério de pronto" roda **pelo comando do critério** (arquivo/suíte
+inteira), **nunca** `-t "..."` isolado — senão o critério aprova um oráculo que só mata
+fora do contexto real (decisão 4.186). Âncora: `users.integration.test.ts` [retry S1].
+**Validade:** geral (teste de concorrência/invariante).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
 
 ## [Testes] Sintoma novo só vira "dívida conhecida" depois de reproduzido sem o diff
 
