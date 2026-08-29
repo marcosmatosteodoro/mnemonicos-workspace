@@ -639,15 +639,38 @@ for (const topic of topics) {
   topic.cards = await prisma.flashcard.findMany({ where: { topicId: topic.id } });
 }
 
-// ✅ uma query, o Prisma resolve o aninhamento
+// ✅ evita o N+1 (não é 1 statement — ver abaixo)
 const topics = await prisma.topic.findMany({
   where: { disciplineId },
   select: { id: true, name: true, flashcards: { select: { id: true, front: true } } },
 });
 ```
 
+- **`select`/`include` aninhado de relação NÃO é uma consulta única por padrão.** Sob a
+  estratégia de carga padrão do Prisma (`query`), cada nível de relação é **+1 ida ao
+  banco** — o exemplo acima resolve o N+1 (2 idas em vez de N+1), não vira 1 statement.
+  Para **1 ida** (LATERAL JOIN): `previewFeatures = ["relationJoins"]` no `generator` +
+  `relationLoadStrategy: 'join'` na consulta. Medido no ciclo de PLAN-003.
+  ⚠️ **O previewFeature torna `join` o DEFAULT global de TODA consulta com relação** — não é
+  opt-in por consulta. Para relação de **lista** (1-N de volume variável — `Topic→flashcards`,
+  `Flashcard→reviews`), o `LATERAL JOIN + JSONB_BUILD_OBJECT` **nem sempre** é mais barato que
+  as 2 idas da estratégia `query` (agrega tudo num JSONB no servidor). Ao introduzir
+  `select`/`include` de relação de lista: medir `join` vs `query` e **fixar a escolhida
+  explicitamente** na consulta (`relationLoadStrategy: 'query'` quando vencer), com a medição
+  no comentário.
+- **Falsificar "não trouxe a linha inteira"**: com `relationJoins` ligado, `include` também
+  emite 1 SELECT — então o teste de custo assere que **nenhuma query contém `passwordHash`**
+  (ou a coluna larga em questão). E `relationLoadStrategy: 'query'` só emite 2 SELECTs
+  **quando a linha relacionada existe** — a fixture do teste de contagem semeia o registro
+  real antes de contar, senão a asserção `=== 1` vira verde permanente.
+- **Consulta num caminho executado por requisição** (middleware de auth, resolvedor de
+  contexto de sessão): a **contagem de idas ao banco** é FIXADA EM TESTE —
+  `log: [{ emit: 'event', level: 'query' }]` no client e asserção sobre o nº de eventos.
+  Asserção sobre a forma do objeto devolvido **não** é prova de custo (passa verde com 2
+  round-trips e 20 colunas). (lição da Wave 3 de PLAN-003 — `src/modules/auth/auth.service.ts`)
 - **`select` explícito, sempre** — nunca traga o modelo inteiro "porque pode servir";
-  coluna de texto longo (o corpo do mnemônico) numa listagem multiplica o tráfego.
+  coluna de texto longo (o corpo do mnemônico) numa listagem multiplica o tráfego, e
+  `passwordHash`/digest de token no caminho quente é custo e superfície.
 - **`_count`** em vez de contar em JS; **`Promise.all`** para queries independentes (é o
   padrão em `listDisciplines`: `findMany` + `count` em paralelo).
 - **Paginação obrigatória** em toda listagem de tamanho variável (`skip`/`take`, com `max`

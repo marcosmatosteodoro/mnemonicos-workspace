@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -31,7 +31,7 @@ COMP-003-008 / COMP-003-007, DEC-003-002 (token opaco com estado no servidor), D
 - `mnemonicos-backend/src/modules/auth/auth.service.ts` — funções (não classe — §4 do perfil):
   - `login(input: { email; password; ip; userAgent? }): Promise<IssuedSession>` — resolve `User` por e-mail; `verifyPassword`; recusa com `UnauthorizedError` **genérico** se usuário inexistente **ou** senha errada **ou** `disabledAt != null` (mensagem única); sucesso → cria 1 `Session` (`familyId` novo; access+refresh via `generateToken`, guardados como `hashToken`) + `recordAuthEvent('login.success')`; falha → `recordAuthEvent('login.failure')` sem senha/token.
   - `resolveAccessSession(accessToken: string, now: Date): Promise<AuthContext | null>` — busca por `accessTokenHash` (`@unique`), confere `accessExpiresAt > now`, `revokedAt IS NULL`, junta `User`, confere `user.disabledAt IS NULL`; devolve `{ userId, role, sessionId }` ou `null`.
-  - `refresh(refreshToken: string, ctx: { ip: string; userAgent?: string }, now: Date): Promise<IssuedSession>` — **furo no plano da Wave 3, resolvido**: `refresh` recebe um `ctx` de origem porque `src/lib/audit.ts` (Wave 2, selado) fixou `ip: string` **obrigatório** em `AuthAuditEvent` e NFR-002-005 (MUST) exige indicador de origem em todo evento; a rota (TASK-003-009) passa `{ ip: req.ip, userAgent: req.get('user-agent') }`. Acha a linha por `refreshTokenHash`; delega a `decideRefresh` (COMP-003-006); `rotate` → `rotatedAt = now` na linha + sucessora no mesmo `familyId` **em `prisma.$transaction`** + `recordAuthEvent({ type: 'token.refresh', at: now, outcome: 'ok', subject: userId, ip: ctx.ip, userAgent: ctx.userAgent })`; `replay-grace` → reemite os cookies do sucessor já criado (idempotente); `reuse` → `revokedAt = now WHERE familyId` + `recordAuthEvent({ type: 'token.reuse', ip: ctx.ip, ... })` + `UnauthorizedError`; `expired` → `UnauthorizedError`, **e se `rotatedAt != null || revokedAt != null`** também `revokedAt = now WHERE familyId` + `recordAuthEvent({ type: 'token.reuse', ip: ctx.ip, ... })` (gate 8 da Wave 2). Token ausente (`undefined`) ou linha não encontrada → `UnauthorizedError` **genérico** (mesma `message` do caminho de credencial inválida), nunca exceção não tratada.
+  - `refresh(refreshToken: string, ctx: { ip: string; userAgent?: string }, now: Date): Promise<IssuedSession>` — **furo no plano da Wave 3, resolvido**: `refresh` recebe um `ctx` de origem porque `src/lib/audit.ts` (Wave 2, selado) fixou `ip: string` **obrigatório** em `AuthAuditEvent` e NFR-002-005 (MUST) exige indicador de origem em todo evento; a rota (TASK-003-009) passa `{ ip: req.ip, userAgent: req.get('user-agent') }`. Acha a linha por `refreshTokenHash`; delega a `decideRefresh` (COMP-003-006); `rotate` → `rotatedAt = now` na linha + sucessora no mesmo `familyId` **em `prisma.$transaction`** + `recordAuthEvent({ type: 'token.refresh', at: now, outcome: 'ok', subject: userId, ip: ctx.ip, userAgent: ctx.userAgent })`; `replay-grace` → **mesmo caminho de `rotate`**: nova ponta da família em `prisma.$transaction`, **sem** revogação e **sem** `token.reuse` (reemitir o sucessor já criado é infeasível — DEC-003-002 só persiste hashes; emenda do gate 7 da Wave 3); `reuse` → `revokedAt = now WHERE familyId` + `recordAuthEvent({ type: 'token.reuse', ip: ctx.ip, ... })` + `UnauthorizedError`; `expired` → `UnauthorizedError`, **e se `rotatedAt != null || revokedAt != null`** também `revokedAt = now WHERE familyId` + `recordAuthEvent({ type: 'token.reuse', ip: ctx.ip, ... })` (gate 8 da Wave 2). Token ausente (`undefined`) ou linha não encontrada → `UnauthorizedError` **genérico** (mesma `message` do caminho de credencial inválida), nunca exceção não tratada.
   - `logout(refreshToken: string, ctx: { ip: string; userAgent?: string }): Promise<void>` — `revokedAt = now WHERE familyId`; `recordAuthEvent({ type: 'logout', at: <now>, outcome: 'ok', subject: userId, ip: ctx.ip, userAgent: ctx.userAgent })`. `refreshToken` ausente (`undefined`) → **no-op silencioso** (a rota faz `clearCookie`). O `ctx` supre o `ip` obrigatório do evento (mesmo furo da Wave 3, ver `refresh`).
   - `changeOwnPassword(userId, input): Promise<void>` — `verifyPassword` da senha atual (erro → `UnauthorizedError`, sem alterar); `hashPassword` da nova; `revokedAt = now WHERE userId AND id != sessão corrente`. `newPassword` == senha atual (e ≥ 12) é **aceita** — F1 não promete política de reuso de senha (o hash muda por salt novo).
   - `revokeAllSessions(userId): Promise<void>` — usado por desativação e reset (TASK-003-010).
@@ -84,26 +84,32 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-29T01:27:00-03:00
+**Data conclusão**: 2026-08-29T08:45:00-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 1078f02 · 036031b (retry gates 8/10/1)
 **Jira**: KAN-16
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (1–7) · security-engineer (8) · performance-engineer (10) — Wave 3, diff acumulado + delta do retry, re-review APROVADO nos três
+**Tentativas**: 3
+**Cobertura final**: n/a
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/auth/auth.service.ts
+  - mnemonicos-backend/src/modules/auth/auth.schema.ts
+  - mnemonicos-backend/src/modules/auth/session-rotation.ts (só comentário — emenda DEC-003-003)
+  - mnemonicos-backend/prisma/schema.prisma (só bloco generator — previewFeatures relationJoins, sem migração)
+  - mnemonicos-backend/tests/integration/auth.service.integration.test.ts
+  - mnemonicos-backend/tests/unit/auth.schema.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — unit 85/85 · integração 46/46
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — re-review do delta APROVADO
+- [x] ACs verificados — AC-002-002/004/005/006/007/008/024/026/029 + revokeAllSessions/token-ausente/nova-senha==atual; par expired∧(rotatedAt|revokedAt) provado; contagem de round-trips de resolveAccessSession fixada em teste
+- [x] Segurança (gate 8): aprovado (Wave 3) — se: disabledAt no refresh + paddingHash fail-secure resolvidos, mutação verificada
+- [ ] Comportamento (gate 9): pendente — FEAT-002-003 completa no fim da Wave 5
+- [x] Performance (gate 10): aprovado (Wave 3) — pe: resolveAccessSession 1 ida (LATERAL JOIN, sem passwordHash), medido contra o Postgres real
 
-**Notas**: 
+**Notas**: Furo no plano (Wave 3): `refresh`/`logout` ganharam `ctx: { ip; userAgent? }` (audit.ts selado exige `ip`). Retry pelos 3 gates: guarda `session.user.disabledAt` no `refresh` (FR-002-007 literal); `paddingHash` não memoiza rejeição + KDF-falha vira `UnauthorizedError` genérico (nunca 500); `select` explícito + `relationLoadStrategy: 'join'` (1 ida, sem `passwordHash`); par de ramos `expired∧reuse` provado; `afterAll` fecha o client de produção. **Emenda DEC-003-003** (decisão degrau 1 do Tech Lead, veto na Entrega): `replay-grace` = mesma rotação de `rotate` (nova ponta, sem revogar nem `token.reuse` dentro da graça) — reemitir o sucessor é infeasible sob DEC-003-002. 3 lições registradas (par coincidente 2º eixo; sintoma×controle negativo; §10 relationJoins default global). Nota não-bloqueante p/ Entrega: o `catch` fail-secure do `login` deve logar a causa antes de negar.

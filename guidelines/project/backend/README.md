@@ -69,6 +69,12 @@ redação (`authorization`, `cookie`, `password`, `token`, `DATABASE_URL`, `JWT_
 Enquanto isso não existir, **nenhum endpoint que devolva dado por usuário entra em
 produção**. Se uma TASK pedir isso, o gate de segurança reprova — e está certo.
 
+**Consumidores de sessão do `src/modules/auth/auth.service.ts`** (checklist para qualquer
+predicado de negação novo — ex.: `disabledAt`, futura suspensão): `login`,
+`resolveAccessSession`, `refresh`, `changeOwnPassword`. Toda função que lê `User`/`Session`
+para autenticar, renovar ou emitir credencial recebe a mesma guarda **no mesmo diff**, com
+prova de negação. Compensador que mora numa TASK futura não conta como controle presente.
+
 ## Testes
 
 - Lógica pura → teste unitário em `tests/unit/`, sem mock de banco.

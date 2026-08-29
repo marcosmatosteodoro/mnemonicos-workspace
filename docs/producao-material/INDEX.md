@@ -20,9 +20,9 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 (vazio até a primeira entrega)
 
 ### Em desenvolvimento
-- Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, 🟡 1/5 tasks Done)
+- Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, 🟡 3/5 tasks Done)
 - Autorização por papel deny-by-default no servidor (SPEC-002/FEAT-002-002, PLAN-003, 🟡 0/3 tasks Done)
-- Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, 🟡 0/3 tasks Done)
+- Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, 🟡 2/3 tasks Done)
 
 ### Especificadas, ainda não planejadas
 (nenhuma — SPEC-002 coberta por PLAN-003)
@@ -39,7 +39,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 | ID | Cobre | FRs cobertos | Tasks | Status |
 |----|-------|--------------|-------|--------|
-| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 6/16 🟡 | Approved |
+| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 9/16 🟡 | Approved |
 
 ## Glossário consolidado
 
@@ -81,8 +81,6 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
-- 2026-08-28: SPEC-002 (Acesso interno e papéis de produção, F1 do épico) criada e promovida a `Approved` via /keelson:specify — 3 FEATs, 24 FRs, 29 ACs; PO ESCALOU 1 ponto (troca da própria senha) resolvido pelo default, veto pendente na Entrega
-- 2026-08-28: PLAN-003 criado e promovido a `Approved` via /keelson:plan — 24 componentes, 12 DECs (todas reversíveis), 6 TRISKs; token opaco com estado no servidor (não JWT), model Session com rotação por família, Argon2id via @node-rs/argon2, deny-by-default na montagem
 - 2026-08-28: PLAN-003 decomposto em 15 TASKs / 7 waves via /keelson:tasks; sync Jira (gancho tasks) — 15 sub-tasks KAN-11..KAN-25 sob KAN-8/KAN-9/KAN-10
 - 2026-08-28: Etapa 3.5 (verificabilidade pré-código) — qa pré-código resolvido (18 achados); PO fixou deny-by-default "por papel" (leitura B): DEC-003-005 emendada com registro central ROUTE_ROLES (rota sem declaração nega 403 mesmo com sessão válida) — custo adicional de F1 pendente de veto do Diretor na entrega
 - 2026-08-28: furo no plano em TASK-003-002 — a suíte de teste do backend não abre conexão com banco (`tests/setup-env.ts` fictício), mas 6 TASKs assumem integração com Prisma real — destino: TASK-003-016 nova (harness de integração, COMP-003-025) na Wave 2, PLAN-003 emendado
@@ -90,3 +88,5 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 - 2026-08-28: Wave 1 do PLAN-003 fechada (TASK-003-001/002/005 Done) — gate 8 reprovou e convergiu em 1 retry (fail-open no COOKIE_SECURE, redação do pino, contrato HMAC); errata propagada ao PLAN e TASKs; 2 lições registradas (pendentes de merge)
 - 2026-08-28: Wave 2 do PLAN-003 fechada (TASK-003-016 harness de integração, -003 libs cripto/audit, -004 rotação pura) — gates 1–8 aprovados após 1 retry de convergência (precedência de ramos falsificável, prova de params de env, guarda fail-closed do banco de teste); 2 lições registradas (pendentes de merge)
 - 2026-08-29: furo no plano em TASK-003-006 — `refresh`/`logout` emitem eventos de auditoria mas suas assinaturas não recebiam `ip`, obrigatório em `AuthAuditEvent` (audit.ts selado na Wave 2) por NFR-002-005 — destino: `refresh`/`logout` passam a receber `ctx: { ip; userAgent? }` (aditivo; rota passa `req.ip`); PLAN + TASK-003-006/009 emendados
+- 2026-08-29: DEC-003-003 emendada (decisão degrau 1 do Tech Lead, veto na Entrega) — cláusula `replay-grace` idempotente era infeasible sob DEC-003-002 (só hashes persistidos); replay-grace passa a tratar como rotate (nova ponta, sem revogação/token.reuse na graça); cliente serializa o refresh (TASK-003-013)
+- 2026-08-29: Wave 3 do PLAN-003 fechada (TASK-003-006 auth.service, -008 freio de login, -012 seed do 1º ADMIN) — gates 1–10 aprovados após 1 retry de convergência + 1 furo no plano (ctx de origem); 3 lições registradas (pendentes de merge)

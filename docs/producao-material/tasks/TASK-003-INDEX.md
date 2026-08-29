@@ -6,9 +6,9 @@
 
 ## Status agregado
 
-- Todo: 10
+- Todo: 7
 - In Progress: 0
-- Done: 6
+- Done: 9
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -24,9 +24,9 @@
 - [x] TASK-003-016 ✅ Done — Harness de teste de integração com banco (furo no plano, depende de 002)
 
 ### Wave 3 (depende da Wave 2)
-- [ ] TASK-003-006 ⏸ Todo — Serviço de autenticação (`auth.service.ts` + `auth.schema.ts`)
-- [ ] TASK-003-008 ⏸ Todo — Freio de login por chave composta (`login-rate-limit.ts`)
-- [ ] TASK-003-012 ⏸ Todo — Seed do primeiro ADMIN a partir de `env`
+- [x] TASK-003-006 ✅ Done — Serviço de autenticação (`auth.service.ts` + `auth.schema.ts`)
+- [x] TASK-003-008 ✅ Done — Freio de login por chave composta (`login-rate-limit.ts`)
+- [x] TASK-003-012 ✅ Done — Seed do primeiro ADMIN a partir de `env`
 
 ### Wave 4 (depende da Wave 3)
 - [ ] TASK-003-007 ⏸ Todo — Middlewares `authenticate` / `authorize` + `Express.Request.auth`

@@ -41,7 +41,7 @@ COMP-003-006 / DEC-003-003 / TRISK-003-005. Função pura sem I/O que, dada a li
 Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critérios prevalecem; nunca siga um passo que enfraqueça um critério.
 
 1. Definir `RefreshDecision` e o tipo estrutural `SessionRow` (só os campos consultados).
-2. Implementar a árvore de decisão **nesta ordem de precedência** (ramos coincidentes seguem-na — expiração absoluta vence a graça): `refreshExpiresAt < now` → `expired`; `revokedAt != null` → `reuse`; `rotatedAt != null` e `now - rotatedAt <= graceSeconds` → `replay-grace`; `rotatedAt != null` e `now - rotatedAt > graceSeconds` → `reuse`; senão → `rotate`.
+2. Implementar a árvore de decisão **nesta ordem de precedência** (ramos coincidentes seguem-na — expiração absoluta vence a graça): `refreshExpiresAt < now` → `expired`; `revokedAt != null` → `reuse`; `rotatedAt != null` e `now - rotatedAt <= graceSeconds` → `replay-grace` (o consumidor trata como `rotate` sem penalizar — emenda do gate 7 da Wave 3; a função pura só classifica); `rotatedAt != null` e `now - rotatedAt > graceSeconds` → `reuse`; senão → `rotate`.
 3. Cobrir cada ramo no teste unitário com `SessionRow` literais, mais os casos de ramos coincidentes.
 
 ## Critérios de pronto

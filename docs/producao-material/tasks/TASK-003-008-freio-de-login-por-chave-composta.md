@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -70,26 +70,30 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-29T01:40:00-03:00
+**Data conclusão**: 2026-08-29T08:45:00-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: eee5969 · 928a750 (retry gate 7)
 **Jira**: KAN-18
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (1–7) · security-engineer (8) · performance-engineer (10) — Wave 3, diff acumulado + delta do retry, re-review APROVADO nos três
+**Tentativas**: 2
+**Cobertura final**: n/a
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/auth/login-rate-limit.ts
+  - mnemonicos-backend/src/http/errors.ts (+ TooManyRequestsError 429)
+  - mnemonicos-backend/src/app.ts (extração de `GLOBAL_RATE_LIMIT_MAX` — necessidade direta do AC, não escoteiro)
+  - mnemonicos-backend/tests/integration/login-rate-limit.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — unit 85/85 · integração 46/46
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — re-review do delta APROVADO
+- [x] ACs verificados — AC-002-003 (chave composta conta+origem, sem lockout duro, 2ª conta legítima da mesma origem autentica), NFR-002-006 (mais estrito que o global — oráculo lê a constante exportada de src/app.ts)
+- [x] Segurança (gate 8): aprovado (Wave 3) — se: freio sem caminho de lockout permanente; MemoryStore sem vazamento (double-buffer + .clear())
+- [ ] Comportamento (gate 9): pendente — FEAT-002-003 completa no fim da Wave 5
+- [x] Performance (gate 10): aprovado (Wave 3) — pe: contador em memória sem crescimento sem bound (TRISK-003-001 segue como dívida multi-instância)
 
-**Notas**: 
+**Notas**: Dois limiters `express-rate-limit` (por e-mail normalizado, por `req.ip` com `ipKeyGenerator`), `skip: () => isTest`, factory `createLoginRateLimiters(overrides?)` para testabilidade. Retry pelo gate 7: envelope de erro 429 passa pela fronteira única (`next(new TooManyRequestsError())` → `errorHandler`); `GLOBAL_RATE_LIMIT_MAX` exportada de `src/app.ts` e importada no teste (era cópia manual). **Classificação corrigida**: a edição de `src/app.ts` é necessidade técnica direta do critério de pronto (que cita "o max global de src/app.ts"), não escoteiro cross-file.
