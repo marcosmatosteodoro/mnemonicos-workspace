@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-08-28T21:52:00-03:00
+**Última atualização**: 2026-08-29T01:35:00-03:00
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -89,3 +89,4 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 - 2026-08-28: sync Jira pulado (sub-task de TASK-003-016) — `atlassianUserInfo` / `getAccessibleAtlassianResources` retornaram AWS WAF "Human Verification" CAPTCHA em vez de JSON — conector bloqueado nesta execução; reconciliar via /keelson:jira-sync quando voltar (parent-alvo KAN-8)
 - 2026-08-28: Wave 1 do PLAN-003 fechada (TASK-003-001/002/005 Done) — gate 8 reprovou e convergiu em 1 retry (fail-open no COOKIE_SECURE, redação do pino, contrato HMAC); errata propagada ao PLAN e TASKs; 2 lições registradas (pendentes de merge)
 - 2026-08-28: Wave 2 do PLAN-003 fechada (TASK-003-016 harness de integração, -003 libs cripto/audit, -004 rotação pura) — gates 1–8 aprovados após 1 retry de convergência (precedência de ramos falsificável, prova de params de env, guarda fail-closed do banco de teste); 2 lições registradas (pendentes de merge)
+- 2026-08-29: furo no plano em TASK-003-006 — `refresh`/`logout` emitem eventos de auditoria mas suas assinaturas não recebiam `ip`, obrigatório em `AuthAuditEvent` (audit.ts selado na Wave 2) por NFR-002-005 — destino: `refresh`/`logout` passam a receber `ctx: { ip; userAgent? }` (aditivo; rota passa `req.ip`); PLAN + TASK-003-006/009 emendados

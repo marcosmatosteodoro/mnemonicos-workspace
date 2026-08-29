@@ -29,6 +29,7 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
 ## Escopo
 
 ### Inclui
+- As rotas `POST /auth/refresh` e `POST /auth/logout` (e `POST /auth/login`) passam ao service um `ctx` de origem `{ ip: req.ip, userAgent: req.get('user-agent') }` — o `refresh`/`logout` de TASK-003-006 exigem esse `ctx` para o indicador de origem obrigatório dos eventos de auditoria (NFR-002-005 × `audit.ts` selado na Wave 2).
 - `mnemonicos-backend/src/modules/auth/auth.routes.ts` — `authRoutes: Router`:
   - `POST /auth/login` (público; precedido por `loginRateLimiters`) → `login`; sucesso → `res.cookie(ACCESS_COOKIE, ...)` e `res.cookie(REFRESH_COOKIE, ...)`; corpo = `SessionUser` (sem token).
   - `POST /auth/refresh` (público) → lê `REFRESH_COOKIE` do cookie, `refresh`; reemite os dois cookies.
