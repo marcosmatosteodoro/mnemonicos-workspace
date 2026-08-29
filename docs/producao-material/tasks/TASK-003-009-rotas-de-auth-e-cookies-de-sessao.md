@@ -24,7 +24,9 @@
 
 COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/limpar os cookies de sessão com as flags exigidas (inacessível a script, `secure` em produção, same-site), e verificar `Origin`/`Host` nas rotas POST que mudam estado (Route Handlers não herdam proteção CSRF). As rotas protegidas declaram seu papel (`{EDITOR, ADMIN}`) via `requireRole` — a leitura B do deny-by-default (DEC-003-005) exige declaração explícita, e essa declaração é dona desta TASK (define `auth.routes.ts`), não só da montagem em TASK-003-011. Fatia sensível (endpoints novos + cookies + declaração de papel) → `security-engineer`.
 
-**Consome (aresta)**: `ACCESS_COOKIE` / `REFRESH_COOKIE` (nomes — TASK-003-007) por nome; `requireRole` e `ROUTE_ROLES` (TASK-003-007); `loginRateLimiters` (TASK-003-008); as funções de `auth.service` (TASK-003-006). **Nomeia**: `accessCookieOptions()` / `refreshCookieOptions()` (opções da DEC-003-004), consumidas pelo `logout` e por fatias futuras.
+**EMENDA DEC-003-005 (Wave 4 — vinculante)**: `requireRole` passou a ter a assinatura **`requireRole(method: HttpMethod, path: string, ...roles: UserRole[])`** e a declarar em `ROUTE_ROLES` **na avaliação da chamada** (tempo de montagem), com chave `"<MÉTODO> <caminho>"`. Toda aplicação de `requireRole` nesta TASK usa a assinatura nova, com o **método** e o **caminho completo visto por `requireAuth`** (a partir da raiz de `apiRoutes`: `/auth/logout`, `/auth/change-password`, `/auth/me`) — nunca a grafia relativa nem a assinatura antiga `requireRole('EDITOR','ADMIN')`. `sealRouteRoles()` é chamado por TASK-003-011 na montagem, não aqui.
+
+**Consome (aresta)**: `ACCESS_COOKIE` / `REFRESH_COOKIE` (nomes — TASK-003-007) por nome; `requireRole(method, path, ...roles)` e `ROUTE_ROLES` (TASK-003-007, assinatura da EMENDA Wave 4); `loginRateLimiters` (TASK-003-008); as funções de `auth.service` (TASK-003-006). **Nomeia**: `accessCookieOptions()` / `refreshCookieOptions()` (opções da DEC-003-004), consumidas pelo `logout` e por fatias futuras.
 
 ## Escopo
 
@@ -33,10 +35,10 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
 - `mnemonicos-backend/src/modules/auth/auth.routes.ts` — `authRoutes: Router`:
   - `POST /auth/login` (público; precedido por `loginRateLimiters`) → `login`; sucesso → `res.cookie(ACCESS_COOKIE, ...)` e `res.cookie(REFRESH_COOKIE, ...)`; corpo = `SessionUser` (sem token).
   - `POST /auth/refresh` (público) → lê `REFRESH_COOKIE` do cookie, `refresh`; reemite os dois cookies.
-  - `POST /auth/logout` (protegido; `requireRole('EDITOR','ADMIN')`) → `logout`; `res.clearCookie` dos dois.
-  - `POST /auth/change-password` (protegido; `requireRole('EDITOR','ADMIN')`) → `changeOwnPassword` (usa `req.auth`).
-  - `GET /auth/me` (protegido; `requireRole('EDITOR','ADMIN')`) → `SessionUser` da sessão corrente.
-  - As rotas protegidas aplicam `requireRole('EDITOR','ADMIN')` (importado de TASK-003-007), registrando `/auth/logout`, `/auth/change-password` e `/auth/me` em `ROUTE_ROLES`; as públicas (`/auth/login`, `/auth/refresh`) **não** recebem `requireRole` e entram em `PUBLIC_PATH_ALLOWLIST` (item já previsto em TASK-003-007).
+  - `POST /auth/logout` (protegido; `requireRole('POST', '/auth/logout', 'EDITOR', 'ADMIN')`) → `logout`; `res.clearCookie` dos dois.
+  - `POST /auth/change-password` (protegido; `requireRole('POST', '/auth/change-password', 'EDITOR', 'ADMIN')`) → `changeOwnPassword` (usa `req.auth`).
+  - `GET /auth/me` (protegido; `requireRole('GET', '/auth/me', 'EDITOR', 'ADMIN')`) → `SessionUser` da sessão corrente.
+  - As rotas protegidas aplicam `requireRole(<método>, <caminho>, 'EDITOR', 'ADMIN')` (importado de TASK-003-007, assinatura da EMENDA Wave 4), declarando `"POST /auth/logout"`, `"POST /auth/change-password"` e `"GET /auth/me"` em `ROUTE_ROLES` **em tempo de montagem**; as públicas (`/auth/login`, `/auth/refresh`) **não** recebem `requireRole` e entram em `PUBLIC_PATH_ALLOWLIST` (item já previsto em TASK-003-007).
   - Middleware local de verificação de `Origin`/`Host` nas rotas POST que mudam estado. Sem `try/catch` (Express 5 encaminha a rejeição).
 - `ACCESS_COOKIE` / `REFRESH_COOKIE` importados de `mnemonicos-backend/src/http/cookies.ts` (TASK-003-007) — nomes **consumidos, nunca redefinidos** aqui.
 - Opções de cookie da DEC-003-004 (definidas nesta TASK): `mnemo_access` (`path '/'`, `httpOnly`, `sameSite: 'lax'`, `secure: env.COOKIE_SECURE`, `maxAge` = `AUTH_ACCESS_TTL_MINUTES`); `mnemo_refresh` (`path '/api/v1/auth'`, demais flags iguais, `maxAge` = `AUTH_REFRESH_TTL_DAYS`). Sem assinatura de cookie.
@@ -54,14 +56,14 @@ COMP-003-010 / DEC-003-004 / §4 do PLAN. Superfície HTTP de auth: escrever/lim
 Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critérios prevalecem; nunca siga um passo que enfraqueça um critério.
 
 1. `app.ts` — `app.use(cookieParser())` (sem segredo) antes de `apiRoutes`.
-2. `auth.routes.ts` — os 5 endpoints; `requireRole('EDITOR','ADMIN')` nas três protegidas; builders `accessCookieOptions()` / `refreshCookieOptions()` a partir de `env`.
+2. `auth.routes.ts` — os 5 endpoints; `requireRole(<método>, <caminho completo>, 'EDITOR', 'ADMIN')` (assinatura da EMENDA Wave 4) nas três protegidas; builders `accessCookieOptions()` / `refreshCookieOptions()` a partir de `env`.
 3. Middleware local de `Origin`/`Host` contra `CORS_ORIGINS` nas rotas POST.
 4. Testes de integração sobre a `app` real, asserção estrutural sobre cada `Set-Cookie` e sobre `ROUTE_ROLES`.
 
 ## Critérios de pronto
 
 - [ ] Testes cobrem AC-002-001 (login estabelece sessão: cookie + refresh persistido + auditoria de sucesso) — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` → `POST /auth/login` com credenciais corretas → asserção **estrutural** sobre os atributos de cada `Set-Cookie` (`HttpOnly`; `Secure` presente sse `env.COOKIE_SECURE`; `SameSite=Lax`; `mnemo_refresh` com `Path=/api/v1/auth`; `Max-Age` = TTL respectivo), ausência das chaves `accessToken`/`refreshToken` no JSON (corpo = `SessionUser`), uma linha `Session` nova cujo `refreshTokenHash` != valor em claro, e `recordAuthEvent('login.success')` chamado. `Tests: ≥2 passed`. Fixada antes do código.
-- [ ] Rotas de auth protegidas declaram papel (AC-002-014 na superfície de auth) — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` (ou `route-authz-matrix`) → `/auth/logout`, `/auth/change-password`, `/auth/me` presentes em `ROUTE_ROLES` com `['EDITOR','ADMIN']`; `GET /auth/me` com sessão de EDITOR válida → 200 (não 403); sem sessão → 401. A mutação que remove `requireRole` de uma dessas rotas deixa o teste da matriz de conformidade vermelho (rota não declarada → 403). `Tests: ≥2 passed`. Fixada antes do código.
+- [ ] Rotas de auth protegidas declaram papel (AC-002-014 na superfície de auth) — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` (ou `route-authz-matrix`) → `ROUTE_ROLES` contém as **chaves método-aware** `"POST /auth/logout"`, `"POST /auth/change-password"`, `"GET /auth/me"` com `['EDITOR','ADMIN']` (igualdade de chave, não `rolesForPath` com fallback); `GET /auth/me` com sessão de EDITOR válida → 200 (não 403); sem sessão → 401; sessão de EDITOR em `GET /auth/me` **passa** mas um método não declarado no mesmo caminho (`DELETE /auth/me`) → 403. A mutação que remove `requireRole` de uma dessas rotas deixa o teste da matriz de conformidade vermelho (rota não declarada → 403). `Tests: ≥2 passed`. Fixada antes do código.
 - [ ] Nomes de cookie consistentes entre login e logout (item do Inclui sem AC) — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` → `POST /auth/login` define `ACCESS_COOKIE`/`REFRESH_COOKIE` e `POST /auth/logout` remove **os mesmos nomes** (`clearCookie`), com a reapresentação do cookie anterior → 401. `Tests: ≥1 passed`. Fixada antes do código.
 - [ ] `POST /auth/refresh` reemite os dois cookies; `POST /auth/logout` limpa os dois — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` → refresh válido → 2 `Set-Cookie`; logout → 2 `Set-Cookie` com `Max-Age=0` / `Expires` no passado. `Tests: ≥2 passed`. Fixada antes do código.
 - [ ] Verificação de `Origin`/`Host` nas rotas POST de auth — verificação executável: `npm --prefix mnemonicos-backend test -- auth.routes` → `POST /auth/login` com `Origin` fora de `CORS_ORIGINS` → 403; com `Origin` da allowlist → segue. `Tests: ≥1 passed`. Fixada antes do código.
@@ -75,7 +77,8 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 ## Riscos específicos
 
 - TRISK-003-002: cookie cross-domain (`SameSite=None` + anti-CSRF) não desenhado — F1 assume mesmo site (dev local + `CORS_ORIGINS`); a verificação de `Origin`/`Host` nas rotas POST é a mitigação agora.
-- Os nomes `ACCESS_COOKIE`/`REFRESH_COOKIE`, `requireRole` e `ROUTE_ROLES` são importados de `src/http/` (TASK-003-007, dependência declarada) — esta TASK adiciona só as *opções* de cookie (flags DEC-003-004) e **aplica** `requireRole` nas rotas protegidas, nunca redefine os nomes nem o registro.
+- Os nomes `ACCESS_COOKIE`/`REFRESH_COOKIE`, `requireRole` (assinatura `(method, path, ...roles)` da EMENDA Wave 4) e `ROUTE_ROLES` são importados de `src/http/` (TASK-003-007, dependência declarada) — esta TASK adiciona só as *opções* de cookie (flags DEC-003-004) e **aplica** `requireRole` nas rotas protegidas, nunca redefine os nomes nem o registro.
+- `HEAD`/`OPTIONS` numa rota protegida → 403 (`rolesForPath` só casa o método declarado) — nota do gate 8 da Wave 4; se um cliente HTTP legítimo precisar de preflight numa rota de auth, é decisão de disponibilidade a escalar, não a contornar abrindo a checagem.
 - Repos symlinkados (lição de exploração): editar/verificar pelo caminho dentro do link (`mnemonicos-backend/src/...`).
 
 ---
