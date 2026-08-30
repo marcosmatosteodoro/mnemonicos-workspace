@@ -29,11 +29,10 @@
 |-----|------|----------------------|-------------|---------------------|:---:|
 | KAN-8 | FEAT-002-001 — Autenticação de sessão | 3 / 5 (004, 006, 008 ✔ · 014, 015 pendentes) + harness KAN-26 ✔ | parcial, em implementação | **In Progress / Em andamento** | ☐ |
 | KAN-9 | FEAT-002-002 — Autorização deny-by-default | 1 / 3 (007 ✔ e revisado · 013, 015 pendentes) | TASK-007 fechada e revisada (gates 1–10) | **In Progress / Em andamento** (a barreira central já passou por review) | ☐ |
-| KAN-10 | FEAT-002-003 — Provisionamento de contas por ADMIN | 2 / 3 (006, 012 ✔ · 010 em implementação) | TASK-010 em codificação | **In Progress / Em andamento** | ☐ |
+| KAN-10 | FEAT-002-003 — Provisionamento de contas por ADMIN | **3 / 3 ✅** (006, 010, 012 ✔) | **completa** — TASK-010 Done, gate 9 APROVADO; falta só a montagem das rotas (TASK-011) e o merge | **Code review / Review** (teto AI — não `Done`) | ☐ |
 
-> Nenhuma Story vai para "review" como um todo ainda — as três estão incompletas.
-> Quando uma FEAT fechar (todas as suas TASKs `Done` + gate 9 do `qa`), este arquivo
-> passa a coluna-alvo dela para **Code review / Review** e avisa na linha.
+> **KAN-10 pronta para review** — as 3 TASKs Done + gate 9 APROVADO. `Done` da Story é
+> merge + Entrega (ato do Diretor). KAN-8 e KAN-9 seguem incompletas → In Progress.
 
 ## Sub-tasks (TASKs do PLAN-003)
 
@@ -47,9 +46,9 @@
 | KAN-16 | TASK-003-006 — serviço de autenticação | KAN-8 | ✅ Done (`036031b`) | **Done** | ☐ |
 | KAN-17 | TASK-003-007 — middlewares authenticate/authorize + ROUTE_ROLES | KAN-9 | ✅ Done (`03d5fc3` · `ead57a2` · `b106b84`) | **Done** | ☐ |
 | KAN-18 | TASK-003-008 — freio de login por chave composta | KAN-8 | ✅ Done (`928a750`) | **Done** | ☐ |
-| KAN-19 | TASK-003-009 — rotas de auth + cookies + cookie-parser | KAN-8 | 🟡 código pronto (`d2560a9`), aguardando rodada de gates da Wave 5 | manter **In Progress** por ora → **Done** quando a Wave 5 fechar | ☐ |
-| KAN-20 | TASK-003-010 — gestão de contas por ADMIN (módulo `users/`) | KAN-10 | 🟡 developer em implementação | **In Progress** | ☐ |
-| KAN-21 | TASK-003-011 — montagem deny-by-default + suíte de conformidade | KAN-9 | ⏸ Todo (Wave 6) | **To Do / Backlog** | ☐ |
+| KAN-19 | TASK-003-009 — rotas de auth + cookies + cookie-parser | KAN-8 | ✅ Done (`d2560a9` · `27ef0dd` · `89c67e2`) | **Done** | ☐ |
+| KAN-20 | TASK-003-010 — gestão de contas por ADMIN (módulo `users/`) | KAN-10 | ✅ Done (`efaef57` · `27ef0dd` · `89c67e2`) | **Done** | ☐ |
+| KAN-21 | TASK-003-011 — montagem deny-by-default + suíte de conformidade | KAN-9 | 🟡 Wave 6 — em implementação | **In Progress** | ☐ |
 | KAN-22 | TASK-003-012 — seed do primeiro ADMIN | KAN-10 | ✅ Done (`8efc829`) | **Done** | ☐ |
 | KAN-23 | TASK-003-013 — store do frontend com reautenticação | KAN-9 | ⏸ Todo (Wave 6) | **To Do / Backlog** | ☐ |
 | KAN-24 | TASK-003-014 — tela de login | KAN-8 | ⏸ Todo (Wave 7) | **To Do / Backlog** | ☐ |
@@ -58,11 +57,13 @@
 
 ---
 
-## Resumo da ação agora
+## Resumo da ação agora (atualizado — Wave 5 fechada)
 
-**10 sub-tasks → Done:** KAN-11, KAN-12, KAN-13, KAN-14, KAN-15, KAN-16, KAN-17, KAN-18, KAN-22, KAN-26.
-**Stories:** KAN-8 / KAN-9 / KAN-10 → **In Progress** (nenhuma pronta para review — todas incompletas).
-**Não mexer:** KAN-7 (Épico), KAN-19 (fecha com a Wave 5), KAN-20 (em curso), KAN-21/23/24/25 (backlog).
+**12 sub-tasks → Done:** KAN-11, KAN-12, KAN-13, KAN-14, KAN-15, KAN-16, KAN-17, KAN-18, **KAN-19**, **KAN-20**, KAN-22, KAN-26.
+**KAN-21 → In Progress** (TASK-003-011, Wave 6 em curso).
+**KAN-10 (Story) → Code review / Review** — FEAT-002-003 completa e revisada (gate 9 APROVADO); teto AI, `Done` só no merge.
+**KAN-8 / KAN-9 (Stories) → In Progress** (incompletas: 3/5+harness e 1/3).
+**Não mexer:** KAN-7 (Épico), KAN-23/24/25 (backlog — Waves 6/7).
 
 ## Notas de reconciliação (do `tracker-sync`)
 
