@@ -4,7 +4,7 @@
 **Pertence a**: PLAN-003
 **Realiza (FRs)**: FR-002-013, FR-002-023
 **Funcionalidade**: FEAT-002-002 (primária), FEAT-002-001
-**Componente**: COMP-003-024, COMP-003-022 (EMENDA Wave 6 — `config.matcher` derivado do grupo `(interno)` criado aqui)
+**Componente**: COMP-003-024, COMP-003-022
 **Wave**: 7
 **Tamanho estimado**: medium
 **Tipo**: feature
@@ -24,6 +24,8 @@
 ## Contexto
 
 COMP-003-024 / DEC-003-011 / FR-002-013 / FR-002-023. Shell da área interna: resolve a sessão (`me`) e reflete os três estados de navegação protegida (carregando neutro / vista renderizada / redirect ou "sem permissão"), e hospeda o controle de logout com seus três estados observáveis. O backend é quem nega de fato (FR-002-012 — TASKs 003-007/011); o shell é apresentação.
+
+**COMP-003-022 (EMENDA Wave 6)**: esta TASK cria o grupo de rotas `(interno)` — logo o `config.matcher` do `proxy.ts` (que TASK-003-013 deixou como *working set* `['/studio/:path*','/gestao/:path*']`) passa a ser **derivado** dos segmentos reais criados aqui, via símbolo compartilhado com o `layout.tsx`. O achado do gate 1/8 da Wave 6 era que `(interno)` não é endereçável por matcher e a lista à mão deriva em silêncio.
 
 ## Escopo
 
