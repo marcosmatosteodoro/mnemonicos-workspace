@@ -530,6 +530,18 @@ Organização (`roots`: `src` e `tests`):
   request. Um teste monta a app real (`requireAuth` antes do router, sem popular o registro
   à mão) e prova o 200 legítimo; o mutante que move a declaração para dentro do handler o
   mata. (lição da Wave 4 de PLAN-003)
+- **Asserção de invariante armada na carga do módulo** (`assertX(...)` no topo de um arquivo
+  de montagem — ex.: `assertDenyByDefault(apiRoutes)`): exige **dois** testes — (a) a função
+  reprova a topologia ruim e aceita a boa; (b) o módulo de produção **reimportado** sob a
+  topologia ruim (`jest.isolateModules(Async)` + `jest.doMock`, ou `expect(() =>
+  createApp()).toThrow()`) **lança**. Aceite = comentar a linha de chamada deixa o teste (b)
+  vermelho. Sem (b), apagar o armamento passa despercebido. (lição da Wave 6 de PLAN-003)
+- **Quando a chave de uma decisão de autz ganha uma dimensão, TODOS os leitores ganham —
+  inclusive a allowlist de exceção.** `ROUTE_ROLES` virou `"<MÉTODO> <caminho>"` na Wave 4,
+  mas `isPublicPath` seguiu comparando só o caminho por 2 waves (`GET /auth/login`,
+  `DELETE /health` atravessavam sem sessão). `PUBLIC_PATH_ALLOWLIST` é pares
+  `"<MÉTODO> <caminho>"`; `isPublicPath(method, path)` exato; a suíte de conformidade trava
+  a ordem de montagem × allowlist nos dois sentidos. (lição das Waves 4/6 de PLAN-003)
 - **Retry que reescreve um arquivo de teste por mudança de assinatura/contrato** entrega o
   **inventário antes/depois** dos nomes de `it(...)` (`git show <pai>:<arquivo>` vs. HEAD);
   cada nome ausente é classificado (renomeado / removido de propósito / **perdido → volta**).

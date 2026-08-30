@@ -475,6 +475,19 @@ backend nega — e é lá que a prova (Art. 1) tem de existir.
   `x-middleware-subrequest` em versões anteriores), o que reforça a regra: nenhuma decisão
   de segurança **só** aqui. Se 16.3.2 está na faixa corrigida daquele advisory precisa ser
   confirmado. ⚠️ não confirmado
+- **`config.matcher` enumera o que GUARDA, nunca o que dispensa.** Route group `(interno)`
+  não aparece na URL; alcançá-lo por catch-all de exclusão (`/((?!login|...).*)`) guarda a
+  home pública e toda página pública futura. Enumere os prefixos internos, **derivados** de
+  um símbolo compartilhado com o layout do grupo, e teste os **dois** lados — interno
+  guardado **e** `/` livre. (lição da Wave 6 de PLAN-003)
+- **Interceptor de re-autenticação declara a superfície e exclui os endpoints públicos de
+  sessão.** Um `baseQuery` global que trata **todo** 401 como "sessão expirada" dispara
+  refresh no 401 de `POST /auth/login` (credencial inválida) e — com refresh vivo do usuário
+  anterior — ressuscita a sessão dele. A lista de exclusão espelha a allowlist pública do
+  backend (`/auth/login`, `/auth/refresh` — **não** `/auth/logout`, que é rota protegida) e
+  tem teste de divergência; e o oráculo "401 do endpoint público não dispara renovação" é
+  obrigatório. Fix que adiciona guarda de curto-circuito num despachante compartilhado
+  enumera **todos** os chamadores e prova o caminho de erro de cada um. (lição da Wave 6)
 - **Server Action é um endpoint POST público.** Ter sido chamada de dentro de uma página
   protegida não protege nada: ela é invocável direto. Toda Server Action verifica sessão **e**
   pertencimento do recurso, no seu próprio corpo, antes de agir. O mesmo vale para cada

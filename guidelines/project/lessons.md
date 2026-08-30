@@ -134,13 +134,99 @@ teste como evidência de gate declara junto a árvore de onde ela saiu — `git 
 evidência reproduzível.
 **Validade:** geral.
 **Estado:** ativa
-**Contadores:** confirmada 3 · contestada 0
+**Contadores:** confirmada 4 · contestada 0
 **Reincidência:** Wave 3 (`zz-perf-probe`, gate 10), Wave 4 (`zz-sec-probe`, gate 8), Wave 5
 (2×: `performance-engineer` fez `npm install` + `@babel/core` no `package.json` da árvore
 principal; e um gate da re-review rodou `npm ci` em worktree com `node_modules` junctionado,
-podando `@babel/core` — `test:integration` quebrou nas duas). Os revisores foram despachados
-com "worktree isolada" explícito e ainda assim; a lacuna é no **template de despacho do
-gate** (junction de `node_modules` + `npm ci` é a variante nova) — roteada ao `agile-coach`.
+podando `@babel/core` — `test:integration` quebrou nas duas), Wave 6 (`tests/zz-probe.test.ts`
+apareceu e sumiu na árvore principal do backend **durante o re-review da própria wave que
+registrou a lição** — a sonda sondava o achado sob revisão; + um worktree órfão `.review-wt`
+de outra sessão com cópia do `.env` real, podado pelo `security-engineer`). Os revisores são
+despachados com "worktree isolada" explícito e a reincidência continua: a regra tem de ser
+**mecânica** no template de despacho (worktree já criada + comando literal; `git status
+--porcelain` colado no report como campo do YAML; `testPathIgnorePatterns: ['zz-.*']` nas
+configs Jest) — roteada ao `agile-coach`.
+
+## [Testes] Asserção de invariante executada na carga do módulo exige DOIS testes: função + wiring
+
+**Erro:** `assertDenyByDefault(apiRoutes)` (o passo que a DEC-003-005 EMENDA chama de
+"fechamento pleno" — falha o boot se uma rota não-pública não tiver declaração exata) foi
+provado só como **função** — dois testes a chamavam à mão sobre a árvore. Apagar a **única
+linha** que a arma no boot (`assertDenyByDefault(apiRoutes);` no fim de `routes.ts`) deixava
+a suíte 21/21 verde. Pego no re-review do gate 1 da Wave 6.
+**Causa:** guarda que age por **efeito colateral na carga do módulo** não tem quem a chame no
+teste. O teste que chama a função a mão prova a REGRA e dá sensação de cobertura; a
+**existência da chamada de produção** fica sem oráculo. O contraste denuncia: o irmão
+`sealRouteRoles()`, uma linha abaixo, tinha teste de wiring (`declareRouteRoles` pós-boot
+lança) porque seu efeito é observável por uma API; o de `assertDenyByDefault` só por
+ausência de exceção.
+**Solução:** `assertX(...)` no topo de um arquivo de montagem exige **dois** testes: (a) a
+função reprova a topologia ruim e aceita a boa; (b) o módulo de produção, **reimportado**
+sob a topologia ruim (`jest.isolateModules`/`isolateModulesAsync` + `jest.doMock`, ou
+`expect(() => createApp()).toThrow()`), **lança**. Critério de aceite = o mutante: comentar
+a linha de chamada deixa **esse** teste vermelho. Complementa — não substitui — a lição
+"[Arquitetura] Barreira que nega com base num registro exige o registro completo antes da 1ª
+requisição": aquela cobre QUANDO o registro é populado, esta cobre SE a guarda foi armada.
+Referência: `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts`
+(o wiring de `sealRouteRoles`, e o `[retry CR1]` de `assertDenyByDefault`).
+**Validade:** geral (qualquer invariante armada na carga do módulo).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Guard de navegação (proxy/middleware) enumera o que GUARDA, nunca o que dispensa
+
+**Erro:** o `config.matcher` do `proxy.ts` foi escrito como catch-all por **exclusão**
+(`/((?!login|_next/...).*)`) para alcançar o route group `(interno)` (que não aparece na
+URL) — e com isso passou a exigir cookie na home pública `/` e em toda página pública
+futura, sem que nenhum teste dissesse o que deve seguir **livre**. Depois, o retry inverteu
+para enumeração explícita (`['/studio/:path*','/gestao/:path*']`), o que remove a proteção
+da home mas troca "nega tudo por engano" por "libera tudo por engano": rota interna nova
+fora dos dois prefixos nasce **sem** o redirect e nada falha. Pego nos gates 1/4/5 e 8 da
+Wave 6.
+**Causa:** deny-by-default é a regra certa na API e a regra **errada** no site público — e o
+mesmo time acabara de aplicá-la no backend na mesma wave. Como `(grupo)` não é endereçável
+por matcher, os dois extremos (exclusão / enumeração à mão) deixam o default frágil: cada
+página nova — pública ou interna — depende de alguém lembrar de mexer na lista.
+**Solução:** o matcher **enumera os prefixos internos**, e a lista é **derivada** de um
+símbolo único compartilhado com o layout do grupo `(interno)` (não grafada à mão em dois
+lugares). O teste do matcher afirma os **dois** lados: as rotas internas são guardadas **e**
+`/` (e toda rota pública existente) **não** é; e enumera os segmentos de `src/app/(interno)/`
+falhando se algum não estiver coberto — a mesma régua de `assertDenyByDefault`/
+`route-authz-matrix` no backend. Rota nova sem asserção de "segue livre" (ou "é guardada",
+conforme o lado) é regressão esperando acontecer. Referência: `mnemonicos-frontend/src/proxy.ts`
++ `src/proxy.test.ts`; consumidor da régua: TASK-003-015.
+**Validade:** geral (proxy/middleware de Next; qualquer guard de borda por padrão).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Constante de segurança espelhada entre repos declara a fonte e tem teste de divergência
+
+**Erro:** o retry do S1 (Wave 6) excluiu `/auth/login`, `/auth/refresh` **e `/auth/logout`**
+da máquina de re-autenticação do frontend, citando `PUBLIC_PATH_ALLOWLIST` do backend como
+"fonte canônica" — mas `POST /auth/logout` **não** está nessa allowlist, é rota protegida.
+O espelho divergiu da fonte que ele próprio declara, e o logout virou **no-op silencioso**:
+com o access expirado e o refresh vivo, "Sair" devolve 401, a guarda nova o engole sem
+renovar, o handler de `logout` nunca roda, a família de refresh não é revogada e os cookies
+não são limpos — a próxima requisição ressuscita a sessão. Pego no re-review do gate 8 da
+Wave 6 (regressão aberta pelo próprio retry).
+**Causa:** constante de segurança duplicada à mão entre `mnemonicos-backend` e
+`mnemonicos-frontend` (como os tipos de domínio), sem prova que compare as duas listas; e a
+correção suprimiu um caminho de código compartilhado (o refresh silencioso) sem enumerar
+**todos** os chamadores desse caminho — corrigiu o login e mudou o logout junto, sem teste
+para o 401 de logout.
+**Solução:** toda constante de segurança espelhada entre os dois repos (allowlist de caminho
+público, enums de papel, nomes de cookie) obedece a duas obrigações: (1) o espelho **declara
+a fonte canônica** E tem teste que **falha quando diverge** dela — entrada a mais no espelho
+é defeito, não conveniência (se um caminho entra por decisão do cliente e não da fonte, o
+comentário diz isso explicitamente e o teste de divergência o exclui da comparação); (2) fix
+que adiciona uma **guarda de curto-circuito** num despachante compartilhado (baseQuery,
+middleware, interceptor) **enumera todos os chamadores afetados** e prova o caminho de erro
+de cada um, não só o que motivou o achado. Referência: `mnemonicos-frontend/src/store/api.ts`
+(`PUBLIC_AUTH_PATHS`) × `mnemonicos-backend/src/http/public-paths.ts` (`PUBLIC_PATH_ALLOWLIST`);
+`guidelines/core/SECURITY.md` "Guarda no sink" / "Acesso por registro".
+**Validade:** geral (constante/contrato espelhado entre repos).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
 
 ## [Performance] `include`/`select` aninhado de relação não é 1 statement por padrão
 
