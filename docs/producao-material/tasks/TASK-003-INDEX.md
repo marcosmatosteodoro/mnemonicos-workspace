@@ -6,9 +6,9 @@
 
 ## Status agregado
 
-- Todo: 6
+- Todo: 4
 - In Progress: 0
-- Done: 10
+- Done: 12
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -32,8 +32,8 @@
 - [x] TASK-003-007 ✅ Done — Middlewares `authenticate` / `authorize` + `Express.Request.auth`
 
 ### Wave 5 (depende da Wave 4)
-- [ ] TASK-003-009 ⏸ Todo — Rotas de auth + cookies de sessão + `cookie-parser`
-- [ ] TASK-003-010 ⏸ Todo — Gestão de contas por ADMIN (módulo `users/`)
+- [x] TASK-003-009 ✅ Done — Rotas de auth + cookies de sessão + `cookie-parser`
+- [x] TASK-003-010 ✅ Done — Gestão de contas por ADMIN (módulo `users/`)
 
 ### Wave 6 (depende da Wave 5)
 - [ ] TASK-003-011 ⏸ Todo — Montagem deny-by-default em `routes.ts` + suíte de conformidade
@@ -122,4 +122,4 @@ aparecem: `Realiza (FRs)` = `nenhuma` (chore ou só NFR via AC), sem FR que deri
 |------|----------------------|------|
 | FEAT-002-001 | TASK-003-004 (P), TASK-003-006 (P), TASK-003-008 (P), TASK-003-014 (P), TASK-003-015 | 3/5 |
 | FEAT-002-002 | TASK-003-007 (P), TASK-003-013 (P), TASK-003-015 (P) | 1/3 |
-| FEAT-002-003 | TASK-003-006, TASK-003-010 (P), TASK-003-012 (P) | 2/3 |
+| FEAT-002-003 | TASK-003-006, TASK-003-010 (P), TASK-003-012 (P) | 3/3 ✅ |

@@ -224,6 +224,8 @@ FEAT é declarada. Cada FR pertence a exatamente uma FEAT.
 
 **Jira**: KAN-10
 
+**Verificação (gate 9)**: 2026-08-30 — APROVADO (comportamento funcional). AC-002-016..024 exercitados sobre Postgres real (harness de integração: `express` + `requireAuth` + `usersRoutes` + `resolveAccessSession`/`login` reais sobre sessões de fixture; rotas ainda não montadas em `app` — TASK-003-011, Wave 6). Provas: criação com papel EDITOR/ADMIN + senha ≥12 (recusa <12 sem criar, 422); e-mail duplicado → 409 com conta existente inalterada; nenhuma capacidade de auto-registro (4 rotas == gestão, cada par método+caminho em `ROUTE_ROLES` com `{ADMIN}`, anon→401/EDITOR→403/ADMIN→201, sem rota register/signup no código-fonte); listagem só `{id,email,name,role,status}` sem hash/token; desativação com marca temporal + revogação imediata das sessões do alvo (`resolveAccessSession`→null, `login`→401) e terceiro intacto; guarda do último ADMIN ativo, provada na fronteira do penúltimo com N desativações concorrentes (fecha na escrita, `$transaction` Serializable); reset de senha → nova autentica, anteriores da conta revogadas; seed cria exatamente 1 ADMIN de `env` (idempotente; parcial/ausente → 0; placeholder do `.env.example` recusado sem ecoar o valor); senha só como saída de Argon2id, nenhum segredo em log ou resposta. Integração 105/105, unit 165/165. Residual sem falha de gate: end-to-end contra a superfície HTTP publicada e a jornada por `/auth/login` (FEAT-002-001) dependem de TASK-003-011.
+
 - **FR-002-014** [MUST] Quando um ADMIN autenticado envia uma nova conta interna com
   e-mail, nome, papel `EDITOR` ou `ADMIN` e senha inicial, o sistema DEVE criar a conta
   com o papel informado e registrá-la; o papel é definido na criação.

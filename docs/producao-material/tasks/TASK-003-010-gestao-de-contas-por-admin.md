@@ -8,7 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -96,26 +96,32 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-29T15:01:49-03:00
+**Data conclusão**: 2026-08-30T03:39:04-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: efaef57 · 27ef0dd (retry Wave 5 — S1/S2/F1/F2/F3/F5) · 3b90884 · 89c67e2 (test-only pós-re-review — fronteira S1 + par de precedência)
 **Jira**: KAN-20
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) · performance-engineer (gate 10) · qa (gate 9 via FEAT-002-003) — Wave 5, diff acumulado + 2 re-reviews do delta
+**Tentativas**: 2 (retry consolidado da Wave 5 + 1 rodada test-only pós-re-review — teto de convergência 4.88, decisão autônoma do Tech Lead pelo default do reviewer, veto do Diretor na Entrega)
+**Cobertura final**: n/a (quality.mutation null na ficha)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/users/users.schema.ts (novo — createUserSchema/resetPasswordSchema/userIdParamSchema/listUsersQuerySchema + search)
+  - mnemonicos-backend/src/modules/users/users.service.ts (novo — create/list/disable/reset; disableUser fecha na escrita, $transaction Serializable)
+  - mnemonicos-backend/src/modules/users/users.routes.ts (novo — 4 rotas requireRole método-aware ADMIN + verifyOrigin nas 3 mutações)
+  - mnemonicos-backend/src/modules/auth/session-revocation.ts (novo — revokeAllSessionsOp, único updateMany de revogação por usuário)
+  - mnemonicos-backend/src/modules/auth/auth.service.ts (revokeAllSessions vira invólucro; changeOwnPassword delega a revokeAllSessionsOp)
+  - mnemonicos-backend/tests/integration/users.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — unit 165/165 (15 suites) · integração-DB 105/105 (5 suites)
+- [x] Lint limpo — exit 0
+- [x] Aderência à ficha/perfil — §4 (camadas; nada de Prisma na rota), §5 (`ConflictError`/`NotFoundError`, sem try/catch no handler; ZodError → 422), §6.1 (sem `$executeRawUnsafe`), §7 (fixture de 2 instâncias; par de precedência de `disableUser` provado)
+- [x] Code review aprovado — 1º passe REPROVOU (gates 1/4/7, 5 mutantes); retry `27ef0dd` fechou F1–F5; re-review REPROVOU só o gate 1 (2ª vez → teto 4.88) por ausência de prova (fixture de corrida fora da fronteira + par de precedência sem caso), resolvido `89c67e2` test-only (proposta+default do reviewer)
+- [x] ACs verificados — AC-002-016..022, 024 + FR-002-022; falsificabilidade: 16 mutantes rodados (14 mortos no re-review + 3 no test-only), controle positivo, em worktree isolada / edição revertida; `select` provado no ponto da consulta (F1); `search` por sujeito (F2); guarda do último ADMIN na fronteira do penúltimo, mutante check-then-act vermelho pelo comando do critério (verificado independente pelo Tech Lead)
+- [x] Segurança (gate 8): aprovado (Wave 5) — re-review do delta APROVADO, `achados: []`; S1 (guarda na escrita — 10 rodadas concorrentes, `Serializable` confirmado no motor) e S2 (`verifyOrigin` nas 3 mutações) reproduzidos e fechados
+- [x] Performance (gate 10): aprovado (Wave 5) — só sugestões (índice de `orderBy`, `ILIKE` seq scan no volume de dezenas, `findUnique` pré-404); round-trips contados em 2–3 volumes, sem N+1, `resolveAccessSession` intocado
+- [x] Comportamento (gate 9): consolidado (FEAT-002-003) — qa APROVADO; AC-002-016..024 exercitados sobre Postgres real no harness de router mínimo; end-to-end contra a superfície HTTP publicada depende de TASK-003-011 (Wave 6)
 
-**Notas**: 
+**Notas**: **S1** — a guarda do último ADMIN (DEC-003-007/FR-002-019) fecha **na escrita**: `count` dentro de `prisma.$transaction(async (tx) => …, { isolationLevel: 'Serializable' })`, write-conflict (`DriverAdapterError 'TransactionWriteConflict'` — não P2034 nesta stack; furo no plano) → `ConflictError` fail-closed. **F5** — `revokeAllSessionsOp` extraído para `session-revocation.ts` (módulo próprio: sob ts-jest CJS a chamada intra-módulo de `changeOwnPassword` não é interceptável por `jest.spyOn`); `revokeFamily` (por `familyId`, Wave 3) mantém o seu `updateMany` — fora de escopo. **F2** — `search` (nome ou e-mail) declarado como capacidade (EMENDA PLAN COMP-003-013/014). Nota de disponibilidade (gate 8, para o Diretor): sob `Serializable`, N desativações concorrentes de ADMINs **distintos** → 1 sucesso, N−1 abortos com retry no cliente — cenário raro, fail-closed; candidato a follow-up (wrapper retry-on-write-conflict).

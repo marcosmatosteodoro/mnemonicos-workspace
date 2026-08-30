@@ -7,7 +7,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -91,26 +91,31 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-29T17:34:05-03:00
+**Data conclusão**: 2026-08-30T03:39:04-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: d2560a9 · 27ef0dd (retry Wave 5 — F4) · 89c67e2 (test-only pós-re-review)
 **Jira**: KAN-19
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) · performance-engineer (gate 10) · qa (gate 9 via FEAT-002-003) — Wave 5, diff acumulado + re-review do delta
+**Tentativas**: 1 (F4 no retry consolidado da Wave 5 — o furo `getSessionUser` foi resolvido antes do 1º despacho, não conta como tentativa)
+**Cobertura final**: n/a (quality.mutation null na ficha)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/app.ts (cookie-parser montado)
+  - mnemonicos-backend/src/modules/auth/auth.routes.ts (novo — 5 endpoints + accessCookieOptions/refreshCookieOptions + verifyOrigin)
+  - mnemonicos-backend/src/modules/auth/auth.service.ts (+getSessionUser — furo no plano da Wave 5, EMENDA PLAN COMP-003-008/010)
+  - mnemonicos-backend/tests/integration/auth.routes.test.ts (+ [retry F4])
+  - mnemonicos-backend/tests/integration/auth.routes.integration.test.ts (novo)
+  - mnemonicos-backend/tests/integration/set-cookie.ts (novo — helper)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — unit 165/165 (15 suites) · integração-DB 105/105 (5 suites)
+- [x] Lint limpo — exit 0
+- [x] Aderência à ficha/perfil — §5 (sem try/catch no handler; ZodError → 422), §6.3/§6.5 (cookies, deny-by-default por rota com requireRole método-aware)
+- [x] Code review aprovado — gates 1–7: `auth.routes.ts`/`auth.service.ts` integralmente limpos no re-review do delta; F4 (Referer malformado ≡ origem ausente) fechado com mutante nomeado morto
+- [x] ACs verificados — AC-002-001 (login → 2 Set-Cookie estruturais + Session persistida + login.success), AC-002-014 na superfície de auth (3 chaves método-aware em ROUTE_ROLES; DELETE /auth/me → 403), `getSessionUser` (fixture ativa/desativada, 2 mutantes mortos)
+- [x] Segurança (gate 8): aprovado (Wave 5) — re-review do delta APROVADO, `achados: []`; cookies/`verifyOrigin`/`getSessionUser` verificados
+- [x] Comportamento (gate 9): consolidado (FEAT-002-003) — qa APROVADO; login/cookies exercitados no harness de integração; jornada end-to-end via `/auth/login` na app publicada depende de TASK-003-011 (Wave 6)
 
-**Notas**: 
+**Notas**: `getSessionUser` (`where: { id, disabledAt: null }`, `select` explícito `{id,name,email,role}`) **nasceu neste diff** por furo no plano da Wave 5 — `req.auth`/`resolveAccessSession` não carregam `name`/`email` e o caminho quente não deve carregar (lição de perf do gate 10 da Wave 3). `accessCookieOptions()`/`refreshCookieOptions()` exportados de `auth.routes.ts` (`src/http/cookies.ts` só nomes). `verifyOrigin` libera quando `Origin` **e** `Referer` ausentes — decisão consciente de F1 (mesmo site; `sameSite: 'lax'` cobre), não achado (gate 8). `verifyOrigin` passou a ser aplicado também nas 3 mutações de `users/` (TASK-003-010, S2).
