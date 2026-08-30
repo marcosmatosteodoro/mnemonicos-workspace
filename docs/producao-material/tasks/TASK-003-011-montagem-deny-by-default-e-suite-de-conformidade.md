@@ -7,7 +7,8 @@
 **Wave**: 6
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: In Progress
+**Data início**: 2026-08-30T04:02:20-03:00
 
 ## Convenções (do projeto)
 
@@ -26,6 +27,10 @@ COMP-003-016 + COMP-003-019, DEC-003-005 (+ EMENDA da Wave 4), §1.3 da SPEC (m�
 
 **Consome (aresta)**: `PUBLIC_PATH_ALLOWLIST`, `ROUTE_ROLES`, `sealRouteRoles` e `requireAuth`/`requireRole(method, path, ...roles)` (TASK-003-007); `authRoutes` (TASK-003-009); `usersRoutes` (TASK-003-010).
 
+**Retry (Wave 6 — REPROVADO nos gates 8 e 1 no 1º passe `02c1361`)**. Correções vinculantes:
+- **S4 (gate 8, MEDIA — EMENDA DEC-003-005 Wave 6)**: `PUBLIC_PATH_ALLOWLIST` é **cega ao método** enquanto `ROUTE_ROLES` já ganhou o método na EMENDA da Wave 4 (é a lição registrada após a Wave 4). Passa a ser pares **`"<MÉTODO> <caminho>"`** (`['GET /health','GET /health/db','POST /auth/login','POST /auth/refresh']`); `isPublicPath(method, path)` com igualdade exata; `assertDenyByDefault` filtra por método+caminho **e** exige que toda rota cujo par está na allowlist esteja montada **antes** de `requireAuth`. Toca `src/http/public-paths.ts` + `src/http/middlewares/authenticate.ts` (o leitor `isPublicPath`) — **carve-out** deste retry no "Não inclui".
+- **CR1 (gate 1)**: `assertDenyByDefault` é testado como **função**, não como **wiring** — apagar a linha `assertDenyByDefault(apiRoutes);` de `routes.ts` deixa a suíte verde. Falta o teste de armamento no boot.
+
 ## Escopo
 
 ### Inclui
@@ -34,8 +39,8 @@ COMP-003-016 + COMP-003-019, DEC-003-005 (+ EMENDA da Wave 4), §1.3 da SPEC (m�
 - Meio de execução dos `*.integration.test.ts` desta TASK: o harness de TASK-003-016 — config `jest.integration.config.ts`, helper `tests/integration/db.ts` (`testPrisma` + `resetDb()` no `beforeEach`), comando `npm --prefix mnemonicos-backend run test:integration`.
 
 ### Não inclui
-- Os middlewares em si (TASK-003-007).
-- As rotas de auth / users (TASKs 003-009, 003-010).
+- Os middlewares em si (TASK-003-007) — **exceto** a mudança de `isPublicPath` para pares `método+caminho` em `src/http/public-paths.ts` e a atualização do seu leitor em `src/http/middlewares/authenticate.ts` (**S4** — carve-out do retry da Wave 6, EMENDA DEC-003-005).
+- As rotas de auth / users (TASKs 003-009, 003-010) — split de `auth.routes.ts` em `publicAuthRoutes`/`protectedAuthRoutes` é permitido (necessidade da montagem plana; handlers intocados).
 - Contrato definitivo de `/disciplines` (fatia F2).
 
 ## Implementação sugerida
@@ -53,7 +58,9 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 - [ ] `PUBLIC_PATH_ALLOWLIST` == exatamente os 4 caminhos previstos — verificação executável: `npm --prefix mnemonicos-backend test -- route-authz-matrix` → `expect([...PUBLIC_PATH_ALLOWLIST].sort()).toEqual(['/auth/login','/auth/refresh','/health','/health/db'])`. `Tests: ≥1 passed`. Fixada antes do código.
 - [ ] Nenhuma rota cria `User` fora de `requireRole('ADMIN')` (AC-002-018) — verificação executável: `npm --prefix mnemonicos-backend test -- route-authz-matrix` → itera as rotas `POST` montadas em `apiRoutes.stack` e, para as que o handler chama `prisma.user.create` (ou o service de criação de conta), afirma que o caminho está em `ROUTE_ROLES` com `['ADMIN']`; `expect(rotasPost.length).toBeGreaterThan(0)`. `Tests: ≥1 passed`. Fixada antes do código.
 - [ ] `/disciplines` passa a exigir sessão (A-002-019) — verificação executável: `npm --prefix mnemonicos-backend test -- route-authz-matrix` → `GET /disciplines` sem cookie → 401; com sessão de EDITOR → não-401. `Tests: ≥1 passed`. Fixada antes do código.
-- [ ] **[EMENDA DEC-003-004 Wave 5]** Toda mutação autenticada por cookie tem `verifyOrigin` na cadeia — verificação executável: `npm --prefix mnemonicos-backend test -- route-authz-matrix` → para **cada** rota `POST`/`PATCH`/`PUT`/`DELETE` de `apiRoutes.stack` fora de `PUBLIC_PATH_ALLOWLIST`, a cadeia de middlewares contém `verifyOrigin` (asserção estrutural sobre `layer.route.stack`, por referência de função ou `name`); rota de mutação montada sem ele → o teste **falha**. Hoje `verifyOrigin` é aplicado **por rota** (7 rotas: 3 mutações de auth + 3 de `users/` + change-password) — a suíte trava a ausência; a consolidação num único `apiRoutes.use(verifyOrigin)` para métodos que mudam estado é follow-up quando o nº de rotas de mutação crescer. `Tests: ≥1 passed`. Fixada antes do código.
+- [ ] **[EMENDA DEC-003-004 Wave 5]** Toda mutação autenticada por cookie tem `verifyOrigin` na cadeia — verificação executável: `npm --prefix mnemonicos-backend test -- route-authz-matrix` → para **cada** rota `POST`/`PATCH`/`PUT`/`DELETE` de `apiRoutes.stack` fora de `PUBLIC_PATH_ALLOWLIST`, a cadeia de middlewares contém `verifyOrigin` (asserção estrutural sobre `layer.route.stack`, por referência de função ou `name`); rota de mutação montada sem ele → o teste **falha**. Hoje `verifyOrigin` é aplicado **por rota** (5 mutações não-públicas) — a suíte trava a ausência; a consolidação num único `apiRoutes.use(verifyOrigin)` é follow-up. `Tests: ≥1 passed`. Fixada antes do código.
+- [ ] **[retry S4]** `isPublicPath` e a allowlist são método-aware (EMENDA DEC-003-005 Wave 6) — verificação executável: `npm --prefix mnemonicos-backend test -- route-authz-matrix` → `PUBLIC_PATH_ALLOWLIST` é `['GET /health','GET /health/db','POST /auth/login','POST /auth/refresh']` (snapshot exato); `isPublicPath('GET','/health')` → `true`, `isPublicPath('DELETE','/health')` → **`false`**, `isPublicPath('GET','/auth/login')` → **`false`**; a suíte monta uma rota fictícia `GET /auth/login` (método não previsto no par) **antes** de `requireAuth` → o **boot lança** (`assertDenyByDefault` recusa: par não está na allowlist mas a rota está montada antes de `requireAuth`), OU a requisição a `DELETE /health` (rota inexistente nesse método) recebe **401**, não passa livre. Mutante: `isPublicPath` comparar só o caminho (ignorar o método) → o caso `GET /auth/login` fictício não é recusado (vermelho). `Tests: ≥2 passed`. Fixada antes do código.
+- [ ] **[retry CR1]** `assertDenyByDefault` tem teste de **wiring** (armamento no boot), não só de função — verificação executável: `npm --prefix mnemonicos-backend test -- route-authz-matrix` → um teste que **reimporta a árvore de montagem** (`jest.isolateModules` remontando `routes.ts`, ou `expect(() => createApp()).toThrow()`) sob uma **topologia adversarial** (uma rota não-pública montada em `apiRoutes` **sem** declaração exata em `ROUTE_ROLES`) e afirma que o **boot lança**. **Fecho falsificável**: remover a linha `assertDenyByDefault(apiRoutes);` de `routes.ts` deixa **esse teste vermelho** (hoje: some sem quebrar nada — a suíte fica 21/21 verde). Espelha o teste de wiring de `sealRouteRoles()` já presente na suíte (`declareRouteRoles` pós-boot lança). `Tests: ≥1 passed`. Fixada antes do código.
 - [ ] A suíte é a fonte de medição da métrica §1.3 — verificação executável: `npm --prefix mnemonicos-backend test -- route-authz-matrix` verde no CI; dono (time de engenharia) e natureza (conformidade, não instrumentação de evento) a registrar no INDEX do slug. Fixada antes do código.
 - [ ] Sem warnings/lints novos — `npm --prefix mnemonicos-backend run lint` → exit 0 (baseline capturada no início da TASK).
 - [ ] Padrão de commit respeitado (Conventional Commits).
