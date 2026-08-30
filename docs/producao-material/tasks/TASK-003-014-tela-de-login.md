@@ -8,7 +8,8 @@
 **Wave**: 7
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: In Progress
+**Data início**: 2026-08-30T11:51:49-03:00
 
 ## Convenções (do projeto)
 
