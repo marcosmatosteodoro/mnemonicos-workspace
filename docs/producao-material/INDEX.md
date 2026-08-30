@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-08-30T07:00:00-03:00
+**Última atualização**: 2026-08-30T14:45:00-03:00
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -21,7 +21,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 ### Em desenvolvimento
 - Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, 🟡 3/5 tasks Done)
-- Autorização por papel deny-by-default no servidor (SPEC-002/FEAT-002-002, PLAN-003, 🟡 1/3 tasks Done)
+- Autorização por papel deny-by-default no servidor (SPEC-002/FEAT-002-002, PLAN-003, 🟡 2/3 tasks Done) — barreira montada (TASK-003-011: `assertDenyByDefault` no boot + suíte `route-authz-matrix`) + store do frontend com re-auth (TASK-003-013); falta o shell (TASK-003-015, Wave 7)
 
 ### Especificadas, ainda não planejadas
 (nenhuma — SPEC-002 coberta por PLAN-003)
@@ -38,7 +38,14 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 | ID | Cobre | FRs cobertos | Tasks | Status |
 |----|-------|--------------|-------|--------|
-| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 12/16 🟡 | Approved |
+| PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 14/16 🟡 | Approved |
+
+> **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
+> `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
+> Dono: time de engenharia. Natureza: **conformidade** (verde/vermelha no CI — toda rota
+> não-pública prova 401 sem sessão / 403 com papel insuficiente ou não-declarado), **não**
+> instrumentação de evento. O boot também recusa a app (`assertDenyByDefault`) se a árvore
+> montada divergir do registro.
 
 ## Glossário consolidado
 
@@ -81,7 +88,6 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 ## Histórico recente
 
 - 2026-08-28: Etapa 3.5 (verificabilidade pré-código) — qa pré-código resolvido (18 achados); PO fixou deny-by-default "por papel" (leitura B): DEC-003-005 emendada com registro central ROUTE_ROLES (rota sem declaração nega 403 mesmo com sessão válida) — custo adicional de F1 pendente de veto do Diretor na entrega
-- 2026-08-28: furo no plano em TASK-003-002 — a suíte de teste do backend não abre conexão com banco (`tests/setup-env.ts` fictício), mas 6 TASKs assumem integração com Prisma real — destino: TASK-003-016 nova (harness de integração, COMP-003-025) na Wave 2, PLAN-003 emendado
 - 2026-08-28: Wave 1 do PLAN-003 fechada (TASK-003-001/002/005 Done) — gate 8 reprovou e convergiu em 1 retry (fail-open no COOKIE_SECURE, redação do pino, contrato HMAC); errata propagada ao PLAN e TASKs; 2 lições registradas (pendentes de merge)
 - 2026-08-28: Wave 2 do PLAN-003 fechada (TASK-003-016 harness de integração, -003 libs cripto/audit, -004 rotação pura) — gates 1–8 aprovados após 1 retry de convergência (precedência de ramos falsificável, prova de params de env, guarda fail-closed do banco de teste); 2 lições registradas (pendentes de merge)
 - 2026-08-29: furo no plano em TASK-003-006 — `refresh`/`logout` emitem eventos de auditoria mas suas assinaturas não recebiam `ip`, obrigatório em `AuthAuditEvent` (audit.ts selado na Wave 2) por NFR-002-005 — destino: `refresh`/`logout` passam a receber `ctx: { ip; userAgent? }` (aditivo; rota passa `req.ip`); PLAN + TASK-003-006/009 emendados
@@ -90,3 +96,4 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 - 2026-08-29: Wave 4 do PLAN-003 fechada (TASK-003-007 middlewares authenticate/authorize + ROUTE_ROLES) — gate 8 APROVADO; gates 1–7 REPROVARAM 1º passe (4 achados críticos de authz: registro populado em request, requireAuth só checava existência, chave sem método, curinga vaza) → retry `ead57a2` fechou os 4; re-review reprovou só gate 1 por regressão de prova (caso de teste perdido na reescrita) → resolvido `b106b84` test-only (teto de convergência 4.88 → decisão autônoma, ao veto do Diretor). DEC-003-005 EMENDA Wave 4 (chave `"<MÉTODO> <caminho>"`, declaração em montagem, `sealRouteRoles`, `requireAuth` piso de autz); resíduo `:param` de irmã estática → critério em TASK-003-011; 4 lições candidatas (pendentes de rota/merge)
 - 2026-08-29: sync Jira reconciliado (gancho closure — conector Atlassian de volta após o bloqueio AWS WAF "Human Verification" das Waves 2–3; prova `atlassianUserInfo` retornou JSON) — sub-task de TASK-003-016 criada (KAN-26 sob KAN-8); marco "TASK concluída" comentado em 10 sub-tasks (KAN-11/12/13/14/15/16/17/18/22/26); "Trabalho iniciado (Story)" comentado em KAN-8/KAN-9/KAN-10; `transition: comment` → nenhum card movido, nenhuma FEAT fechada (KAN-8 0/5+harness, KAN-9 1/3, KAN-10 2/3)
 - 2026-08-30: Wave 5 do PLAN-003 fechada (TASK-003-009 rotas de auth + cookies + `getSessionUser`; TASK-003-010 módulo `users/`) — gate 10 APROVADO, gate 9 APROVADO (FEAT-002-003 completa → Implementadas); gate 8 REPROVOU (race condition na guarda do último ADMIN + CSRF nas 3 mutações de `users/`) → retry `27ef0dd` fechou; re-review REPROVOU só o gate 1 (2ª vez → teto 4.88) por ausência de prova (fixture de corrida fora da fronteira + par de precedência de `disableUser` sem caso) → resolvido `89c67e2` test-only (decisão autônoma, veto do Diretor). Furos no plano: `getSessionUser` nasce na TASK-009 (`req.auth` sem `name`/`email`); falha de serialização é `DriverAdapterError`, não P2034 (Prisma 7 + adapter-pg). EMENDAS: COMP-003-008/013/014/015, DEC-003-004. 6 lições candidatas (2 projeto registradas; processo → agile-coach). Incidente de higiene: gates poluíram a árvore compartilhada 2× (npm install + `@babel/core`; npm ci em worktree junctionada) → restaurado com `npm ci`.
+- 2026-08-30: Wave 6 do PLAN-003 fechada (TASK-003-011 montagem deny-by-default + suíte `route-authz-matrix`; TASK-003-013 store do frontend com re-auth + `proxy.ts`) — gate 10 n/a, gate 1–7 REPROVOU 1º passe (CR1 `assertDenyByDefault` sem wiring; CR2 matcher catch-all; CR3 ramo `://`) → retry `c5188cf`/`e75a11f` fechou, re-review APROVADO; gate 8 REPROVOU 1º passe (S1 alta: re-auth ressuscita sessão no 401 de `/auth/login`; +S4 allowlist cega ao método) → retry fechou os 4, mas ABRIU regressão alta (`/auth/logout` no espelho → logout no-op com access expirado) → resolvida `6281039` (teto 4.88 → decisão autônoma, veto do Diretor). EMENDAS: DEC-003-005 (allowlist método-aware — lição da Wave 4 aplicada), COMP-003-022 (matcher enumerado). Métrica §1.3: fonte = `route-authz-matrix`, registrada no INDEX. 5 lições candidatas (3 projeto + node-22/next-16; processo → agile-coach). Incidentes de higiene: gate concorrente escreveu `tests/zz-probe.test.ts` na árvore durante o re-review (reincidência 4); worktree órfão com `.env` real podado.

@@ -7,7 +7,7 @@
 **Wave**: 6
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 **Data início**: 2026-08-30T04:02:20-03:00
 
 ## Convenções (do projeto)
@@ -79,26 +79,32 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-30T04:02:20-03:00
+**Data conclusão**: 2026-08-30T11:40:21-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 02c1361 · c5188cf (retry Wave 6 — S4/CR1)
 **Jira**: KAN-21
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — Wave 6, diff acumulado + re-review do delta
+**Tentativas**: 2 (retry consolidado da Wave 6)
+**Cobertura final**: n/a (quality.mutation null na ficha)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/http/routes.ts (montagem plana pública→requireAuth→protegido; `assertDenyByDefault` + `sealRouteRoles` no escopo do módulo; `collectRoutes`/`visitLayer`/`MountedRoute` enumerador único)
+  - mnemonicos-backend/src/modules/auth/auth.routes.ts (split `publicAuthRoutes`/`protectedAuthRoutes`; handlers intocados)
+  - mnemonicos-backend/src/modules/disciplines/disciplines.routes.ts (`requireRole('GET','/disciplines','EDITOR','ADMIN')` — A-002-019)
+  - mnemonicos-backend/src/http/public-paths.ts (retry S4 — pares `"<MÉTODO> <caminho>"`, `isPublicPath(method, path)`)
+  - mnemonicos-backend/src/http/middlewares/authenticate.ts (retry S4 carve-out — leitor passa `req.method`)
+  - mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts (novo — 28 casos)
+  - mnemonicos-backend/tests/integration/authenticate.test.ts (retry S4 — adaptação à assinatura de par; inventário de `it()` 28→28)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — unit 165/165 · integração-DB 133/133 (6 suites; `route-authz-matrix` 28/28)
+- [x] Lint limpo — exit 0
+- [x] Aderência à ficha/perfil — §6.3 (deny-by-default na montagem; ordem de middleware semântica, agora **conferida mecanicamente no boot**); §7 (a suíte lê `apiRoutes.stack`, risco declarado)
+- [x] Code review aprovado — 1º passe REPROVOU (CR1 `assertDenyByDefault` sem wiring; +CR2/CR3 em TASK-013); retry `c5188cf` fechou CR1 e S4; re-review APROVADO (7 mutantes mortos, teto de convergência não alcançado)
+- [x] ACs verificados — AC-002-010 (matriz 401/403 por rota, lista derivada de `apiRoutes.stack`, N=8 não-públicas), AC-002-014 (rota fictícia sem `requireRole` + EDITOR → 403; `assertDenyByDefault` lança no boot para topologia adversarial — teste de wiring), AC-002-018 (nenhum handler cria `User` fora de `requireRole('ADMIN')`), NFR-002-001; EMENDA DEC-003-005 Wave 6 (allowlist método-aware)
+- [x] Segurança (gate 8): aprovado (Wave 6) — re-review do delta; ordem de montagem provada comportamentalmente, `verifyOrigin` nas 5 mutações asserido por referência de função, allowlist método-aware exata (`isPublicPath('DELETE','/health')` → false; boot lança até para remoção da barreira `requireAuth`)
+- [x] Comportamento (gate 9): consolidado (Etapa 4 / FEAT-002-002) — a suíte `route-authz-matrix` **é** a fonte de medição externa da métrica §1.3; gate 9 de FEAT-002-002 no fecho da Wave 7 (com TASK-003-015)
 
-**Notas**: 
+**Notas**: A barreira central deny-by-default. `assertDenyByDefault(apiRoutes)` no escopo do módulo enumera `apiRoutes.stack` e **lança o boot** se (a) rota não-pública sem declaração exata `"<MÉTODO> <caminho>"` em `ROUTE_ROLES`, (b) rota cujo par está na allowlist montada **depois** de `requireAuth`, (c) barreira `requireAuth` ausente com rota protegida montada. `sealRouteRoles()` ao fim. Métrica §1.3: fonte de medição = a suíte `route-authz-matrix`; dono = time de engenharia; natureza = conformidade (verde/vermelha no CI), não instrumentação de evento — registrado no INDEX. Follow-up backend (sugestões não-bloqueantes do code-reviewer): `routes.ts` `barrierFound` é dead code com docblock que promete papel inexistente (guarda é fail-closed sem ele — provado); `route-authz-matrix:489-490` tem narrativa de rodada em comentário. `config.matcher` do frontend (TASK-003-013) precisa de critério vinculante em TASK-003-015 para sincronizar com o grupo `(interno)` real.

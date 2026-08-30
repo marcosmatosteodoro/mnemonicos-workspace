@@ -8,7 +8,7 @@
 **Wave**: 6
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 **Data início**: 2026-08-30T04:33:36-03:00
 
 ## Convenções (do projeto)
@@ -93,26 +93,28 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-30T04:33:36-03:00
+**Data conclusão**: 2026-08-30T11:40:21-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 0ce714a · e75a11f (retry Wave 6 — S1/S2/S3/CR2/CR3) · 6281039 (2ª volta — regressão do logout no-op)
 **Jira**: KAN-23
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — Wave 6, diff acumulado + 2 re-reviews do delta
+**Tentativas**: 2 (retry consolidado da Wave 6 + 1 rodada bounded — regressão do gate 8 aberta pelo retry; teto de convergência 4.88 → decisão autônoma do Tech Lead pelo default do reviewer, veto do Diretor na Entrega)
+**Cobertura final**: n/a (quality.mutation null na ficha)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/store/api.ts (`baseQueryWithReauth` serializado; `PUBLIC_AUTH_PATHS` = espelho literal de `PUBLIC_PATH_ALLOWLIST` `['/auth/login','/auth/refresh']`; `isPublicAuthRequest` early-return no 401 público; `onQueryStarted` `resetApiState` em login+logout, logout fail-closed local na falha; 8 endpoints + `tagTypes`)
+  - mnemonicos-frontend/src/proxy.ts (`export function proxy` + `config.matcher` enumerado `['/studio/:path*','/gestao/:path*']`; `isSafeRelativePath` — `next` como caminho relativo)
+  - mnemonicos-frontend/src/store/api.test.ts · src/proxy.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — frontend 47/47 (5 suites)
+- [x] Lint limpo — exit 0
+- [x] Aderência à ficha/perfil — `next-16.md` §1 (`proxy.ts`, export `proxy`), §4/§6.5 (estado do servidor só em RTK Query, sem slice; `resetApiState` após login/logout), §6.6 (destino de redirect é path relativo validado); `@jest-environment node` nos testes de `fetchBaseQuery`
+- [x] Code review aprovado — 1º passe REPROVOU (CR2 matcher catch-all; CR3 ramo `://`); retry `e75a11f` fechou; re-review APROVADO (7 mutantes mortos)
+- [x] ACs verificados — AC-002-028 (renovação silenciosa com repetição única; falha → `resetApiState`+`/login?sessao=expirada`; serialização — 3× 401 → 1 refresh); FR-002-012 (`proxy.ts` conveniência, `next` validado); mutantes S1/S1b/S3/CR2/CR3 mortos com controle positivo
+- [x] Segurança (gate 8): aprovado (Wave 6) — S1 (401 de endpoint público de sessão não dispara re-auth), S2, S3 (logout+login zeram o cache RTK Query); **regressão do 1º retry** (`/auth/logout` no espelho → logout no-op quando o access expirou) reproduzida e **corrigida** em `6281039` (mutante `[retry S1b]` verificado vermelho pelo Tech Lead)
+- [x] Comportamento (gate 9): pendente — FEAT-002-002 completa no fecho da Wave 7 (com TASK-003-015)
 
-**Notas**: 
+**Notas**: `baseQueryWithReauth` serializa o refresh (flag de módulo — `makeStore()` segue função; risco registrado: 1º prefetch server-side torna a flag estado por-request). `PUBLIC_AUTH_PATHS` exportado para o teste de divergência contra `PUBLIC_PATH_ALLOWLIST` do backend — entrada a mais na lista é defeito (a regressão da 2ª volta). `config.matcher` `['/studio/:path*','/gestao/:path*']` é **working set F1** — o grupo `src/app/(interno)/` ainda não existe; TASK-003-015 nasce com critério vinculante de sincronizar/derivar o matcher do grupo criado (senão o guard protege nada em silêncio). `isSafeRelativePath` fail-closed (`//`, `/\`, `://`, `%2f` — os dois últimos ficam same-origin após o parse WHATWG).
