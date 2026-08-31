@@ -153,6 +153,8 @@ FEAT é declarada. Cada FR pertence a exatamente uma FEAT.
 
 **Jira**: KAN-8
 
+**Verificação (gate 9)**: 2026-08-31 — PARCIAL / pendente_handoff (qa). **Exercitado com execução real**: AC-002-028 APROVADO (renovação silenciosa do cliente com repetição única + mensagem de sessão expirada na tela de login); FR-002-001..008 APROVADOS na Wave 3/5 sobre `createApp()` + Postgres real (login/rotação/reuso→revogação da família/expiração 7d/logout/freio por chave composta); partes de gate 1 de AC-002-009 (três estados do form — pendente/sucesso-navega/falha-genérica-sem-campo). **Pendente de tela** (causa: `credencial` — `keelson.local.json` realm `app` com `loginPath`/`username`/`password` nulos + apps fora do ar; evidência: `probe-env.sh` exit 1): trânsito real à área interna no sucesso do login (AC-002-009). Seed de verificação em `HANDOFF-PLAN-003.md`.
+
 - **FR-002-001** [MUST] Quando uma conta interna ativa envia e-mail e senha corretos à
   rota de login, o sistema DEVE estabelecer uma sessão autenticada: emitir uma credencial
   de acesso de vida curta em cookie inacessível a script e um token de renovação persistido
@@ -199,6 +201,8 @@ FEAT é declarada. Cada FR pertence a exatamente uma FEAT.
 > o guard de rota do cliente é só conveniência de navegação.
 
 **Jira**: KAN-9
+
+**Verificação (gate 9)**: 2026-08-31 — PARCIAL / pendente_handoff (qa). **Exercitado com execução real**: AC-002-010/011/012/014 APROVADOS sobre `createApp()` + Postgres real — suíte `route-authz-matrix` 28/28 (censo de 12 rotas; não-pública → 401 sem payload; `{ADMIN}` → 403 EDITOR / 200 ADMIN; chamada direta por supertest mantém a checagem; rota sem declaração → 403; `assertDenyByDefault` recusa topologia adversarial no boot); partes de gate 1 de AC-002-013 (4 ramos do `InternalShell`: carregando neutro / children / redirect sem sessão / "sem permissão" com papel insuficiente — mutante `EDITOR: ['STUDENT','EDITOR','ADMIN']` morto) e de AC-002-027 (falha transitória de `logout` mantém o usuário na área interna com feedback observável — oráculo montado contra a `api` real). **Pendente de tela** (causa: `credencial`): caminhada e2e de AC-002-013 (aba anônima → redirect `/login`; login EDITOR → carregando → vista renderizada) e ida-e-volta UI→servidor do logout de sucesso (AC-002-027: `sessions.revokedAt` da família + reapresentar cookie anterior → 401). Seed de verificação em `HANDOFF-PLAN-003.md`.
 
 - **FR-002-010** [MUST] O sistema DEVE recusar por padrão toda rota não-pública: uma
   requisição sem sessão autenticada válida DEVE receber uma resposta de não-autorizado e

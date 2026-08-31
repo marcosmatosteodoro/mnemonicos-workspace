@@ -410,3 +410,69 @@ subagente que vai varrer código deve avisar que os repos são symlinks.
 **Validade:** enquanto os dois repos entrarem no workspace por symlink (ver `.gitignore`).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Valor de configuração lido por analisador de build só é provado por oráculo que passe pelo build
+
+**Erro:** na Wave 7 de PLAN-003, `config.matcher` do `proxy.ts` passou a ser derivado por
+`INTERNAL_ROUTE_PREFIXES.flatMap(...)` de um símbolo compartilhado. Cinco testes novos
+ficaram verdes provando a derivação — e `next build` **abortou**
+(`matcher needs to be a static string or array of static strings`): o Next lê `config` por
+análise estática do AST e nunca executa o módulo. O guard de navegação não existia no app
+buildado; a suíte verde era falso oráculo.
+**Causa:** o teste elegeu como oráculo um **modelo** do consumidor (um `toRegExp` caseiro
+sobre o valor obtido em runtime) em vez do consumidor. Jest executa o módulo; o Next não. É
+a forma da lição "função + wiring" (abaixo) num eixo novo: valor lido em **tempo de
+build**. E a EMENDA COMP-003-022 pediu "derivado de um símbolo" sem dizer em que momento a
+derivação pode acontecer — o que tornava a expressão em runtime uma leitura literal do
+critério.
+**Solução:** valor que um analisador de build consome — `config` de
+`proxy.ts`/`middleware.ts`, route segment config, `generateStaticParams` — só é provado por
+um oráculo que passe pelo build:
+- o **valor no arquivo é literal** (array de strings literais / objeto literal) — nenhuma
+  chamada de função, spread ou template com expressão dentro do `config`;
+- "derivado de um símbolo" = o **teste** assere a equivalência literal↔símbolo (oráculo de
+  defasagem: mutar o literal sem tocar o símbolo → vermelho), **ou** um codegen versionado
+  em build gera o literal;
+- teste de **wiring** obrigatório: `extractExportedConstValue(parse('src/proxy.ts'), 'config')`
+  devolve `value` e não `unsupported` — ou `quality.build` (`npm --prefix mnemonicos-frontend
+  run build` → exit 0) no critério de pronto da TASK.
+Referência: `mnemonicos-frontend/src/proxy.ts` + `src/proxy.test.ts`;
+`guidelines/project/frontend/next-16.md` §6.3 e §11.
+**Validade:** enquanto o frontend for Next App Router com Turbopack (config por AST estático).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Predicado de decisão de UI a partir de estado de RTK Query só se prova no componente montado
+
+**Erro:** o predicado que decide redirect/render do `InternalShell` (`computeMissingSession`)
+foi extraído como **função pura** e provado sobre `api.endpoints.me.select()` da store. O
+mutante (guarda `isUninitialized`/`isFetching` removida) morria nesse teste e **sobrevivia
+no componente montado** — e um bug real de AC-002-027 (falha transitória de `logout` sem
+feedback: `resetApiState()` no `finally` desmonta `LogoutControl` e destrói o `useState`
+`hasFailed`) ficou **verde na suíte**.
+**Causa:** o estado que o teste puro fixava (`isUninitialized: true` logo após
+`resetApiState()`) só existe **sem subscritor montado**. Com o componente montado, o RTK
+Query re-subscreve e re-busca `me` no mesmo flush — `isUninitialized` nunca é `true` em
+produção. Testar o predicado isolado da store montada troca o consumidor real (o ciclo de
+vida do hook: re-subscrição + refetch pós-reset é *parte do comportamento sob prova*) por
+um modelo dele. É a lição "função + wiring" (acima) em tempo de render. Agravante: a
+extração criou export de produção cuja única razão de existir era o teste mais fraco — o
+que faz a substituição parecer rigor.
+**Solução:**
+- Predicado que decide render/navegação a partir de estado de RTK Query → oráculo que passa
+  pelo **componente MONTADO** contra a `api` real (store real via `makeStore()` + `fetch`
+  mockado). O teste da função pura **complementa**, nunca substitui. Critério de aceite: o
+  mutante morre no teste **montado**.
+- `resetApiState()` (login/logout) pode **desmontar a subárvore dentro de um único flush** —
+  polling de 1ms não vê. Asserção de presença no DOM **não acusa**: o oráculo precisa de
+  contador de montagem/efeito **ou** de asserção sobre estado local que a remontagem
+  destruiria (`useState` de erro sobrevivendo).
+- Harness: `fetch`/`Response`/`Request`/`Headers` em jsdom exigem um `testEnvironment`
+  custom estendendo `jest-environment-jsdom` e injetando esses globais do realm Node —
+  **sem dependência nova**.
+Referência: `mnemonicos-frontend/src/components/internal-shell.tsx` +
+`src/components/internal-shell.integration.test.tsx`.
+**Validade:** enquanto o frontend usar RTK Query com componentes que ramificam em
+`isLoading`/`isError`/`data`.
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

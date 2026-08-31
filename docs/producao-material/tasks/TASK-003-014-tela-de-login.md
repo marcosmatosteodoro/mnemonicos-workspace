@@ -8,7 +8,7 @@
 **Wave**: 7
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 **Data início**: 2026-08-30T11:51:49-03:00
 
 ## Convenções (do projeto)
@@ -53,6 +53,9 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 - [ ] O `LoginForm` renderiza a mensagem genérica em pt-BR sem apontar campo quando a mutation `login` rejeita — verificação executável: `npm --prefix mnemonicos-frontend test -- login-form` → após a mutation mockada rejeitar com 401, `findByText('E-mail ou senha inválidos.')` aparece, nenhum campo com `aria-invalid`, e os inputs voltam a aceitar entrada (não ficam `disabled`). `Tests: ≥2 passed`. Fixada antes do código.
 - [ ] Testes cobrem AC-002-028 (mensagem de sessão expirada na tela de login) — verificação executável: `npm --prefix mnemonicos-frontend test -- login` → renderizando `/login?sessao=expirada`, há um `role="status"` com o texto pt-BR de sessão expirada ("Sua sessão expirou. Entre novamente."); sem o parâmetro, `queryByRole('status')` para essa mensagem é nulo. `Tests: ≥1 passed`. Fixada antes do código.
 - [ ] Identificadores de código em inglês e texto de interface em pt-BR (NFR-002-009) — verificação executável: `npm --prefix mnemonicos-frontend run lint` → exit 0 (baseline capturada no início da TASK); o teste de componente afirma o texto pt-BR exato exibido na falha ("E-mail ou senha inválidos."). `Tests: ≥1 passed`. Fixada antes do código.
+- [ ] **[retry Wave 7 — gate 8 ACHADO 2]** O `<form>` tem `method="post"` e o controle de submit fica desabilitado até a hidratação — verificação executável: `npm --prefix mnemonicos-frontend test -- login-form` → o `<form>` renderizado tem atributo `method="post"` (mutante: remover `method` → um submit nativo pré-hidratação vira `GET /login?email=…&password=…`, vazando credencial na URL — asserção fica vermelha); e o botão de submit está `disabled` no primeiro render antes de os efeitos rodarem (flag de hidratação: `disabled={isLoading || !hydrated}`). `Tests: ≥1 passed`. Fixada antes do código.
+- [ ] **[retry Wave 7 — gate 7 A5]** O destino do `router.push` em sucesso é o símbolo canônico `INTERNAL_HOME` importado de `@/lib/internal-routes` — não um literal `'/studio'` local — verificação executável: `npm --prefix mnemonicos-frontend test -- login-form` → a asserção de sucesso é `expect(pushMock).toHaveBeenCalledWith(INTERNAL_HOME)` com `INTERNAL_HOME` importado do módulo canônico (mutante: renomear o segmento em `INTERNAL_ROUTE_PREFIXES` → `proxy.test.ts` **e** `login-form.test.tsx` ficam vermelhos juntos, nunca verde com o login empurrando para 404). `grep -n "INTERNAL_HOME\s*=\s*'" mnemonicos-frontend/src/components/login-form.tsx` → sem resultado (a constante não é redefinida no componente). `Tests: ≥1 passed`. Fixada antes do código.
+- [ ] `npm --prefix mnemonicos-frontend run build` → exit 0 (gate `quality.build` da ficha).
 - [ ] Sem warnings/lints novos — `npm --prefix mnemonicos-frontend run lint` → exit 0 (baseline capturada no início da TASK).
 - [ ] Padrão de commit respeitado (Conventional Commits).
 - [ ] Aderência à stack/padrões da ficha e do perfil (`next-16.md`, §1 — Server/Client Components; identificadores/interface; README do repo vence em conflito).
@@ -83,26 +86,29 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-30T11:51:49-03:00
+**Data conclusão**: 2026-08-31T10:22:38-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 9aabaf1 (implementação) · f6cc4ed (retry Wave 7 — FIX5 `INTERNAL_HOME` derivado do símbolo; FIX6 `<form method="post">` + gate de hidratação)
 **Jira**: KAN-24
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — `revisado_por ≠ implementado_por`
+**Tentativas**: 2 (implementação + 1 retry consolidado da rodada de gates da Wave 7)
+**Cobertura final**: n/a (não coletada; piso do projeto 50% mantido — suíte frontend 68→86)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/app/login/page.tsx
+  - mnemonicos-frontend/src/app/login/page.test.tsx
+  - mnemonicos-frontend/src/components/login-form.tsx
+  - mnemonicos-frontend/src/components/login-form.test.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — frontend jest 86/86 (11 suítes); lint/typecheck/build exit 0
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — code-reviewer, re-review da Wave 7 (2ª volta): FIX5/FIX6 fechados com mutante morto (`INTERNAL_HOME` rename cruza `proxy.test.ts` + `login-form.test.tsx`; remover `method="post"` → vermelho; `disabled` sem `!hydrated` → vermelho)
+- [x] ACs verificados — AC-002-009 (três estados do form, gate 1) · AC-002-028 (mensagem de sessão expirada) · gate 8 ACHADO 2 fechado (`<form method="post">` — sem vazamento de credencial em GET pré-hidratação)
+- [x] Segurança (gate 8): aprovado (Wave 7, 2ª volta) — security-engineer; ACHADO 2 (MEDIA, `<form>` sem `method=`) FECHADO, verificado por `renderToStaticMarkup`
+- [ ] Comportamento (gate 9): pendente_handoff (FEAT-002-001) — qa; trânsito real à área interna no sucesso de login não exercitável (causa: `credencial` — `keelson.local.json` realm `app` com `loginPath`/`username`/`password` nulos + apps fora do ar). Seed consolidada em HANDOFF-PLAN-003.md. O que o qa exercitou (gate 1 do form; AC-002-028 com execução real) APROVADO.
 
-**Notas**: 
+**Notas**: FR-002-009 / NFR-002-009 satisfeitos. O destino pós-login (`INTERNAL_HOME`) é derivado do símbolo canônico `INTERNAL_ROUTE_PREFIXES` (`internal-routes.ts`), não um literal duplicado. Rodada de gates da Wave 7 rodou 1× sobre o diff acumulado das duas TASKs (4.90); os achados de A5/gate8-ACHADO2 desta TASK foram roteados aqui e fechados no retry `f6cc4ed`.

@@ -6,9 +6,9 @@
 
 ## Status agregado
 
-- Todo: 2
+- Todo: 0
 - In Progress: 0
-- Done: 14
+- Done: 16
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -40,8 +40,8 @@
 - [x] TASK-003-013 ✅ Done — Store do frontend (`api.ts` com re-auth + `proxy.ts`)
 
 ### Wave 7 (depende da Wave 6)
-- [ ] TASK-003-014 ⏸ Todo — Tela de login
-- [ ] TASK-003-015 ⏸ Todo — Shell da área interna
+- [x] TASK-003-014 ✅ Done — Tela de login
+- [x] TASK-003-015 ✅ Done — Shell da área interna
 
 ## Cobertura de FRs
 
@@ -120,6 +120,6 @@ aparecem: `Realiza (FRs)` = `nenhuma` (chore ou só NFR via AC), sem FR que deri
 
 | FEAT | TASKs (P = primária) | Done |
 |------|----------------------|------|
-| FEAT-002-001 | TASK-003-004 (P), TASK-003-006 (P), TASK-003-008 (P), TASK-003-014 (P), TASK-003-015 | 3/5 |
-| FEAT-002-002 | TASK-003-007 (P), TASK-003-013 (P), TASK-003-015 (P) | 2/3 |
+| FEAT-002-001 | TASK-003-004 (P), TASK-003-006 (P), TASK-003-008 (P), TASK-003-014 (P), TASK-003-015 | 5/5 ✅ |
+| FEAT-002-002 | TASK-003-007 (P), TASK-003-013 (P), TASK-003-015 (P) | 3/3 ✅ |
 | FEAT-002-003 | TASK-003-006, TASK-003-010 (P), TASK-003-012 (P) | 3/3 ✅ |

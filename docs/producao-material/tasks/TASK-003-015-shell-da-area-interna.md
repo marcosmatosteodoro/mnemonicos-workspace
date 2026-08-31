@@ -8,7 +8,7 @@
 **Wave**: 7
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 **Data início**: 2026-08-30T12:00:00-03:00
 
 ## Convenções (do projeto)
@@ -60,7 +60,14 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 - [ ] Testes cobrem AC-002-013 (ramo "sessão válida + papel insuficiente → sem permissão") no gate 1 — verificação executável: `npm --prefix mnemonicos-frontend test -- internal-shell` → com `useMeQuery` devolvendo um usuário EDITOR e o `InternalShell` numa vista-stub que exige `requiredRole="ADMIN"`, o DOM mostra "Você não tem permissão para ver esta página." e **não** renderiza `children`; F1 não embarca tela ADMIN-only, então este ramo é provado aqui (não no gate 9). `Tests: ≥1 passed`. Fixada antes do código.
 - [ ] O controle de logout fica desabilitado com indicador de progresso enquanto a mutation `logout` está pendente; em sucesso navega para `/login`; em falha mostra mensagem genérica em pt-BR e permanece — verificação executável: `npm --prefix mnemonicos-frontend test -- internal-shell` → 3 casos via mock da mutation `logout`: `pending` → controle `disabled` + progresso; resolvida → navegação para `/login` chamada; rejeitada (500) → `findByText` da mensagem genérica pt-BR, sem navegação. `Tests: ≥3 passed`. Fixada antes do código.
 - [ ] **[furo no plano — AC-002-027 × S1b]** Falha **transitória** de logout (500/rede) mantém o usuário na área interna — verificação executável: `npm --prefix mnemonicos-frontend test -- api` → com o `logout` mockado respondendo **500** (não 401), o `logout.onQueryStarted` **não** chama `reauth.redirect`/`window.location.assign`; `store.getState().api.queries` é zerado (`resetApiState`), a sessão `me` segue válida no mock. Mutante: `catch` do `logout.onQueryStarted` redireciona em qualquer rejeição → o caso 500 chama o redirect (vermelho). E o caminho "sessão morta de vez" (`logout` 401 + `refresh` 401) **continua** redirecionando para `/login` (pelo ramo `!renewed` do `baseQueryWithReauth` — teste `[retry S1b]` da TASK-003-013 segue verde). `Tests: ≥2 passed`. Fixada antes do código.
-- [ ] **[EMENDA COMP-003-022 Wave 6]** `config.matcher` do `proxy.ts` é derivado do grupo `(interno)` real, e a home pública `/` não é guardada — verificação executável: `npm --prefix mnemonicos-frontend test -- proxy` → o teste **enumera** os segmentos de primeiro nível de `mnemonicos-frontend/src/app/(interno)/` (via `fs.readdirSync` ou lista literal derivada do símbolo compartilhado `INTERNAL_ROUTE_PREFIXES`) e afirma que **cada** um está coberto por `config.matcher` (aplicado com âncoras `^…$`); afirma que `/`, `/login`, `/_next/static/x` **não** casam. Mutante: adicionar um `(interno)/gestao/` (dir) sem tocar o símbolo → o teste de enumeração fica vermelho (segmento não coberto). Mutante: voltar o matcher a catch-all por exclusão → `matches('/')` vira `true` (vermelho). `Tests: ≥2 passed`. Fixada antes do código.
+- [ ] **[EMENDA COMP-003-022 Wave 6 · retry Wave 7 A1/A2]** `config.matcher` do `proxy.ts` é um **array literal de strings literais** (`['/studio', '/studio/:path*']`) — nunca `.flatMap()`, spread ou template com expressão dentro do `config` (o Next lê `config` por AST estático e aborta o build em `CallExpression`). A derivação do símbolo compartilhado `INTERNAL_ROUTE_PREFIXES` acontece **no teste** (oráculo de defasagem), não no arquivo. Verificações executáveis:
+  - `npm --prefix mnemonicos-frontend run build` → exit 0 (mutante: `config.matcher` como `INTERNAL_ROUTE_PREFIXES.flatMap(...)` → build **aborta** em `./src/proxy.ts` com `matcher needs to be a static string or array of static strings`). Baseline: hoje o build está **vermelho** por esse exato motivo — o critério fecha quando fica verde.
+  - `npm --prefix mnemonicos-frontend test -- proxy` → **teste de wiring**: `extractExportedConstValue` de `next/dist/build/analysis/extract-const-value` sobre `src/proxy.ts` devolve `{ value: { matcher: [...] } }` e **não** `{ unsupported: ... }` (mutante: `.flatMap()` → `unsupported` → vermelho). Se o import do extractor for instável, o oráculo de wiring é o `run build` acima anexado ao critério.
+  - `npm --prefix mnemonicos-frontend test -- proxy` → **teste de equivalência** literal↔símbolo: `config.matcher` é igual a `INTERNAL_ROUTE_PREFIXES.flatMap((p) => ['/' + p, '/' + p + '/:path*'])` computado no teste (mutante: mudar o literal em `proxy.ts` sem tocar o símbolo → vermelho). Mais os casos já existentes de enumeração do diretório real de `(interno)/` e de `/` não-guardada. `Tests: ≥4 passed`. Fixada antes do código.
+- [ ] **[retry Wave 7 A3 — AC-002-013]** Cada linha de `SUFFICIENT_ROLES` que a produção exercita tem caso — `npm --prefix mnemonicos-frontend test -- internal-routes` → `roleSatisfies('STUDENT', 'EDITOR') === false`, `roleSatisfies('STUDENT', INTERNAL_MIN_ROLE) === false`, `roleSatisfies('EDITOR', 'EDITOR') === true`, `roleSatisfies('ADMIN', 'EDITOR') === true`, `roleSatisfies('EDITOR', 'ADMIN') === false`, `roleSatisfies('ADMIN', 'ADMIN') === true`. Mutante: `EDITOR: ['STUDENT', 'EDITOR', 'ADMIN']` em `internal-routes.ts` → o caso `roleSatisfies('STUDENT', 'EDITOR')` fica **vermelho** (hoje esse mutante sobrevive com 68/68 verde). Mais um caso em `internal-shell` — `useMeQuery` devolvendo STUDENT contra `requiredRole={INTERNAL_MIN_ROLE}` → "sem permissão", sem `children`, sem `replace`. `Tests: ≥1 passed` (internal-routes) + `≥1 passed` (internal-shell). Fixada antes do código.
+- [ ] **[retry Wave 7 A4 — AC-002-027, 2ª volta]** Falha transitória de `logout` produz **feedback observável que sobrevive ao ciclo de vida do cache** — o oráculo é o **do critério**: `InternalShell` **MONTADO** contra a `api` real (store real via `makeStore()` + `fetch`/`Response`/`Request`/`Headers` do realm Node, injetados por um `testEnvironment` custom que estende `jest-environment-jsdom` — **sem dependência nova**), não função pura sobre `me.select()`. Cenário: `me` resolve EDITOR → clicar "Sair" → `logout` responde **500**. Asserções (todas): (a) a mensagem `Não foi possível sair agora. Tente novamente.` **está no DOM** após o `flush` e **permanece** (não é destruída por remontagem da subárvore); (b) `replaceMock` / `pushMock` **não** são chamados; (c) `me` segue com `data` (sessão não foi zerada). Design (EMENDA COMP-003-021 Wave 7): `logout.onQueryStarted` faz `resetApiState()` **só após sucesso**; falha transitória não reseta nem navega. Mutante 1: `resetApiState()` no `finally` (após sucesso **e** falha) → a subárvore desmonta, `hasFailed` some, asserção (a) **vermelha**. Mutante 2: `catch` do `logout.onQueryStarted` chama `reauth.redirect` → asserção (b) **vermelha**. Controle positivo (4.186): sem nenhum mutante, `logout` 200 → `pushMock('/login')` chamado e cache zerado (o instrumento distingue sucesso de falha). `grep -n "resetApiState" mnemonicos-frontend/src/store/api.ts` → a ocorrência em `logout` está dentro do `try`/após `await queryFulfilled`, nunca em `finally`. `Tests: ≥1 passed` (montado) + o caminho "sessão morta de vez" (`api.test.ts` `[retry S1b]`) segue verde. Fixada antes do código.
+- [ ] **[retry Wave 7 A4 — gate 7]** `internal-shell.tsx` reflete a costura real: com `me` preservado na falha transitória, `computeMissingSession` e sua guarda `isUninitialized`/`isFetching` (postas na 1ª volta) **saem** — o predicado volta a inline `missingSession = isError || (!isLoading && !data)` e o export de produção some — **a menos que** o teste montado acima demonstre necessidade residual (então o docblock descreve o que a costura montada de fato faz, sem narrar a rodada — 4.88). Verificação: `grep -n "computeMissingSession" mnemonicos-frontend/src/` → sem resultado, ou (se mantido) o docblock não afirma causalidade que o teste montado contradiz.
+- [ ] `npm --prefix mnemonicos-frontend run build` → exit 0 (gate `quality.build` da ficha — obrigatório em toda TASK que edita `proxy.ts` / route segment config; ver `next-16.md` §11).
 - [ ] Sem warnings/lints novos — `npm --prefix mnemonicos-frontend run lint` → exit 0 (baseline capturada no início da TASK).
 - [ ] Padrão de commit respeitado (Conventional Commits).
 - [ ] Aderência à stack/padrões da ficha e do perfil (`next-16.md`, §1/§6.3 — esconder ≠ autorizar; README do repo vence em conflito).
@@ -95,26 +102,33 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-08-30T12:00:00-03:00
+**Data conclusão**: 2026-08-31T11:06:44-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 3946b60 (implementação) · 0c54b96 (furo AC-002-027 × S1b) · f6cc4ed (retry Wave 7 — `config.matcher` literal + wiring de build; cobertura `roleSatisfies`/AC-002-013) · e6d0c75 (rodada dirigida A4 — `logout` falho preserva cache e feedback)
 **Jira**: KAN-25
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1–7) · security-engineer (gate 8) — `revisado_por ≠ implementado_por`
+**Tentativas**: 4 (implementação + reconciliação do furo AC-002-027 + retry consolidado da Wave 7 + rodada dirigida A4 autorizada após teto 4.88)
+**Cobertura final**: n/a (não coletada; piso do projeto 50% mantido — suíte frontend 68→86)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/app/(interno)/layout.tsx
+  - mnemonicos-frontend/src/app/(interno)/studio/page.tsx · page.test.tsx
+  - mnemonicos-frontend/src/components/internal-shell.tsx · internal-shell.test.tsx · internal-shell.integration.test.tsx
+  - mnemonicos-frontend/src/lib/internal-routes.ts · internal-routes.test.ts
+  - mnemonicos-frontend/src/proxy.ts · proxy.test.ts
+  - mnemonicos-frontend/src/store/api.ts · api.test.ts (carve-out: furo AC-002-027 × S1b + EMENDA COMP-003-021 Wave 7)
+  - mnemonicos-frontend/test/jsdom-fetch-env.js (novo — `testEnvironment` custom que estende `jest-environment-jsdom`, sem dependência nova)
+  - mnemonicos-frontend/eslint.config.mjs (bloco `files: ['test/**/*.js']` — CJS do environment custom)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): verificado | n/a — <qa ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando — frontend jest 86/86 (11 suítes); `quality.build` exit 0 (era vermelho — fechou no retry); lint/typecheck exit 0; caminho "sessão morta de vez" (`api.test.ts` S1b) 4/4 sem mudança de asserção
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil — `next-16.md` §6.3/§11 (`config` por AST estático: array literal, derivação vive no teste + wiring por `extractExportedConstValue`); §6.5 (estado de servidor só em RTK Query; `makeStore()` função)
+- [x] Code review aprovado — code-reviewer, re-review da rodada dirigida A4: A4 fechou com prova falsificável (3 mutantes mortos — `resetApiState` no `finally` → mensagem some; `catch` redireciona → asserção (b) vermelha; predicado neutralizado → 2 ramos vermelhos — com controle positivo verde). Regressão de prova 4.174 auditada executando nos dois sentidos: inversão declarada da EMENDA COMP-003-021 Wave 7, não enfraquecimento
+- [x] ACs verificados — AC-002-013 (`roleSatisfies` por linha + 4 ramos do `InternalShell`, gate 1) · AC-002-027 (falha transitória de `logout` mantém o usuário na área interna **com feedback observável**, oráculo montado contra a `api` real) · EMENDA COMP-003-022 (`config.matcher` derivado do grupo `(interno)`, `/` não guardada)
+- [x] Segurança (gate 8): aprovado (Wave 7 2ª volta + re-review da rodada dirigida A4) — security-engineer; ACHADO 1 (ALTA, `config.matcher` derrubava `next build`) FECHADO, verificado por build + manifesto compilado + probe HTTP real; `logout` falho preservar o cache não abre vazamento de outra identidade
+- [ ] Comportamento (gate 9): pendente_handoff (FEAT-002-002 primária + FEAT-002-001) — qa; caminhada e2e de AC-002-013 (aba anônima → redirect; login EDITOR → carregando → vista) e ida-e-volta UI→servidor do logout de sucesso (AC-002-027, `sessions.revokedAt` + cookie antigo → 401) não exercitáveis (causa: `credencial`). Seed em HANDOFF-PLAN-003.md. Exercitado com execução real: AC-002-010/011/012/014 sobre `createApp()` + Postgres real (route-authz-matrix 28/28); partes de gate 1 de AC-002-013/027 APROVADAS
 
-**Notas**: 
+**Notas**: FR-002-013 / FR-002-023 satisfeitos. A rodada dirigida A4 (`e6d0c75`) foi autorizada pelo Tech Lead em nome do Diretor após o teto de convergência 4.88 (2ª volta do gate 1 no achado A4) — **veto na Entrega**. Design decidido: `logout.onQueryStarted` reseta o cache **só após sucesso** (idêntico a `login`), amendando a EMENDA COMP-003-021 Wave 7 (o "só `resetApiState()` na falha transitória" era o próprio defeito — apagava `me`, desmontava `LogoutControl`, matava a mensagem). `computeMissingSession` e a guarda `isUninitialized`/`isFetching` postas na 1ª volta foram removidas (tratavam o sintoma). 2 `licao_candidata` alvo:processo pendentes de agile-coach (Etapa 4.5): isolamento de escrita entre gates paralelos; `git diff HEAD` (não `git diff`) no contrato de higiene de gate.

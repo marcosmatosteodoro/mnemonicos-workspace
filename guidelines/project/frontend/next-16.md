@@ -480,6 +480,18 @@ backend nega — e é lá que a prova (Art. 1) tem de existir.
   home pública e toda página pública futura. Enumere os prefixos internos, **derivados** de
   um símbolo compartilhado com o layout do grupo, e teste os **dois** lados — interno
   guardado **e** `/` livre. (lição da Wave 6 de PLAN-003)
+- **`config` (matcher e todo route/segment config) é lido por ANÁLISE ESTÁTICA de AST, não
+  executado.** O extrator do Next (`next/dist/build/analysis/extract-const-value`) só
+  resolve **literal**: array de strings literais, objeto literal. `matcher:
+  PREFIXES.flatMap(...)`, spread, `[...a, ...b]` ou template com expressão → `next build`
+  **aborta** (`matcher needs to be a static string or array of static strings`) e, no
+  caminho tolerante, cai para catch-all `^.*$`. "Derivar de um símbolo compartilhado" aqui
+  significa: o **valor no arquivo é literal**, e o **teste** assere a equivalência
+  literal↔símbolo (oráculo de defasagem) — ou um codegen versionado em build gera o
+  literal. Nunca a derivação dentro do `config`. Prova obrigatória: um teste de **wiring**
+  cujo oráculo passa pelo build (`extractExportedConstValue` devolve `value`, não
+  `unsupported`; ou `quality.build` no critério da TASK) — o teste que importa o módulo no
+  Jest é falso oráculo, porque Jest executa e o Next não. (lição da Wave 7 de PLAN-003)
 - **Interceptor de re-autenticação declara a superfície e exclui os endpoints públicos de
   sessão.** Um `baseQuery` global que trata **todo** 401 como "sessão expirada" dispara
   refresh no 401 de `POST /auth/login` (credencial inválida) e — com refresh vivo do usuário
@@ -822,6 +834,10 @@ comentário ou na DEC.
 - **Turbopack é o default de `dev` e `build`.** `next build` **falha** se detectar config de
   webpack. Loader/plugin de webpack precisa de equivalente Turbopack ou de `--webpack`
   (temporário, com prazo).
+- **`export const config` de `proxy.ts` / route segment config é resolvido por AST estático,
+  não executado** — só literal passa; `.flatMap()`/spread/template com expressão fazem
+  `next build` abortar (§6.3). Verde no Jest não prova nada aqui (Jest executa; o build
+  não). `quality.build` é gate obrigatório de toda TASK que edita esses arquivos.
 - **`next lint` não existe** — o lint é `eslint .` (já é o caso aqui).
 - **Cache dinâmico por default** (§10): quem vem do 13/14 espera `fetch` cacheado e vai
   encontrar comportamento diferente. `use cache`/`cacheComponents` é opt-in.
