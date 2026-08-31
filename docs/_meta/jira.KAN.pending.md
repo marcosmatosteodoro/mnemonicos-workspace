@@ -13,7 +13,7 @@
 > - **Épico** KAN-7 → intocado.
 >
 > Site: `mp-consultoria.atlassian.net` · projeto `KAN` · board `2`.
-> Última atualização deste arquivo: **2026-08-30T14:50 -03** (Wave 6 fechada; Wave 7 em curso).
+> Última atualização deste arquivo: **2026-08-31T14:45 -03** (Wave 7 fechada; PLAN-003 completo 16/16; Entrega de F1 em preparação — aguarda veto do Diretor + merge).
 
 ---
 
@@ -21,18 +21,19 @@
 
 | Key | Item | Estado keelson | Ação no Jira |
 |-----|------|----------------|--------------|
-| KAN-7 | SPEC-002 — Acesso interno e papéis de produção (fatia F1) | Em implementação (PLAN-003, 14/16 TASKs) | **nenhuma** — segue em andamento até a Entrega de F1 |
+| KAN-7 | SPEC-002 — Acesso interno e papéis de produção (fatia F1) | Implementação concluída (PLAN-003, 16/16 TASKs); Entrega em preparação | **nenhuma** — segue em andamento até o merge das 2 branches de código + Entrega (ato do Diretor) |
 
 ## Stories (FEATs)
 
 | Key | FEAT | TASKs (Done / total) | Estado real | Coluna-alvo no Jira | ☐ aplicado |
 |-----|------|----------------------|-------------|---------------------|:---:|
-| KAN-8 | FEAT-002-001 — Autenticação de sessão | 3 / 5 (004, 006, 008 ✔ · 014, 015 na Wave 7) + harness KAN-26 ✔ | parcial, em implementação | **In Progress / Em andamento** | ☐ |
-| KAN-9 | FEAT-002-002 — Autorização deny-by-default | 2 / 3 (007, 013 ✔ e revisados · 015 na Wave 7) | barreira montada (TASK-011) + store do frontend (TASK-013); falta o shell | **In Progress / Em andamento** | ☐ |
+| KAN-8 | FEAT-002-001 — Autenticação de sessão | **5 / 5 ✅** (004, 006, 008, 014, 015 ✔) + harness KAN-26 ✔ | **completa** — telas de login entregues; gate 9 pendente_handoff (tela, causa: credencial); falta o merge | **Code review / Review** (teto AI — não `Done`) | ☐ |
+| KAN-9 | FEAT-002-002 — Autorização deny-by-default | **3 / 3 ✅** (007, 013, 015 ✔) | **completa** — barreira + store + shell entregues; gate 9 pendente_handoff (tela, causa: credencial); falta o merge | **Code review / Review** (teto AI — não `Done`) | ☐ |
 | KAN-10 | FEAT-002-003 — Provisionamento de contas por ADMIN | **3 / 3 ✅** (006, 010, 012 ✔) | **completa** — TASK-011 montou as rotas; gate 9 APROVADO; falta só o merge | **Code review / Review** (teto AI — não `Done`) | ☐ |
 
-> **KAN-10 pronta para review** — as 3 TASKs Done + gate 9 APROVADO + rotas montadas (TASK-011).
-> `Done` da Story é merge + Entrega (ato do Diretor). KAN-8 e KAN-9 seguem incompletas → In Progress.
+> **As 3 Stories prontas para review** — todas as sub-tasks Done. KAN-10 com gate 9 APROVADO;
+> KAN-8 e KAN-9 com gate 9 pendente_handoff de tela (causa: credencial — ver HANDOFF-PLAN-003).
+> `Done` da Story é merge + Entrega (ato do Diretor).
 
 ## Sub-tasks (TASKs do PLAN-003)
 
@@ -51,19 +52,17 @@
 | KAN-21 | TASK-003-011 — montagem deny-by-default + suíte de conformidade | KAN-9 | ✅ Done (`02c1361` · `c5188cf`) | **Done** | ☐ |
 | KAN-22 | TASK-003-012 — seed do primeiro ADMIN | KAN-10 | ✅ Done (`8efc829`) | **Done** | ☐ |
 | KAN-23 | TASK-003-013 — store do frontend com reautenticação | KAN-9 | ✅ Done (`0ce714a` · `e75a11f` · `6281039`) | **Done** | ☐ |
-| KAN-24 | TASK-003-014 — tela de login | KAN-8 | 🟡 Wave 7 — em implementação | **In Progress** | ☐ |
-| KAN-25 | TASK-003-015 — shell da área interna | KAN-9 | ⏸ Todo (Wave 7) | **To Do / Backlog** | ☐ |
+| KAN-24 | TASK-003-014 — tela de login | KAN-8 | ✅ Done (`9aabaf1` · `f6cc4ed`) | **Done** | ☐ |
+| KAN-25 | TASK-003-015 — shell da área interna | KAN-9 | ✅ Done (`3946b60` · `0c54b96` · `f6cc4ed` · `e6d0c75`) | **Done** | ☐ |
 | KAN-26 | TASK-003-016 — harness de teste de integração com banco (chore) | KAN-8 | ✅ Done (`f956aec`) — criada nesta sessão | **Done** | ☐ |
 
 ---
 
-## Resumo da ação agora (atualizado — Wave 6 fechada)
+## Resumo da ação agora (atualizado — Wave 7 fechada; PLAN-003 completo)
 
-**14 sub-tasks → Done:** KAN-11 a KAN-23 (todas) + KAN-26. Ou seja, **KAN-21** e **KAN-23** entram agora.
-**KAN-24 → In Progress** (TASK-003-014, Wave 7 em curso). KAN-25 segue To Do / Backlog.
-**KAN-10 (Story) → Code review / Review** — FEAT-002-003 completa e revisada (gate 9 APROVADO) + rotas montadas; teto AI, `Done` só no merge.
-**KAN-8 / KAN-9 (Stories) → In Progress** (incompletas: 3/5 e 2/3 — as duas dependem de TASK-003-015, Wave 7).
-**Não mexer:** KAN-7 (Épico), KAN-25 (backlog — Wave 7).
+**Todas as 16 sub-tasks → Done:** KAN-11 a KAN-26. Entram agora: **KAN-24** e **KAN-25**.
+**As 3 Stories → Code review / Review** — KAN-8 (FEAT-002-001), KAN-9 (FEAT-002-002) e KAN-10 (FEAT-002-003) estão **completas** (5/5, 3/3, 3/3). Gate 9 de KAN-10 APROVADO; de KAN-8 e KAN-9 pendente_handoff de tela (causa: credencial — HANDOFF-PLAN-003). Teto AI: `Done` da Story só no merge da branch + Entrega, ato do Diretor.
+**Não mexer:** KAN-7 (Épico) — segue em andamento até a Entrega de F1 (merge das 2 branches de código).
 
 ## Notas de reconciliação (do `tracker-sync`)
 
