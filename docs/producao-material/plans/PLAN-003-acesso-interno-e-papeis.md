@@ -362,6 +362,7 @@ model Session {
 **Reabrir se**: o volume de requisições autenticadas tornar a consulta de sessão por requisição um gargalo **medido** (TRISK-003-003) — a saída então é cache de sessão, não JWT.
 **Irreversível**: nao
 **Aderência à ficha/perfil**: nova (especifica o desenho de sessão que o perfil §6.5 declara inexistente, mantendo "revogação exige estado no servidor")
+<!-- RATIFICADO pelo Diretor na Entrega de F1 (2026-08-31, via delegação do item 1 do relatório — E3 do PO): a premissa do BRIEF-002 citava "access token JWT curto", o desenho entregou token opaco com estado no servidor. Números idênticos (15 min / 7 dias); `JWT_SECRET` segue exigido, agora como pepper do HMAC. Ganho: logout e desativação derrubam a sessão no mesmo instante (com JWT, o cookie valeria até 15 min após a revogação). Nenhuma ação pendente. -->
 
 ### DEC-003-003: `model Session` para access + refresh com rotação por família
 **Contexto**: A-002-003/007/018 pedem credencial curta + token de renovação rotacionado, revogável, com detecção de reuso e tolerância a renovações concorrentes. RISK-002-002 alerta que o repositório de tokens é superfície sensível.
