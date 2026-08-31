@@ -85,6 +85,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | RISK-002-003 | Dependências novas de criptografia/sessão (derivação de senha, geração de token, leitura de cookie) entram na árvore — superfície de cadeia de suprimento | gate de auditoria de dependências sobre o diff de F1 (/keelson:audit); fixar versão e revisar | SPEC-002 §9 |
 | TRISK-003-001 | `trust proxy: 1` pode ser o nº errado de proxies no deploy — erra `req.ip` e recoloca o bypass do freio de login; contador do rate-limit é por instância em serverless | verificar no ambiente real; store compartilhado para proteção multi-instância (fora do escopo de F1) | PLAN-003 §8 |
 | TRISK-003-002 | Cookie cross-domain (SameSite=None + anti-CSRF) não desenhado; F1 assume mesmo site | verificação de `Origin`/`Host` nas rotas POST de auth agora; token anti-CSRF quando o deploy for cross-domain | PLAN-003 §8 |
+| HANDOFF-003 | Verificação de tela pendente — HANDOFF-PLAN-003 (login e shell interno; 6 itens V1–V6): trânsito real ao `/studio` no sucesso do login, caminhada e2e de AC-002-013, ida-e-volta UI→servidor do logout de sucesso e da falha transitória | fechar num ambiente com tela (app local + browser + credencial do realm `app`); prompt no relatório da Entrega | qa (gate 9 PARCIAL, causa: credencial) |
 
 ## Histórico recente
 

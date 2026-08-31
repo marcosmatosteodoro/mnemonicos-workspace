@@ -15,6 +15,16 @@
 - [2026-08-27 · epico] `User` com `passwordHash` Argon2id e `JWT_SECRET` validado no boot já existem no schema/config, mas nenhuma rota de login/registro os usa — F1 é quem primeiro os liga — mnemonicos-backend/prisma/schema.prisma:44-61
 - [2026-08-27 · epico] `JWT_SECRET` é validado no boot em env.ts — mnemonicos-backend/src/config/env.ts:32-33
 - [2026-08-27 · epico] `USER_ROLES` existe só no backend; frontend não tem os tipos correspondentes — fonte de dessincronia entre repos que F1/F2 precisam fechar — mnemonicos-backend/src/domain/types.ts:24-26
+- [2026-08-31 · F1] Sessão completa (branch `feat/producao-material-mnemora-studio`, aguarda merge): tabela `Session` só com hashes, `familyId` agrupa a rotação, `revokedAt`; `auth.service.ts` faz login/refresh/rotação/reuso→revogação da família/logout/`getSessionUser`/`changeOwnPassword`; rotação é função pura recebendo `now` — mnemonicos-backend/src/modules/auth/auth.service.ts:1-200
+- [2026-08-31 · F1] Rotação de sessão como lógica pura sem I/O, `now` por parâmetro — mnemonicos-backend/src/modules/auth/session-rotation.ts:1-90
+- [2026-08-31 · F1] Barreira deny-by-default: `ROUTE_ROLES` indexado por `"<MÉTODO> <caminho>"` em `route-roles.ts`; `requireRole(method,path,...roles)` declara na montagem, `sealRouteRoles()` sela pós-boot, `requireAuth` é o piso (nega sessão indefinida OU papel fora do conjunto) — mnemonicos-backend/src/http/middlewares/authenticate.ts:1-120
+- [2026-08-31 · F1] `assertDenyByDefault(apiRoutes)` no escopo do módulo derruba o boot em topologia adversarial; `PUBLIC_PATH_ALLOWLIST` são pares método+caminho (`isPublicPath` por igualdade exata) — mnemonicos-backend/src/http/public-paths.ts:1-60
+- [2026-08-31 · F1] `route-authz-matrix.integration.test.ts` é a fonte de medição da métrica §1.3 da SPEC-002 (censo de 12 rotas, 28 asserções) — mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts:1-40
+- [2026-08-31 · F1] `USER_ROLES`/`UserRole`/`SessionUser` agora espelhados no frontend, mantidos à mão em sincronia com o backend — mnemonicos-frontend/src/types/domain.ts:1-40
+- [2026-08-31 · F1] Frontend de sessão: `baseQueryWithReauth` (401 → `POST /auth/refresh` 1× → repete; morta → `resetApiState()` + `/login?sessao=expirada`); `logout.onQueryStarted` reseta o cache só após sucesso — mnemonicos-frontend/src/store/api.ts:1-220
+- [2026-08-31 · F1] Guard de navegação: `proxy.ts` `config.matcher` é array literal (o Next lê `config` por AST estático — sem `.flatMap`/spread); a equivalência com `INTERNAL_ROUTE_PREFIXES` vive no teste; `(interno)` é route group, nunca catch-all por exclusão — mnemonicos-frontend/src/proxy.ts:42-52
+- [2026-08-31 · F1] `INTERNAL_ROUTE_PREFIXES` / `INTERNAL_MIN_ROLE` / `roleSatisfies` — fonte única do contrato de área interna — mnemonicos-frontend/src/lib/internal-routes.ts:1-40
+- [2026-08-31 · F1] Telas mínimas de F1: `/login` (`LoginForm`, 3 estados, `<form method="post">`, gate de hidratação) e `(interno)/` (`InternalShell` resolve `me`, 3 estados de navegação protegida + logout com 3 estados). Apresentação, não fronteira — mnemonicos-frontend/src/components/internal-shell.tsx:1-125
 
 ## Revisão espaçada (dormente por A-005)
 
@@ -24,6 +34,7 @@
 ## Rotas e contrato de API
 
 - [2026-08-27 · epico] Rotas montadas hoje: só `health`, `health/db` e `disciplines` — F1/F2 partem de uma superfície quase vazia — mnemonicos-backend/src/http/routes.ts:9-10
+- [2026-08-31 · F1] `apiRoutes` monta em ordem: `healthRoutes` (público) → auth pública (`POST /auth/login`, `/auth/refresh`) → `requireAuth` → auth protegida (`/auth/logout`, `/auth/me`, `/auth/change-password`) → `usersRoutes` (`requireRole('ADMIN')`) → `disciplinesRoutes` (`requireRole('EDITOR','ADMIN')`); `verifyOrigin` em toda mutação autenticada por cookie — mnemonicos-backend/src/http/routes.ts:1-60
 - [2026-08-27 · epico] Frontend já chama `/mnemonics` e `/flashcards/due`, que não existem no backend — contrato adiantado, quebra em runtime sem o typecheck acusar; F2 precisa fechar isso primeiro — mnemonicos-frontend/src/store/api.ts:28-35
 - [2026-08-27 · epico] Tipos de domínio do frontend não têm `CardState`/`Review` — espelho do `USER_ROLES` ausente do lado do backend — mnemonicos-frontend/src/types/domain.ts:41-83
 
