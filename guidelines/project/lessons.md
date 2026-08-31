@@ -476,3 +476,26 @@ Referência: `mnemonicos-frontend/src/components/internal-shell.tsx` +
 `isLoading`/`isError`/`data`.
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Comentário que afirma paridade entre os dois repos só vale se o teste LER as duas fontes
+
+**Erro:** `mnemonicos-frontend/src/store/api.ts` comenta que `PUBLIC_AUTH_PATHS` é
+"espelho literal de `PUBLIC_PATH_ALLOWLIST` do backend" e que "o teste de divergência fixa
+a igualdade literal". O teste (`api.test.ts`) só faz
+`expect(PUBLIC_AUTH_PATHS).toEqual(['/auth/login','/auth/refresh'])` — um snapshot do
+frontend contra ele mesmo. Divergência real entre os repos não fica vermelha. (Achado da
+convergência de fecho de PLAN-003; não bloqueou — nenhum FR/AC exige essa paridade e o
+backend tem tripwire próprio em `route-authz-matrix`.)
+**Causa:** espelhar uma constante do outro repo é barato; **provar** o espelho exige ler o
+arquivo do outro repo. Quando o teste fica só no lado local, ele documenta a intenção em
+vez de sustentá-la, e o comentário congela a crença de que a rede de proteção existe.
+**Solução:** comentário que afirma paridade cross-repo → o teste **lê as duas fontes**. O
+padrão de referência já está no repo: `mnemonicos-backend/tests/unit/domain-types-parity.test.ts`
+resolve o caminho do outro repo e **lança** se o arquivo não existir (falha alto, nunca
+verde vazio). Aplicar a qualquer literal duplicado por fronteira de repositório
+(`PUBLIC_AUTH_PATHS` × `PUBLIC_PATH_ALLOWLIST`, nomes de cookie, chaves de serialização).
+Alternativa aceitável quando a paridade não é requisito: suavizar o comentário para
+descrever o que o teste de fato garante.
+**Validade:** enquanto houver constantes espelhadas à mão entre `mnemonicos-backend` e `mnemonicos-frontend`.
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
