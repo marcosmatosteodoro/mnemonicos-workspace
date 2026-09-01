@@ -111,3 +111,4 @@ trocar o seed para **Obrigação Tributária** (Direito Tributário), o conteúd
 
 - largada: 2026-09-01T01:42:26-03:00
 - specify: 2026-09-01T02:30:00-03:00 · correções: 2 · classes: spec-fr-sem-deve(1) · janelas: redação 8min/436l · correção 7min/546l
+- plan: 2026-09-01T03:15:00-03:00 · correções: 1 · classes: plan-dec-irreversivel-enum(9) · plan-parse-campo(4) · janelas: redação 7min/461l · correção 4min/461l
