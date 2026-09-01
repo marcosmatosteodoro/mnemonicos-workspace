@@ -1,0 +1,152 @@
+# TASK-006-013: Formulário de Conteúdo bruto — criação, edição e remoção
+
+**Slug**: producao-material
+**Pertence a**: PLAN-006
+**Realiza (FRs)**: FR-005-003, FR-005-004, FR-005-006, FR-005-007, FR-005-009, FR-005-010, FR-005-012, FR-005-022
+**Funcionalidade**: FEAT-005-001 (primária), FEAT-005-002
+**Componente**: COMP-006-014 (principal)
+**Wave**: 5
+**Tamanho estimado**: medium
+**Tipo**: feature
+**Status**: Todo
+
+## Convenções (do projeto)
+
+**Branch sugerida**: `feat/producao-material-mnemora-studio` (branch única do épico MNEMORA STUDIO — `git.branchStrategy: unica`; não criar branch por task; a closure commita TASK a TASK)
+**Padrão de commit**: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`) — sem automação de release
+**Framework de teste**: Jest via `next/jest`, `testEnvironment: jsdom` (harness `mnemonicos-frontend/test/jsdom-fetch-env.js` — `testEnvironment` custom que estende `jest-environment-jsdom` e injeta `fetch`/`Response`/`Request`/`Headers` do realm Node; **sem dependência nova**, criado em F1/TASK-003-015), Testing Library (consulta por papel/texto). Em `mnemonicos-frontend/`. Gates: `npm --prefix mnemonicos-frontend test` / `run lint` / `run typecheck` / `run build`. Gate de tela: `gates.screenVerify` (skill `screen-verify`, Playwright).
+
+## Dependências
+
+- **Depende de**: TASK-006-003, TASK-006-010, TASK-006-011
+- **Bloqueia**: nenhuma
+
+## Contexto
+
+COMP-006-014 / FR-005-003, FR-005-004, FR-005-006, FR-005-007, FR-005-009, FR-005-010, FR-005-012 (FEAT-005-001) e FR-005-022 (FEAT-005-002) / NFR-005-002. Segunda e terceira estações de tela da linha de produção: um **client component compartilhado** `ContentForm` entre `(interno)/content/new/page.tsx` (criação) e `(interno)/content/[id]/page.tsx` (detalhe/edição) — a costura congelada é o próprio `content-form` (resolução 7 do manifesto; candidata a `large`, reavaliável no fecho da Wave 4 — decisão 4.301). Campos: texto normativo, disciplina, tema/assunto, classe do radar de prova (as 5) e fonte normativa estruturada (tipo do dispositivo + citação + link opcional). As três ações — registrar, editar e remover — expõem três estados observáveis (em andamento / sucesso / falha com dados preservados e mensagem pt-BR); a remoção pede confirmação explícita e, ao concluir, o item some da listagem. A imutabilidade da autoria, o carimbo de última alteração, o alcance por papel e o filtro de remoção reversível são **do serviço** (TASK-006-006/008); a barreira de rotas é backend (TASK-006-011); o guard de navegação é TASK-006-003. Aqui a tela monta o formulário, sinaliza a faceta de UI da validação e chama as mutations. As opções de disciplina **e tema/assunto** vêm de `useListDisciplinesQuery` — `GET /disciplines`, estendido por **TASK-006-002** com `topics: { id, name, slug }[]` (pick-only do acervo semeado, A-005-007; nenhum cadastro de tema pela tela — E-01 segue pendente do Diretor na Entrega).
+
+Gates previstos: g1 (Jest + Testing Library, componente montado contra a `api` real) · g9 (screenVerify — AC-005-011) · g11 (product-designer — a fatia toca superfície de interface); g8 e g10 são n/a (não toca autorização/sessão nem superfície de custo de consulta).
+
+## Escopo
+
+### Inclui
+
+- `mnemonicos-frontend/src/app/(interno)/content/new/page.tsx` — Server Component (sem `'use client'`, exporta `metadata` com título pt-BR), no padrão de `(interno)/studio/page.tsx`; renderiza `<ContentForm mode="create" />`. Fica sob o `layout.tsx` do grupo `(interno)` já existente (`InternalShell`).
+- `mnemonicos-frontend/src/app/(interno)/content/[id]/page.tsx` — Server Component (sem `'use client'`, `metadata` pt-BR); lê o `id` da rota (`params`) e renderiza `<ContentForm mode="edit" contentId={id} />`.
+- `mnemonicos-frontend/src/components/content-form.tsx` — `'use client'` (`ContentForm`), único para os dois modos. Campos: texto normativo (área de texto), disciplina (select — opções de `useListDisciplinesQuery` de `src/store/api.ts`), tema/assunto (select — os `topics` da disciplina escolhida, vindos do mesmo `useListDisciplinesQuery`; acervo semeado, A-005-007), classe do radar de prova (select das 5 de `PROOF_RADAR_CLASSES`, rótulos de `PROOF_RADAR_CLASS_LABELS`), fonte normativa (tipo select das 6 de `NORMATIVE_SOURCE_TYPES` com rótulos de `NORMATIVE_SOURCE_TYPE_LABELS` + citação do dispositivo + link opcional). Mesmas regras de obrigatoriedade no registro e na edição: texto normativo, disciplina e tema/assunto obrigatórios (FR-005-003); classe do radar obrigatória (faceta UI de FR-005-002); citação obrigatória quando há tipo do dispositivo selecionado (faceta UI de FR-005-011).
+- Modo `create`: `useCreateRawContentMutation`. Modo `edit`: `useGetRawContentQuery(contentId)` para pré-preencher o formulário com os valores persistidos (ramos `isLoading` → indicador `role="status"` pt-BR; `isError` → mensagem pt-BR + repetir) e `useUpdateRawContentMutation` para salvar. `authorId` **nunca** é enviado nem editável.
+- Três estados observáveis das ações registrar/editar: *em andamento* (controle de envio `disabled`, indicador de progresso `role="status"` com texto pt-BR), *sucesso* (confirmação exibida; a listagem reflete via invalidação da tag `RawContent` feita pelas mutations de TASK-006-010), *falha* (mensagem de erro pt-BR em `role="alert"`, dados digitados **preservados** no formulário, nada persistido).
+- Remoção: `useDeleteRawContentMutation`, disparada só depois de **confirmação explícita** (diálogo/mensagem pt-BR de confirmar); três estados observáveis — *em andamento* (controle desabilitado + indicador), *sucesso* (o item some da listagem por invalidação de `RawContent`), *falha* (o item permanece, mensagem de erro pt-BR).
+- Via de acesso à Quebra da regra a partir da visão do conteúdo (modo `edit`): controle de navegação para `/content/<id>/breakdown` com o `href` correto para aquele `contentId` (faceta "via de acesso" de AC-005-022 / FR-005-022).
+- Ao reabrir (modo `edit`): texto normativo, disciplina, tema/assunto, classe do radar e fonte normativa (tipo, citação, link) aparecem exatamente como persistidos (AC-005-008 / AC-005-014, faceta UI).
+- `mnemonicos-frontend/src/components/content-form.test.tsx` — colocado; Testing Library; `ContentForm` **montado** contra a `api` real (`makeStore()` + `fetch` mockado por cenário; `testEnvironment` `test/jsdom-fetch-env.js`).
+- Todo texto de interface em pt-BR; vocabulário de domínio (classe do radar, tipo do dispositivo) sempre pelos mapas de `src/types/domain.ts`, nunca literal solto no JSX.
+
+### Não inclui
+
+- Cadastro de nova disciplina ou tema/assunto pela tela de produção — fora de F2 (A-005-007).
+- Preenchimento ou edição da Quebra da regra — TASK-006-014.
+- Envio ou edição de `authorId` (imutável); carimbo de última alteração (quem/quando) e imutabilidade da autoria — são do serviço (TASK-006-006).
+- Validação de servidor (schemas Zod, refinamento "citação obrigatória quando há tipo") — TASK-006-006; aqui só a faceta de UI (sinalização de campo pendente/inválido, preservação do digitado).
+- Alcance por papel e filtro `deletedAt: null` (inclusive a inalcançabilidade por id direto — AC-005-037) — são do serviço e da rota (TASK-006-006/008/011).
+- Exibição da prioridade de apresentação Alta/Média/Baixa e o mapa/função que a deriva — F10 (DEC-006-009).
+- Endpoints/hooks RTK Query (`useCreateRawContentMutation`, `useUpdateRawContentMutation`, `useDeleteRawContentMutation`, `useGetRawContentQuery`, `useListDisciplinesQuery`) — TASK-006-010.
+- A extensão de `GET /disciplines` com `topics` e o tipo `Discipline`/`Paginated` correspondente — TASK-006-002 (backend) / TASK-006-004 (interface `Discipline`) / TASK-006-010 (`listDisciplines`).
+- Registro do segmento de rota `content` (`INTERNAL_ROUTE_PREFIXES` + `config.matcher` do `proxy.ts`) — TASK-006-003.
+- Rotas `POST/GET/PATCH/DELETE /contents` sob a barreira deny-by-default — TASK-006-011.
+- Tela de listagem de Conteúdos brutos e a via de acesso à Quebra **a partir da listagem** (AC-005-033) — TASK-006-012.
+
+## Implementação sugerida
+
+Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critérios prevalecem; nunca siga um passo que enfraqueça um critério.
+
+1. `(interno)/content/new/page.tsx` e `(interno)/content/[id]/page.tsx` — Server Components com `export const metadata`; renderizam `<ContentForm>` passando `mode` e, na edição, `contentId` lido de `params`.
+2. `content-form.tsx` (`'use client'`) — estado local dos campos com `useState`; selects de disciplina (`useListDisciplinesQuery`), tema/assunto (os `topics` da disciplina escolhida, do mesmo query), classe do radar (`PROOF_RADAR_CLASSES`) e tipo de fonte (`NORMATIVE_SOURCE_TYPES`) com rótulos pt-BR dos mapas de `domain.ts`.
+3. Modo `edit`: `useGetRawContentQuery(contentId)`; popular o estado local uma vez quando os dados chegam; ramos `isLoading` / `isError` com render próprio.
+4. Submeter: `createRawContent` / `updateRawContent`; enquanto `isLoading` da mutation, desabilitar o envio e exibir o indicador; no `catch` do `.unwrap()`, manter o estado local intacto e mostrar mensagem pt-BR; no sucesso, confirmação e deixar a invalidação de tag atualizar a listagem.
+5. Remoção: controle que abre a confirmação explícita; ao confirmar, `deleteRawContent`; três estados; no sucesso, a invalidação de `RawContent` tira o item da listagem.
+6. Via de acesso à Quebra: `Link` para `/content/${contentId}/breakdown` na visão de edição.
+7. `content-form.test.tsx` — montar com `makeStore()` + `fetch` mockado por cenário (`test/jsdom-fetch-env.js`).
+
+## Critérios de pronto
+
+- [ ] `content/new/page.tsx` e `content/[id]/page.tsx` são Server Components e ambos compõem o **mesmo** client component `ContentForm` — verificação executável: `npm --prefix mnemonicos-frontend test -- content-form` monta `ContentForm` nos dois modos (`render` com `Provider`/`makeStore()`) e tem ≥1 asserção de conteúdo por modo (`Tests: ≥2 passed`); `grep -nE "^['\"]use client['\"]" "mnemonicos-frontend/src/app/(interno)/content/new/page.tsx" "mnemonicos-frontend/src/app/(interno)/content/[id]/page.tsx"` → sem resultado (a diretiva vive só em `content-form.tsx`, arquivo novo desta branch; comando também sem resultado no commit-pai por os arquivos não existirem lá). Fixada antes do código.
+- [ ] Testes cobrem **AC-005-005**, **AC-005-006**, **AC-005-007** e **AC-005-010** (três estados observáveis de registrar e de editar) — `ContentForm` montado contra a `api` real: (i) pendente → controle de envio `disabled` e indicador `role="status"` pt-BR visível, nada persistido; (ii) sucesso (mutation 2xx) → confirmação exibida e, no modo `edit`, os campos refletem os novos valores; (iii) falha (mutation 4xx/5xx) → mensagem de erro pt-BR (`role="alert"`), os valores digitados **permanecem** nos campos e nada foi persistido. AC-005-010: os três estados valem no modo `edit` como no registro, e a falha preserva o digitado. Verificação executável: `npm --prefix mnemonicos-frontend test -- content-form` → cenários com `fetch` mockado por estado (`POST /contents` e `PATCH /contents/:id` pendente sem resolver / `201`/`200` / `500`); saída `Tests: ≥4 passed`. Falsificável: remover o `disabled` durante o pending → caso (i) acha o controle habilitado (vermelho); limpar o formulário no `catch` → caso (iii) não acha o texto digitado (vermelho). Fixada antes do código.
+- [ ] Testes cobrem **AC-005-002** (faceta UI) e **AC-005-004** (faceta UI) — Quando o EDITOR tenta salvar sem selecionar a classe do radar de prova, o formulário sinaliza o campo de classe como pendente (mensagem pt-BR / `aria-invalid`) e **não** dispara a mutation; Quando tenta salvar com texto normativo, disciplina ou tema/assunto em branco, o formulário lista quais desses campos faltam e **não** dispara a mutation. Verificação executável: `npm --prefix mnemonicos-frontend test -- content-form` → montar, deixar a classe sem seleção, acionar salvar → asserção da marca de pendência no campo de classe e `fetch` **não** chamado para `/contents`; repetir com `rawText` vazio → a mensagem lista "texto normativo". Falsificável: submeter mesmo com classe ausente → o `fetch` é chamado (vermelho); não marcar o campo → a asserção de pendência falha (vermelho). Fixada antes do código.
+- [ ] Testes cobrem **AC-005-008** (faceta UI), **AC-005-014** (faceta UI) e **AC-005-015** (faceta UI) — no modo `edit`, `ContentForm` montado com `useGetRawContentQuery` mockado devolvendo um `RawContent` persistido (texto, disciplina, tema, `radarClass`, `sourceType: 'CTN'`, `sourceCitation: 'CTN, art. 113'`, `sourceUrl`) → todos os campos reabrem com esses valores exatos, inclusive tipo/citação/link da fonte; AC-005-015: com um tipo de dispositivo selecionado e a citação **vazia**, acionar salvar → o campo de citação é sinalizado inválido (mensagem pt-BR) e a mutation **não** dispara. Verificação executável: `npm --prefix mnemonicos-frontend test -- content-form` → `getByDisplayValue('CTN, art. 113')` e o select de tipo em `CTN`; cenário de citação ausente com tipo presente → asserção de invalidez + `fetch` não chamado. Falsificável: não popular o estado local a partir do query → `getByDisplayValue` falha (vermelho); aceitar submissão com tipo sem citação → `fetch` chamado (vermelho). Fixada antes do código.
+- [ ] Testes cobrem **AC-005-009** (faceta UI) — no modo `edit`, `ContentForm` montado com `useGetRawContentQuery` mockado devolvendo o `RawContent` persistido → os campos reabrem com esses valores; Quando o EDITOR altera campos e aciona salvar, a mutation `PATCH /contents/:id` é chamada com **os valores alterados** no corpo. Verificação executável: `npm --prefix mnemonicos-frontend test -- content-form` → `getByDisplayValue` contra o payload do query; após editar e salvar, asserção sobre o corpo do `fetch` interceptado == valores novos. Falsificável: não popular o estado a partir do query → `getByDisplayValue` falha (vermelho); enviar o payload original em vez do editado → asserção do corpo falha (vermelho). A persistência ponta-a-ponta (recarregar → valores visíveis) é confirmada pela listagem refletindo os novos valores (AC-005-006, faceta render). Fixada antes do código.
+- [ ] Testes cobrem **AC-005-012** (faceta UI da falha de remoção) — Dado o EDITOR que confirma a remoção e a mutation `DELETE /contents/:id` falha, Então o componente não navega nem sinaliza remoção concluída (o item permanece) e uma mensagem de erro pt-BR (`role="alert"`) é exibida. Verificação executável: `npm --prefix mnemonicos-frontend test -- content-form` → `fetch` mockado `500` no `DELETE`; após confirmar, asserção da mensagem pt-BR e ausência de callback/navegação de sucesso. Falsificável: tratar erro de `DELETE` como sucesso → o teste acha o estado de "removido" (vermelho). Fixada antes do código.
+- [ ] Item do Inclui **"via de acesso à Quebra da regra a partir da visão do conteúdo"** — AC-005-022 (faceta "via de acesso", FR-005-022); a caminhada ponta-a-ponta a partir da listagem é AC-005-033 (TASK-006-012, gate 9) e a de remoção é AC-005-011 (gate 9 desta TASK). No modo `edit`, `ContentForm` renderiza um controle de navegação para `/content/<id>/breakdown` com o `href` correto para aquele `contentId`. Verificação executável: `npm --prefix mnemonicos-frontend test -- content-form` → modo `edit` com `contentId: "abc"` → `getByRole('link', { name: /quebra da regra/i })` com `href="/content/abc/breakdown"`. Falsificável: `href` omitido, com outra rota ou outro `id` → vermelho. Fixada antes do código.
+- [ ] Testes cobrem **AC-005-029** (faceta tela) — toda string visível do formulário (rótulos, botões, mensagens de validação e de erro) está em pt-BR; o rótulo da classe do radar vem de `PROOF_RADAR_CLASS_LABELS` e o do tipo do dispositivo de `NORMATIVE_SOURCE_TYPE_LABELS`, nunca do valor cru. Verificação executável: `npm --prefix mnemonicos-frontend test -- content-form` → para `radarClass: 'PEGADINHA'` o DOM mostra `PROOF_RADAR_CLASS_LABELS.PEGADINHA` (valor pt-BR importado no teste do próprio mapa) e **não** a string `'PEGADINHA'`; idem para um `sourceType` e `NORMATIVE_SOURCE_TYPE_LABELS`. Falsificável: renderizar o valor cru do enum → o teste acha `'PEGADINHA'` e não o rótulo (vermelho). Fixada antes do código.
+- [ ] **Lição ativa [Testes] "Predicado de decisão de UI a partir de estado de RTK Query só se prova no componente montado"** aplicada a `content-form.tsx`. Texto da lição (solução): *"Predicado que decide render/navegação a partir de estado de RTK Query → oráculo que passa pelo componente MONTADO contra a `api` real (store real via `makeStore()` + `fetch` mockado). O teste da função pura complementa, nunca substitui. Critério de aceite: o mutante morre no teste montado. `resetApiState()` (login/logout) pode desmontar a subárvore dentro de um único flush — polling de 1ms não vê. Asserção de presença no DOM não acusa: o oráculo precisa de contador de montagem/efeito ou de asserção sobre estado local que a remontagem destruiria."* Item verificável: os ramos do formulário — `isLoading`/`isError` do `useGetRawContentQuery` (modo `edit`); pendente/sucesso/falha das mutations de criar, editar e remover; "a recusa/falha não descarta o digitado" — provam-se **no componente `ContentForm` montado** contra a `api` real (`makeStore()` + `fetch` mockado via `test/jsdom-fetch-env.js`), nunca por função pura sobre `api.endpoints.*.select()`; teste de função pura só complementa. O oráculo de "não descarta o digitado" **não** se apoia só em presença no DOM: usa um **contador de montagem/efeito** OU asserção sobre o `useState` dos campos que uma remontagem destruiria — cobrindo a janela em que uma invalidação de tag `RawContent` / `resetApiState` / refetch remontaria a subárvore. O mutante que remove a guarda de estado (renderizar/submeter sem checar `isLoading`/`isError`, ou resetar os campos no `catch`) **morre no teste montado**. Verificação executável: `npm --prefix mnemonicos-frontend test -- content-form` → os cenários de estado montam `render(<Provider store={makeStore()}>…)`, não `select()` sobre store sem subscritor; `Tests: ≥1 passed` com contador de montagem/efeito no cenário de "não descarta". Fixada antes do código.
+- [ ] `npm --prefix mnemonicos-frontend run build` → exit 0 — as rotas `(interno)/content/new` e `(interno)/content/[id]` compilam (fronteira `'use client'` correta: as duas `page.tsx` Server Components, `content-form.tsx` client; nenhum Server Component `async` marcado `'use client'`). Baseline: build verde hoje nos dois repos (exploração — fe jest 90/90, typecheck/lint/build limpos). Falsificável: marcar `content-form.tsx` como Server Component `async` usando hook de cliente → build aborta apontando `./src/components/content-form.tsx`. Fixada antes do código.
+- [ ] Sem warnings/lints novos — `npm --prefix mnemonicos-frontend run lint` → exit 0 (baseline capturada no início da TASK) e `npm --prefix mnemonicos-frontend run typecheck` → exit 0.
+- [ ] Padrão de commit respeitado (Conventional Commits — `feat:`).
+- [ ] Aderência à stack/padrões da ficha e do perfil (`next-16.md`: Server Component por default e `'use client'` no componente mais fundo §4; estado de servidor só em RTK Query §6.5; `makeStore()` função, nunca singleton; rótulos pt-BR do mapa de `domain.ts` §3; teste por papel/texto; guidelines de projeto vencem o perfil em conflito).
+- [ ] Code review aprovado.
+
+## Roteiro do gate 9 (fixado ANTES do código)
+
+**Ambiente**: frontend Next em `http://localhost:3000` (`next dev`, sem base path); rota de criação `http://localhost:3000/content/new`; rota de detalhe/edição `http://localhost:3000/content/<id>`; a listagem `http://localhost:3000/content` serve para observar o item sair da lista. API backend em `http://localhost:3333/api/v1`. Realm `app` (dev local; Postgres do `mnemonicos-backend/docker-compose.yml`).
+
+**Autenticação — pré-condição**: popular `keelson.local.json` (dev-local, **gitignored** — passo do Diretor/dev, como o `.env`) a partir de `keelson.local.example.json` — realm `app` (`loginPath: "/login"`) **+ realm `editor`** (molde acrescentado por TASK-006-005), com as credenciais do **EDITOR de dev** vindas de `SEED_EDITOR_EMAIL` / `SEED_EDITOR_PASSWORD`. O `mnemonicos-backend/.env` precisa de `SEED_EDITOR_*` **reais** e a semente (`db:seed`) **já rodada**. O gate injeta as credenciais do realm; **nunca chutar** (HANDOFF-PLAN-003, bloco `sonda`). O molde `keelson.local.example.json` (realm `editor`) e a função de seed `seedDevEditor` são entregues por **TASK-006-005**.
+
+**Sujeito concreto**: o **EDITOR de dev** semeado por TASK-006-005 (env-gated `SEED_EDITOR_EMAIL` / `SEED_EDITOR_PASSWORD`; ausência = nenhum EDITOR criado); a credencial correspondente no realm `editor` de `keelson.local.json`. O ADMIN semeado (`SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`) fica disponível para montagem/restauração.
+
+**Pré-condição — montar**:
+1. `mnemonicos-backend/.env` com `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD` **e** `SEED_EDITOR_EMAIL`/`SEED_EDITOR_PASSWORD` preenchidos (não placeholders). `npm --prefix mnemonicos-backend run db:up` (Docker Postgres); `npm --prefix mnemonicos-backend run db:deploy` (aplica a migração de F2 — TASK-006-001) — **⚠️ execução de migração: confirmar com o Diretor antes (regra do projeto / TRISK-006-001)**; `npm --prefix mnemonicos-backend run db:seed` → carrega Direito Tributário / Obrigação Tributária, 1 ADMIN, 1 EDITOR de dev e ≥1 `RawContent` (autor = ADMIN) com `RuleBreakdown` completa.
+2. Subir os apps: `npm --prefix mnemonicos-backend run dev` (:3333) e `npm --prefix mnemonicos-frontend run dev` (:3000); confirmar `NEXT_PUBLIC_API_BASE_URL` apontando para :3333.
+3. O EDITOR de dev **só alcança os Conteúdos brutos que registrou** (alcance por autor — TASK-006-008); o `RawContent` semeado é do ADMIN. Logo, autenticado como o EDITOR de dev em `http://localhost:3000/login`, registrar **um** Conteúdo bruto pela tela `http://localhost:3000/content/new` — texto normativo, disciplina semeada, tema semeado e classe do radar. **Se a via de tela falhar**, registrar o `RawContent` de setup via `POST http://localhost:3333/api/v1/contents` com a sessão do EDITOR (como TASK-006-012/TASK-006-014). Anotar o `id` retornado: é o item que será removido no passo.
+
+**Pré-condição — restaurar** (ao fim):
+1. Obter o id do EDITOR de dev: `SELECT id FROM users WHERE email = '<SEED_EDITOR_EMAIL>'` (ou via `GET http://localhost:3333/api/v1/users` autenticado como ADMIN).
+2. No Postgres local — `DELETE FROM rule_breakdowns WHERE "rawContentId" IN (SELECT id FROM raw_contents WHERE "authorId" = '<id do EDITOR de dev>');` · `DELETE FROM raw_contents WHERE "authorId" = '<id do EDITOR de dev>';` · `DELETE FROM sessions WHERE "userId" = '<id do EDITOR de dev>';` — **nunca** truncar todas as sessões do realm dev compartilhado. A remoção do passo é **reversível** (`deletedAt`), então o item removido continua na tabela e é limpo por este mesmo `DELETE ... WHERE "authorId"`. Alternativa: re-seed idempotente (resolução 2 do manifesto).
+
+**Passo (AC-005-011) — remoção com confirmação e estado transitório falsificável**:
+1. Em `http://localhost:3000/login`, autenticar como o EDITOR de dev (`SEED_EDITOR_EMAIL` / `SEED_EDITOR_PASSWORD`).
+2. Abrir `http://localhost:3000/content/<id>` do Conteúdo bruto registrado na pré-condição (ou chegar nele pela listagem `http://localhost:3000/content`).
+3. Acionar o controle de remoção → a **confirmação explícita** aparece (diálogo/mensagem pt-BR pedindo confirmar).
+4. **Antes de confirmar**, instrumentar a rede: interceptar `DELETE http://localhost:3333/api/v1/contents/<id>` e **segurar/atrasar a resposta** — a técnica do passo é interceptação de rede, não a latência real do ambiente (decisão 4.319), senão o estado transitório fica inobservável por clique + snapshot.
+5. Confirmar a remoção. **Enquanto a resposta do `DELETE` está retida**: o controle de remoção (e o de confirmação) está **desabilitado**; um indicador de progresso pt-BR está visível; o item **ainda não** sumiu da listagem.
+6. Liberar a resposta do `DELETE` (204/200). **Esperado**: ao concluir, o item **sai da listagem** `http://localhost:3000/content` e deixa de ser exibido; abrir `http://localhost:3000/content/<id>` diretamente resulta em não encontrado/inacessível (a faceta de inalcançabilidade no servidor é AC-005-037 / TASK-006-011; aqui basta a tela não exibir mais o item). É o gate falsificável de AC-005-011: controle não desabilitado durante a retenção, ou item sumindo antes da resposta, reprovam o passo.
+
+**Nota (handoffs anteriores do slug)**: HANDOFF-PLAN-003 registra V6 (falha transitória de logout) como não-exercitável **por exigir 500 seletivo numa rota** — não é o caso deste passo, cuja técnica é **interceptação/hold** da resposta do `DELETE`, suportada pela ferramenta de tela. As caminhadas V1–V5 de F1 foram **exercitadas com sucesso local em 2026-09-01** (Playwright, contra o código mergeado) — o ambiente de tela funciona; este passo é **tentado localmente**. Só se o ambiente de tela falhar na execução o gate 9 vira `pendente_handoff` (Etapa 4.6 do `/keelson:auto`; resolução 1 do manifesto).
+
+## Riscos específicos
+
+- Repos symlinkados (lição [Exploração]): editar e verificar sempre pelo caminho **dentro** do link (`mnemonicos-frontend/src/...`); ausência detectada por varredura não é fato.
+- **Origem das opções do select de tema/assunto — resolvida**: `useListDisciplinesQuery` (`GET /disciplines`) passa a trazer `topics: { id, name, slug }[]` por disciplina após **TASK-006-002** (parte 2). O campo tema/assunto é **pick-only** desses `topics` (A-005-007); nenhum cadastro de tema pela tela. A interface `Discipline` do frontend (com `topics`) é de TASK-006-004 e o typing de `listDisciplines` é de TASK-006-010 — sem esses dois mergeados o typecheck deste campo quebra.
+- **Estado transitório de remoção** só é observável no gate 9 com **interceptação de rede** segurando a resposta do `DELETE` (decisão 4.319) — a latência local real é curta demais.
+- `test/jsdom-fetch-env.js` (`testEnvironment` custom que estende `jest-environment-jsdom`, criado em F1/TASK-003-015) é o harness dos testes montados contra a `api` real — **sem dependência nova**.
+- Depende de TASK-006-010 (hooks `useCreateRawContentMutation` / `useUpdateRawContentMutation` / `useDeleteRawContentMutation` / `useGetRawContentQuery` / `useListDisciplinesQuery` em `src/store/api.ts`), TASK-006-011 (rotas `/contents` sob a barreira) e TASK-006-003 (segmento `content` em `INTERNAL_ROUTE_PREFIXES` + `config.matcher` do `proxy.ts`) — sem os três a rota não é guardada nem servida.
+- **Candidata a `large`** (manifesto, resolução 7): se a execução mostrar o formulário de criação/edição e o fluxo de remoção como comportamentos que estouram o horizonte de execução confiável, o fecho da Wave 4 (decisão 4.301) pode dividir — o `content-form` compartilhado permanece a costura congelada.
+
+---
+
+## Histórico de execução (preenchido pelo /keelson:implement)
+
+<!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
+
+**Data início**: 
+**Data conclusão**: 
+**Branch**: 
+**Commit SHA**: 
+**Jira**: KAN-41
+**Implementado por**: 
+**Revisado por**: 
+**Tentativas**: 
+**Cobertura final**: 
+**Arquivos modificados**:
+  - 
+
+**Quality gates**:
+- [ ] Implementação completa
+- [ ] Testes passando
+- [ ] Lint limpo
+- [ ] Aderência à ficha/perfil
+- [ ] Code review aprovado
+- [ ] ACs verificados
+- [ ] Segurança (gate 8): n/a — tela de frontend; não toca autorização, sessão nem superfície sensível (a barreira é backend — TASK-006-011; o guard de navegação é TASK-006-003)
+- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa; AC-005-011 (remoção: confirmação explícita → controle desabilitado enquanto a resposta do DELETE está retida → item sai da listagem ao concluir; interceptação de rede segurando a resposta do DELETE — 4.319); receita e restauração no Roteiro do gate 9 desta TASK; sujeito EDITOR de dev (SEED_EDITOR_*)>
+
+**Notas**: 

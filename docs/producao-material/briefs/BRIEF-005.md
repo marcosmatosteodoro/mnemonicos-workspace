@@ -112,3 +112,4 @@ trocar o seed para **Obrigação Tributária** (Direito Tributário), o conteúd
 - largada: 2026-09-01T01:42:26-03:00
 - specify: 2026-09-01T02:30:00-03:00 · correções: 2 · classes: spec-fr-sem-deve(1) · janelas: redação 8min/436l · correção 7min/546l
 - plan: 2026-09-01T03:15:00-03:00 · correções: 1 · classes: plan-dec-irreversivel-enum(9) · plan-parse-campo(4) · janelas: redação 7min/461l · correção 4min/461l
+- tasks: 2026-09-01T10:15:00-03:00 · correções: 1 (rodada consolidada 3.5: task-validator + qa pré-código + gap de decomposição) · classes: task-realiza-nfr-sufixo(11) · task-criterio-grep-nao-ancorado(9→4 aceitos) · task-mutacao-sem-contagem(3) · task-nome-tipo(4) · task-criterio-sem-ac(1) · task-refactor-sem-identidade(1) · qa-achados(12) · janelas: redação 15min/1875l (fan-out: decompositor + 3 redatores paralelos, com 1 corte de rate-limit e retry) · correção 23min/1875l
