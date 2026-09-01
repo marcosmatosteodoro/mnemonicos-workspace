@@ -91,6 +91,37 @@ O developer escolhe a implementação; o critério de aceite é o comportamento 
 - [ ] `[retry S1b]` e o caso "401+401 sessão morta" (`api.test.ts`) seguem verdes **sem
       mudança de asserção** após tudo acima.
 
+### Addendum (autorizado pelo Diretor após teto 4.88 — 2026-08-31): 3º oráculo da §6.3
+
+**Contexto**: `guidelines/project/frontend/next-16.md` §6.3:503-513 (seção CRÍTICA) —
+"guarda de curto-circuito com estado de módulo + janela temporal exige **TRÊS** oráculos
+distintos: (1) ativação · (2) supressão · (3) expiração". O retry cobriu (1) e (2); falta
+(3). Régua: o oráculo (3) tem de **morrer com o mutante da expiração SOZINHO, no próprio
+`it()`** — nunca por poluição colateral entre `it()` nem pelo `jest.runOnlyPendingTimers()`
+do `afterEach` (que mascara flag presa como falso **verde**).
+
+- [ ] **[§6.3 oráculo 3 — expiração]** `it()` próprio (em `internal-shell.integration.test.tsx`
+      ou `api.test.ts`, com timers falsos): logout **204** (arma `justLoggedOut`) →
+      `jest.advanceTimersByTime(JUST_LOGGED_OUT_GRACE_MS + 1)` → requisição autenticada
+      (`GET /users`) recebe **401** com o `refresh` também **401** → **exigir**
+      `reauth.redirect('/login?sessao=expirada')` chamado **1×** (a máquina de re-auth
+      voltou ao normal após a janela). Variante no mesmo ou em `it()` irmão: mesma
+      sequência com `refresh` **200** → exigir `POST /auth/refresh` **≥1×** e o retry
+      bem-sucedido. **Mutante**: `justLoggedOut = false` → no-op dentro do `setTimeout`
+      (`api.ts` ~:253, "a flag nunca expira") → **este `it()` fica vermelho SOZINHO**
+      (não pelas falhas colaterais em `api.test.ts`). Confirme rodando o mutante e
+      contando as falhas: só o `it()` novo.
+- [ ] **[export]** `JUST_LOGGED_OUT_GRACE_MS` exportado de `src/store/api.ts` (hoje `const`
+      privado) — o teste usa a constante, nunca o literal `2000`/`2001` solto.
+- [ ] **[desacoplar do `afterEach`]** Um test-hook `__resetAuthGuards()` exportado de
+      `src/store/api.ts` (zera `justLoggedOut` e `refreshInFlight`), chamado no `beforeEach`
+      de `internal-shell.integration.test.tsx` **e** de `api.test.ts`. **Verificação**: com
+      a linha `jest.runOnlyPendingTimers()` do `afterEach` de `internal-shell.integration.test.tsx`
+      **comentada**, os `it()` do arquivo **seguem todos verdes** (o `it()` de ativação
+      da 1ª rodada deixa de depender do drain do timer vazado).
+- [ ] Não-regressão: `npx jest -t S1b` 4/4 sem mudança de asserção; teste 'a corrida do V5'
+      verde; suíte completa verde; lint/typecheck/build verdes.
+
 ## TASKs
 
 nenhuma — o brief é a unidade de execução.
