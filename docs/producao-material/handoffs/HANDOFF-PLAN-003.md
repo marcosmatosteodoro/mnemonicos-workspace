@@ -1,12 +1,13 @@
 ---
 id: HANDOFF-PLAN-003
 slug: producao-material
-branch: feat/producao-material-mnemora-studio
+branch: feat/producao-material-mnemora-studio (mergeada em main — backend 25cdafd · frontend 834f117)
 status: Pendente
 criado: 2026-08-31T14:40:00-03:00
+verificado_parcial: 2026-09-01 (Playwright, app local — V1–V4 OK · V5 FALHOU · V6 não exercitado)
 origem: PLAN-003
 commits: [9aabaf1, 3946b60, 0c54b96, f6cc4ed, e6d0c75]
-motivo: credencial
+motivo: credencial (resolvido em 2026-09-01 — ADMIN admin@mnemonicos.local semeado no DB de dev; apps subidos em :3000/:3333)
 sonda: >-
   Realm `app` (mnemonicos-frontend) — `scripts/probe-env.sh` exit 1;
   `keelson.local.json` › `screenVerify.realms.app` com `loginPath` (linha 8),
@@ -15,6 +16,22 @@ sonda: >-
   o EDITOR de teste. Apps também não estavam de pé no ambiente do ciclo. Saída que
   resolve: `/keelson:init` (realm `app`) ou preencher `loginPath`/`username`/`password`
   no `keelson.local.json` — nunca chutar credencial.
+achado_bloqueante: >-
+  V5 (logout de sucesso) — DIVERGE de AC-002-027/FR-002-023. Clicar "Sair" numa sessão
+  válida encerra a sessão no servidor (correto: `POST /auth/logout` → 204, `me` seguinte
+  → 401) mas: (a) o usuário cai em `/login?sessao=expirada` com a mensagem "Sua sessão
+  expirou. Entre novamente." — mensagem de EXPIRAÇÃO num logout DELIBERADO; (b) dispara
+  uma tempestade de ~90 pares `GET /auth/me` 401 → `POST /auth/refresh` 401 antes de
+  assentar. Causa: `LogoutControl` faz `router.push('/login')` após o sucesso, mas o
+  `logout.onQueryStarted` dispara `resetApiState()`, o `useMeQuery` ainda montado no
+  `InternalShell` durante a navegação re-busca `me` → 401 → `baseQueryWithReauth` tenta
+  `refresh` → 401 → ramo `!renewed` → `redirect('/login?sessao=expirada')` +
+  `resetApiState()` → laço. É o "logout success race" listado como não-bloqueante na
+  Wave 7 (adiado, não corrigido); ao vivo é pior que cosmético. Fix sugerido: na
+  navegação de logout de sucesso, desmontar/pausar o `useMeQuery` antes do
+  `resetApiState()`, ou marcar "logout deliberado" para o `baseQueryWithReauth` não
+  tratar o 401 imediatamente seguinte como sessão expirada. → developer + re-gate,
+  fast-follow em `main`.
 ---
 
 # Handoff de verificação de tela — Acesso interno e papéis de produção (F1)
@@ -95,7 +112,13 @@ credencial: a tela de login (`/login`, TASK-003-014) e o shell da área interna
   `mnemo_access` está presente. Nenhuma mensagem de erro.
 - **Risco se falhar**: o caminho feliz do login não entrega o usuário na área interna —
   a feature central de F1 fica sem porta de entrada pela UI.
-- **Evidência**: _(preencher na verificação)_
+- **Evidência**: ✅ **OK** (2026-09-01, Playwright, ADMIN `admin@mnemonicos.local`). `/login`
+  renderiza form (E-mail/Senha/"Entrar"); submeter credenciais corretas → navega para
+  `http://localhost:3000/studio`, título "Studio · Mnemônicos", shell renderiza (botão
+  "Sair" + heading "Área interna · Studio" + placeholder "A produção de material chega
+  numa próxima fatia."). Nenhuma mensagem de erro. Cookie `mnemo_access` httpOnly (não
+  visível a JS — correto). O estado *em andamento* ("Entrando…") é sub-frame com esta
+  latência local, não capturado no snapshot — coberto por teste de unidade (gate 1).
 
 ### V2 — Mensagem genérica de falha, sem apontar campo (AC-002-009 / FR-002-009)
 - **Tela/rota**: `http://localhost:3000/login`
@@ -109,7 +132,11 @@ credencial: a tela de login (`/login`, TASK-003-014) e o shell da área interna
   aceitar entrada (inputs e botão habilitados). Não há navegação.
 - **Risco se falhar**: enumeração de contas pela UI (distinguir "e-mail não existe" de
   "senha errada") — vazamento de quais e-mails são internos.
-- **Evidência**: _(preencher na verificação)_
+- **Evidência**: ✅ **OK** (2026-09-01, Playwright). Senha errada (`admin@mnemonicos.local`
+  + `senha-errada-999`) → permanece em `/login`, `role="alert"` = exatamente
+  "E-mail ou senha inválidos.", inputs mantêm valor e ficam editáveis, sem `aria-invalid`.
+  E-mail inexistente (`ninguem-existe@nada.local`) → **mesma** string exata, mesmo
+  comportamento. Não distingue os dois casos.
 
 ### V3 — Guard de navegação: rota interna sem sessão redireciona (AC-002-013 / FR-002-013)
 - **Tela/rota**: `http://localhost:3000/studio`
@@ -123,7 +150,10 @@ credencial: a tela de login (`/login`, TASK-003-014) e o shell da área interna
 - **Risco se falhar**: ou a área interna fica acessível sem sessão (o guard não roda), ou
   o matcher guarda demais e a home pública redireciona para login (inverte o default do
   site).
-- **Evidência**: _(preencher na verificação)_
+- **Evidência**: ✅ **OK** (2026-09-01, Playwright, sem sessão). `/studio` →
+  `/login?next=%2Fstudio`. `/studio/qualquer-sub-rota` → `/login?next=%2Fstudio%2Fqualquer-sub-rota`
+  (relativo, percent-encoded). `/` → permanece em `/` (200, home renderiza — **não**
+  guardada).
 
 ### V4 — Estados de navegação protegida com sessão válida (AC-002-013 / FR-002-013)
 - **Tela/rota**: `http://localhost:3000/studio`
@@ -137,7 +167,12 @@ credencial: a tela de login (`/login`, TASK-003-014) e o shell da área interna
   renderiza. Não há redirect.
 - **Risco se falhar**: flash de conteúdo protegido antes da checagem, ou a vista não
   renderiza para um papel legítimo.
-- **Evidência**: _(preencher na verificação)_
+- **Evidência**: ✅ **OK** (2026-09-01, Playwright, ADMIN — satisfaz o mínimo EDITOR).
+  Logado, navegar a `/studio` → vista renderiza limpa, sem mensagem de erro nem de
+  "sem permissão", sem redirect. O flash do estado "Carregando…" é sub-frame nesta
+  latência local; o ramo de loading do `InternalShell` (não renderiza `children` até `me`
+  resolver) é coberto por teste de unidade. Ramo "papel insuficiente" = `n/a` (F1 não tem
+  tela ADMIN-only).
 
 ### V5 — Logout de sucesso: ida-e-volta UI → servidor (AC-002-027 / FR-002-023)
 - **Tela/rota**: área interna (`/studio`), logado como EDITOR.
@@ -155,7 +190,15 @@ credencial: a tela de login (`/login`, TASK-003-014) e o shell da área interna
   seguinte à área interna redireciona para `/login`).
 - **Risco se falhar**: logout "cosmético" — a sessão continua válida no servidor e o
   cookie roubado continua servindo.
-- **Evidência**: _(preencher na verificação)_
+- **Evidência**: ❌ **FALHOU** (2026-09-01, Playwright — reproduzido 2×). **Servidor OK**:
+  `POST /auth/logout` → 204, `GET /auth/me` com o mesmo cookie depois → **401** (sessão
+  revogada de verdade). **UI diverge de AC-002-027/FR-002-023**: clicar "Sair" numa
+  sessão válida NÃO leva a `/login` limpo — leva a `/login?sessao=expirada` com a
+  mensagem "Sua sessão expirou. Entre novamente." (mensagem de EXPIRAÇÃO num logout
+  deliberado), precedida de uma tempestade de ~90 pares `GET /auth/me` 401 →
+  `POST /auth/refresh` 401. Ver `achado_bloqueante` no front-matter para a causa e o fix
+  sugerido. O usuário **acaba** deslogado no `/login` — o defeito é de UX/eficiência, não
+  de segurança.
 
 ### V6 — Logout com falha transitória: permanece na área interna (AC-002-027 / FR-002-023)
 - **Tela/rota**: área interna (`/studio`), logado como EDITOR.
@@ -171,7 +214,12 @@ credencial: a tela de login (`/login`, TASK-003-014) e o shell da área interna
   tela real que a mensagem não some por remontagem.)
 - **Risco se falhar**: falha de logout expulsa o usuário sem feedback, ou o feedback
   aparece e some antes de ser lido.
-- **Evidência**: _(preencher na verificação)_
+- **Evidência**: ⏸ **NÃO EXERCITADO** (2026-09-01) — exige 500 seletivo só em
+  `POST /auth/logout` mantendo `me` OK; parar o backend inteiro derruba `me` junto e
+  testa outro caminho. Coberto por `internal-shell.integration.test.tsx` (oráculo montado
+  contra a `api` real: `logout` 500 → mensagem "Não foi possível sair agora." permanece,
+  sem navegação, `me` preservado). Reexercitar quando houver como injetar o 500 seletivo
+  (ex.: um proxy/mock entre :3000 e :3333).
 
 > **Ramo "papel insuficiente → sem permissão"** de AC-002-013: `n/a` no gate 9 — F1 não
 > embarca nenhuma tela ADMIN-only, então não há superfície ponta-a-ponta. Coberto no

@@ -1,7 +1,7 @@
 # PLAN-003: Acesso interno e papéis de produção
 
 **Slug**: producao-material
-**Status**: Approved
+**Status**: Done
 **Versão**: 0.1
 **Autor**: time keelson (scribe)
 **Data**: 2026-08-28
