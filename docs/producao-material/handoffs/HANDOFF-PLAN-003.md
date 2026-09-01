@@ -16,8 +16,17 @@ sonda: >-
   o EDITOR de teste. Apps também não estavam de pé no ambiente do ciclo. Saída que
   resolve: `/keelson:init` (realm `app`) ou preencher `loginPath`/`username`/`password`
   no `keelson.local.json` — nunca chutar credencial.
-achado_bloqueante: >-
-  V5 (logout de sucesso) — DIVERGE de AC-002-027/FR-002-023. Clicar "Sair" numa sessão
+achado_v5_resolvido: >-
+  CORRIGIDO na branch `fix/producao-material-logout-success-race` (BRIEF-004, commits
+  9f2225c·8f91d3b·635314c) — flag de módulo `justLoggedOut`: no logout de sucesso o
+  `baseQueryWithReauth` devolve o 401 seguinte sem `refresh` nem redirect de "sessão
+  expirada", com os 3 oráculos da §6.3 (ativação/supressão/expiração). Gates 1–9
+  APROVADO/CONVERGE. Verificado no browser (Playwright, 2×): "Sair" → `/login` exato, 0
+  `refresh`, sessão revogada. **Pendente**: merge da branch (ato do Diretor) + a caminhada
+  de tela de V5 e V6 contra o código mergeado, para então fechar este handoff.
+achado_bloqueante_historico: >-
+  V5 (logout de sucesso) — DIVERGIA de AC-002-027/FR-002-023 (ver `achado_v5_resolvido`).
+  Clicar "Sair" numa sessão
   válida encerra a sessão no servidor (correto: `POST /auth/logout` → 204, `me` seguinte
   → 401) mas: (a) o usuário cai em `/login?sessao=expirada` com a mensagem "Sua sessão
   expirou. Entre novamente." — mensagem de EXPIRAÇÃO num logout DELIBERADO; (b) dispara
