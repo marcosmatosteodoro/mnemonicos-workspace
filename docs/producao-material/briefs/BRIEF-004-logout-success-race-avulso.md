@@ -66,6 +66,31 @@ O developer escolhe a implementação; o critério de aceite é o comportamento 
 - [ ] `npm --prefix mnemonicos-frontend test` / `run lint` / `run typecheck` / `run build` → tudo verde.
 - [ ] Sem warnings/lints novos.
 
+### Retry (rodada de gates — gate 8 MEDIA + code-reviewer não-bloqueantes)
+
+- [ ] **[gate 8 — ativação da flag]** A flag `justLoggedOut` só é armada no logout de
+      **sucesso** — provado por oráculo próprio: teste montado onde `logout` responde **500**
+      (ou erro de rede) e, **na mesma execução**, uma requisição autenticada seguinte
+      recebe 401 e o `refresh` também 401 → **exigir** `reauth.redirect('/login?sessao=expirada')`
+      **chamado** (a expulsão da sessão morta continua acontecendo após um logout que
+      falhou). **Mutante**: mover `justLoggedOut = true` para o `catch`, o `finally` ou
+      para antes do `try` de `logout.onQueryStarted` → este teste fica **vermelho** (o
+      redirect deixa de ser chamado). Os testes de logout 500 já existentes seguem verdes.
+- [ ] **[code-reviewer #2 — limpar a flag no login]** `login.onQueryStarted`, ramo de
+      sucesso: `justLoggedOut = false` (1 linha). Fecha o resíduo "401 imediatamente
+      pós-login dentro dos 2s seria engolido sem tentar refresh" e a fragilidade de
+      isolamento entre testes. Verificação: teste montado — logout de sucesso, depois
+      `login` de sucesso dentro da janela, depois uma requisição autenticada 401 + refresh
+      renovável → o retry acontece (a flag foi limpa pelo login). Mutante: sem a linha →
+      o 401 pós-login é devolvido cru → vermelho.
+- [ ] **[code-reviewer #1 — comentário]** Ajustar o comentário em `api.ts` que hoje
+      superclama a obrigatoriedade da ordem "setar a flag antes do `resetApiState()`":
+      trocar por algo como "setada antes do reset por defesa — o refetch do `me` é
+      agendado pelo `dispatch` e não há garantia de que só rode no próximo tick". A ordem
+      defensiva no código **permanece**.
+- [ ] `[retry S1b]` e o caso "401+401 sessão morta" (`api.test.ts`) seguem verdes **sem
+      mudança de asserção** após tudo acima.
+
 ## TASKs
 
 nenhuma — o brief é a unidade de execução.

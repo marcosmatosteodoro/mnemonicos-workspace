@@ -499,3 +499,37 @@ descrever o que o teste de fato garante.
 **Validade:** enquanto houver constantes espelhadas à mão entre `mnemonicos-backend` e `mnemonicos-frontend`.
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos
+
+**Erro:** o fix do V5 (BRIEF-004) adicionou uma flag de módulo `justLoggedOut` no
+`baseQueryWithReauth` — setada no logout de sucesso, consultada para devolver o 401
+seguinte sem `refresh`/redirect, limpa por `setTimeout(2000ms)`. Entrou com prova do
+**efeito** (401 suprimido → `/login` sem `?sessao=expirada`) mas **sem** prova da
+**condição de ativação** (só no ramo de sucesso): um mutante que movesse
+`justLoggedOut = true` para o `catch`/`finally`/antes do `try` sobrevivia à suíte inteira
+— o caso de logout 500 não espera redirect de qualquer jeito, e o caso de sessão morta já
+tinha o `reauth.redirect` agendado pelo `setTimeout` do `baseQueryWithReauth` **antes** do
+`queryFulfilled` rejeitar. A expiração da flag só era coberta por vazamento de estado de
+módulo entre `it()` do mesmo arquivo, via `jest.runOnlyPendingTimers()` do `afterEach`.
+**Causa:** o §6.3 do perfil mandava "enumerar todos os chamadores e provar o caminho de
+erro de cada um" (lição da Wave 6), mas uma guarda com **estado temporal** tem três
+propriedades independentes — quando **liga**, o que **suprime**, quando **desliga** — e só
+a do meio tinha oráculo.
+**Solução:** guarda com flag de módulo + janela temporal exige teste próprio para cada:
+- **ativação**: o ramo que **não** deve ligar a flag (logout que falhou / erro de rede)
+  mantém a expulsão intacta — mutante "flag no `catch`/`finally`/antes do `try`" fica
+  vermelho. Concretamente: logout 500 → depois requisição autenticada 401 + refresh 401 →
+  exigir `reauth.redirect('/login?sessao=expirada')` chamado.
+- **supressão**: enquanto ativa, 401 devolvido sem `refresh` nem redirect (o oráculo que
+  já existia).
+- **expiração**: teste que **avança o timer** e confirma o retorno ao normal — nunca
+  apoiado em ordem de `it()` nem no `runOnlyPendingTimers()` do `afterEach`, que mascara
+  flag presa como falso **verde** (não falso vermelho).
+Corolário: limpar a flag também no ramo de sucesso do evento oposto (aqui,
+`login.onQueryStarted`) fecha a fragilidade de isolamento e um resíduo real (401
+imediatamente pós-login dentro dos 2s seria engolido). Referência:
+`mnemonicos-frontend/src/store/api.ts` (`justLoggedOut`) + `next-16.md` §6.3.
+**Validade:** enquanto o `baseQueryWithReauth` usar flags de módulo para condicionar a re-auth.
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

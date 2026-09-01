@@ -500,6 +500,17 @@ backend nega — e é lá que a prova (Art. 1) tem de existir.
   tem teste de divergência; e o oráculo "401 do endpoint público não dispara renovação" é
   obrigatório. Fix que adiciona guarda de curto-circuito num despachante compartilhado
   enumera **todos** os chamadores e prova o caminho de erro de cada um. (lição da Wave 6)
+- **Guarda de curto-circuito com estado de módulo + janela temporal exige TRÊS oráculos
+  distintos, não um.** Uma flag como `justLoggedOut` (setada num evento, consultada pelo
+  `baseQuery`, limpa por `setTimeout`) tem três propriedades separadas a provar: **(1)
+  ativação** — o ramo que **não** deve ligar a flag (ex.: logout que *falhou*) mantém a
+  expulsão/redirect intactos; teste próprio com o mutante "flag setada no `catch`/`finally`/
+  antes do `try`" ficando vermelho; **(2) supressão** — enquanto a flag está ativa, o 401 é
+  devolvido sem `refresh` nem redirect; **(3) expiração** — teste próprio que **avança o
+  timer** e confirma que a máquina volta ao normal, **nunca** apoiado em ordem de execução
+  entre `it()` nem no `jest.runOnlyPendingTimers()` do `afterEach` (que mascara flag presa
+  como falso verde). Provar só a (2) deixa a propriedade de segurança central sem teste.
+  (lição do fix do V5, BRIEF-004)
 - **Server Action é um endpoint POST público.** Ter sido chamada de dentro de uma página
   protegida não protege nada: ela é invocável direto. Toda Server Action verifica sessão **e**
   pertencimento do recurso, no seu próprio corpo, antes de agir. O mesmo vale para cada
