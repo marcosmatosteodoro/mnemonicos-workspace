@@ -2,9 +2,10 @@
 id: HANDOFF-PLAN-003
 slug: producao-material
 branch: feat/producao-material-mnemora-studio (mergeada em main — backend 25cdafd · frontend 834f117)
-status: Pendente
+status: Concluído
 criado: 2026-08-31T14:40:00-03:00
-verificado_parcial: 2026-09-01 (Playwright, app local — V1–V4 OK · V5 FALHOU · V6 não exercitado)
+concluido: 2026-09-01 (Playwright, app local contra o código mergeado — V1–V5 OK · V6 n/a coberto por teste montado)
+verificado_parcial: 2026-09-01 (1ª passagem — V1–V4 OK · V5 FALHOU → corrigido em BRIEF-004, mergeado · V6 não exercitável na tela)
 origem: PLAN-003
 commits: [9aabaf1, 3946b60, 0c54b96, f6cc4ed, e6d0c75]
 motivo: credencial (resolvido em 2026-09-01 — ADMIN admin@mnemonicos.local semeado no DB de dev; apps subidos em :3000/:3333)
@@ -17,13 +18,13 @@ sonda: >-
   resolve: `/keelson:init` (realm `app`) ou preencher `loginPath`/`username`/`password`
   no `keelson.local.json` — nunca chutar credencial.
 achado_v5_resolvido: >-
-  CORRIGIDO na branch `fix/producao-material-logout-success-race` (BRIEF-004, commits
-  9f2225c·8f91d3b·635314c) — flag de módulo `justLoggedOut`: no logout de sucesso o
-  `baseQueryWithReauth` devolve o 401 seguinte sem `refresh` nem redirect de "sessão
-  expirada", com os 3 oráculos da §6.3 (ativação/supressão/expiração). Gates 1–9
-  APROVADO/CONVERGE. Verificado no browser (Playwright, 2×): "Sair" → `/login` exato, 0
-  `refresh`, sessão revogada. **Pendente**: merge da branch (ato do Diretor) + a caminhada
-  de tela de V5 e V6 contra o código mergeado, para então fechar este handoff.
+  CORRIGIDO e MERGEADO — branch `fix/producao-material-logout-success-race` (BRIEF-004,
+  commits 9f2225c·8f91d3b·635314c) mergeada em `main` via PR #2 (`f60659c`). Flag de
+  módulo `justLoggedOut`: no logout de sucesso o `baseQueryWithReauth` devolve o 401
+  seguinte sem `refresh` nem redirect de "sessão expirada", com os 3 oráculos da §6.3
+  (ativação/supressão/expiração). Gates 1–9 APROVADO/CONVERGE. V5 reexercitado no browser
+  contra o código mergeado (2026-09-01): "Sair" → `/login` exato, 0 `refresh`, sessão
+  revogada. Handoff FECHADO.
 achado_bloqueante_historico: >-
   V5 (logout de sucesso) — DIVERGIA de AC-002-027/FR-002-023 (ver `achado_v5_resolvido`).
   Clicar "Sair" numa sessão
@@ -199,15 +200,16 @@ credencial: a tela de login (`/login`, TASK-003-014) e o shell da área interna
   seguinte à área interna redireciona para `/login`).
 - **Risco se falhar**: logout "cosmético" — a sessão continua válida no servidor e o
   cookie roubado continua servindo.
-- **Evidência**: ❌ **FALHOU** (2026-09-01, Playwright — reproduzido 2×). **Servidor OK**:
-  `POST /auth/logout` → 204, `GET /auth/me` com o mesmo cookie depois → **401** (sessão
-  revogada de verdade). **UI diverge de AC-002-027/FR-002-023**: clicar "Sair" numa
-  sessão válida NÃO leva a `/login` limpo — leva a `/login?sessao=expirada` com a
-  mensagem "Sua sessão expirou. Entre novamente." (mensagem de EXPIRAÇÃO num logout
-  deliberado), precedida de uma tempestade de ~90 pares `GET /auth/me` 401 →
-  `POST /auth/refresh` 401. Ver `achado_bloqueante` no front-matter para a causa e o fix
-  sugerido. O usuário **acaba** deslogado no `/login` — o defeito é de UX/eficiência, não
-  de segurança.
+- **Evidência**: ✅ **OK** (2026-09-01, Playwright, contra o código mergeado — `f60659c`, fix
+  do BRIEF-004). Login como ADMIN → `/studio` → clicar "Sair" → URL final =
+  `http://localhost:3000/login` **exata** (`sessao=expirada` ausente), **nenhuma**
+  mensagem "Sua sessão expirou." na tela, `POST /auth/refresh` chamado **0×**
+  (`/auth/logout` 1× · `/auth/me` 2×), `GET /auth/me` com o cookie anterior → **401**
+  (sessão revogada no servidor). O bug da 1ª passagem (`/login?sessao=expirada` + laço de
+  ~90 `me`/`refresh` 401) está corrigido pela flag `justLoggedOut`.
+  _1ª passagem (2026-09-01, pré-fix): ❌ FALHOU — logout de sucesso caía em
+  `/login?sessao=expirada` com "Sua sessão expirou." + tempestade de `me`/`refresh` 401.
+  Corrigido em BRIEF-004 (`fix/producao-material-logout-success-race`, mergeado)._
 
 ### V6 — Logout com falha transitória: permanece na área interna (AC-002-027 / FR-002-023)
 - **Tela/rota**: área interna (`/studio`), logado como EDITOR.
@@ -223,12 +225,14 @@ credencial: a tela de login (`/login`, TASK-003-014) e o shell da área interna
   tela real que a mensagem não some por remontagem.)
 - **Risco se falhar**: falha de logout expulsa o usuário sem feedback, ou o feedback
   aparece e some antes de ser lido.
-- **Evidência**: ⏸ **NÃO EXERCITADO** (2026-09-01) — exige 500 seletivo só em
-  `POST /auth/logout` mantendo `me` OK; parar o backend inteiro derruba `me` junto e
-  testa outro caminho. Coberto por `internal-shell.integration.test.tsx` (oráculo montado
-  contra a `api` real: `logout` 500 → mensagem "Não foi possível sair agora." permanece,
-  sem navegação, `me` preservado). Reexercitar quando houver como injetar o 500 seletivo
-  (ex.: um proxy/mock entre :3000 e :3333).
+- **Evidência**: **n/a — coberto por teste montado** (decisão do Diretor, 2026-09-01).
+  Exige 500 seletivo só em `POST /auth/logout` mantendo `me` OK; sem proxy/mock entre
+  :3000 e :3333 no ambiente, não exercitável na tela. Coberto por
+  `mnemonicos-frontend/src/components/internal-shell.integration.test.tsx` — oráculo
+  montado contra a `api` real: `logout` 500 → mensagem "Não foi possível sair agora.
+  Tente novamente." **permanece** no DOM (não some por remontagem), **sem** navegação,
+  `me` preservado na store; controle positivo (`logout` 204 → `/login`) ao lado. Mutante
+  `resetApiState()` no `finally` → a mensagem some → vermelho.
 
 > **Ramo "papel insuficiente → sem permissão"** de AC-002-013: `n/a` no gate 9 — F1 não
 > embarca nenhuma tela ADMIN-only, então não há superfície ponta-a-ponta. Coberto no
