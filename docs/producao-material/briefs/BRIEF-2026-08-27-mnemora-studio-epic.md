@@ -43,8 +43,8 @@ fora do MVP).
 
 | # | Fatia | Slug de destino | Estado |
 |---|---|---|---|
-| 1 | Acesso interno e papéis de produção | producao-material | em ciclo (docs/producao-material/briefs/BRIEF-002.md) |
-| 2 | Conteúdo bruto, quebra da regra e fonte normativa | producao-material | pendente |
+| 1 | Acesso interno e papéis de produção | producao-material | entregue (BRIEF-002 · SPEC-002 · PLAN-003 Done 16/16; mergeado PR #1; HANDOFF-PLAN-003 fechado 2026-09-01) |
+| 2 | Conteúdo bruto, quebra da regra e fonte normativa | producao-material | em ciclo (docs/producao-material/briefs/BRIEF-005.md) |
 | 3 | Instrumentação de etapas da fábrica | producao-material | pendente |
 | 4 | Tira mnemônica como sequência de quadros | producao-material | pendente |
 | 5 | Biblioteca visual reutilizável | producao-material | pendente |
@@ -130,3 +130,7 @@ fora do MVP).
 - 2026-08-27: Diretor liga `jira.enabled: true`; `createmeta` do projeto KAN medido
   (Epic `10006`, Story `10009`, Subtask `10007`, Task `10008`) e gravado na ficha e em
   `docs/_meta/jira.KAN.md`; Epic-raiz criado — `KAN-6`.
+- 2026-08-31: `/keelson:continue` — correção declarada da fila (princípio 2): F1 estava
+  como `em ciclo (BRIEF-002.md)` mas os artefatos filhos mostram **entregue** — PLAN-003
+  Done 16/16, PR #1 mergeado (backend `25cdafd` · frontend `834f117`), HANDOFF-PLAN-003
+  fechado 2026-09-01, Stories KAN-8/9/10 Concluído. Próxima: F2.

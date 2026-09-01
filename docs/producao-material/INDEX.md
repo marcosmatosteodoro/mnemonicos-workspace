@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-08-31T14:30:00-03:00
+**Última atualização**: 2026-09-01T02:30:00-03:00
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -25,15 +25,16 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 (nenhuma — PLAN-003 completo; F1 do épico MNEMORA STUDIO aguarda merge + Entrega)
 
 ### Especificadas, ainda não planejadas
-(nenhuma — SPEC-002 coberta por PLAN-003)
+- Conteúdo bruto e Quebra da regra (SPEC-005, F2 do épico MNEMORA STUDIO, ✍️ 2026-09-01) — registro/edição/remoção reversível de Conteúdo bruto com classe do radar de prova (5 classes da TAP) e fonte normativa estruturada; decomposição da regra 1:1 (5 blocos + síntese); listagem com 3 estados, ordenação determinística, sem filtros; navegação listagem→Quebra; carimbo de última alteração com autoria preservada; semente de exemplo passa a Obrigação Tributária; saneamento das chamadas de leitura do frontend (`/mnemonics`, `/flashcards/due`). Atrás da barreira EDITOR/ADMIN de F1.
 
-_Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 em ciclo (BRIEF-002)._
+_Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 em ciclo (BRIEF-005/SPEC-005)._
 
 ## SPECs
 
 | ID | Título | Status | Data |
 |----|--------|--------|------|
 | SPEC-002 | Acesso interno e papéis de produção | Approved | 2026-08-28 |
+| SPEC-005 | Conteúdo bruto e quebra da regra | Approved | 2026-09-01 |
 
 ## PLANs
 
@@ -52,9 +53,18 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 | Termo | Definição | Origem |
 |-------|-----------|--------|
-| Tira mnemônica | Sequência ordenada de quadros que reconstrói uma regra (CONCEITO → AÇÃO → OBJETO → CONDIÇÃO/EXCEÇÃO) | BRIEF-001 |
-| Quebra da regra | Decomposição do texto normativo bruto nos cinco blocos, mais a síntese da regra | BRIEF-001 |
-| Radar de prova | Classificação por risco de prova: alta, média, detalhe, exceção, pegadinha | BRIEF-001 |
+| Tira mnemônica | Sequência ordenada de quadros que reconstrói uma regra (CONCEITO → AÇÃO → OBJETO → CONDIÇÃO/EXCEÇÃO) — entidade própria de F4 | BRIEF-001 |
+| Quebra da regra | Decomposição do texto normativo bruto nos cinco blocos, mais a síntese da regra; 1:1 com o Conteúdo bruto | BRIEF-001 / SPEC-005 |
+| Radar de prova | Classificação por risco de prova | BRIEF-001 |
+| Classe do radar de prova | Uma de `ALTA`, `MEDIA`, `DETALHE`, `EXCECAO`, `PEGADINHA` — as 5 classes da TAP §3.2 camada 1; dado persistido no Conteúdo bruto (RDR-001 selado por A-005-001) | SPEC-005 |
+| Prioridade de apresentação | Rótulo derivado não persistido (`ALTA`→Alta, `MEDIA`→Média, `DETALHE`/`EXCECAO`/`PEGADINHA`→Baixa); exibição adiada para F10 | SPEC-005 |
+| Conteúdo bruto | Texto normativo colado + disciplina + tema/assunto + classe do radar de prova; a primeira estação da linha de produção | SPEC-005 |
+| Bloco da quebra | Cada um dos cinco campos textuais independentes: CONCEITO, AÇÃO, OBJETO, CONDIÇÃO, EXCEÇÃO (CONDIÇÃO/EXCEÇÃO em branco = "não se aplica") | SPEC-005 |
+| Síntese da regra essencial | A regra reduzida ao núcleo, em linguagem tecnicamente correta | BRIEF-001 / SPEC-005 |
+| Tipo do dispositivo | Gênero da fonte normativa: CF, CTN, lei, lei complementar, súmula, ato normativo | SPEC-005 |
+| Citação do dispositivo | Apontador textual do dispositivo dentro da fonte (ex.: "CTN, art. 113") | SPEC-005 |
+| Remoção reversível (Conteúdo bruto) | Item e Quebra vinculada saem da listagem e ficam inalcançáveis (inclusive por id direto), dados preservados para expurgo futuro (F8) | SPEC-005 |
+| Carimbo de última alteração | Par quem/quando de estado atual no Conteúdo bruto, sem trilha histórica (trilha é F8); não sobrescreve a autoria original | SPEC-005 |
 | Associação visual | Imagem/cena/símbolo a serviço da recuperação; reprovada se removê-la não perde função cognitiva | BRIEF-001 |
 | Versão aprovada | Checagem jurídica e pedagógica passaram; material liberado para exportação (gate) | BRIEF-001 |
 | Fonte normativa | Dispositivo oficial que sustenta a regra (CF, CTN, lei, LC, súmula, ato normativo) | BRIEF-001 |
@@ -79,7 +89,10 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | ID | Risco | Mitigação | Origem |
 |----|-------|-----------|--------|
 | PIL-001 | Teste da tira aprovado sem limiar (Q-11) e cinco das seis métricas da §5.4 sem instrumento (Q-12) — não bloqueiam a SPEC, bloqueiam a conclusão do piloto | decidir antes do beta; retomar via /keelson:brief producao-material | BRIEF-001 |
-| RDR-001 | Mapeamento entre as cinco classes do radar de prova (TAP §3.2) e as três prioridades das telas sugeridas não está decidido | resolver como premissa na SPEC da fatia F2 | BRIEF-001 |
+| ~~RDR-001~~ | **RESOLVIDO 2026-09-01** — SPEC-005 A-005-001: as 5 classes da TAP são o dado persistido; as 3 prioridades do mockup são derivação de apresentação, exibição adiada para F10. Não é 2ª dimensão gravada. | selado (premissa com `Reabrir se:` F7/F10/F11 precisarem priorizar natureza acima de grau) | BRIEF-001 → SPEC-005 |
+| RISK-005-001 | Colapso das 5 classes do radar numa prioridade única de apresentação: reverter o mapeamento exigiria reclassificação **manual** de todo o acervo já produzido (trabalho humano, A-007), não só migração de schema | classe das 5 fica persistida; exibição da prioridade adiada p/ F10; `Reabrir se:` em A-005-001 | SPEC-005 §9 |
+| RISK-005-004 | Texto livre de fonte (`Mnemonic.source`) convivendo com a fonte estruturada até F4 — duas representações da fonte na janela F2→F4 | A-005-010 registra a razão; A-005-013 (mnemônico legado deixa de ser visível na fábrica após F2); F4 consome e encerra | SPEC-005 §9 |
+| Q-005-004 (E-01) | O EDITOR pode criar tema/assunto novo em disciplina existente, ou só escolhe entre os semeados? Se a semente não cobrir os temas do módulo de Obrigação Tributária, a produção trava dentro de F2 | proposta recomendada: criação mínima de tema na tela Novo Conteúdo; default: segue A-005-007 + AC-005-027 reforçado. Prazo: confirmação da migração (Q-005-003). Vai ao Diretor na Entrega junto de MET-002-001 | SPEC-005 §9 / PO |
 | RISK-002-001 | "Revisor jurídico ≠ autor" (A-010) inexequível com operação de 1 pessoa; com o papel de revisão acumulado no ADMIN, com 1 pessoa o gate de "Versão aprovada" de F9 fica só em disciplina operacional | 2 ADMINs distintos no piloto (A-002-017); F9 decide se separa o papel de revisor | SPEC-002 §9 |
 | RISK-002-002 | Token de renovação persistido é superfície de dado sensível — vazamento do repositório permitiria continuar sessões | guardar só o necessário, valores não reversíveis onde viável, revogar família em reuso, expiração absoluta curta (7 dias) | SPEC-002 §9 |
 | RISK-002-003 | Dependências novas de criptografia/sessão (derivação de senha, geração de token, leitura de cookie) entram na árvore — superfície de cadeia de suprimento | gate de auditoria de dependências sobre o diff de F1 (/keelson:audit); fixar versão e revisar | SPEC-002 §9 |
@@ -87,7 +100,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | TRISK-003-002 | Cookie cross-domain (SameSite=None + anti-CSRF) não desenhado; F1 assume mesmo site | verificação de `Origin`/`Host` nas rotas POST de auth agora; token anti-CSRF quando o deploy for cross-domain | PLAN-003 §8 |
 | ~~HANDOFF-003~~ | **RESOLVIDO 2026-09-01** — `HANDOFF-PLAN-003` `status: Concluído`. V1–V5 OK na tela (Playwright, código mergeado: login→`/studio`, mensagem genérica sem enumeração, guard redireciona anônimo, vista protegida renderiza, logout de sucesso → `/login` exato com 0 `refresh` e sessão revogada). V6 `n/a` (coberto por `internal-shell.integration.test.tsx`). O V5 foi corrigido em BRIEF-004 (mergeado, PR #2 `f60659c`). | — nenhuma | qa + Playwright 2026-09-01 |
 | RISK-002-003-audit | `/keelson:audit` sobre o diff de F1 (3 deps novas de cripto/sessão: `@node-rs/argon2`, `cookie-parser`) — DoD do PLAN-003 sem ato registrado (E2 do PO). `npm audit --omit=dev --audit-level=high` no backend = 0 vulns (2026-08-31); falta a revisão de cadeia de suprimento | ato do Diretor: rodar `/keelson:audit` antes do merge (o assistente não pode invocá-lo) | PO (Entrega F1) |
-| MET-002-001 | Veredito da métrica §1.3 da SPEC-002 pendente — a fonte (`route-authz-matrix` 28/28 verde) prova **conformidade** (deny-by-default aplicado), não o número de negócio da §1.3. O veredito é cobrado no início do próximo ciclo do slug (decisão 4.99) | próximo `/keelson:specify`/`/keelson:brief` em `producao-material` repassa ao Diretor | PLAN-003 §9 / SPEC-002 §1.3 |
+| MET-002-001 | Veredito da métrica §1.3 da SPEC-002 pendente — a fonte (`route-authz-matrix` 28/28 verde) prova **conformidade** (deny-by-default aplicado), não o número de negócio da §1.3. Cobrança aberta neste ciclo (decisão 4.99): SPEC-005 Q-005-001 repassa ao Diretor na **Entrega de F2**, junto de E-01 | veredito ao Diretor na Entrega de F2 (`/keelson:auto`, item 6.4) | PLAN-003 §9 / SPEC-002 §1.3 |
 
 ## Histórico recente
 
@@ -105,3 +118,5 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 - 2026-09-01: PLAN-003 **mergeado** (backend `25cdafd` · frontend `834f117`, PR #1); Status → **Done**; Stories KAN-8/9/10 e sub-tasks KAN-11..26 → Concluído no Jira (KAN-7 Épico segue aberto — multi-fatia). Caminhada de tela do HANDOFF-PLAN-003 exercitada (Playwright, app local): **V1–V4 OK**, **V5 FALHOU** (logout de sucesso → `/login?sessao=expirada` + laço de `me`/`refresh` 401 — "logout success race" da Wave 7, agora com evidência ao vivo), V6 não exercitado. Handoff **permanece Pendente**; fast-follow em `main` (developer + re-gate). Ambiente de dev: ADMIN `admin@mnemonicos.local` semeado, 4 usuários-fixture removidos do DB de dev, `SEED_ADMIN_*` no `.env` local (gitignored).
 - 2026-08-31: `/keelson:integrate` de PLAN-003 — DoD §9 validada (14 itens; `npm audit` backend 0 vulns; `gates.screenVerify` parcial via HANDOFF-003 aceito). Suíte completa verde (be unit 165/165 · be integração 133/133 · fe 86/86 · lint/typecheck/build). **Convergência de fecho: CONVERGIU** (code-reviewer — 0 gaps `ausente`/`parcial`/`contradiz`; 24 FR + 9 NFR + 29 AC provados; 12 DEC + EMENDAS refletidas; métrica §1.3 verde; paridade de tipos por leitura cross-repo; sem segredo em log/resposta). `quality.mutation`/`quality.e2e` = não configurados (opt-in). **PR não aberto** — `gh` ausente / sem `GH_TOKEN` no ambiente; descrições dos 2 PRs prontas (backend + frontend, base `main`, head `feat/producao-material-mnemora-studio`). Aberto pendente: 2 decisões não-bloqueantes declaradas (comentário de `api.ts` × teste de divergência cross-repo; superfície declarada sem consumidor em F1). 1 lição de projeto registrada.
 - 2026-08-31: Wave 7 do PLAN-003 fechada (TASK-003-014 tela de login; TASK-003-015 shell da área interna) — PLAN-003 **16/16**, FEAT-002-001 e FEAT-002-002 → Implementadas. gate 10 n/a. gate 1–7 REPROVOU 1º passe (`config.matcher` via `.flatMap()` derruba `next build` — Next lê `config` por AST estático; `roleSatisfies('STUDENT',*)` sem caso; `INTERNAL_HOME` literal duplicado; costura `resetApiState()`×`missingSession` sem oráculo) → retry `f6cc4ed` fechou 5 de 6; gate 8 REPROVOU 1º passe (mesma raiz do `config.matcher` + `<form>` sem `method=`) → fechou no mesmo retry. A4 (AC-002-027) não fechou no retry (oráculo trocado por função pura; bug real verde na suíte: `resetApiState()` no `finally` do `logout` desmontava `LogoutControl` e matava a mensagem de falha) → teto 4.88 batido → **rodada dirigida A4 `e6d0c75`** autorizada pelo Tech Lead (veto do Diretor na Entrega): `logout.onQueryStarted` reseta o cache só após sucesso (EMENDA COMP-003-021 Wave 7); re-review APROVADO (3 mutantes mortos, oráculo montado contra a `api` real). gate 9 **pendente_handoff** para as duas FEATs (tela bloqueada — causa: credencial). EMENDAS: COMP-003-021 Wave 7, COMP-003-022 (matcher literal), TASK-003-014/015 (critérios de retry). 3 lições projeto em `lessons.md` + `next-16.md` §6.3/§11; 3 lições processo → agile-coach (Etapa 4.5). Incidentes de higiene: gates paralelos escreveram mutantes/sonda na árvore compartilhada + alteração estagiada invertendo oráculo A4 (restaurado pelo security-engineer; árvore confirmada pristina em `e6d0c75`).
+- 2026-09-01: sync Jira (gancho specify — SPEC-005 "Conteúdo bruto e quebra da regra", 2 FEATs) — issue principal SPEC-005 = **KAN-6** (reuso do Epic-raiz MNEMORA STUDIO por instrução do Tech Lead: "sem criar Epic novo"; nenhum Epic criado); Stories das FEATs: **KAN-27** (FEAT-005-001) + **KAN-28** (FEAT-005-002), ambas com `parent` = KAN-6 (Epic▸História, adjacência OK). `transition: comment` → nenhum card movido. Achado reportado ao Tech Lead: F1 usou Epic dedicado por fatia (KAN-7, sem `parent` para KAN-6); F2 diverge desse padrão — decisão de estrutura pendente do Diretor.
+- 2026-09-01: **SPEC-005 criada via /keelson:specify** (F2 do épico MNEMORA STUDIO, nasce de BRIEF-005) — 2 FEATs, 24 FRs, 7 NFRs, 36 ACs (vão intencional em AC-005-017), 13 premissas. spec-validator PASS (0 ERROR, 1 auto-fix); graph.sh 0 achado. `product-analyst` REVISAR_ANTES_DE_APROVAR (10 pontos de mérito); `po` ESCALAR → 10 pontos resolvidos pelo BRIEF-005 / decisão reversível em nome do Diretor (prioridade de apresentação → F10; remoção reversível; ADMIN escreve com autoria imutável + carimbo; métrica §1.3 ganha número observacional na Entrega; 3 estados + ordenação na listagem; navegação listagem→Quebra vira FR+AC; A-005-012/013 novas), **1 escalação E-01** (cadastro de tema pelo EDITOR) que não bloqueia — vai ao Diretor na Entrega com MET-002-001. SPEC promovida a **Approved** (v0.2). RDR-001 resolvido.
