@@ -43,3 +43,23 @@ artefato_patchado: proposta_plugin (modo consumidor) — `commands/implement.md`
 patch: "DECs que tocam o escopo" passa a "DECs que tocam o escopo (IDs conferidos contra o PLAN lido na abertura da wave — nunca de memória)" — edição in-line, saldo 0
 reincidencia: 0
 estado: ativa
+
+## LRN-005: Ambiguidade de "confirmado pelo Diretor" no report do developer
+data: 2026-09-04
+gatilho: gate_reprovado
+origem: PLAN-006 (slug producao-material), Wave 1, TASK-006-001 — reprovação do code-reviewer no gate "escopo respeitado"
+causa_raiz: instrucao_ausente — o contrato de report do `developer` (etapa 8) não distinguia "confirmar uma propriedade do artefato" (o SQL é aditivo) de "autorizar uma ação" (executá-lo); a frase "confirmado pelo Diretor" cobre os dois atos sem desambiguar, e o `code-reviewer` não tem acesso ao ledger de sessão onde a autorização real vive
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor)
+patch: proposta de nova regra na etapa 8 de `agents/developer.md` exigindo que toda menção a "confirmado/autorizado pelo Diretor" declare O QUÊ foi confirmado (propriedade · autorização de execução · ambas)
+reincidencia: 0
+estado: ativa
+
+## LRN-006: Critério de TASK que proíbe efeito fora da árvore de código sem oráculo mecânico
+data: 2026-09-04
+gatilho: gate_reprovado
+origem: PLAN-006 (slug producao-material), Wave 1, TASK-006-001 — o "Não inclui"/risco (TRISK-006-001) proibia executar a migração fora do banco de teste descartável, mas nada na TASK media isso contra o estado real do banco; só apareceu porque o `code-reviewer`, por iniciativa própria, consultou `_prisma_migrations`
+causa_raiz: instrucao_ausente — o catálogo de "resistir a contorno" de `commands/tasks.md` (etapa 3, fixação de critérios) cobre grep/estrutura/mutação/round-trip mas não a classe "critério proíbe efeito colateral fora da árvore de código (banco, fila externa, sistema de terceiros)"; nasce como promessa em prosa, não como oráculo executável sobre o alvo
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor)
+patch: proposta de item novo no catálogo de fixação de `commands/tasks.md` exigindo que critério desse tipo nasça com o comando/query que lê o estado real do alvo externo, com o resultado esperado entrando no report do developer
+reincidencia: 0
+estado: ativa
