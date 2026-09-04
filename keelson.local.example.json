@@ -8,6 +8,13 @@
         "loginPath": null,
         "username": null,
         "password": null
+      },
+      "editor": {
+        "description": "Área interna (mnemonicos-frontend) autenticada como EDITOR de dev — sujeito concreto do gate 9 das telas de produção de material (F2). Credencial semeada por `seedDevEditor` a partir de SEED_EDITOR_EMAIL/SEED_EDITOR_PASSWORD (mnemonicos-backend/.env); preencha aqui com os MESMOS valores usados no .env local.",
+        "baseUrl": "http://localhost:3000",
+        "loginPath": "/login",
+        "username": null,
+        "password": null
       }
     }
   }
