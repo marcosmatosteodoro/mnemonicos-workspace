@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -71,26 +71,28 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-04T19:16:40-03:00
+**Data conclusão**: 2026-09-04T19:21:37-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 5ee6501 (impl) · db9d60a (carona gate 7)
 **Jira**: KAN-31
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8)
+**Tentativas**: 2 (1 code-review aprovou o mérito do arquivo, mas reprovou a wave por achado de outra TASK; retry aplicou a remoção Art.7 sugerida; re-review delta aprovou)
+**Cobertura final**: n/a (91/91 no frontend pós-implementação; 23/23 no escopo `proxy`)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/lib/internal-routes.ts
+  - mnemonicos-frontend/src/proxy.ts
+  - mnemonicos-frontend/src/proxy.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: NFR-005-001 (faceta de borda do frontend, via proxy.test.ts)
+- [x] Segurança (gate 8): aprovado — security-engineer, Wave 1 (guard permanece conveniência; reformulação do teste de mirror→subconjunto conferida sem brecha)
+- [ ] Comportamento (gate 9): n/a — sem AC de tela; nenhuma page.tsx criada nesta TASK
 
-**Notas**: 
+**Notas**: A equivalência exata do mirror (`INTERNAL_ROUTE_PREFIXES` == diretórios reais) foi reformulada para checagem de sentido único (subconjunto) + cobertura pelo símbolo, para acomodar "content" declarado antes de a página existir (Wave 5) — garantia original preservada, inventário de `it()` 14→15 sem perda. Carona Art. 7 trocou a referência temporal ("Wave 5") por porquê durável no comentário.

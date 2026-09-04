@@ -95,17 +95,25 @@ no commit pai** — morrer só no pai é regressão de prova.
 
 **Erro:** o hook de pre-commit (`prettier --write` + `eslint --fix` via lint-staged) grava
 os arquivos com fim-de-linha **LF**, mas o checkout usa `core.autocrlf=true`; logo após o
-commit os arquivos reaparecem como ` M` em `git status --porcelain` (conteúdo idêntico,
-`git diff` vazio), exigindo `git checkout --` para reconciliar. Verificações de "árvore
-limpa pós-commit" na closure veem sujeira falsa.
-**Causa:** desalinhamento entre `endOfLine` do prettier / `.gitattributes` / `core.autocrlf`.
-**Solução:** alinhar — `endOfLine: 'lf'` no prettier + `* text=auto eol=lf` em
+commit os arquivos reaparecem sujos em `git status --porcelain`, em **dois estados
+distintos** que exigem remédios diferentes: ` M` (working tree ≠ índice, mas ambos ==
+HEAD em conteúdo — `git diff HEAD` vazio; é falso-dirty de eol puro) e **`MM`** (o índice
+ficou com a versão **pré**-`prettier`/`eslint --fix` — o working tree bate com HEAD, mas o
+índice não; um `git commit` sem `-a` a partir daqui **desfaria** a formatação que o hook
+acabou de aplicar). Verificações de "árvore limpa pós-commit" na closure que só olham
+` M`/`git diff` (não `git diff --cached`) veem a sujeira ` M` como falsa e **perdem** o
+`MM`.
+**Causa:** desalinhamento entre `endOfLine` do prettier / `.gitattributes` / `core.autocrlf`;
+o remédio usual (`git checkout --`) reconcilia o *working tree*, não o *índice* — por isso
+resolve ` M` e deixa `MM` intocado.
+**Solução:** alinhar na raiz — `endOfLine: 'lf'` no prettier + `* text=auto eol=lf` em
 `.gitattributes` para os globs de código, ou `core.autocrlf=input` no ambiente. Enquanto
-não alinhado: a closure roda `git checkout --` nos arquivos recém-commitados antes de
-aferir a árvore.
+não alinhado: a closure confere os **dois** estados e aplica o remédio de cada — ` M` →
+`git checkout -- <arquivos>`; `MM` → `git reset -- <arquivos>` (ou `git add --renormalize .`
+para reconciliar tudo de uma vez) — **antes** do próximo commit nos mesmos arquivos.
 **Validade:** projeto (toolchain do `mnemonicos-backend`/`-frontend`).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 2 · contestada 0
 
 ## [Testes] Sonda de investigação não nasce em `tests/**`; contagem de teste declara a árvore
 

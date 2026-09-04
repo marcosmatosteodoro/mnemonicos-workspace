@@ -8,7 +8,8 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
+**Data início**: 2026-09-04T22:02:12+0000
 
 ## Convenções (do projeto)
 
@@ -89,26 +90,30 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-04T19:14:00-03:00
+**Data conclusão**: 2026-09-04T19:42:14-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: a1725a0 (impl) · 827e36e (retry gate 1-7)
 **Jira**: KAN-30
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8) · performance-engineer (gate 10)
+**Tentativas**: 2 (1 code-review reprovou por 3 achados baratos + achado de escopo de TASK-006-001; retry fechou os 4; re-review delta aprovou)
+**Cobertura final**: n/a (312 testes verdes pós-implementação; 14/14 no escopo `disciplines` pós-retry)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/domain/types.ts
+  - mnemonicos-backend/src/modules/disciplines/disciplines.service.ts
+  - mnemonicos-backend/src/modules/users/users.service.ts (2º consumidor de Paginated<T>, ajuste dentro do Art. 6)
+  - mnemonicos-backend/tests/integration/disciplines.integration.test.ts
+  - mnemonicos-backend/tests/unit/domain-types-paginated.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-004 (faceta "fonte do campo tema")
+- [x] Segurança (gate 8): aprovado — security-engineer, Wave 1
+- [ ] Comportamento (gate 9): n/a — sem efeito observável de tela nesta TASK; FEAT-005-001 ainda não completa
 
-**Notas**: 
+**Notas**: `relationLoadStrategy: 'join'` medido (1 round-trip fixo, não escala com N) e fixado em teste. Retry provou a 2ª cláusula do deny-by-default (STUDENT→403) e consolidou o probe de queries duplicado; carona de gate 7 renomeou o título do caso de 401 que sobre-prometia (commit `ed12238`, riding com o fecho da wave). `licao_candidata` [projeto] roteada (mesma lição de T001, confirmada 2).

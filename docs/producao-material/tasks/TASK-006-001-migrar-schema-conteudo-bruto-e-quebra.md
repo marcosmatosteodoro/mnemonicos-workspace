@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -78,6 +78,7 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 ## Riscos específicos
 
 - **TRISK-006-001** — a execução da migração aditiva exige confirmação do Diretor; a TASK gera com `--create-only` e para. Nenhum comando que altere estrutura roda fora de `mnemonicos_test`.
+  **Resolvido na largada do `/keelson:implement`** (Etapa 4 do `/keelson:auto`, antes do despacho desta TASK): o Diretor confirmou, via `AskUserQuestion`, a opção "Gerar e executar" — aplicar a migração aditiva **também** no banco de dev (`mnemonicos`), não só no `mnemonicos_test` do harness. Evento registrado no ledger da sessão (`intervencao`, `ts: 2026-09-01T13:27:23+0000`, origem `tech-lead`): *"Diretor confirmou (via AskUserQuestion na largada da Wave 1 do implement): migração Prisma aditiva de F2 = GERAR E EXECUTAR (arquivo versionado revisável + aplicar no banco de dev e mnemonicos_test)."* A autorização precede a execução (13:27:23 UTC vs. aplicação em `mnemonicos` às 13:33:16 UTC, conferida em `_prisma_migrations` pelo gate 1–7 da Wave 1). O texto original desta linha (acima) reflete o estado da TASK **no momento da decomposição**, antes da confirmação — a exclusão "fora de `mnemonicos_test`" ficou superada pela decisão do Diretor, registrada aqui para o leitor futuro não ler a divergência como violação.
 - Nomes de coluna: o `schema.prisma` só mapeia o **nome da tabela** (`@@map`) — as colunas seguem o que o Prisma gera dos campos (camelCase, salvo `@map` explícito no schema real). Conferir o schema real antes de fixar os literais do teste de estrutura (item (ii)/(iv)).
 - Repos symlinkados (lição [Exploração]): editar e verificar sempre pelo caminho dentro do link (`mnemonicos-backend/prisma/...`); ausência detectada por varredura não é fato.
 - A suíte de integração não foi exercitada no sync de largada — rodar `npm --prefix mnemonicos-backend run db:up` antes de `test:integration`.
@@ -88,26 +89,30 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-01T10:27:21-03:00
+**Data conclusão**: 2026-09-04T19:38:26-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: e847fd5 (impl) · 827e36e (retry gate 1-7) · ed12238 (carona gate 7)
 **Jira**: KAN-29
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8)
+**Tentativas**: 2 (1 code-review reprovou por achado de escopo já autorizado + 3 achados baratos; retry fechou os 4; re-review delta aprovou)
+**Cobertura final**: n/a (migração + teste de estrutura; suíte do backend 166/166 unit, 146/146 integração pós-wave)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/prisma/schema.prisma
+  - mnemonicos-backend/prisma/migrations/20260901133222_add_raw_content_and_rule_breakdown/migration.sql
+  - mnemonicos-backend/tests/integration/raw-content-structure.integration.test.ts
+  - mnemonicos-backend/jest.integration.config.ts
+  - mnemonicos-backend/jest.config.ts (retry — zz-.* simétrico)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-032
+- [x] Segurança (gate 8): aprovado — security-engineer, Wave 1 (migração 100% aditiva confirmada linha a linha contra DEC-006-008; 2 achados MEDIA não-bloqueantes registrados fora desta TASK)
+- [ ] Comportamento (gate 9): n/a — sem efeito observável de tela nesta TASK (schema/migração); FEAT-005-001 ainda não completa
 
-**Notas**: 
+**Notas**: Migração aditiva executada com autorização do Diretor confirmada na largada do `/keelson:implement` (ver "Riscos específicos" acima — evento de ledger `intervencao`, `ts: 2026-09-01T13:27:23+0000`, anterior à aplicação em dev às 13:33:16 UTC). `licao_candidata` [projeto] (husky/lint-staged índice divergente) roteada e persistida em `guidelines/project/lessons.md` (lição "[Testes] `lint-staged` grava LF..." — confirmada 2, estendida com a distinção ` M` × `MM`). `licao_candidata` [processo] (ambiguidade de "confirmado pelo Diretor" em report; critério que proíbe efeito fora da árvore sem oráculo no alvo) roteada ao `agile-coach`.

@@ -6,17 +6,17 @@
 
 ## Status agregado
 
-- Todo: 14
+- Todo: 11
 - In Progress: 0
-- Done: 0
+- Done: 3
 - Blocked: 0
 
 ## Ordem de execução (waves)
 
-### Wave 1 (paralelizável)
-- [ ] TASK-006-001 ⏸ Todo — Migrar o schema Prisma: enums e models de Conteúdo bruto e Quebra da regra
-- [ ] TASK-006-002 ⏸ Todo — Consolidar `Paginated<T>` no domínio e fechar o contrato de `GET /disciplines`
-- [ ] TASK-006-003 ⏸ Todo — Registrar o segmento de rota `content` na área interna
+### Wave 1 (sequencial — migração força a wave) — ✅ concluída 2026-09-04
+- [x] TASK-006-001 ✅ Done — Migrar o schema Prisma: enums e models de Conteúdo bruto e Quebra da regra
+- [x] TASK-006-002 ✅ Done — Consolidar `Paginated<T>` no domínio e estender `GET /disciplines` com temas
+- [x] TASK-006-003 ✅ Done — Registrar o segmento de rota `content` na área interna
 
 ### Wave 2 (depende de Wave 1)
 - [ ] TASK-006-004 ⏸ Todo — Espelhar os tipos de domínio cross-repo (enums, interfaces, rótulos pt-BR)
