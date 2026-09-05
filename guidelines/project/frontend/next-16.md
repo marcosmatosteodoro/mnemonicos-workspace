@@ -612,6 +612,17 @@ primeira rota autenticada.
 O wrapper `next/jest` cuida da transformação SWC, dos mocks de `next/font` e do CSS —
 **não** troque por `ts-jest` configurado à mão. Comando: `npm test`.
 
+**Rodada escopada a um caminho usa `--runTestsByPath`, nunca o argumento posicional.**
+O argumento posicional do Jest é `testPathPattern` — uma **regex**:
+`npx jest "src/app/(interno)/content/page.test.tsx"` lê `(interno)` como grupo de
+captura, o caminho literal deixa de casar, e o Jest roda **menos** suítes do que o
+caminho pedia — sem erro, sem aviso, "N passed" com ar de sucesso. Toda tela da área
+interna vive sob `src/app/(interno)/`, então qualquer gate escopado por caminho está
+exposto. Use `npx jest --runTestsByPath <caminho-literal>` (trata o argumento como
+caminho); com `testPathPattern` os parênteses exigiriam escape (`\(interno\)`). Rodada
+escopada por caminho confere `Test Suites: N` contra o nº de arquivos que se pretendia
+rodar **antes** de aceitar o verde (controle positivo — lição da Wave 5 de PLAN-006).
+
 Organização:
 
 | Tipo | Onde | Como |
