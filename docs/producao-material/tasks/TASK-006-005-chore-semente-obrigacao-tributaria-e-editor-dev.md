@@ -7,7 +7,8 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
+**Data início**: 2026-09-04T20:04:34-03:00
 
 ## Convenções (do projeto)
 
@@ -93,26 +94,34 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-04T20:00:48-03:00
+**Data conclusão**: 2026-09-05T00:51:41-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 96a30e1 (impl) · 74c7380 (workspace — keelson.local.example.json) · bf21d2c (retry gate 1-7/8)
 **Jira**: KAN-33
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8)
+**Tentativas**: 2 (1ª passada reprovou por `.env.example` derrubando o boot + AC-005-027(iv) sem prova falsificável + 3 achados de segurança; retry fechou os 4 + os 3; re-review delta aprovou os dois gates)
+**Cobertura final**: n/a (190/190 unit, 174/174 integração pós-retry)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/.env.example
+  - mnemonicos-backend/src/config/env.ts
+  - mnemonicos-backend/prisma/seed-admin.ts
+  - mnemonicos-backend/prisma/seed-dev-editor.ts
+  - mnemonicos-backend/prisma/seed-material.ts
+  - mnemonicos-backend/prisma/seed.ts
+  - mnemonicos-backend/tests/unit/env.test.ts
+  - mnemonicos-backend/tests/integration/seed-material.integration.test.ts
+  - keelson.local.example.json (workspace)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-027
+- [x] Segurança (gate 8): aprovado — Wave 2, após retry (5 achados MEDIA fechados com prova falsificável: allowlist de URL não se aplica aqui, prova de hash do EDITOR, normalização de env vazia, guarda de produção, race condition do service)
+- [ ] Comportamento (gate 9): n/a — sem efeito observável de tela; sujeito ao gate 9 remoto das telas de Wave 5 (o EDITOR de dev semeado aqui é o sujeito concreto)
 
-**Notas**: 
+**Notas**: Reworked em relação ao texto original da TASK (achado do `qa` pré-código + `code-reviewer`/`security-engineer` da Wave 1): `seedMaterial`/`seedDevEditor` viraram funções puras testáveis (o harness de integração omite `SEED_ADMIN_*` de propósito — `main()` nunca é exercitado diretamente). `removeLegacyDisciplines` guardado por `isProduction` (nunca roda em produção). `licao_candidata`s [Segurança]/[Código] roteadas a `guidelines/project/lessons.md`; incidente de ambiente (junção NTFS de node_modules corrompendo a árvore principal durante mutação isolada) roteado ao `agile-coach` como lição de processo. `npm audit` pós-`npm ci` de recuperação revelou 3 vulnerabilidades (2 moderate, 1 high) nas deps — não introduzidas por este diff; registradas como risco para `/keelson:audit` na Entrega (fix disponível exigiria downgrade maior de Prisma, não aceitável; superfície `mysql2` provavelmente inalcançável em projeto PostgreSQL — hipótese, não medição).

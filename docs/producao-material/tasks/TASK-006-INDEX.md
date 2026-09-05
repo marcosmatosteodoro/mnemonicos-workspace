@@ -6,9 +6,9 @@
 
 ## Status agregado
 
-- Todo: 11
+- Todo: 8
 - In Progress: 0
-- Done: 3
+- Done: 6
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -18,10 +18,10 @@
 - [x] TASK-006-002 ✅ Done — Consolidar `Paginated<T>` no domínio e estender `GET /disciplines` com temas
 - [x] TASK-006-003 ✅ Done — Registrar o segmento de rota `content` na área interna
 
-### Wave 2 (depende de Wave 1)
-- [ ] TASK-006-004 ⏸ Todo — Espelhar os tipos de domínio cross-repo (enums, interfaces, rótulos pt-BR)
-- [ ] TASK-006-005 ⏸ Todo — Trocar a semente para Obrigação Tributária + EDITOR de dev
-- [ ] TASK-006-006 ⏸ Todo — `contents.service` + `contents.schema`: ciclo de vida do Conteúdo bruto
+### Wave 2 (paralela — territórios disjuntos) — ✅ concluída 2026-09-05
+- [x] TASK-006-004 ✅ Done — Espelhar os tipos de domínio cross-repo (enums, interfaces, rótulos pt-BR)
+- [x] TASK-006-005 ✅ Done — Trocar a semente para Obrigação Tributária + EDITOR de dev
+- [x] TASK-006-006 ✅ Done — `contents.service` + `contents.schema`: ciclo de vida do Conteúdo bruto
 
 ### Wave 3 (depende de Wave 2)
 - [ ] TASK-006-007 ⏸ Todo — Estender a rede de paridade cross-repo aos dois enums novos

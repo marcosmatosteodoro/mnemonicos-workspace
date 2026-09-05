@@ -345,7 +345,15 @@ inteira), **nunca** `-t "..."` isolado — senão o critério aprova um oráculo
 fora do contexto real (decisão 4.186). Âncora: `users.integration.test.ts` [retry S1].
 **Validade:** geral (teste de concorrência/invariante).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
+**Reincidência (Wave 2, PLAN-006, re-review de retry):** o próprio `code-reviewer` rodou
+`npx jest --config jest.integration.config.ts` (sem `--experimental-vm-modules`) para 4
+mutantes do fechamento contável de TASK-006-006 — a suíte inteira quebrou por incompatibilidade
+com o Prisma 7 (o `jest.integration.config.ts` avisa da flag no próprio docblock), e "18 failed"
+foi lido como "mutante morto" (falso positivo — o comando nunca rodou de verdade). Corrigido
+com controle negativo (sem mutante, invocação certa → 18/18 verde) antes de refazer os 4. A
+régua desta lição cobre o **avaliador**, não só quem escreve o critério: todo mutante precisa
+de controle negativo no mesmo universo de invocação, ou "morreu" e "não rodou" são indistinguíveis.
 
 ## [Testes] Sintoma novo só vira "dívida conhecida" depois de reproduzido sem o diff
 
@@ -539,5 +547,39 @@ Corolário: limpar a flag também no ramo de sucesso do evento oposto (aqui,
 imediatamente pós-login dentro dos 2s seria engolido). Referência:
 `mnemonicos-frontend/src/store/api.ts` (`justLoggedOut`) + `next-16.md` §6.3.
 **Validade:** enquanto o `baseQueryWithReauth` usar flags de módulo para condicionar a re-auth.
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Guarda de operação destrutiva por `NODE_ENV` é opt-out permissivo — nasce opt-in
+**Erro:** `removeLegacyDisciplines` (seed de material, PLAN-006/TASK-006-005) cascateia até
+`CardState`/`Review` de estudante; a guarda entregue foi `if (isProduction) return`, com
+`NODE_ENV` default `development` no `envSchema` — permissivo por padrão.
+**Causa:** `NODE_ENV` é sinal de *build/runtime*, não de "qual banco está do outro lado do
+`DATABASE_URL`". O acidente realista não é o servidor de produção rodando o seed — é
+`npm run db:seed` numa workstation/CI com `NODE_ENV=development` e um `DATABASE_URL`
+apontado para staging/produção: a guarda entregue não recusa nada nesse cenário.
+**Solução:** operação que apaga dado de terceiro nasce com **opt-in explícito**, nunca
+opt-out por nome de ambiente — variável dedicada (`SEED_ALLOW_DESTRUCTIVE`, forma
+`z.enum(['true','false']).default('false')`, nunca `z.coerce.boolean()`) e/ou correlação
+com o host de `DATABASE_URL` (negar por padrão quando o host não é local). Referência:
+`mnemonicos-backend/prisma/seed-material.ts` (gate 8, Wave 2 de PLAN-006).
+**Validade:** geral (qualquer operação destrutiva condicionada a ambiente).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Código] Correção de duplicação (DRY) introduz nova re-derivação do canônico no mesmo diff
+**Erro:** o retry que eliminou a redeclaração de dois enums de domínio (`contents.schema.ts`
+passou a importar de `domain/types.ts`) introduziu, no mesmo despacho,
+`env.NODE_ENV === 'production'` em `seed-material.ts` — enquanto `isProduction` já é
+exportado pelo mesmo módulo (`src/config/env.ts`) que o arquivo importa.
+**Causa:** a correção foi lida como endereço ("pare de redeclarar ESTES dois enums"), não
+como condição ("nenhum símbolo do diff re-deriva valor que o canônico já exporta") — guarda
+nova escrita do zero não passa pela pergunta "este predicado já existe?", porque a atenção
+está no comportamento a adicionar, não no vocabulário a reusar.
+**Solução:** ao adicionar guarda/predicado, importar o canônico do módulo em vez de repetir
+a expressão que o define — e no fecho de um achado de DRY, varrer o **próprio delta** pela
+mesma condição antes de despachar/commitar. Exemplar: `src/lib/prisma.ts` importa
+`{ env, isProduction }` de `../config/env` em vez de recalcular.
+**Validade:** geral (qualquer predicado derivado de configuração/env).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0

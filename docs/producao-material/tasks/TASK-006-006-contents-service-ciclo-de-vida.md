@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -68,6 +68,7 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 - [ ] `softDeleteRawContent(id, actor)` — seta `deletedAt` no item no alcance; depois dele `getRawContent(id, actor)` lança 404, e a linha de `rule_breakdowns` (se semeada) **continua** no banco — cobre **AC-005-037** (faceta remoção → inacessível por id direto), **AC-005-013** (faceta service — a Quebra vinculada deixa de ser alcançável junto do pai; a recusa de `getRuleBreakdown` sobre pai soft-deleted é completada em TASK-006-009) e a faceta "e depois o remove … autoria inalterada" de **AC-005-036**. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service` → capturar `authorId`/`lastEditedById` da linha antes; `softDeleteRawContent(ativoA, editorA)` → `deletedAt` NOT NULL na linha; **`authorId` e `lastEditedById` da linha permanecem os de antes** (o soft-delete não é uma edição de autoria); `getRawContent(ativoA, editorA)` → 404; `SELECT` direto em `raw_contents`/`rule_breakdowns` ainda acha as linhas. `Tests: ≥3 passed`. Falsificável: `softDeleteRawContent` fazendo `DELETE` físico → o `SELECT` direto não acha a linha (vermelho — a remoção é reversível); `softDeleteRawContent` setando `lastEditedById = actor.id` → a asserção de autoria inalterada fica vermelha. Fixada antes do código.
 - [ ] **Lição ativa [Segurança] "Guarda de estado de conta/sessão: enumerar por DADO, não por rota"** + contrato §273(c) (predicado de escopo na persistência). Texto da lição (solução): *"ao introduzir uma guarda de estado de conta/sessão, enumerar por dado, não por rota — toda função que lê o recurso escopado recebe a mesma guarda no mesmo diff, cada uma com prova de negação (fixture de 2 instâncias, mutação do filtro reprova)."* Critério de mutação **contável**: **todo método de `contents.service.ts` que toca a tabela `raw_contents` (leitura ou escrita, com ou sem predicado hoje) — `createRawContent`, `getRawContent`, `updateRawContent`, `softDeleteRawContent`: 4 metodos, 4 provas** de mutação do predicado de escopo (`deletedAt: null` e/ou `authorId` do helper de alcance). Fixture com **2 autores** (`editorA`, `editorB`) + **2 instâncias** (uma ativa, uma soft-deleted). Para cada método, neutralizar o predicado no método (`deletedAt: null` **ou** o alcance `authorId`) → a prova correspondente **reprova**; `createRawContent` (escrita sem predicado hoje) entra com o cenário "o `authorId` vem do `actorId` da sessão, nunca do `input`" — mutar para ler `authorId` do `input` reprova. Mais um caso por ramo EDITOR × ADMIN do alcance nos métodos de leitura/edição/remoção. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service` → o inventário de casos do arquivo declara **"4 metodos, 4 provas"** e cada mutação nomeada mata ao menos um caso, **rodada pelo comando do critério** (suíte/arquivo inteiro, nunca `-t` isolado). Fixada antes do código; o confronto número × código é do gate 8.
 - [ ] **Lição ativa [Testes] "Árvore de decisão com precedência: um caso por PAR de ramos que coincide"**. Texto da lição (solução + corolário): *"toda árvore de decisão com precedência declarada ganha um caso por par de ramos que pode coincidir — não só um por ramo —, e o nome do teste enuncia quem vence; o mutante que troca a ordem daquele par morre. Função com ≥3 guards em ordem declarada → o Critério enumera os pares que podem coincidir, com o mutante de reordenação como aceite."* Aplicada a `getRawContent` e `updateRawContent` (3 guards em ordem: `id inexistente → 404` · `deletado → 404` · `fora do alcance → 404`): o par **`deletado ∧ fora do alcance`** coincide e é alcançável (item soft-deleted **de outro autor**, pedido por um EDITOR) e tem caso próprio, cujo nome enuncia qual guard responde. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service` → caso "item soft-deleted de outro autor → 404" para `getRawContent` e para `updateRawContent`; o **mutante que troca a ordem** dos dois guards **morre** pela suíte do critério (não `-t` isolado). Falsificável: sem esse caso, reordenar os guards mantém tudo verde. Fixada antes do código.
+  **Furo no plano declarado no retry da Wave 2** (aceito pelo `code-reviewer`, mesma classe do "mesmo commit" de TASK-006-004): o desenho entregue usa `where` **conjuntivo** (`{ id, ...ACTIVE_RAW_CONTENT_WHERE, ...scopeWhere(actor) }`, sem colisão de chave) — a ordem do spread é semanticamente inerte, então "o mutante que troca a ordem dos dois guards morre" é estruturalmente inaplicável a este desenho (não há precedência a observar). A proteção substantiva continua provada: o fixture do par coincidente (soft-deleted de outro autor) permanece, e os 4 mutantes do critério contável acima (predicado `deletedAt`/`authorId`) sustentam peso. Os nomes dos casos foram corrigidos para "as duas negações valem, sem precedência a observar".
 - [ ] **Lição ativa [Performance] "`include`/`select` aninhado de relação não é 1 statement por padrão"**. Texto da lição (solução + ressalva): *"(1) `select` explícito, sempre — só os campos usados. (3) consulta em caminho por requisição tem a contagem de round-trips FIXADA EM TESTE (`log: [{ emit: 'event', level: 'query' }]` + asserção sobre o nº de eventos) — asserção sobre o objeto devolvido não é prova de custo. Ressalva: `relationJoins` ligado torna `join` o default global; para relação de lista, medir `query` × `join` e fixar a escolhida; `relationLoadStrategy:'query'` só emite o 2º SELECT quando a linha relacionada existe — semear o registro real antes de contar."* Aplicada a `getRawContent`: `select` **explícito** só dos campos consumidos, sem `include` de relação não usada. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service` → um caso com client de teste `log: [{ emit:'event', level:'query' }]` que **semeia a linha real** e assere o nº de statements de `getRawContent`; **checagem estrutural ancorada em início de linha (contrato §273(b))**: `grep -nE "^\s*include:\s*\{" mnemonicos-backend/src/modules/contents/contents.service.ts` → **sem resultado** (nenhum `include` implícito de relação não consumida). Falsificável: trocar `select` explícito por `include: { topic: true, author: true }` → a contagem de round-trips sobe, caso vermelho, e o `grep` casa. Fixada antes do código.
 - [ ] **Lição ativa [Testes] "Sonda de investigação não nasce em `tests/**`; contagem de teste declara a árvore"** — o teste de service nasce como `mnemonicos-backend/tests/integration/contents.service.integration.test.ts` versionado, nome no `testMatch` (não `zz-*`); o caso de medição de round-trips do critério acima é caso versionado, não sonda solta; nenhuma sonda de perf/N+1 em `tests/**`; a closure declara a contagem com `git status --porcelain mnemonicos-backend/` **vazio**; gate que escreve arquivo (mutação) roda em `git worktree` isolada, sem `npm ci`/`npm install` na árvore principal; `testPathIgnorePatterns` cobre `zz-.*`. Verificação executável: `git status --porcelain mnemonicos-backend/` → vazio após o commit; `npm --prefix mnemonicos-backend run test:integration` → contagem declarada == observada.
 - [ ] `createRawContent` e `updateRawContent` aplicam o **mesmo** conjunto de obrigatoriedade (FR-005-007 faceta service) — o update reusa `createRawContentSchema` / o refinamento de fonte; provado por um caso de `updateRawContentSchema` que recusa `sourceType` sem `sourceCitation`. Verificação executável: `npm --prefix mnemonicos-backend test -- contents.schema` → caso do update; `Tests: ≥1 passed`.
@@ -92,26 +93,29 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-04T20:00:48-03:00
+**Data conclusão**: 2026-09-05T00:52:10-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 96ba180 (impl) · f4fa5b7 (retry gate 1-7/8)
 **Jira**: KAN-34
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8) · performance-engineer (gate 10)
+**Tentativas**: 2 (1ª passada reprovou por reimplementação de enum de domínio + achados de segurança/performance na `contents.schema.ts`/`contents.service.ts`; retry fechou os 8 itens consolidados; re-review delta aprovou os 3 gates)
+**Cobertura final**: n/a (190/190 unit, 174/174 integração pós-retry)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/contents/contents.schema.ts
+  - mnemonicos-backend/src/modules/contents/contents.service.ts
+  - mnemonicos-backend/tests/unit/contents.schema.test.ts
+  - mnemonicos-backend/tests/integration/contents.service.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-001/002/003/004/008/009/013/014/015/036/037
+- [x] Segurança (gate 8): aprovado — Wave 2, após retry (IDOR/alcance por autor provado por mutação — 4 métodos, 4 provas; race condition fechada com `updateMany` atômico; `sourceUrl` com allowlist http(s))
+- [ ] Comportamento (gate 9): n/a — sem efeito observável de tela nesta TASK (service puro); FEAT-005-001/002 ainda não completas
 
-**Notas**: 
+**Notas**: Fechamento contável "4 métodos, 4 provas" confirmado com o código na mão pelo gate 8 (mutantes mortos, não só número batendo). `updateRawContent`/`softDeleteRawContent` colapsados em `updateMany` atômico no retry, fechando check-then-act + reduzindo round-trips. `furo_no_plano` declarado e aceito: o critério original pedia mutante de reordenação de guards, estruturalmente inaplicável ao `where` conjuntivo entregue (mesma classe do "mesmo commit" de T004) — texto do critério atualizado na TASK. 3 sugestões não-bloqueantes com destino declarado: `.max(2048)` em `sourceUrl` sem AC/teste próprio (decisão registrada em nome do Diretor — limite defensivo, reversível); copy da mensagem de `sourceUrl` vazio mudou; `isProduction` duplicado em `seed-material.ts` em vez de importar de `env.ts` (lição [Código] registrada).

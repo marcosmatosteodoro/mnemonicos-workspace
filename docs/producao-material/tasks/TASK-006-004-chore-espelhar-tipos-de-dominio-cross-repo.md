@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -85,26 +85,29 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-04T20:00:48-03:00
+**Data conclusão**: 2026-09-04T20:08:17-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 75d6b5b (backend) · 0978a53 (frontend) — SHAs distintos por construção (repos `.git` separados; NFR-005-005 verificado por "mesmo lote de trabalho", precedente TASK-003-005)
 **Jira**: KAN-32
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8, coberto na rodada da Wave 2)
+**Tentativas**: 1 (aprovada de primeira, inclusive o furo_no_plano do "mesmo commit")
+**Cobertura final**: n/a (267 testes verdes pós-implementação nos dois repos)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/domain/types.ts
+  - mnemonicos-backend/tests/unit/domain-types-raw-content.test.ts
+  - mnemonicos-frontend/src/types/domain.ts
+  - mnemonicos-frontend/tests/types/raw-content.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados (4 propriedades implícitas de exports/uso não-nulo — sem AC formal, item de Inclui sem AC)
+- [x] Segurança (gate 8): aprovado — Wave 2 (constante espelhada; enums entram na fronteira de validação de T006)
+- [ ] Comportamento (gate 9): n/a — sem efeito observável de tela; FEAT-005-001/002 ainda não completas
 
-**Notas**: 
+**Notas**: `RawContentSummary` assimétrico por decisão (resolução 5 do manifesto): local ao módulo `contents` no backend (nasce em T006/T008), definido em `domain.ts` no frontend. Forma provisória — TASK-006-010 confere o formato real que `contents.service.ts` devolve.
