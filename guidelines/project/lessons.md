@@ -683,3 +683,26 @@ mesma condição antes de despachar/commitar. Exemplar: `src/lib/prisma.ts` impo
 **Validade:** geral (qualquer predicado derivado de configuração/env).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Design] Cor semântica de texto (erro/sucesso/link) vem de token do tema, nunca de literal da paleta
+
+**Erro:** `internal-shell.tsx` e `login-form.tsx` (F1/PLAN-003, já mergeados/Done) usam
+`text-red-500` direto da paleta do Tailwind para mensagem de erro — contraste medido em
+3.55-3.81:1 no tema claro, abaixo do piso AA (4.5:1). O defeito atravessou merge e "Done"
+sem nenhum gate acusar; só apareceu 2 planos depois, quando a Wave 5 de PLAN-006 mediu o
+mesmo literal nos próprios arquivos novos e criou o token `--danger`/`text-danger`
+(commit `b990e41`) — a correção nos arquivos de F1 saiu como BRIEF-008 avulso.
+**Causa:** cor de estado escolhida direto da paleta utilitária (`text-red-*`,
+`text-green-*`, `text-blue-*` etc.) sem token do projeto e sem medida de contraste contra
+o fundo real (`--surface`/`--surface-raised`) em cada tema. A paleta "parece" a cor certa
+o suficiente para passar despercebida por inspeção — nenhum gate tem âncora mecânica para
+reprovar um literal que "parece bem" sem medição.
+**Solução:** cor semântica de texto (erro, sucesso, link, aviso) vem sempre de token do
+`@theme`/`:root` de `src/app/globals.css`, com par claro/escuro, nunca de literal da
+paleta em componente. Ao criar o token, medir o contraste contra os QUATRO fundos do
+produto (`--surface` e `--surface-raised`, nos dois temas) e registrar o valor em
+comentário no próprio token — padrão já em `globals.css` para `--link` e `--danger`.
+Referência: `core/DESIGN.md` "Tokens, não literais" + "Contraste AA".
+**Validade:** geral (qualquer cor de texto com significado semântico).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

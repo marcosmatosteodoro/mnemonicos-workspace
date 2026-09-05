@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Aberto
+**Status**: Concluído
 **Data**: 2026-09-05
 **Largada**: 2026-09-05T19:47:09-03:00
 **Origem**: Diretor (pedido em sessão — AskUserQuestion, escolha "Corrigir agora")
@@ -42,7 +42,8 @@ nenhuma — o brief é a unidade de execução (2 arquivos, troca mecânica de c
 ## Execução
 
 - **Implementado por**: developer
-- **Revisado por**: product-designer (gate 11 — confirma o contraste e a ausência de
-  regressão visual); code-reviewer dispensável (troca de classe de cor, sem lógica nova) —
-  se o developer tocar qualquer coisa além da classe, promover para gate 1-7 também.
-- **Commit**: pendente — Tech Lead commita, mesma prática já em uso nesta sessão.
+- **Revisado por**: product-designer (gate 11 — **APROVADO**, contraste recalculado de forma
+  independente sobre o CSS compilado: 6.08-6.77:1 nos 2 temas/2 superfícies, pior caso acima
+  do piso AA; diff conferido como só a troca de classe, nada mais tocado); code-reviewer não
+  promovido (a cláusula do brief não disparou — nenhuma lógica além da classe foi tocada).
+- **Commit**: `4a24934` (backend intocado; só `mnemonicos-frontend`).
