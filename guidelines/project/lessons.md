@@ -91,7 +91,7 @@ para este — ou não usa o filtro.
 **Nota:** achado em si — RISK-006-008, INDEX do slug `producao-material` — **RESOLVIDO**:
 `POST /auth/refresh` sempre teve `verifyOrigin` (F1, commit `d2560a9`); o gap era só na
 REDE DE PROVA, nunca uma vulnerabilidade ativa. Corrigido via BRIEF-007 (avulso, autorizado
-pelo Diretor, commit `d0d9294`). Complementa (não duplica) "[Segurança] Chave de decisão de
+pelo Diretor, commit `9b2ddef`). Complementa (não duplica) "[Segurança] Chave de decisão de
 autz que ganha uma dimensão", acima: lá a exceção não acompanha uma dimensão nova do MESMO
 controle; aqui a exceção de um controle é importada por outro sem revalidação.
 **Confirmação (gate 8 do BRIEF-007):** security-engineer reexecutou o mutante
@@ -639,6 +639,31 @@ opt-out por nome de ambiente — variável dedicada (`SEED_ALLOW_DESTRUCTIVE`, f
 com o host de `DATABASE_URL` (negar por padrão quando o host não é local). Referência:
 `mnemonicos-backend/prisma/seed-material.ts` (gate 8, Wave 2 de PLAN-006).
 **Validade:** geral (qualquer operação destrutiva condicionada a ambiente).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Suíte de integração com DDL/TRUNCATE em banco compartilhado exige exclusividade real entre execuções concorrentes, não só `--runInBand`
+
+**Erro:** `jest.integration.config.ts` serializa com `maxWorkers: 1` só **dentro** do
+processo, mas `resetDb()` (`tests/integration/db.ts`) faz `TRUNCATE ... CASCADE` no schema
+`public` de um banco `mnemonicos_test` de **nome fixo, compartilhado por qualquer runner
+da máquina**. Com gates do keelson rodando em paralelo (default da rodada), 2 runners
+truncaram um ao outro em duas execuções consecutivas (84 e depois 48 falhas por violação
+de FK) — sintoma indistinguível de regressão real; um revisor menos cético teria
+reprovado o commit sob revisão. Pego pelo `code-reviewer` no gate 1-7 do BRIEF-007. Isto
+**corrige** a hipótese anterior de RISK-006-007 no INDEX do slug (que suspeitava de
+acúmulo de conexão do `withQueryProbe`) — a causa real é TRUNCATE concorrente.
+**Causa:** `--runInBand`/`maxWorkers: 1` serializa specs dentro de **um** processo; não
+impede um **segundo** processo (outro gate da mesma rodada, ou outra sessão) de truncar o
+mesmo banco ao mesmo tempo — exclusividade aparente, não real.
+**Solução:** harness que faz DDL/TRUNCATE em schema compartilhado usa exclusividade
+**real**: banco por execução (nome derivado de PID/worker em `db-url.ts`) **ou**
+`pg_advisory_lock` tomado no `globalSetup` e liberado no `globalTeardown`.
+**Nota:** complementa — não substitui — "[Testes] Infra de teste que faz DDL/TRUNCATE
+valida o alvo na carga do módulo, fail-closed" (acima): aquela cobre truncar o banco
+**errado**; esta cobre truncar o banco **certo, mas ao mesmo tempo que outro processo**.
+**Validade:** enquanto `tests/integration/db.ts`/`jest.integration.config.ts` usarem
+`TRUNCATE` num banco compartilhado por nome fixo.
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
 
