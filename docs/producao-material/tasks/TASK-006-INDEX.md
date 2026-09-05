@@ -6,9 +6,9 @@
 
 ## Status agregado
 
-- Todo: 4
+- Todo: 3
 - In Progress: 0
-- Done: 10
+- Done: 11
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -29,8 +29,8 @@
 - [x] TASK-006-009 ✅ Done — `contents.service`: Quebra da regra — upsert 1:1, obrigatoriedade e inalcançabilidade
 - [x] TASK-006-010 ✅ Done — Sanear e estender `src/store/api.ts` (RTK Query)
 
-### Wave 4 (depende de Wave 3)
-- [ ] TASK-006-011 ⏸ Todo — `contents.routes.ts`: 7 rotas sob a barreira + tripwire 12→19 + `contents.integration.test.ts`
+### Wave 4 (depende de Wave 3) — ✅ concluída 2026-09-05 (1 retry test-only)
+- [x] TASK-006-011 ✅ Done — `contents.routes.ts`: 7 rotas sob a barreira + tripwire 12→19 + `contents.integration.test.ts`
 
 ### Wave 5 (depende de Wave 4)
 - [ ] TASK-006-012 ⏸ Todo — Tela de listagem de Conteúdos brutos
@@ -125,5 +125,5 @@
 
 | FEAT | TASKs (P = primária) | Done |
 |------|----------------------|------|
-| FEAT-005-001 | TASK-006-001 (P), TASK-006-002 (P), TASK-006-006 (P), TASK-006-008 (P), TASK-006-010, TASK-006-011 (P), TASK-006-012 (P), TASK-006-013 (P) | 5/8 |
-| FEAT-005-002 | TASK-006-001, TASK-006-008, TASK-006-009 (P), TASK-006-010, TASK-006-011, TASK-006-012, TASK-006-013, TASK-006-014 (P) | 4/8 |
+| FEAT-005-001 | TASK-006-001 (P), TASK-006-002 (P), TASK-006-006 (P), TASK-006-008 (P), TASK-006-010, TASK-006-011 (P), TASK-006-012 (P), TASK-006-013 (P) | 6/8 |
+| FEAT-005-002 | TASK-006-001, TASK-006-008, TASK-006-009 (P), TASK-006-010, TASK-006-011, TASK-006-012, TASK-006-013, TASK-006-014 (P) | 5/8 |

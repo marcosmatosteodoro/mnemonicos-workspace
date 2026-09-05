@@ -8,7 +8,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -65,7 +65,7 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 - [ ] **Tripwire 12 → 19 / métrica §1.3 da SPEC** — `route-authz-matrix` verde no CI, **19 pares**, **0 rota não-declarada**. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- route-authz-matrix.integration.test.ts` → a asserção `expect(ROUTES.map(key).sort()).toEqual([...])` tem **exatamente 19** entradas, incluindo os 7 pares novos, **literais**, conferidos contra os `requireRole(...)` de `contents.routes.ts` (o teste deriva `ROUTES` de `collectRoutes(apiRoutes)` — âncora **estrutural**, não grep de prosa): `GET /contents` · `POST /contents` · `GET /contents/:id` · `PATCH /contents/:id` · `DELETE /contents/:id` · `GET /contents/:id/breakdown` · `PUT /contents/:id/breakdown`. `Tests: N passed`; nenhuma rota do censo dos laços sem par correspondente na lista. Falsificável: adicionar um par à lista sem montar a rota → `ROUTES.map(key)` não o contém, `toEqual` falha; montar a rota e não atualizar a lista → `toEqual` falha (TRISK-006-002). Fixada antes do código.
 
-- [ ] `verifyOrigin` como **1º handler** nas mutações — `POST /contents`, `PATCH /contents/:id`, `DELETE /contents/:id`, `PUT /contents/:id/breakdown`. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- route-authz-matrix.integration.test.ts` → a matriz assere, **por referência de função** (identidade de `verifyOrigin`, padrão `:317-327`), que cada uma das 4 mutações tem `verifyOrigin` como 1º handler e que `GET /contents`, `GET /contents/:id`, `GET /contents/:id/breakdown` **não** o têm. `Tests: N passed`. Falsificável: omitir `verifyOrigin` de `POST /contents` → a asserção de referência de função falha (vermelho). Fixada antes do código.
+- [ ] **[Testes] `EMENDA pós gate 1-7` — `verifyOrigin` provado por POSIÇÃO, não por pertencimento**: a asserção original (`route.handlers.includes(verifyOrigin)`) prova só que `verifyOrigin` está EM ALGUM LUGAR da cadeia — não que é o **1º handler**, nem que está **ausente** dos GETs. Fortalecer a MESMA asserção da matriz, **repo-wide** (toda rota não-pública, não só as 4 de `/contents` desta TASK — a condição, não a lista de instâncias): (a) para toda rota não-pública de MUTAÇÃO (`POST`/`PATCH`/`PUT`/`DELETE`), `route.handlers[0] === verifyOrigin`; (b) para toda rota não-pública que NÃO é mutação (`GET`), `!route.handlers.includes(verifyOrigin)`. Já passa em HEAD (nenhuma rota do repo viola) — é fortalecimento de prova, não mudança de comportamento. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- route-authz-matrix.integration.test.ts` → `Tests: N passed`. Mutantes (rodam pelo comando, arquivo inteiro — nunca `-t`): mover `verifyOrigin` para a 2ª posição em qualquer mutação não-pública → `handlers[0] !== verifyOrigin` → vermelho; acrescentar `verifyOrigin` a um GET não-público → `includes` vira `true` → vermelho. Ambos devem morrer (não sobreviveram no re-review anterior — retry corrige). Fixada antes do código (retry).
 
 - [ ] **[Arquitetura] "Barreira que nega com base num registro exige o registro completo antes da 1ª requisição"**. Texto da lição (solução): *"(1) declaração é ato de montagem — `requireRole(method, path, ...roles)` declara na avaliação da chamada, nunca dentro do handler; registro selado após o boot. (2) O caminho feliz de MONTAGEM é oráculo distinto do caminho feliz de REQUEST: toda TASK que introduz registro/efeito-colateral consumido por um middleware anterior na cadeia ganha um teste que monta a app real (sem popular o registro à mão) e prova o 200 legítimo — o mutante que move a escrita para o handler o mata."* Item verificável: `contents.integration.test.ts` monta a app **real** (sem popular `ROUTE_ROLES` à mão) e prova `GET /contents` → **200** com `seedSession('EDITOR')` **e** com `seedSession('ADMIN')`. Verificação executável: `npm --prefix mnemonicos-backend run test:integration` → o mutante que move a declaração de papéis de qualquer rota `/contents` para **dentro do handler** faz o EDITOR/ADMIN legítimo receber 403 → caso vermelho. Fixada antes do código.
 
@@ -110,26 +110,31 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-05T11:09:14-03:00
+**Data conclusão**: 2026-09-05T12:06:21-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 774b540 (impl) · 00a1e1e (retry — verifyOrigin por posição, test-only)
 **Jira**: KAN-39
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8)
+**Tentativas**: 2 (1ª passada aprovada no gate 8 direto e reprovada só no gate 1-7: o critério de `verifyOrigin` prometia posição/exclusão, mas a asserção só provava pertencimento — 2 mutantes sobreviventes, código de produção já correto. Retry test-only fortaleceu a asserção repo-wide (não só as 4 rotas de `/contents`); re-review aprovou com 5 mutantes reexecutados ao vivo, incluindo 2 de controle fora do escopo de `/contents` que confirmaram o alcance repo-wide)
+**Cobertura final**: n/a (AC-005-026, AC-005-016 faceta HTTP, AC-005-031/037 facetas HTTP)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/contents/contents.routes.ts (novo)
+  - mnemonicos-backend/src/modules/contents/contents.schema.ts
+  - mnemonicos-backend/src/http/routes.ts
+  - mnemonicos-backend/tests/integration/contents.integration.test.ts (novo)
+  - mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts
+  - mnemonicos-backend/tests/integration/contents.service.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-026, AC-005-016, AC-005-031, AC-005-037
+- [x] Segurança (gate 8): aprovado — varredura completa por 13 categorias OWASP, 0 achados; 4 mutantes adversariais reexecutados ao vivo
+- [ ] Comportamento (gate 9): n/a — sem tela nesta TASK (superfície HTTP pura); FEAT-005-001/002 ainda não completas (Wave 5 pendente)
 
-**Notas**: 
+**Notas**: Fatia sensível confirmada com o código na mão: `requireRole` na montagem (nunca no handler) das 7 rotas, `verifyOrigin` como 1º handler nas 4 mutações (agora provado por posição, não só pertencimento), tripwire `route-authz-matrix` com exatamente 19 pares literais, árvore plana, zero Prisma na rota, reconciliação "7 métodos, 7 provas" do `contents.service.ts` confirmada. **Achado de segurança relevante, PRÉ-EXISTENTE (F1, não introduzido por esta wave)**: o re-review descobriu que `POST /auth/refresh` pode perder `verifyOrigin` sem nenhuma suíte acusar — a asserção repo-wide fortalecida filtra por rotas não-públicas (eixo de autorização), e as 2 rotas POST públicas (`/auth/login`, `/auth/refresh`) ficam fora dela; `/auth/login` tem prova comportamental própria (Origin estranha → 403), `/auth/refresh` não tem. É rota que emite cookies a partir de outro cookie — alvo clássico de CSRF. Registrado como risco ativo no INDEX do slug para decisão do Diretor (fora do escopo desta TASK/wave, per 4.88 + teto de retry 4.187). 2 remoções de comentário Art. 7 aplicadas pelo Tech Lead antes do fecho (narrativa de processo em nomes de teste). Dívida declarada (não desta wave): 28 ocorrências pré-existentes da mesma classe de rótulo em 7 arquivos do backend.
