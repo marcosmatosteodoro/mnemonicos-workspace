@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Aberto
+**Status**: Concluído
 **Data**: 2026-09-05
 **Largada**: 2026-09-05T12:41:22-03:00
 **Origem**: Diretor (pedido em sessão — AskUserQuestion, escolha "Corrigir agora, fora do ciclo")
@@ -17,42 +17,47 @@ nenhuma suíte acusar — é a rota que emite cookies novos a partir do cookie d
 clássico de CSRF. Confirmado com mutante ao vivo (removi `verifyOrigin` dali e as 2 suítes,
 208+213 testes, continuaram verdes)."
 
-## Interpretação
+## Resultado
 
-**Correção pós-implementação (registro factual, gate 8)**: a investigação confirmou que
-`POST /auth/refresh` (COMP-003-010, F1/PLAN-003, já mergeado) **sempre teve** `verifyOrigin`
-como 1º handler — presente desde o commit original (`d2560a9`). **Não havia vulnerabilidade
-ativa em produção.** O parágrafo abaixo é a interpretação ORIGINAL, anterior a essa
-confirmação, preservada como registro de como a demanda nasceu (a suspeita era razoável:
-nenhuma suíte provava a propriedade, então uma regressão futura passaria despercebida).
+**A premissa do "Pedido como dito" acima foi REFUTADA pela investigação — registro factual,
+não opinião.** `POST /auth/refresh` (COMP-003-010, F1/PLAN-003) **sempre teve**
+`verifyOrigin` como 1º handler, desde o commit original (`git log -L 160,161:src/modules/auth/auth.routes.ts`
+→ `d2560a9`), idêntico no commit-pai deste brief. **Não houve vulnerabilidade ativa em
+produção em nenhum momento.** O que existia era um buraco na REDE DE PROVA: a asserção
+estrutural de CSRF filtrava por `NON_PUBLIC` (recorte de autorização), e as 2 rotas POST
+públicas (`/auth/login`, `/auth/refresh`) ficavam fora do escopo dela — `/auth/login` tinha
+teste comportamental próprio cobrindo o guard por outra via; `/auth/refresh` não tinha
+nenhum. Se `verifyOrigin` fosse removido dali por engano num diff futuro, nenhuma suíte
+acusaria — esse era o risco real (RISK-006-008, já fechado no INDEX do slug), nunca um
+`fix:` de produção.
 
-A asserção estrutural repo-wide de CSRF filtra por `NON_PUBLIC` (recorte de autorização) e
-as 2 rotas POST públicas (`/auth/login`, `/auth/refresh`) ficam fora do escopo da prova.
-`/auth/login` tem teste comportamental próprio; `/auth/refresh` não tinha nenhum — logo,
-*se* o `verifyOrigin` fosse removido dali por engano num diff futuro, nada acusaria.
-Correção real aplicada: (1) ~~adicionar `verifyOrigin` como 1º handler de `POST
-/auth/refresh`~~ **desnecessário — já presente**; (2) generalizar a asserção estrutural para particionar por
-MÉTODO (muta estado?) em vez de por público/não-público, fechando a classe inteira — não só
-esta rota — para qualquer rota futura que mude estado sem exigir sessão.
+Diante disso, dos 2 itens do "Critério de aceite" original, o item 1 (adicionar
+`verifyOrigin`) já estava satisfeito **antes** do diff — nenhuma linha de `auth.routes.ts`
+foi tocada. Só o item 2 (generalizar a asserção estrutural) exigiu trabalho real: 1 arquivo,
+3 linhas, `test:` — nunca `fix:`.
 
-## Critério de aceite
+## Critério de aceite (estado final provado)
 
 - `mnemonicos-backend/src/modules/auth/auth.routes.ts` — `POST /auth/refresh` monta
-  `verifyOrigin` como 1º handler (mesmo padrão de `POST /auth/login`, `POST /contents`, etc.).
+  `verifyOrigin` como 1º handler (mesmo padrão de `POST /auth/login`, `POST /contents`,
+  etc.) — **já satisfeito antes deste brief**, confirmado por `git log -L`.
 - `route-authz-matrix.integration.test.ts` — a asserção estrutural de CSRF (bloco
-  "EMENDA DEC-003-004 — verifyOrigin por POSIÇÃO...") passa a ter como base de população
-  **todas as rotas montadas** (`ROUTES`, não `NON_PUBLIC`) para o caso de mutação: toda rota
+  "EMENDA DEC-003-004 — verifyOrigin por POSIÇÃO...") tem como base de população **todas as
+  rotas montadas** (`ROUTES`, não `NON_PUBLIC`) para o caso de mutação: toda rota
   POST/PATCH/PUT/DELETE tem `handlers[0] === verifyOrigin`, pública ou não. O caso de leitura
-  (GETs sem `verifyOrigin`) continua como está.
+  (GETs sem `verifyOrigin`) continua sobre `NON_PUBLIC`. — **item efetivamente implementado
+  por este diff (commit `d0d9294`).**
 - Mutante que remove `verifyOrigin` de `POST /auth/refresh` **morre** no comando do critério
-  (suíte inteira, nunca `-t` isolado) — confirmado ao vivo, revertido, `git status --porcelain`
-  limpo.
-- `POST /auth/login` continua coberto (já tinha prova própria — não pode regredir).
-- Suíte completa do backend verde (unit + integração), lint/typecheck limpos, sem regressão
-  em nenhuma das 19+ rotas do tripwire.
-- Comportamento observável: uma requisição de `POST /auth/refresh` com `Origin`/`Referer`
-  de terceiro passa a receber 403 (mesmo padrão de `/auth/login`) em vez de processar a
-  renovação — sem quebrar o fluxo legítimo (mesma origem).
+  (suíte inteira, nunca `-t` isolado) — confirmado ao vivo por 3 partes independentes
+  (developer, code-reviewer, security-engineer), revertido, `git status --porcelain` limpo
+  em todas as rodadas.
+- `POST /auth/login` continua coberto (já tinha prova própria — sem regressão).
+- Suíte completa do backend verde (unit 208/208 + integração 213/213), lint/typecheck
+  limpos, sem regressão em nenhuma das 19 rotas do tripwire.
+- Comportamento observável (estado final, não mudança): uma requisição de `POST
+  /auth/refresh` com `Origin`/`Referer` de terceiro recebe 403 (mesmo padrão de
+  `/auth/login`); com a mesma origem, segue o fluxo normal de renovação — confirmado ao vivo
+  pelo security-engineer.
 
 ## TASKs
 
@@ -62,8 +67,7 @@ nenhuma — o brief é a unidade de execução (1 executor, diff concentrado em 
 ## Execução
 
 - **Implementado por**: developer
-- **Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8 — fatia sensível,
-  autenticação/CSRF)
-- **Commit**: pendente — commit é ato do Diretor no modo sob demanda (decisão 4.91), mas esta
-  mudança nasce dentro de uma sessão em `/keelson:auto` já autorizada a commitar por TASK; o
-  Tech Lead commita como as demais correções desta sessão, seguindo a mesma prática já em uso.
+- **Revisado por**: code-reviewer (gates 1-7 — REPROVADO 1x por rastro durável falso no
+  brief/tipo de commit, não por código; re-review APROVADO após reconciliação) ·
+  security-engineer (gate 8 — APROVADO direto)
+- **Commit**: `test(producao-material): KAN-43 generaliza prova estrutural de CSRF para toda rota mutante montada` (amend do assunto original, ainda não pushado no momento do amend — nenhuma linha de conteúdo alterada, só tipo/escopo/key do Conventional Commit)
