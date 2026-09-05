@@ -8,8 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
-**Data início**: 2026-09-05T13:18:34-03:00
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -123,26 +122,30 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-05T13:18:34-03:00
+**Data conclusão**: 2026-09-05T19:51:47-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 8126f96 (impl) · 643fd9b (retry 1, KAN-40) · 2c37b22 (retry R3) · b990e41 (retry R4) · 4a24934 (BRIEF-008, arquivo de F1 correlato)
 **Jira**: KAN-40
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · product-designer (gate 11) · qa (gate 9)
+**Tentativas**: 5 (1ª implementação limpa; gate 11 reprovou 1ª rodada — vazio sem affordance/design geral; retry 1 fechou mas gate 1-7 e gate 11 acharam achados novos no PRÓPRIO retry — ação primária duplicada, contraste no tema escuro — 2 rodadas escaladas ao Diretor pelo teto de convergência 4.88, autorizadas explicitamente; retry R4 fechou os 2 gates; 1 resíduo em arquivo de F1 (internal-shell.tsx) fechado via BRIEF-008 avulso, também autorizado)
+**Cobertura final**: n/a (AC-005-034, AC-005-018, AC-005-016, AC-005-025, AC-005-029)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/app/(interno)/content/page.tsx
+  - mnemonicos-frontend/src/app/(interno)/content/page.test.tsx
+  - mnemonicos-frontend/src/components/content-list.tsx
+  - mnemonicos-frontend/src/components/content-list.test.tsx
+  - mnemonicos-frontend/src/app/globals.css (token `--link`/`--danger`, compartilhado com T013/T014)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): n/a — tela de frontend; não toca autorização, sessão nem superfície sensível (a barreira é backend — TASK-006-011; o guard de navegação é TASK-006-003)
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa; AC-005-033 (rota /content → /content/<id>/breakdown); receita e restauração no Roteiro do gate 9 desta TASK; sujeito EDITOR de dev (SEED_EDITOR_*)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-034, AC-005-018, AC-005-016, AC-005-025, AC-005-029
+- [x] Segurança (gate 8): n/a — tela de frontend; não toca autorização, sessão nem superfície sensível (a barreira é backend — TASK-006-011; o guard de navegação é TASK-006-003)
+- [x] Comportamento (gate 9): verificado — qa exercitou AC-005-033 com execução real (browser + Postgres), navegação da listagem para a Quebra da regra confirmada com o `id` exato; linha `**Verificação (gate 9)**:` gravada na SPEC-005 sob FEAT-005-002
 
-**Notas**: 
+**Notas**: Wave com 5 rodadas de convergência de gate 1-7/11 — histórico completo no ledger de sessão. Achados reais e bem fundamentados em cada rodada (nunca ruído): grafo de navegação incompleto, contraste AA (tokens `--link`/`--danger` criados e medidos), ação primária duplicada (fechada com prova composta — teste de componente isolado não bastava), guarda de hidratação sem oráculo (T013, mesma família). 2 rodadas passaram do teto de 1 retry (decisão 4.88) e foram escaladas ao Diretor via AskUserQuestion antes de prosseguir — nunca decididas sozinhas. Tokens `--link`/`--danger` em `globals.css` ficaram estabelecidos como o padrão canônico de cor semântica do produto, aplicados também retroativamente a 2 arquivos de F1 via BRIEF-008.

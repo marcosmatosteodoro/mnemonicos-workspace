@@ -8,8 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
-**Data início**: 2026-09-05T13:18:34-03:00
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -127,26 +126,28 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-05T13:18:34-03:00
+**Data conclusão**: 2026-09-05T19:51:47-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: e3c1c19 (impl) · a46ba01 (retry 1, KAN-42 — acessibilidade e navegação) · 2c37b22 (retry R3) · b990e41 (retry R4)
 **Jira**: KAN-42
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · product-designer (gate 11) · qa (gate 9)
+**Tentativas**: 5 (implementação inicial já a mais bem provada das 3 telas — aprovada sem achado no gate 1-7 desde a 1ª rodada; gate 11 pediu ajustes de acessibilidade/navegação, corrigidos no retry 1; retry R3 introduziu regressão de prova no `role="alert"` da recusa consolidada, corrigida e fechada com comparação nos dois commits no retry R4 — escalada ao Diretor pelo teto 4.88, autorizada explicitamente)
+**Cobertura final**: n/a (AC-005-022, AC-005-023, AC-005-024, AC-005-029)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/app/(interno)/content/[id]/breakdown/page.tsx
+  - mnemonicos-frontend/src/components/rule-breakdown-form.tsx
+  - mnemonicos-frontend/src/components/rule-breakdown-form.test.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): n/a — tela de frontend; não toca autorização, sessão nem superfície sensível (a barreira é backend — TASK-006-011; o guard de navegação é TASK-006-003)
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa; AC-005-019 (preencher os cinco blocos + síntese → salvar → recarregar → reabrir → persistidos e vinculados ao conteúdo); receita e restauração no Roteiro do gate 9 desta TASK; sujeito EDITOR de dev (SEED_EDITOR_*)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-022, AC-005-023, AC-005-024, AC-005-029
+- [x] Segurança (gate 8): n/a — tela de frontend; não toca autorização, sessão nem superfície sensível (a barreira é backend — TASK-006-011; o guard de navegação é TASK-006-003)
+- [x] Comportamento (gate 9): verificado — qa exercitou AC-005-019 com execução real: preencheu os 5 blocos + síntese com valores distintos → salvou → **reload real do browser** → reabriu → os 6 valores voltaram idênticos; confirmado por `GET` direto (200, mesmos valores) e checagem de não-vazamento (2º conteúdo do mesmo EDITOR sem Quebra → 404); linha `**Verificação (gate 9)**:` gravada na SPEC-005 sob FEAT-005-002
 
-**Notas**: 
+**Notas**: Sua guarda de hidratação (flag em `useState`, ajuste no corpo do render — nunca `useRef`/efeito) virou o padrão canônico que T013 adotou no retry. Descoberta de implementação registrada: o backend devolve 404 tanto para "conteúdo não alcançável" quanto para "ainda sem Quebra salva" — o componente trata só o 2º caso como sucesso (formulário vazio); custo residual roteado como nota (não achado desta TASK).

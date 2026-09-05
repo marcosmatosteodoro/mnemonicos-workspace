@@ -8,8 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
-**Data início**: 2026-09-05T13:18:34-03:00
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -141,26 +140,29 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-05T13:18:34-03:00
+**Data conclusão**: 2026-09-05T19:51:47-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: ef10397 (impl) · 4a2cecc (retry 1, KAN-41 — guarda de hidratação + a11y) · 2c37b22 (retry R3) · b990e41 (retry R4)
 **Jira**: KAN-41
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · product-designer (gate 11) · qa (gate 9)
+**Tentativas**: 5 (1ª implementação com guarda de hidratação sem oráculo — corrigida no retry 1 adotando o mesmo mecanismo já provado em T014; 2 rodadas subsequentes acharam achados novos nos próprios retries — navegação/foco/estado de disciplinas — escaladas ao Diretor pelo teto 4.88, autorizadas explicitamente; retry R4 fechou os 2 gates)
+**Cobertura final**: n/a (AC-005-002/004/005/006/007/008/009/010/012/014/015/022/029)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/components/content-form.tsx
+  - mnemonicos-frontend/src/components/content-form.test.tsx
+  - mnemonicos-frontend/src/app/(interno)/content/new/page.tsx
+  - mnemonicos-frontend/src/app/(interno)/content/[id]/page.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): n/a — tela de frontend; não toca autorização, sessão nem superfície sensível (a barreira é backend — TASK-006-011; o guard de navegação é TASK-006-003)
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa; AC-005-011 (remoção: confirmação explícita → controle desabilitado enquanto a resposta do DELETE está retida → item sai da listagem ao concluir; interceptação de rede segurando a resposta do DELETE — 4.319); receita e restauração no Roteiro do gate 9 desta TASK; sujeito EDITOR de dev (SEED_EDITOR_*)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-002, AC-005-004, AC-005-005, AC-005-006, AC-005-007, AC-005-008, AC-005-009, AC-005-010, AC-005-012, AC-005-014, AC-005-015, AC-005-022, AC-005-029
+- [x] Segurança (gate 8): n/a — tela de frontend; não toca autorização, sessão nem superfície sensível (a barreira é backend — TASK-006-011; o guard de navegação é TASK-006-003)
+- [x] Comportamento (gate 9): verificado — qa exercitou AC-005-011 com execução real: confirmação explícita pt-BR → `DELETE` real interceptado e retido (técnica 4.319, sem fake de resposta) → controles desabilitados + "Removendo…" enquanto retido, item ainda presente via `GET` fresco em aba paralela → liberado o `DELETE` (204 real), item sai da listagem, acesso direto → 404; linha `**Verificação (gate 9)**:` gravada na SPEC-005 sob FEAT-005-001
 
-**Notas**: 
+**Notas**: A guarda de hidratação única (evitar que o refetch da invalidação de tag sobrescreva uma edição em curso) trocou de `useRef`+`setState`-em-efeito para o mesmo mecanismo já provado em `rule-breakdown-form.tsx` (T014) — DRY entre as duas telas da wave, com o oráculo comparativo confirmado nos dois commits. Descoberto e corrigido no meio do caminho: guarda de estado de `disciplineId` também tinha efeito reativo desnecessário, eliminado a favor de derivação em render (achado do próprio lint `react-hooks/set-state-in-effect`).
