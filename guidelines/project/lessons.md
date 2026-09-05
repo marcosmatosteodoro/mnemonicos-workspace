@@ -70,6 +70,33 @@ exatamente uma rota montada naquele método.
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
 
+## [Segurança] Asserção estrutural repo-wide que filtra por allowlist de OUTRO controle declara por que a exceção vale, ou não filtra
+
+**Erro:** `route-authz-matrix.integration.test.ts` prova `verifyOrigin` (defesa CSRF) sobre
+`NON_PUBLIC` — o mesmo recorte usado para autorização (`isPublicPath`) — e ficou cega às 2
+rotas POST públicas (`/auth/login`, `/auth/refresh`), que mudam estado e emitem cookie e são
+alvo canônico de CSRF. 15 rotas mutantes provadas, unit 208/208 e integração 213/213 verdes;
+mutante confirmado ao vivo (remover `verifyOrigin` de `auth.routes.ts:160` sobrevive). Pego
+no re-review do retry (gate 1-7 da Wave 4 de PLAN-006).
+**Causa:** "não exige sessão" (autorização) e "não muda estado" (CSRF) são superfícies
+diferentes; o filtro que torna a asserção correta para autorização é exatamente o que abre o
+buraco para CSRF. A allowlist de exceção de um controle foi reusada por outro sem revalidar a
+premissa.
+**Solução:** asserção estrutural de defesa CSRF particiona por MÉTODO (muta estado?), nunca
+por público/não-público — base do caso de mutação deveria ser `ROUTES` (todas), não
+`NON_PUBLIC`: toda rota POST/PATCH/PUT/DELETE montada tem `handlers[0] === verifyOrigin`,
+pública ou não. Regra geral: quando um teste repo-wide filtra a população por allowlist de
+exceção de OUTRO controle, o teste declara por que a exceção daquele controle vale também
+para este — ou não usa o filtro.
+**Nota:** achado em si (`POST /auth/refresh` sem `verifyOrigin`) registrado como
+RISK-006-008 no INDEX do slug `producao-material` — corrigido via BRIEF-007 (avulso,
+autorizado pelo Diretor). Complementa (não duplica) "[Segurança] Chave de decisão de autz
+que ganha uma dimensão", acima: lá a exceção não acompanha uma dimensão nova do MESMO
+controle; aqui a exceção de um controle é importada por outro sem revalidação.
+**Validade:** geral (qualquer asserção estrutural repo-wide que reusa filtro de outro controle).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
 ## [Testes] Retry que reescreve arquivo de teste por mudança de assinatura entrega o inventário antes/depois dos `it()`
 
 **Erro:** o retry que mudou a assinatura de `requireRole` reescreveu os dois arquivos de
