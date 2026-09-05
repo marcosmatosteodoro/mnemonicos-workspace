@@ -8,7 +8,8 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: In Progress
+**Data início**: 2026-09-05T13:18:34-03:00
 
 ## Convenções (do projeto)
 
@@ -62,6 +63,11 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 ## Critérios de pronto
 
+- [ ] **[Design] `EMENDA pós gate 11` — sucesso do salvar anunciado**: a mensagem "Quebra da regra salva com sucesso." vira `<p role="status" aria-live="polite" className="text-sm text-muted">` (mesmo padrão de `content-form.tsx:337-341`) — hoje é um `<p>` sem `role`, invisível a leitor de tela, e usa `text-green-600` cru em vez do token do tema.
+- [ ] **[Design] `EMENDA pós gate 11` — via de volta ao Conteúdo bruto**: acrescentar `Link` para `/content/${contentId}` — a tela hoje só tem "voltar do navegador" como saída. **Rótulo por destino, não por histórico** ("Ir para o Conteúdo bruto", nunca "Voltar ao conteúdo" — a tela tem 2 entradas possíveis, listagem e formulário, e um rótulo de direção histórica seria falso numa delas).
+- [ ] **[Design] `EMENDA pós gate 11` — obrigatório/opcional distinguíveis**: os 6 campos são renderizados idênticos hoje. Marcar visualmente os 4 obrigatórios (`REQUIRED_FIELDS`) OU anotar CONDIÇÃO/EXCEÇÃO com "(deixe vazio se não se aplica)" — a decisão de produto (A-005-012) já existe, só não chegou à tela.
+- [ ] **[Design] `EMENDA pós gate 11` — validação perto do campo**: hoje a recusa sai só como lista agregada no rodapé; somar `aria-invalid`/`aria-describedby` no `<textarea>` de cada campo pendente (mesmo padrão que `content-form.tsx` está ganhando no seu próprio retry).
+- [ ] **[Design] `EMENDA pós gate 11` — botão "Salvar" no mesmo padrão canônico**: remover o `text-sm` do botão de salvar — o canônico do produto (`login-form.tsx`, já seguido por `content-form.tsx`) é `surface-card px-4 py-2 font-medium disabled:opacity-60`, sem tamanho de texto reduzido.
 - [ ] `content/[id]/breakdown/page.tsx` é Server Component e compõe o client component `RuleBreakdownForm` — verificação executável: `npm --prefix mnemonicos-frontend test -- rule-breakdown-form` monta `RuleBreakdownForm` (`render` com `Provider`/`makeStore()`) e tem ≥1 asserção de conteúdo (`Tests: ≥1 passed`); `grep -nE "^['\"]use client['\"]" "mnemonicos-frontend/src/app/(interno)/content/[id]/breakdown/page.tsx"` → sem resultado (a diretiva vive só em `rule-breakdown-form.tsx`, arquivo novo desta branch; comando também sem resultado no commit-pai por o arquivo não existir lá). Fixada antes do código.
 - [ ] Testes cobrem **AC-005-023** (três estados observáveis de salvar a Quebra da regra) — `RuleBreakdownForm` montado contra a `api` real: (i) pendente → controle de envio `disabled` e indicador `role="status"` pt-BR visível; (ii) sucesso (mutation 2xx no `PUT /contents/:id/breakdown`) → confirmação exibida; (iii) falha (mutation 4xx/5xx) → mensagem de erro pt-BR (`role="alert"`) e os cinco blocos + a síntese digitados **permanecem** nos campos. Verificação executável: `npm --prefix mnemonicos-frontend test -- rule-breakdown-form` → cenários com `fetch` mockado por estado (pendente sem resolver / `200` / `500`); saída `Tests: ≥3 passed`. Falsificável: remover o `disabled` durante o pending → caso (i) acha o controle habilitado (vermelho); limpar os campos no `catch` → caso (iii) não acha o texto digitado (vermelho). Fixada antes do código.
 - [ ] Testes cobrem **AC-005-022** (faceta UI) — Quando o EDITOR tenta salvar sem CONCEITO, AÇÃO, OBJETO ou a síntese, o formulário **lista os campos pendentes** (mensagem pt-BR) e **não** dispara a mutation; Quando CONCEITO, AÇÃO, OBJETO e síntese estão preenchidos e CONDIÇÃO e EXCEÇÃO ficaram **vazios**, o salvar **prossegue** (mutation disparada). Verificação executável: `npm --prefix mnemonicos-frontend test -- rule-breakdown-form` → cenário A: só CONDIÇÃO/EXCEÇÃO preenchidos, acionar salvar → asserção da lista de pendências e `fetch` **não** chamado para `/breakdown`; cenário B: os quatro obrigatórios preenchidos, CONDIÇÃO/EXCEÇÃO vazios, acionar salvar → `fetch` chamado com `condition`/`exception` vazios/ausentes no corpo. Falsificável: bloquear o salvar quando CONDIÇÃO/EXCEÇÃO estão vazios → cenário B não chama `fetch` (vermelho); aceitar o salvar sem os obrigatórios → cenário A chama `fetch` (vermelho). Fixada antes do código.
