@@ -7,7 +7,7 @@
 **Wave**: 3
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -122,26 +122,27 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-05T03:36:03-03:00
+**Data conclusão**: 2026-09-05T04:47:41-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 2a8f815 (backend) · d2f2d44 (frontend)
 **Jira**: KAN-35
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7, Wave 3 — aprovado direto, sem retry)
+**Tentativas**: 1 (o sandbox do developer bloqueou a execução ao vivo de 2 mutantes da AC-005-030; o Tech Lead rodou os dois manualmente com a árvore quieta — remover `PEGADINHA` só no frontend → vermelho; renomear o arquivo do frontend → lança erro — e reverteu, árvore confirmada limpa; código-reviewer confirmou a forma no HEAD sem precisar re-executar)
+**Cobertura final**: n/a (paridade cross-repo — 5 casos em `domain-types-parity.test.ts`, 4 em `mnemonicos-frontend/tests/types/domain.test.ts`)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/tests/unit/domain-types-parity.test.ts
+  - mnemonicos-frontend/tests/types/domain.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-030
+- [x] Segurança (gate 8): n/a — wave coberta pelo gate 8 em T008/T009 (superfície sensível); T007 é rede de teste cross-repo, sem alcance/autorização
+- [ ] Comportamento (gate 9): n/a — sem efeito observável de tela; FEAT-005-001/002 ainda não completas
 
-**Notas**: 
+**Notas**: `extractUserRoles(source)` generalizado para `extractConstArray(source, constName)`, reusado pelos 3 enums (inclusive `USER_ROLES`) em vez de triplicar a extração — escoteiro dentro do Art. 6. Único gap: o sandbox do developer impediu a prova ao vivo dos 2 mutantes da AC-005-030 na 1ª passada; fechado pelo Tech Lead antes do gate (ver Tentativas).

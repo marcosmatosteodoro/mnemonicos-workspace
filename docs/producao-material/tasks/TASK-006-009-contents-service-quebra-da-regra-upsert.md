@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -68,7 +68,11 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 - [ ] Prova de escopo por DADO com fechamento **contável** (gate 8 — alcance do pai; inalcançabilidade após remoção). Fechamento: **as 2 funções do Escopo desta TASK que tocam `raw_contents` (via o guard do pai) — `getRuleBreakdown` (leitura) e `saveRuleBreakdown` (escrita em `rule_breakdowns` condicionada ao pai) — têm, cada uma, cenário de segunda instância cuja mutação do predicado reprova: 2 funções, 2 provas** + 1 caso por ramo do predicado do pai (autor próprio / ADMIN irrestrito; pai ativo / pai soft-deleted). `saveRuleBreakdown` é **escrita**: a prova de que EDITOR A **não grava** a Quebra de um `RawContent` de EDITOR B é prova **exigida** (IDOR de escrita — decisão 4.232), não opcional. Fixture: `RawContent` de EDITOR B (ator = EDITOR A) e `RawContent` de A com `deletedAt != null`. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service.integration.test.ts` → como A sobre o conteúdo de B, `getRuleBreakdown`/`saveRuleBreakdown` → `AppError`; como ADMIN → alcança. Mutantes (rodam pelo comando, **arquivo inteiro — nunca `-t`**): neutralizar o predicado `authorId` do guard → A lê/grava a Quebra de B (vermelho); neutralizar `deletedAt: null` → A opera sobre o conteúdo soft-deleted (vermelho). Fixture de 2 autores com o predicado neutralizado reprovando — fixada aqui, não deixada para o gate 8. Fixada antes do código.
 
-- [ ] **[Testes] "Árvore de decisão com precedência: um caso por PAR de ramos que coincide"** — `saveRuleBreakdown` avalia os guards do pai em ordem: `inexistente → soft-deleted → fora do alcance`. Texto da lição (corolário para ≥3 guards em ordem declarada): *"o 'Critério de pronto' enumera os pares que podem coincidir (com o mutante de reordenação como aceite), nunca 'um caso por ramo'."* Par alcançável que coincide: **`soft-deleted ∧ fora do alcance`** — `RawContent` de EDITOR B **e** `deletedAt != null`, ator = EDITOR A. Caso com nome que enuncia quem vence (ex.: `"conteúdo removido E de outro autor → recusa por remoção"`); o mutante que troca a ordem dos guards `soft-deleted` e `fora do alcance` **morre** no comando do critério. (`inexistente` não coincide com os demais — id ausente não tem autor nem `deletedAt`.) Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service.integration.test.ts` → `Tests: ≥1 passed`. Fixada antes do código.
+- [ ] **[Segurança/Testes] "Guarda de alcance nunca fica atrás de outra recusa — precedência corrigida no retry"** — `EMENDA pós gate 8/1-7 (Wave 3)`: a ordem original desta TASK (`inexistente → soft-deleted → fora do alcance`) foi implementada em `assertRawContentReachable` e **vazava existência**: um EDITOR A que possui o id de um `RawContent` de EDITOR B distinguia "não encontrado" (id aleatório ou item ativo de B) de "foi removido" (item de B soft-deleted) — oráculo de autoria via mensagem, achado convergente de code-reviewer (achado 2) e security-engineer (achado 1, decisivo sobre a dimensão de vazamento). **Ordem corrigida, obrigatória**: `inexistente → fora do alcance → soft-deleted`. Quem NÃO alcança o pai (id aleatório OU item de outro autor, removido ou não) recebe **sempre** a mesma mensagem literal ("Conteúdo bruto não encontrado."); "Conteúdo bruto foi removido." só chega a quem alcança (dono ou ADMIN) sobre item soft-deleted. Par coincidente (`soft-deleted ∧ fora do alcance`) — `RawContent` de EDITOR B **e** `deletedAt != null`, ator = EDITOR A — tem caso próprio nomeado por PAPEL (não por "quem vence"): `"não-dono sobre conteúdo removido de outro autor → recusa indistinguível de 'não encontrado'"` **e** um caso irmão `"dono sobre o próprio conteúdo removido → recusa por remoção"` (mensagem diferente, mesma função, ator distinto). O mutante que reordena de volta para `soft-deleted` antes de `fora do alcance` **morre** no comando do critério — e o mutante que troca a mensagem da recusa por alcance por um texto que nomeia autoria (ex.: "pertence a outro autor") também **morre** (as duas recusas de não-alcance são comparadas por igualdade de string entre si no mesmo caso, não só por tipo `AppError`). Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service.integration.test.ts` → `Tests: ≥1 passed`. Fixada antes do código (retry).
+
+- [ ] **[Escopo] `EMENDA pós gate 1-7 (Wave 3)` — ramo "pai alcançável, sem Quebra ainda" declarado e testado**: `getRuleBreakdown(rawContentId, actor)` sobre um `RawContent` alcançável que NUNCA teve `saveRuleBreakdown` chamado hoje lança `AppError` 404 ("Quebra da regra não encontrada.") — esse é o caminho FELIZ de T014 abrir o editor de uma Quebra nova, e nenhum AC/critério desta TASK o declarava. Decisão (Tech Lead, reversível): manter o 404 é a forma correta — T014 trata 404 de `getRuleBreakdown` como "abrir formulário vazio", análogo ao padrão REST already usado no contrato. Adicionar teste explícito nomeando esse ramo: `"pai alcançável sem Quebra ainda → getRuleBreakdown recusa com 404, saveRuleBreakdown cria normalmente"`. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service.integration.test.ts` → `Tests: ≥1 passed`. Fixada antes do código (retry).
+
+- [ ] **[Código] `EMENDA pós gate 1-7 (Wave 3)` — DRY: `withQueryProbe` duplicado**: `tests/integration/contents.service.integration.test.ts:569` reimplementa VERBATIM o helper de mesmo nome já presente no mesmo arquivo (nascido em T006, linha ~220). Içar um único `withQueryProbe` ao escopo do módulo/arquivo; remover a cópia. (Consolidação com as cópias de `disciplines.integration.test.ts`/`auth.service.integration.test.ts` fica fora de escopo — diff futuro, 4.88.) Verificação executável: `grep -c "function withQueryProbe" mnemonicos-backend/tests/integration/contents.service.integration.test.ts` → `1` (não 2). Fixada antes do código (retry).
 
 - [ ] **[Testes] "Sonda de investigação não nasce em `tests/**`; contagem de teste declara a árvore"**: os gates desta TASK rodam em `git worktree` isolada **declarada no despacho** (worktree já criada + comando literal; **sem** `node_modules` junctionado — `npm ci` na worktree poda `@babel/core` e quebra `test:integration`); nenhuma sonda/probe em `mnemonicos-backend/tests/**`; `testPathIgnorePatterns` cobre `zz-.*`; **nenhum `npm install`/`npm ci` nem edição de `package*.json` na árvore principal**; o report da closure cola `git status --porcelain` (vazio) ao lado de `Tests: N passed`.
 
@@ -93,26 +97,29 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-05T03:36:03-03:00
+**Data conclusão**: 2026-09-05T10:25:46-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: e222aa7 (impl) · 8262cb7 (retry — reordenação de guards + docblock) · 6eccd54 (limpeza Art. 7 pós re-review)
 **Jira**: KAN-37
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8)
+**Tentativas**: 2 (1ª passada reprovada — o docblock de `assertRawContentReachable` afirmava convergência de mensagem que a ordem `inexistente → soft-deleted → fora do alcance` não cumpria: EDITOR A sobre conteúdo removido de EDITOR B recebia "foi removido" em vez do "não encontrado" genérico, vazando existência de conteúdo de outro autor (achado convergente code-reviewer + security-engineer, decisivo o veredito deste último); também `withQueryProbe` duplicado e ramo "pai alcançável sem Quebra ainda" sem teste. Retry reordenou para `inexistente → fora do alcance → soft-deleted`, unificou a mensagem de não-alcance, içou o helper e testou o ramo faltante; re-review aprovou os 2 gates com os mutantes de reordenação/mensagem reexecutados ao vivo)
+**Cobertura final**: n/a (AC-005-013/019/020/021/022/024/031/037)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/contents/contents.schema.ts
+  - mnemonicos-backend/src/modules/contents/contents.service.ts
+  - mnemonicos-backend/tests/integration/contents.service.integration.test.ts
+  - mnemonicos-backend/tests/unit/contents.schema.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-013, AC-005-019, AC-005-020, AC-005-021, AC-005-022, AC-005-024, AC-005-031, AC-005-037
+- [x] Segurança (gate 8): aprovado — após retry (precedência de guards corrigida, mensagem de não-alcance indistinguível provada por igualdade literal entre as duas recusas, não só tipo `AppError`)
+- [ ] Comportamento (gate 9): n/a — sem efeito observável de tela nesta TASK (service puro); FEAT-005-002 ainda não completa
 
-**Notas**: 
+**Notas**: Achado de segurança mais sério da Wave 3: a ordem original (mandada pelo texto original desta TASK) vazava um oráculo de autoria via mensagem — "existe (de outro autor) e foi removido" vs. "não existe". Corrigido para `inexistente → fora do alcance → soft-deleted`: não-dono recebe SEMPRE "Conteúdo bruto não encontrado.", independente do estado de soft-delete; "foi removido" só alcança dono/ADMIN. `getRuleBreakdown` sobre pai alcançável sem Quebra ainda mantém 404 por decisão do Tech Lead (reversível) — T014 trata como "abrir formulário vazio". `withQueryProbe` (duplicado verbatim desde T006) içado a definição única no módulo.

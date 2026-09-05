@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -66,6 +66,10 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 - [ ] `listRawContents` calcula `total` (contagem para paginação) aplicando o **mesmo** predicado de escopo de `data` — `deletedAt: null` e o alcance do actor. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service.integration.test.ts` → fixture com **3** itens do EDITOR (1 soft-deleted) → `listRawContents({ page: 1, perPage: 10 }, editor)` → `data.length === 2` **e** `total === 2` (não 3). Falsificável: `prisma.rawContent.count()` sem `where` de escopo → `total === 3` → vermelho (paginação errada + vazamento da contagem de removidos). Fixada antes do código.
 
+- [ ] **[Segurança] `EMENDA pós gate 8 (Wave 3)` — `total` prova o escopo por AUTORIA, não só por soft-delete**: o mutante `count({ where: ACTIVE_RAW_CONTENT_WHERE })` (ignora `authorId`, mantém só `deletedAt: null`) sobreviveu à suíte atual (security-engineer, 2 execuções) — a fixture de 2 autores (critério anterior) não assere `total`, e a fixture que assere `total` tem 1 autor só. Estender o caso de 2 EDITORes (A, B) + item soft-deleted: `listRawContents({}, editorA).total === 1` e `listRawContents({}, admin).total === 2`. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service.integration.test.ts` → `Tests: ≥1 passed`. Mutante (arquivo inteiro, nunca `-t`): `count` com `where` sem `authorId` → `total` de A conta o item de B → vermelho. Fixada antes do código (retry).
+
+- [ ] **[Performance] `EMENDA pós gate 10 (Wave 3)` — índice composto para a ordenação da listagem**: gate 10 reprovou por Seq Scan em `raw_contents` (sem índice cobrindo `where{deletedAt,authorId} + orderBy createdAt`), medido crescendo linearmente com o volume (170,9ms EDITOR / 218,9ms ADMIN em 30-40k linhas → 3,7ms / 0,626ms com o índice certo). Adicionar em `prisma/schema.prisma`, modelo `RawContent`: `@@index([authorId, createdAt(sort: Desc)])` e `@@index([createdAt(sort: Desc)])`; o `@@index([deletedAt])` isolado (redundante após os dois novos) pode sair — confirme com `EXPLAIN` antes de remover. Migração aditiva no mesmo diff (autorizada pelo Diretor — gerar e executar). Verificação executável: `EXPLAIN (ANALYZE, BUFFERS)` do SQL real de `listRawContents` contra base semeada em volume (≥10k linhas do autor medido) → **sem** `Seq Scan on raw_contents` no plano. Fixada antes de fechar o retry (não precisa rodar em todo `npm test` — é prova pontual de plano, cole a saída do `EXPLAIN` no report).
+
 - [ ] Testes cobrem **AC-005-016** e **AC-005-025** (faceta service) — cada `RawContentSummary` traz ao menos `sourceCitation` e a flag "tem Quebra da regra", e a flag é resolvida **sem** carregar a `RuleBreakdown` inteira. Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service.integration.test.ts` → fixture com item X (`sourceCitation` preenchida + `RuleBreakdown` gravada) e item Y (sem `RuleBreakdown`) → o summary de X traz `sourceCitation` == valor semeado e flag de quebra `true`; o summary de Y traz flag `false`. `Tests: ≥1 passed`. Falsificável: omitir `sourceCitation` do `select` → o caso de X falha; fixar a flag como constante `true` → o caso de Y falha. Fixada antes do código.
 
 - [ ] **[Performance]** contagem de round-trips de `listRawContents` FIXADA EM TESTE (gate 10 — join + agregação de existência). Texto da lição (solução, item 3): *"Consulta em caminho por requisição … tem a contagem de round-trips FIXADA EM TESTE (`log: [{ emit: 'event', level: 'query' }]` + asserção sobre o nº de eventos) — asserção sobre o objeto devolvido não é prova de custo."* Ressalva do re-review: *"`previewFeatures = ["relationJoins"]` torna `join` o DEFAULT global … Para relação de lista, medir as duas e fixar a escolhida … o teste de contagem semeia o registro real antes de contar."* Item verificável: com `Topic`, `Discipline` e `RuleBreakdown` **reais** semeados, uma chamada de `listRawContents` emite **exatamente 2** eventos `query` (o `findMany` com o join `Topic → Discipline` e a projeção de existência de `breakdown` + o `count` do `total`); semear **3** itens → **ainda 2** (não cresce com o nº de itens). Verificação executável: `npm --prefix mnemonicos-backend run test:integration -- contents.service.integration.test.ts` → caso com Prisma client instrumentado por `log` de query → `queryEvents.length === 2` com 1 e com 3 itens semeados. `Tests: ≥1 passed`. Falsificável: resolver a flag "tem Quebra" com uma consulta por item (N+1) → a contagem cresce com o nº de itens (vermelho); trocar `select` por `include: { topic: true }` → `Object.keys(summary)` traz `topic` cru (vermelho, ver critério seguinte). Fixada antes do código.
@@ -97,26 +101,33 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-05T03:36:03-03:00
+**Data conclusão**: 2026-09-05T10:25:46-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: b4d32f4 (impl) · 8262cb7 (retry — total por autoria + índice/migração) · d041e77 (retry — contrato cross-repo) · 6eccd54 (limpeza Art. 7 pós re-review)
 **Jira**: KAN-36
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8) · performance-engineer (gate 10)
+**Tentativas**: 2 (1ª passada reprovada nos 3 gates — ver TASK-006-009/010 para os achados de escopo compartilhado; achados próprios desta TASK: `total` sem prova de escopo por autoria (gate 8, M3 sobrevivente) e Seq Scan em `listRawContents` por falta de índice composto (gate 10, medido 170,9-218,9ms); retry fechou os dois — índice `@@index([authorId,createdAt])`+`@@index([createdAt])` com migração aditiva `20260905130131_add_raw_content_listing_indexes`, e teste de `total` estendido para 2 autores; re-review aprovou os 3 gates)
+**Cobertura final**: n/a (AC-005-001/016/018/024/025/035 + faceta service de AC-005-018/024)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/contents/contents.schema.ts
+  - mnemonicos-backend/src/modules/contents/contents.service.ts
+  - mnemonicos-backend/prisma/schema.prisma
+  - mnemonicos-backend/prisma/migrations/20260905130131_add_raw_content_listing_indexes/migration.sql
+  - mnemonicos-backend/tests/integration/contents.service.integration.test.ts
+  - mnemonicos-backend/tests/unit/contents.schema.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-001, AC-005-016, AC-005-018, AC-005-024, AC-005-025, AC-005-035
+- [x] Segurança (gate 8): aprovado — após retry (mutante M3 do `count` sem `authorId` fechado; migração conferida puramente aditiva)
+- [ ] Comportamento (gate 9): n/a — sem efeito observável de tela nesta TASK (service puro); FEAT-005-001/002 ainda não completas
+
+**Notas**: Migração de índice **autorizada explicitamente pelo Diretor** via AskUserQuestion antes de gerar/aplicar (ledger da sessão) — aditiva, só `CREATE INDEX` × 2, sem `DROP`/`ALTER`. `@@index([deletedAt])` isolado mantido após confirmação por `EXPLAIN`/contrafactual (`DROP` em transação com `ROLLBACK`): sem ele, o `count` do ADMIN regride para Seq Scan. `EXPLAIN` antes/depois: ADMIN 36,1ms→0,16-0,914ms, EDITOR 10,2-170,9ms→0,28-0,631ms (medido em 2 rodadas independentes, developer e performance-engineer, bases descartáveis distintas). `@@index([authorId])` isolado ficou estritamente redundante (prefixo do composto novo) — não avaliado por ninguém nesta wave, sinal para o futuro. `RawContentSummary` ganhou o campo `id` (fora do texto literal do Escopo original, justificado por T012/T013 precisarem do link `/content/<id>/breakdown`) — confirmado pelo code-reviewer que não viola DEC-006-009 (nenhum campo de prioridade).
 
 **Notas**: 

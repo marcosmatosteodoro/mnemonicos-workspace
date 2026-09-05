@@ -6,9 +6,9 @@
 
 ## Status agregado
 
-- Todo: 8
+- Todo: 4
 - In Progress: 0
-- Done: 6
+- Done: 10
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -23,11 +23,11 @@
 - [x] TASK-006-005 ✅ Done — Trocar a semente para Obrigação Tributária + EDITOR de dev
 - [x] TASK-006-006 ✅ Done — `contents.service` + `contents.schema`: ciclo de vida do Conteúdo bruto
 
-### Wave 3 (depende de Wave 2)
-- [ ] TASK-006-007 ⏸ Todo — Estender a rede de paridade cross-repo aos dois enums novos
-- [ ] TASK-006-008 ⏸ Todo — `contents.service`: listar com alcance, ordenação determinística e resumo
-- [ ] TASK-006-009 ⏸ Todo — `contents.service`: Quebra da regra — upsert 1:1, obrigatoriedade e inalcançabilidade
-- [ ] TASK-006-010 ⏸ Todo — Sanear e estender `src/store/api.ts` (RTK Query)
+### Wave 3 (paralela parcial — T007/T008/T010 disjuntos, T009 sequencial após T008 por overlap de arquivo) — ✅ concluída 2026-09-05 (1 retry consolidado)
+- [x] TASK-006-007 ✅ Done — Estender a rede de paridade cross-repo aos dois enums novos
+- [x] TASK-006-008 ✅ Done — `contents.service`: listar com alcance, ordenação determinística e resumo
+- [x] TASK-006-009 ✅ Done — `contents.service`: Quebra da regra — upsert 1:1, obrigatoriedade e inalcançabilidade
+- [x] TASK-006-010 ✅ Done — Sanear e estender `src/store/api.ts` (RTK Query)
 
 ### Wave 4 (depende de Wave 3)
 - [ ] TASK-006-011 ⏸ Todo — `contents.routes.ts`: 7 rotas sob a barreira + tripwire 12→19 + `contents.integration.test.ts`
@@ -125,5 +125,5 @@
 
 | FEAT | TASKs (P = primária) | Done |
 |------|----------------------|------|
-| FEAT-005-001 | TASK-006-001 (P), TASK-006-002 (P), TASK-006-006 (P), TASK-006-008 (P), TASK-006-010, TASK-006-011 (P), TASK-006-012 (P), TASK-006-013 (P) | 0/8 |
-| FEAT-005-002 | TASK-006-001, TASK-006-008, TASK-006-009 (P), TASK-006-010, TASK-006-011, TASK-006-012, TASK-006-013, TASK-006-014 (P) | 0/8 |
+| FEAT-005-001 | TASK-006-001 (P), TASK-006-002 (P), TASK-006-006 (P), TASK-006-008 (P), TASK-006-010, TASK-006-011 (P), TASK-006-012 (P), TASK-006-013 (P) | 5/8 |
+| FEAT-005-002 | TASK-006-001, TASK-006-008, TASK-006-009 (P), TASK-006-010, TASK-006-011, TASK-006-012, TASK-006-013, TASK-006-014 (P) | 4/8 |

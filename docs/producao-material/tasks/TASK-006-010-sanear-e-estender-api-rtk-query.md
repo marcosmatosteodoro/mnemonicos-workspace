@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -75,6 +75,13 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 - [ ] **[Testes] "Retry que reescreve arquivo de teste … entrega o inventário antes/depois dos `it()`"** — `api.test.ts` perde os casos de `listMnemonics`/`listDueFlashcards`. Texto da lição (solução): *"… entrega o inventário antes/depois dos nomes de `it(...)` (`git show <pai>:<arquivo>` vs. HEAD), e cada nome ausente é classificado: renomeado (com o substituto citado), removido de propósito (com o motivo) ou perdido (então volta)."* Item verificável: a closure registra o inventário de `it(...)`/`test(...)` de `mnemonicos-frontend/src/store/api.test.ts` antes (`git show <commit-pai>:...`) e depois (HEAD); cada `it()` ausente classificado — os de `listMnemonics`/`listDueFlashcards` como **removido de propósito** (endpoint saneado — AC-005-028); **nenhum** caso do bloco de sessão/reauth perdido. Verificação executável: o diff de nomes de `it()` colado na closure; `npm --prefix mnemonicos-frontend test -- api` verde. Fixada antes do código.
 
+- [ ] **[Testes] `EMENDA pós gate 1-7 (Wave 3)` — contrato cross-repo das interfaces de F2 provado por leitura das duas pontas, não por typecheck isolado**: code-reviewer achou uma CLASSE de divergência entre o que `contents.service.ts` (backend) emite e o que `mnemonicos-frontend/src/types/domain.ts`/`api.ts` (frontend) tipam — nenhum teste falsifica porque `api.test.ts` monta o fixture a partir do PRÓPRIO tipo do frontend (autoconfirma). Instâncias confirmadas (corrigir todas, é ilustração não-exaustiva — a prova abaixo é o fechamento real):
+  - `rawText`/`hasRuleBreakdown` (backend, `contents.service.ts:192-200`) vs `rawTextExcerpt`/`hasBreakdown` (frontend) — alinhar o NOME no backend e/ou no frontend para o mesmo par nas duas pontas (decida um lado canônico; se o frontend prometia recorte e o backend manda o texto inteiro, ou o backend passa a truncar (`.slice`) ou o frontend renomeia para refletir "texto completo" — registre a escolha).
+  - `RuleBreakdown` do frontend promete `id`/`rawContentId`/`createdAt`/`updatedAt`; o backend (`RuleBreakdownDetail`, `contents.service.ts:324-331`) só devolve os 6 campos de conteúdo — alinhar o tipo do frontend para o formato REAL devolvido (remover os 4 campos fantasma, ou o backend passa a projetá-los — decida e alinhe as duas pontas no mesmo diff).
+  - `condition`/`exception`: `contents.schema.ts:109-110` usa `z.string().trim().optional()`, que **rejeita `null`**; o frontend tipa `condition?: string | null`. Normalizar a fronteira do schema para aceitar `null` (`z.string().trim().nullable().optional().transform(v => v || undefined)` ou equivalente) — sem isso o ciclo ler→editar→salvar de T014 leva 400 no caminho feliz.
+  - `getRawContent`: o tipo `RawContent` do frontend promete `deletedAt: string | null`; o `select` do backend (`RAW_CONTENT_DETAIL_SELECT`) nunca o projeta — adicionar ao `select` ou remover do tipo do frontend.
+  Fechamento: adicionar um teste cross-repo análogo a `domain-types-parity.test.ts` (lê os dois arquivos de tipos como texto, ou compara as chaves de um payload REAL do service contra as chaves do tipo do frontend) que **falha** se um campo/nome divergir — não um fixture que se autoconfirma a partir de um dos lados. Verificação executável: `npm --prefix mnemonicos-backend test -- contents.schema` + `npm --prefix mnemonicos-frontend test -- api` verdes; o novo teste cross-repo falha se você reverter qualquer um dos 4 alinhamentos acima (mutante). Fixada antes do código (retry).
+
 - [ ] **Lições ativas que nomeiam `api.ts` — declaradas `n/a`** (cruzamento 4.138/4.233):
   - **[Segurança] "Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos"** → **n/a**: esta TASK **não toca** `baseQueryWithReauth` nem a flag `justLoggedOut` (bloco de sessão de F1 — ver "Não inclui").
   - **[Segurança] "Constante de segurança espelhada entre repos declara a fonte e tem teste de divergência"** → **n/a**: `PUBLIC_AUTH_PATHS` não é tocado; os enums/tipos espelhados de F2 e a sua rede nascem em T004/T007, não aqui.
@@ -102,26 +109,30 @@ Passos NÃO-VINCULANTES — em tensão com os 'Critérios de pronto', os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-05T03:36:03-03:00
+**Data conclusão**: 2026-09-05T10:25:46-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: ac41614 (impl) · 6cdf54e (retry — alinhar tipos ao contrato real do backend) · e789c6d (limpeza Art. 7 pós re-review)
 **Jira**: KAN-38
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8, avaliou o novo formato alinhado — só reduz superfície)
+**Tentativas**: 2 (1ª passada reprovada por uma CLASSE de divergência de contrato cross-repo: `rawText`/`hasRuleBreakdown` do backend vs. `rawTextExcerpt`/`hasBreakdown` do tipo do frontend; `RuleBreakdown` do frontend prometendo 4 campos fantasma; `condition`/`exception` aceitando `null` no frontend mas rejeitados pelo Zod do backend — ciclo ler→editar→salvar de T014 levaria 400 no caminho feliz; `deletedAt` prometido mas nunca projetado. Causa raiz: DEC-006-005 tirou as INTERFACES da rede de paridade, apostando em "mesmo diff + typecheck", que é por repo e não compara as pontas — o próprio `api.test.ts` montava fixture a partir do tipo do frontend e se autoconfirmava. Retry escolheu o backend como lado canônico e alinhou o frontend, com novo teste `contents-frontend-contract.test.ts` que lê as duas fontes; re-review aprovou com os 4 mutantes de reintrodução de divergência reexecutados ao vivo, todos mortos)
+**Cobertura final**: n/a (AC-005-028)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/store/api.ts
+  - mnemonicos-frontend/src/store/api.test.ts
+  - mnemonicos-frontend/src/types/domain.ts
+  - mnemonicos-frontend/tests/types/raw-content.test.ts
+  - mnemonicos-backend/tests/unit/contents-frontend-contract.test.ts (novo — contraparte backend do contrato)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados: AC-005-028
+- [x] Segurança (gate 8): aprovado — o alinhamento SÓ reduz superfície (remove `deletedAt` e 4 campos fantasma do frontend); nenhum campo novo, nenhuma reabertura
+- [ ] Comportamento (gate 9): n/a — sem efeito observável de tela nesta TASK (contrato RTK Query); FEAT-005-001/002 ainda não completas
 
-**Notas**: 
+**Notas**: Censo formal (contra commit-pai `0978a53`) confirmou que só `api.ts` consumia `listMnemonics`/`listDueFlashcards` — nada em `src/app/**`/`src/components/**`; remoção segura. Bloco de sessão de F1 (`baseQueryWithReauth`/`login`/`logout`/`justLoggedOut`/`PUBLIC_AUTH_PATHS`) confirmado intocado por `git diff` filtrado. Achado da 1ª passada (gate 1-7): a garantia de contrato cross-repo "mesmo diff + typecheck" (DEC-006-005) era vazia por construção — typecheck é por repositório, nunca compara as duas pontas, e o teste do frontend se autoconfirmava a partir do próprio tipo. Corrigido com um teste que lê as duas fontes como texto (mesmo padrão de `domain-types-parity.test.ts`), agora também para interfaces, não só enums. Licao_candidata [Testes] roteada: "mesmo diff + typecheck" é premissa, nunca garantia, para contrato cross-repo.
