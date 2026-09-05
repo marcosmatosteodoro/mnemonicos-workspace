@@ -19,12 +19,19 @@ clássico de CSRF. Confirmado com mutante ao vivo (removi `verifyOrigin` dali e 
 
 ## Interpretação
 
-`POST /auth/refresh` (COMP-003-010, F1/PLAN-003, já mergeado e em produção) não tem
-`verifyOrigin` como 1º handler — a asserção estrutural repo-wide de CSRF filtra por
-`NON_PUBLIC` (recorte de autorização) e as 2 rotas POST públicas (`/auth/login`,
-`/auth/refresh`) ficam fora do escopo da prova. `/auth/login` tem teste comportamental
-próprio; `/auth/refresh` não tem nenhum. Correção: (1) adicionar `verifyOrigin` como 1º
-handler de `POST /auth/refresh`; (2) generalizar a asserção estrutural para particionar por
+**Correção pós-implementação (registro factual, gate 8)**: a investigação confirmou que
+`POST /auth/refresh` (COMP-003-010, F1/PLAN-003, já mergeado) **sempre teve** `verifyOrigin`
+como 1º handler — presente desde o commit original (`d2560a9`). **Não havia vulnerabilidade
+ativa em produção.** O parágrafo abaixo é a interpretação ORIGINAL, anterior a essa
+confirmação, preservada como registro de como a demanda nasceu (a suspeita era razoável:
+nenhuma suíte provava a propriedade, então uma regressão futura passaria despercebida).
+
+A asserção estrutural repo-wide de CSRF filtra por `NON_PUBLIC` (recorte de autorização) e
+as 2 rotas POST públicas (`/auth/login`, `/auth/refresh`) ficam fora do escopo da prova.
+`/auth/login` tem teste comportamental próprio; `/auth/refresh` não tinha nenhum — logo,
+*se* o `verifyOrigin` fosse removido dali por engano num diff futuro, nada acusaria.
+Correção real aplicada: (1) ~~adicionar `verifyOrigin` como 1º handler de `POST
+/auth/refresh`~~ **desnecessário — já presente**; (2) generalizar a asserção estrutural para particionar por
 MÉTODO (muta estado?) em vez de por público/não-público, fechando a classe inteira — não só
 esta rota — para qualquer rota futura que mude estado sem exigir sessão.
 

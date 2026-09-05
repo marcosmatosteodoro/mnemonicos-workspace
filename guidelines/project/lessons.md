@@ -88,14 +88,19 @@ por público/não-público — base do caso de mutação deveria ser `ROUTES` (t
 pública ou não. Regra geral: quando um teste repo-wide filtra a população por allowlist de
 exceção de OUTRO controle, o teste declara por que a exceção daquele controle vale também
 para este — ou não usa o filtro.
-**Nota:** achado em si (`POST /auth/refresh` sem `verifyOrigin`) registrado como
-RISK-006-008 no INDEX do slug `producao-material` — corrigido via BRIEF-007 (avulso,
-autorizado pelo Diretor). Complementa (não duplica) "[Segurança] Chave de decisão de autz
-que ganha uma dimensão", acima: lá a exceção não acompanha uma dimensão nova do MESMO
+**Nota:** achado em si — RISK-006-008, INDEX do slug `producao-material` — **RESOLVIDO**:
+`POST /auth/refresh` sempre teve `verifyOrigin` (F1, commit `d2560a9`); o gap era só na
+REDE DE PROVA, nunca uma vulnerabilidade ativa. Corrigido via BRIEF-007 (avulso, autorizado
+pelo Diretor, commit `d0d9294`). Complementa (não duplica) "[Segurança] Chave de decisão de
+autz que ganha uma dimensão", acima: lá a exceção não acompanha uma dimensão nova do MESMO
 controle; aqui a exceção de um controle é importada por outro sem revalidação.
+**Confirmação (gate 8 do BRIEF-007):** security-engineer reexecutou o mutante
+independentemente (remover `verifyOrigin` de `auth.routes.ts:160` → suíte vermelha) e
+confirmou as 11 rotas mutantes do repo cobertas pela asserção generalizada — mesma causa,
+mesma solução, 2ª confirmação.
 **Validade:** geral (qualquer asserção estrutural repo-wide que reusa filtro de outro controle).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
 
 ## [Testes] Retry que reescreve arquivo de teste por mudança de assinatura entrega o inventário antes/depois dos `it()`
 
