@@ -264,8 +264,19 @@ duas e fixar a escolhida explicitamente. E `relationLoadStrategy: 'query'` só e
 SELECTs quando a linha relacionada **existe** — o teste de contagem semeia o registro real
 antes de contar, senão a asserção `=== 1` vira verde permanente.
 **Validade:** enquanto o backend usar Prisma 7 com `relationJoins` ligado.
+**Ressalva 2 (gate 10 da Wave 3 de PLAN-006 — `listRawContents`):** contagem de
+round-trips fixada em teste e ESTÁVEL (2 eventos, não cresce com N) passou nos gates
+mesmo com a consulta fazendo **Seq Scan** em `raw_contents` — round-trips e **plano de
+acesso** são provas de coisas diferentes. Fixture de integração de baixo volume (1-3
+linhas) nunca reproduz o `seq_page_cost` real: abaixo dele o planner escolhe Seq Scan de
+qualquer jeito, então nenhuma suíte de integração de poucas linhas falsifica a ausência
+de índice. Toda consulta nova com `orderBy`+`where` sobre tabela de volume variável exige,
+antes de fechar a TASK, um `EXPLAIN (ANALYZE, BUFFERS)` do SQL real capturado do driver
+contra base semeada em volume (≥10k linhas do ramo medido, `ANALYZE` rodado) — a asserção
+é "sem `Seq Scan on <tabela>` no plano", e o par índice+migração entra no mesmo diff. A
+contagem de round-trips continua em teste (prova complementar, não substituta).
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0
+**Contadores:** confirmada 2 · contestada 0
 
 ## [Segurança] Guarda de estado de conta/sessão: enumerar por DADO, não por rota
 
@@ -316,7 +327,7 @@ da decisão (`{ kind: 'expired'; reused: boolean }`). Reincidiu em `auth.service
 `expired ∧ reuse`): apagar o bloco de revogação+auditoria deixava as duas suítes verdes.
 **Validade:** geral (padrão de teste).
 **Estado:** ativa
-**Contadores:** confirmada 2 · contestada 0
+**Contadores:** confirmada 3 · contestada 0
 **Reincidência (gate 1 da Wave 5, `disableUser`):** `disableUser` foi reescrita no retry
 com 3 guards em ordem declarada (`id == null → 404` · `disabledAt != null → no-op` ·
 `role == 'ADMIN' && activeAdmins <= 1 → 409`); o par `disabledAt != null` × `último ADMIN
@@ -324,6 +335,20 @@ ativo` **coincide e é alcançável** (ADMIN já desativado + 1 ADMIN ativo rest
 sem caso — o mutante que troca a ordem sobreviveu. Corolário para quem escreve o card:
 função com ≥3 guards em ordem declarada → o "Critério de pronto" **enumera os pares que
 podem coincidir** (com o mutante de reordenação como aceite), nunca "um caso por ramo".
+**Corolário de segurança (gate 8 da Wave 3 de PLAN-006, `assertRawContentReachable`):**
+quando UM dos guards do par coincidente é **autorização/alcance** e o outro **revela
+estado do dado** (soft-delete, arquivado, etc.), "cobrir o par com um caso nomeando quem
+vence" não basta — o teste pode fixar como correta uma ordem que **vaza um oráculo de
+autoria**. Caso real: `inexistente → soft-deleted → fora do alcance` foi implementado e
+testado (par `soft-deleted ∧ fora do alcance` coberto, mutante de reordenação morrendo);
+ainda assim EDITOR A sobre conteúdo REMOVIDO de EDITOR B recebia "foi removido", diferente
+de "não encontrado" (id aleatório ou item ativo de B) — distinguindo três estados que
+deveriam ser dois. A regra: **a guarda de alcance roda SEMPRE primeiro**, nunca depois de
+uma guarda que revele estado do dado; quem não alcança recebe uma mensagem ÚNICA,
+independente do estado do dado do dono real. O caso do par coincidente se escreve por
+**PAPEL** (não-dono vs. dono/ADMIN), asserindo a **mensagem por igualdade literal** entre
+as duas recusas de não-alcance — nunca só `instanceof AppError`. Referência:
+`guidelines/core/SECURITY.md` "Padrões de autorização" + `node-22.md` §6.3.
 
 ## [Testes] Prova de corrida/exclusão nasce na fronteira da invariante, e o mutante roda pelo comando do critério
 
@@ -512,9 +537,27 @@ verde vazio). Aplicar a qualquer literal duplicado por fronteira de repositório
 (`PUBLIC_AUTH_PATHS` × `PUBLIC_PATH_ALLOWLIST`, nomes de cookie, chaves de serialização).
 Alternativa aceitável quando a paridade não é requisito: suavizar o comentário para
 descrever o que o teste de fato garante.
-**Validade:** enquanto houver constantes espelhadas à mão entre `mnemonicos-backend` e `mnemonicos-frontend`.
+**Reincidência (gate 1-7 da Wave 3 de PLAN-006 — extensão de literal para INTERFACE):** a
+mesma classe alcança **forma de interface/type shape**, não só constante literal.
+DEC-006-005 restringiu a rede de paridade cross-repo aos 2 enums de F2, deixando as
+interfaces (`RawContentSummary`, `RuleBreakdown`, `RawContent`) sob "mesmo diff +
+typecheck" — o typecheck é **por repositório**, nunca compara as duas pontas. Pior: o
+teste de contrato do frontend (`api.test.ts`) montava o fixture a partir do **próprio
+tipo do frontend**, então se autoconfirmava e passava verde exatamente no caso em que o
+backend emitia outro nome/forma (`rawText`/`hasRuleBreakdown` vs.
+`rawTextExcerpt`/`hasBreakdown`; `RuleBreakdown` prometendo 4 campos que o backend nunca
+devolve; `condition`/`exception` aceitando `null` no frontend mas rejeitados pelo Zod do
+backend — o ciclo ler→editar→salvar da tela levaria 400 no caminho feliz). Corolário:
+"mesmo diff + typecheck" é **premissa**, nunca **garantia**, para contrato cross-repo — só
+vale como rede quando alguém a nomeia como tal e aceita o risco. Fechado com
+`contents-frontend-contract.test.ts`, mesmo padrão de leitura textual das duas fontes,
+agora comparando conjuntos de campos de interface. Limite conhecido (não fechado): o teste
+compara DECLARAÇÃO×DECLARAÇÃO, não `select`×declaração — uma chave nova no `select` do
+Prisma sem a mesma chave na interface do frontend passa pelo typecheck (extra property em
+valor não-literal) e por este teste; revisitar se doer.
+**Validade:** enquanto houver constantes OU interfaces espelhadas à mão entre `mnemonicos-backend` e `mnemonicos-frontend`.
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
 
 ## [Segurança] Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos
 

@@ -64,3 +64,13 @@ artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensa
 patch: proposta de item novo no catálogo de fixação de `commands/tasks.md` exigindo que critério desse tipo nasça com o comando/query que lê o estado real do alvo externo, com o resultado esperado entrando no report do developer
 reincidencia: 0
 estado: ativa
+
+## LRN-007: rótulo de retry (EMENDA/gate/Wave) na TASK migra para o código quando o despacho não diz que não deve
+data: 2026-09-05
+gatilho: gate_reprovado
+origem: PLAN-006 (slug producao-material), Wave 3 — re-review do retry consolidado (gate 1-7) achou "EMENDA pós gate N (Wave 3)"/"retry Wave 3" em 19 pontos de código de produção, docblocks e nomes de teste; removido manualmente pelo Tech Lead (commits `6eccd54`/`e789c6d`) antes do fecho
+causa_raiz: instrucao_ausente — o despacho do retry edita os Critérios de pronto da TASK rotulando-os "EMENDA pós gate N (Wave N)" para o próprio Tech Lead localizar o item, mas nada no despacho diz ao developer que esse rótulo identifica o critério no artefato e NÃO é para entrar no código — a âncora durável em comentário é sempre o AC/DEC/FR (Art. 7). `guidelines/core/CODE-REVIEW.md` §Convergência ("Narrativa de correção não entra no código") já cobre o lado do avaliador; o lado do gerador (`commands/implement.md` §3.3, ponto em que o rótulo nasce) não repete a distinção, e leitura literal do texto recebido foi razoável
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor)
+patch: proposta de 2 frases em `commands/implement.md` §3.3 (parágrafo "Falha em qualquer gate"), logo após "narrativa de correção fica no report — nunca em comentário": (1) o rótulo do despacho (EMENDA/gate N/retry Wave M) serve só para localizar o critério na TASK e nunca migra para comentário/docblock/nome de teste — a âncora durável ali é o AC/DEC/FR (Art. 7); (2) o report do developer inclui grep de fechamento sobre o próprio delta antes de reportar Done
+reincidencia: 0
+estado: ativa
