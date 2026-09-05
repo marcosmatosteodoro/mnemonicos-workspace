@@ -46,7 +46,7 @@ foi tocada. Só o item 2 (generalizar a asserção estrutural) exigiu trabalho r
   rotas montadas** (`ROUTES`, não `NON_PUBLIC`) para o caso de mutação: toda rota
   POST/PATCH/PUT/DELETE tem `handlers[0] === verifyOrigin`, pública ou não. O caso de leitura
   (GETs sem `verifyOrigin`) continua sobre `NON_PUBLIC`. — **item efetivamente implementado
-  por este diff (commit `d0d9294`).**
+  por este diff (commit `9b2ddef`).**
 - Mutante que remove `verifyOrigin` de `POST /auth/refresh` **morre** no comando do critério
   (suíte inteira, nunca `-t` isolado) — confirmado ao vivo por 3 partes independentes
   (developer, code-reviewer, security-engineer), revertido, `git status --porcelain` limpo
