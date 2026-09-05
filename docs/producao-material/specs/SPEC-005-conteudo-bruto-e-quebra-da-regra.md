@@ -166,6 +166,8 @@ Entrega. Prazo: Entrega de F2.
 > classe do radar de prova e fonte normativa estruturada; recarrega e revê; lista, edita e
 > remove os itens que registrou. Testável de ponta a ponta sem depender da Quebra da regra.
 
+**Verificação (gate 9)**: 2026-09-05 — APROVADO (comportamento funcional). AC-005-011 exercitado com execução real (`next dev` :3000 + backend Express :3333 + Postgres real; EDITOR de dev semeado por `seedDevEditor`, TASK-006-005): confirmação explícita pt-BR ("Tem certeza que deseja remover este conteúdo bruto?...") → `DELETE /contents/:id` real **retido** por interceptação de rede (`page.route` + `route.continue()` pós-liberação, técnica 4.319, sem fake de resposta) → enquanto retido, "Confirmar remoção"/"Cancelar" desabilitados e indicador pt-BR "Removendo…" visível, item ainda presente via `GET` fresco em aba paralela (nada persistido antes da resposta) → liberado o `DELETE` (204 real do backend), o item sai da listagem e o acesso direto (`GET /contents/:id` e reabrir `/content/<id>`) retorna 404/mensagem de erro pt-BR. Identidade e estabilidade do código confirmadas (frontend HEAD `ef10397`, backend HEAD `9b2ddef`, `git status` limpo antes e depois do exercício, sem mudança concorrente). Pré-condição e restauração conforme Roteiro do gate 9 de TASK-006-013 (dados do EDITOR de dev limpos ao final).
+
 - **FR-005-001** [MUST] Quando um EDITOR submete um novo Conteúdo bruto com texto
   normativo, disciplina, tema/assunto e classe do radar de prova válidos, o sistema DEVE
   persistir o item e associá-lo ao EDITOR que o registrou.
@@ -233,6 +235,8 @@ a esta FEAT — daí a sequência não-contígua. -->
 > QA: a partir de um Conteúdo bruto existente, um EDITOR preenche os cinco blocos e a
 > síntese da regra essencial, recarrega e revê, altera e salva. A quebra é 1:1 com o
 > conteúdo. Testável de ponta a ponta sobre um Conteúdo bruto já registrado.
+
+**Verificação (gate 9)**: 2026-09-05 — APROVADO (comportamento funcional). AC-005-033 e AC-005-019 exercitados com execução real (mesmo ambiente de TASK-006-012/014: `next dev` :3000 + backend :3333 + Postgres real, EDITOR de dev semeado). AC-005-033: acionada, na listagem, a via "Ver Quebra da regra" do item registrado pelo EDITOR → navegação real para `/content/<id>/breakdown` com o `<id>` exato daquele item (não outro), tela da Quebra exibida (vazia, sem Quebra prévia). AC-005-019: preenchidos os cinco blocos (CONCEITO/AÇÃO/OBJETO/CONDIÇÃO/EXCEÇÃO) + síntese com valores distintos → salvo ("Quebra da regra salva com sucesso.") → **reload real do browser** e reabertura → os 6 valores voltam idênticos aos digitados; confirmado por `GET /contents/<id>/breakdown` (200, os mesmos 6 valores) e checagem de não-vazamento: um segundo Conteúdo bruto do mesmo EDITOR sem Quebra continua `GET .../breakdown` → 404 (não vazou). Identidade e estabilidade do código confirmadas (frontend HEAD `ef10397`, backend HEAD `9b2ddef`, `git status` limpo antes/depois, sem mudança concorrente). Pré-condição e restauração conforme Roteiro do gate 9 de TASK-006-012/TASK-006-014 (dados do EDITOR de dev limpos ao final).
 
 - **FR-005-014** [MUST] Quando um EDITOR salva a Quebra da regra de um Conteúdo bruto, o
   sistema DEVE persistir os cinco blocos (CONCEITO, AÇÃO, OBJETO, CONDIÇÃO, EXCEÇÃO) como
