@@ -6,7 +6,7 @@
 **Data**: 2026-09-05
 **Largada**: 2026-09-05T19:47:09-03:00
 **Origem**: Diretor (pedido em sessão — AskUserQuestion, escolha "Corrigir agora")
-**Jira**: <a gravar pelo sync>
+**Jira**: KAN-44
 
 ## Pedido como dito
 
