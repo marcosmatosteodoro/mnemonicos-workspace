@@ -105,12 +105,17 @@ nunca siga um passo que enfraqueça um critério.
       todos os 5 campos de auditoria intactos na releitura) — verificação executável: `npm
       --prefix mnemonicos-backend run test:integration -- production-events.service` →
       suíte verde, incluindo (a) o teste estrutural que falha se o texto-fonte de
-      `production-events.service.ts` casar o padrão
+      `production-events.service.ts` **e** de
+      `mnemonicos-backend/src/modules/contents/contents.service.ts` (o único outro
+      consumidor do model hoje) casar o padrão
       `/\.productionStageEvent\.(update|updateMany|delete|deleteMany|upsert)\s*\(/`
-      (nenhuma chamada de mutação além de `.create(` sobre o model, ancorado na chamada real
-      — não em docblock), e (b) um `recordProductionStageEvent` seguido de
-      `listProductionStageEvents` afirmando `rawContentId`, `stageType`, `transitionType`,
-      `actorId`, `occurredAt` todos presentes e iguais ao `input`.
+      (nenhuma chamada de mutação além de `.create(` sobre o model, ancorado na chamada
+      real — não em docblock, em nenhum dos dois arquivos), com comentário no teste
+      declarando explicitamente, citando os dois arquivos por nome, que a varredura cobre
+      "os consumidores conhecidos do model nesta fatia" (não todo o repo — decisão
+      4.161/4.369, não-exaustivo declarado), e (b) um `recordProductionStageEvent` seguido
+      de `listProductionStageEvents` afirmando `rawContentId`, `stageType`,
+      `transitionType`, `actorId`, `occurredAt` todos presentes e iguais ao `input`.
 - [ ] Testes cobrem AC-009-008 (ordem determinística e estável de eventos registrados no
       mesmo instante para o mesmo conteúdo, preservando a sequência de emissão real mesmo
       com `occurredAt` idêntico) — verificação executável: mesmo comando acima, caso que

@@ -481,6 +481,36 @@ COMP-010-005 sobem para comparação cross-repo real.
 **Aderência à ficha/perfil**: exceção documentada (o padrão de F2 era espelhar sempre;
 aqui a ausência de consumidor muda o cálculo — YAGNI do Charter Art. 3)
 
+### DEC-010-007: Serialização do 1º salvamento concorrente da Quebra da regra aceita como propriedade emergente do lock de índice único, sem lock explícito adicional
+**Contexto**: 2 requisições concorrentes de `saveRuleBreakdown` sobre o mesmo
+`rawContentId`, ambas vendo só `ABERTURA` no histórico de `QUEBRA_DA_REGRA` (nenhuma
+`CONCLUSAO` gravada ainda), poderiam em tese decidir `CONCLUSAO` as duas — mas
+`RuleBreakdown.rawContentId` é `@unique` (`schema.prisma:318`) e o `tx.ruleBreakdown.upsert`
+sobre essa chave serializa as 2 transações via lock de índice único do Postgres: a 2ª só lê
+`productionStageEvent` depois do commit da 1ª, já vendo a `CONCLUSAO` gravada e decidindo
+`RETRABALHO`. Essa proteção é hoje uma propriedade EMERGENTE do schema de F2 (a FK
+`@unique` já existia antes desta fatia), nunca decidida explicitamente para este propósito.
+**Decisão**: aceitar e documentar que a serialização do "1º salvamento" concorrente depende
+do lock de índice único de `RuleBreakdown.rawContentId` — sem introduzir lock explícito
+adicional (`SELECT ... FOR UPDATE`) nesta fatia.
+**Alternativas consideradas**:
+- `SELECT ... FOR UPDATE` explícito sobre a linha de `RawContent` (ou um lock consultivo)
+  antes de decidir a transição, descartada por ser custo novo não medido (mais um
+  round-trip + retenção de lock por transação) para um risco de baixo volume concorrente
+  esperado (2 estações, poucos EDITORes simultâneos sobre o mesmo conteúdo) — o próprio
+  `@unique` já entrega a serialização de graça, sem código novo.
+**Consequências**: a garantia de "nunca 2 `CONCLUSAO`" para o mesmo par (`rawContentId`,
+`QUEBRA_DA_REGRA`) depende de uma propriedade do schema (F2) que esta fatia não introduziu
+e não pode remover sem reabrir esta decisão; a suíte de COMP-010-006/TASK-010-003 ganha 1
+teste de concorrência real (`Promise.all`) provando o comportamento observável, não a
+implicação teórica do índice.
+**Reabrir se**: medição real mostrar 2+ eventos de `CONCLUSAO` para o mesmo par
+(`rawContentId`, `stageType`) em produção, ou o volume concorrente real crescer a ponto de
+exigir prova formal (não palpite — Charter Art. 8).
+**Irreversível**: nao
+**Aderência à ficha/perfil**: herdada (nenhum mecanismo novo — reusa a constraint
+`@unique` já existente de F2)
+
 ## 7. Mapeamento FR -> componente
 
 | FR | Componente | AC cobertos |
@@ -521,6 +551,12 @@ aqui a ausência de consumidor muda o cálculo — YAGNI do Charter Art. 3)
   (DEC-010-006) — risco de a rede "esfriar" (não pegar drift real com o frontend) até o
   dia em que o espelho existir (mitigação: comentário explícito no teste apontando a
   condição de upgrade; DEC-010-006 registra o gatilho).
+- **TRISK-010-005** A serialização do "1º salvamento" concorrente da Quebra da regra
+  (nenhuma 2ª `CONCLUSAO` para o mesmo `rawContentId`) depende de uma propriedade
+  emergente do schema (lock de índice único de `RuleBreakdown.rawContentId`, F2), não de
+  um mecanismo desta fatia (mitigação: DEC-010-007 aceita e documenta a dependência sem
+  lock explícito adicional; teste de concorrência real com `Promise.all` em
+  TASK-010-003/AC-009-003 prova o comportamento observável).
 
 ## 9. Definition of Done deste PLAN
 

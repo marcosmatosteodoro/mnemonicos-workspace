@@ -111,6 +111,16 @@ nunca siga um passo que enfraqueça um critério.
       retrabalho, nunca uma 2ª conclusão) — mesmo comando, caso que chama
       `saveRuleBreakdown` uma 2ª vez e confirma o evento `QUEBRA_DA_REGRA` (`RETRABALHO`) —
       e afirma, por contagem, só 1 evento `CONCLUSAO` de `QUEBRA_DA_REGRA` no total.
+- [ ] Teste de concorrência real para AC-009-003/AC-009-005 (garante, sob concorrência
+      real, a exclusividade da 1ª conclusão que os 2 testes sequenciais acima só provam sob
+      serialização controlada pelo próprio teste) — verificação executável: mesmo comando
+      de `contents.service`, caso que dispara 2 chamadas de `saveRuleBreakdown` **em
+      paralelo** (`Promise.all`, nunca sequencial) sobre o mesmo `rawContentId` recém-criado
+      (nenhuma Quebra da regra salva ainda, só o histórico de `ABERTURA`) e confirma, após
+      ambas resolverem, via `listProductionStageEvents`, **exatamente 1** evento
+      `QUEBRA_DA_REGRA` (`CONCLUSAO`) no total (nunca 2) — a garantia sendo provada é
+      DEC-010-007 (serialização via lock de índice único de `RuleBreakdown.rawContentId`,
+      propriedade emergente do schema de F2, sem lock explícito adicional nesta fatia).
 - [ ] Testes cobrem AC-009-007 (parte — nenhum evento novo de etapa é gravado em razão da
       remoção; a faceta de sobrevivência via FK `Restrict` é da TASK-010-001) — mesmo
       comando, caso que cria um Conteúdo bruto (N eventos emitidos), chama
@@ -128,12 +138,20 @@ nunca siga um passo que enfraqueça um critério.
       evento vazado), medido pelas asserções já existentes no arquivo de F2, intocadas.
 - [ ] Testes cobrem AC-009-010 (fail-secure: falha na emissão do evento reverte a mutação
       de negócio inteira, nenhum estado meio-salvo, erro genérico) — verificação
-      executável: mesmo comando de `contents.service`, caso que injeta um `db` de teste cujo
-      `productionStageEvent.create` (ou `findMany`) lança dentro do `$transaction` de
-      `createRawContent` (e, por simetria, de `saveRuleBreakdown`) e confirma (a) a exceção
-      propaga ao chamador, (b) `testPrisma.rawContent.count()` (ou `.findMany`) confirma
-      **zero** linhas de `RawContent`/`RuleBreakdown` novas persistidas pela chamada
-      fracassada — nenhum sucesso parcial.
+      executável: mesmo comando de `contents.service`, **3 casos**, mesma técnica de
+      injeção de falha (mock/spy sobre `recordProductionStageEvent` ou sobre o client do
+      evento, `productionStageEvent.create`/`findMany` lançando dentro do `$transaction`):
+      (a) `createRawContent` com a emissão falhando → a exceção propaga ao chamador e
+      `testPrisma.rawContent.count()` confirma **zero** linhas de `RawContent` novas
+      persistidas pela chamada fracassada (nenhum sucesso parcial); (b) `updateRawContent`
+      sobre um Conteúdo bruto já existente, com a emissão de `RETRABALHO` falhando dentro
+      do mesmo `$transaction` → a exceção propaga e `tx.rawContent.updateMany` não
+      persiste — `testPrisma.rawContent.findUnique` confirma que o Conteúdo bruto
+      permanece exatamente no estado anterior à chamada (campos intactos, nenhuma escrita
+      parcial); (c) `saveRuleBreakdown` com a emissão falhando → a exceção propaga e
+      `testPrisma.ruleBreakdown.count()`/`.findUnique` confirma que nenhuma `RuleBreakdown`
+      nova é criada (1º salvamento) nem atualizada (salvamento subsequente) pela chamada
+      fracassada.
 - [ ] Sem warnings/lints novos (sobre todos os arquivos do diff — produção e teste, `git
       diff --name-only main...HEAD`)
 - [ ] Padrão de commit respeitado
