@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Jira**: KAN-6
-**Status**: Emitido
+**Status**: Aceito
 **Data**: 2026-09-06
 **Largada**: 2026-09-06T01:38:27-03:00
 **SPEC**: SPEC-009
