@@ -585,19 +585,21 @@ exigir prova formal (não palpite — Charter Art. 8).
 
 ## 9. Definition of Done deste PLAN
 
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs
-- [ ] Todos os NFRs cobertos têm verificação
-- [ ] Decisões DEC refletidas no código
-- [ ] Aderência à ficha/perfil validada
-- [ ] Todos os ACs cobertos por teste (gate 1 dos quality gates)
-- [ ] Métrica da SPEC operacional (SPEC-009 §1.3 declara `Fonte de medição`):
+- [x] Todos os FRs cobertos têm implementação satisfazendo os ACs
+- [x] Todos os NFRs cobertos têm verificação
+- [x] Decisões DEC refletidas no código
+- [x] Aderência à ficha/perfil validada
+- [x] Todos os ACs cobertos por teste (gate 1 dos quality gates)
+- [x] Métrica da SPEC operacional (SPEC-009 §1.3 declara `Fonte de medição`):
   (a) externa — suíte de teste (COMP-010-006) prova os 5 gatilhos + tripwire de
   append-only (nenhum caminho de update/delete sobre evento já emitido), natureza
   conformidade, dono: time de engenharia; instrumentação entregue e provada (gate 9
-  exibe o evento existindo); (b) observacional — nº de eventos emitidos vs. nº de
+  exibe o evento existindo) — **item (a) satisfeito, 231/231 integração verde**;
+  (b) observacional — nº de eventos emitidos vs. nº de
   Conteúdos brutos/Quebras produzidos pela tela na janela, com a razão esperada (3 eventos
   por criação de Conteúdo bruto, +1 por 1º salvamento de Quebra) apurada por inspeção
-  humana no relatório de Entrega, dono e veredito registrados no INDEX (mesma natureza do
+  humana no relatório de Entrega — **item (b) pendente, fica para o relatório de
+  Entrega** (mesma natureza do
   item (b) de SPEC-005/§1.3).
 
 ## 10. Não coberto por este PLAN

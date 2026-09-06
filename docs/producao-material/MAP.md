@@ -47,6 +47,41 @@
 - [2026-09-06 · PLAN-006] Telas `(interno)/content` (listagem), `/content/new` (formulário) e `/content/[id]/breakdown` (Quebra da regra) — Server Component default, `'use client'` só onde há estado/evento — mnemonicos-frontend/src/app/(interno)/content/page.tsx:1-40
 - [2026-09-06 · PLAN-006] Tokens de cor semântica `--link`/`--danger` (light/dark em `:root`/`@media (prefers-color-scheme: dark)`, expostos via `@utility text-link`/`@utility text-danger`) — padrão canônico do produto para texto de erro/sucesso/link, substitui literal de paleta Tailwind (`text-brand-500`/`text-red-500`, que falhava contraste AA num dos 2 temas) — mnemonicos-frontend/src/app/globals.css:31-78
 
+## Instrumentação de etapas de produção (F3 · PLAN-010)
+
+- [2026-09-06 · PLAN-010] `ProductionStageEvent` (append-only real — só `create`/`findMany`
+  em todo o código escrito; sem `updatedAt`/`deletedAt`, a imutabilidade é ausência de
+  caminho de update/delete, não campo de estado) + enums `ProductionStageType`
+  (`CONTEUDO_BRUTO`, `QUEBRA_DA_REGRA` — extensível, F4-F9 acrescentam valor por migração
+  aditiva) e `ProductionEventTransition` (`ABERTURA`/`CONCLUSAO`/`RETRABALHO`) — primeira
+  tabela append-only real do projeto (antes greenfield) e primeira sequência monotônica
+  (`sequence BigInt @default(autoincrement())`, desempata `occurredAt` idêntico) —
+  mnemonicos-backend/prisma/schema.prisma:352-388.
+- [2026-09-06 · PLAN-010] `production-events.service.ts` — módulo sem `.schema.ts` nem
+  `.routes.ts` (nunca chamado por rota, só por outro `.service.ts`): `decideStageTransition`
+  (regra pura, decide por histórico lido dentro da mesma tx — nenhum chamador sabe se é
+  abertura/conclusão/retrabalho), `recordProductionStageEvent` (emissão, recebe o `tx` do
+  chamador, nunca abre transação própria), `listProductionStageEvents` (leitura interna,
+  sem rota) — mnemonicos-backend/src/modules/production-events/production-events.service.ts:1-105.
+- [2026-09-06 · PLAN-010] `contents.service.ts` ganhou `prisma.$transaction` em
+  `createRawContent`/`updateRawContent`/`saveRuleBreakdown` (antes 1 statement cada) —
+  chama `recordProductionStageEvent` dentro do mesmo `tx`, fail-secure (falha na emissão
+  reverte a mutação de negócio inteira). `softDeleteRawContent` não muda (nenhuma emissão
+  na remoção) — mnemonicos-backend/src/modules/contents/contents.service.ts:78-490.
+- [2026-09-06 · PLAN-010] Serialização do "1º salvamento" concorrente de
+  `RuleBreakdown` (nunca 2 `CONCLUSAO` para o mesmo par) depende de propriedade EMERGENTE
+  do lock de índice único de `RuleBreakdown.rawContentId` (de F2) — não de mecanismo desta
+  fatia; provado por mutation testing (mutante que reordena emissão antes do upsert mata o
+  teste de concorrência). Garantia é por-chamador: um 3º consumidor futuro (F4-F9) que
+  emita antes de escrever sua própria linha reintroduz o risco — considerar índice único
+  parcial `(rawContentId, stageType) WHERE transitionType='CONCLUSAO'` se isso acontecer.
+- [2026-09-06 · PLAN-010] `tests/support/production-events-fixtures.ts` — primeiro helper
+  de fixture compartilhado do projeto (perfil §7); `createUser`/`createTopic`/
+  `createRawContent` usados pelos 2 arquivos de teste de `production-events`. Ainda
+  convivem 6 cópias locais equivalentes em outros arquivos de teste (`auth.routes`,
+  `auth.service`, `contents`, `contents.service`, `disciplines`, `users`) — consolidação
+  pendente, fora do escopo desta fatia.
+
 ## Publicação (ausente)
 
 - [2026-08-27 · epico] Nenhuma geração ou exportação de PDF existe nos dois repos — nem dependência, nem rota, nem script; F6 é greenfield total nesta área — busca em ambos os repos não retornou nada
