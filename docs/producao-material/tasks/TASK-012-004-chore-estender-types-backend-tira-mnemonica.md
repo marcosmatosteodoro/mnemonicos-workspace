@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -139,26 +139,27 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T19:55:43-0300
+**Data conclusão**: 2026-09-06T19:58:07-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 9042e91
 **Jira**: KAN-54
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (aprovado sem achados, Wave 2) · security-engineer (gate 8 aprovado, Wave 2)
+**Tentativas**: 1
+**Cobertura final**: n/a (item do Inclui sem AC próprio — prova por AC-011-018)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/domain/types.ts
+  - mnemonicos-backend/tests/unit/domain-types-parity.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (228/228, fechou o vermelho sancionado da Wave 1)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados (AC-011-018)
+- [x] Segurança (gate 8): aprovado — mudança de tipo pura, sem I/O
+- [x] Comportamento (gate 9): n/a — extensão de constante de domínio, sem efeito observável direto
 
 **Notas**:

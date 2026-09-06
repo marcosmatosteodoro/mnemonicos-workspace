@@ -800,7 +800,45 @@ existem), comparar contra o **irmão canônico já mergeado da mesma camada** no
 eu copiei?" (→ regra repetida vira fonte única) e "o que eu exportei que ninguém pediu?"
 (→ remover, import direto do módulo de origem quando o consumidor existir). A lista do
 PLAN entra como checklist de cobertura, nunca como texto a reproduzir.
+**Reincidência (code-reviewer, Wave 2 de PLAN-012 — mesmo PLAN, variante mais insidiosa):**
+`tira.service.ts` (TASK-012-005) manteve a SINTAXE `Pick<X, 5 chaves>` que o texto da TASK
+já nomeava corretamente (`Pick<RuleBreakdownDetail, ...>`, tipo canônico exportado de
+`contents.service.ts:393`), mas trocou o REFERENTE por uma interface local homônima em
+forma (`RuleBreakdownBlocks`, mesmos 5 campos) — duplicação + indireção morta que não
+deixa rastro em typecheck, lint nem teste, só na leitura. Corolário: quando a TASK cita um
+tipo/símbolo por NOME, esse nome é o canônico a IMPORTAR — declarar um local
+homônimo-em-forma é duplicação, e um `Pick<T, …>` que lista TODAS as chaves de `T` é o
+sinal mecânico de que o referente foi trocado. Autocheck antes de commitar arquivo de
+fronteira novo: para cada tipo declarado no diff, `grep` pelos nomes dos seus campos nos
+`*Detail` exportados dos services irmãos — bateu, importe.
 **Validade:** todo arquivo de fronteira novo (schema/service/routes) gerado a partir de um
 PLAN, neste projeto.
-**Estado:** em-observacao
+**Estado:** ativa
+**Contadores:** confirmada 1 · contestada 0
+
+## [Processo] Conflito de merge em prosa: descartar por FRASE perde afirmação independente que sobrevivia dentro dela
+**Erro:** ao resolver o conflito de `git merge origin/main` em `mnemonicos-backend/README.md`
+(branch `fix/kan-49-vercel-entrypoint-500`), o lado `origin/main` trazia uma frase com duas
+afirmações: (a) uma claim de mecanismo ("build command não é o default do framework preset")
+que contradizia a explicação já estabelecida do lado local (KAN-49: `"framework": null` e a
+detecção do `vercel-build` são mecanismos independentes da Vercel) e (b) um fato operacional
+sem relação com a contradição (Build Command apontado explicitamente no painel, com o caminho
+de navegação). A resolução descartou a frase inteira por causa de (a) e levou (b) junto —
+deixando o passo 3 do runbook de break-glass ("aponte o Build Command do painel... depois
+volte para `npm run vercel-build`") órfão da premissa de que havia um override manual para
+desfazer. Pego pelo `code-reviewer` (gate avulso sobre o diff da resolução, modo sob demanda).
+**Causa:** a unidade de decisão na resolução do conflito foi a frase/parágrafo do bloco em
+conflito, não a afirmação individual. Frase de documentação em prosa costuma empacotar mais
+de uma claim (mecanismo técnico + estado operacional atual) com valores de verdade
+independentes entre si — julgar uma como falsa/contraditória não torna a outra falsa.
+**Solução:** em conflito de conteúdo em prosa (não-código), decompor cada lado em afirmações
+atômicas e decidir manter/descartar **por afirmação**, nunca por bloco/frase inteira. Depois
+de resolver, reler os trechos que **dependem** semanticamente da afirmação descartada
+(runbooks, listas numeradas, referências cruzadas) para checar se ficaram órfãos de premissa
+— sintoma típico: um passo cita reverter/retornar a um estado que o texto restante já não
+afirma existir. Referência: `mnemonicos-backend/README.md` §Deploy (Vercel), merge commit
+`3410e18`.
+**Validade:** geral (qualquer resolução de conflito de merge em texto/documentação com mais
+de uma claim por frase).
+**Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0

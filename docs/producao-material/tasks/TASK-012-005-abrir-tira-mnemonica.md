@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -225,26 +225,30 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T20:15:14-0300
+**Data conclusão**: 2026-09-06T20:48:07-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: da27117 (implementação inicial `a21e483`, retry de convergência `da27117`)
 **Jira**: KAN-55
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (REPROVADO na 1ª rodada — achado A1 bloqueante + A2/A3 carona; CONVERGIU no re-review delta-scoped) · security-engineer (gate 8 aprovado, Wave 2) · performance-engineer (gate 10 aprovado, Wave 2 — N+1 confirmado ausente por sonda real)
+**Tentativas**: 2 (1 retry, roteado pelo achado A1 do code-reviewer)
+**Cobertura final**: n/a (item do Inclui sem AC próprio — prova pelos ACs abaixo)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/tira/tira.service.ts
+  - mnemonicos-backend/tests/unit/tira.rule.test.ts
+  - mnemonicos-backend/tests/integration/tira.service.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (3/3 unit + 8/8 integração, mesma contagem antes/depois do retry)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (convergiu após retry — tipo `RuleBreakdownBlocks` local removido em favor de `RuleBreakdownDetail` canônico)
+- [x] ACs verificados (AC-011-001, AC-011-002, AC-011-003, AC-011-013, AC-011-015, AC-011-020, AC-011-021, AC-011-022, AC-011-023, AC-011-025)
+- [x] Segurança (gate 8): aprovado — guard de alcance confirmado como 1ª chamada por mutation testing (mutante M4 morto); fail-secure confirmado (mutante M2 morto); sem oráculo de enumeração no ramo de corrida
+- [x] Comportamento (gate 9): n/a — regra de negócio backend, sem tela; a faceta observável fica com TASK-012-012 (gate 9 do DoD)
+
+**Notas**: achado A1 (tipo `RuleBreakdownBlocks` duplicando `RuleBreakdownDetail` canônico de `contents.service.ts`) corrigido no retry — 2ª reincidência da lição "[Código] Interface pública do PLAN é contrato mínimo" (promovida de em-observação para ativa em `guidelines/project/lessons.md`). Mutation testing do code-reviewer (4 mutantes independentes: corrida real, fail-secure, N+1, ordem do guard) confirmou que os testes falsificam de fato, não são verde vazio.
 
 **Notas**:

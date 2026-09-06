@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -137,26 +137,27 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T20:18:29-0300
+**Data conclusão**: 2026-09-06T20:21:48-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 13d07a6
 **Jira**: KAN-60
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (aprovado sem achados, Wave 2)
+**Tentativas**: 1
+**Cobertura final**: n/a (item do Inclui sem AC — oráculo é o contrato do próprio item; override registrado no topo da TASK)
 **Arquivos modificados**:
-  -
+  - mnemonicos-frontend/src/store/api.ts
+  - mnemonicos-frontend/src/store/api.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando (44/44)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados (n/a — sem AC numerado)
+- [x] Segurança (gate 8): n/a — declaração de contrato RTK Query, sem lógica de servidor (confirmado pelo security-engineer, Wave 2)
+- [x] Comportamento (gate 9): n/a — endpoints sem tela consumidora ainda (TASK-012-012)
 
 **Notas**:

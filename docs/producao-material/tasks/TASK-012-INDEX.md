@@ -9,9 +9,9 @@ backend, Server Components por padrão + RTK Query para estado de servidor no fr
 
 ## Status agregado
 
-- Todo: 9
+- Todo: 6
 - In Progress: 0
-- Done: 4
+- Done: 7
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -22,10 +22,10 @@ backend, Server Components por padrão + RTK Query para estado de servidor no fr
 - [x] TASK-012-003 ✅ Done — Criar `tira.schema.ts` — validação Zod de Quadro
 - [x] TASK-012-009 ✅ Done — Estender `types/domain.ts` (frontend) com `MnemonicStrip`/`MnemonicFrame`
 
-### Wave 2 (depende de Wave 1)
-- [ ] TASK-012-004 ⏸ Todo — Estender `domain/types.ts` (backend) com `TIRA_MNEMONICA` e confirmar paridade
-- [ ] TASK-012-005 ⏸ Todo — Abrir a Tira mnemônica — geração idempotente e leitura
-- [ ] TASK-012-010 ⏸ Todo — Estender `store/api.ts` com endpoints RTK Query da Tira
+### Wave 2 (depende de Wave 1) — ✅ concluída
+- [x] TASK-012-004 ✅ Done — Estender `domain/types.ts` (backend) com `TIRA_MNEMONICA` e confirmar paridade
+- [x] TASK-012-005 ✅ Done — Abrir a Tira mnemônica — geração idempotente e leitura
+- [x] TASK-012-010 ✅ Done — Estender `store/api.ts` com endpoints RTK Query da Tira
 
 ### Wave 3 (depende de Wave 2)
 - [ ] TASK-012-006 ⏸ Todo — Reindexar posições em duas fases e reordenar Quadros (fatia sensível — DEC-012-003/RISK-011-003)
