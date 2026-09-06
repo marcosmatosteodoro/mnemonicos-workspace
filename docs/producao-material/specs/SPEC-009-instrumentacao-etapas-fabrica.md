@@ -59,6 +59,18 @@ abertura de "Quebra da regra"; cada 1º salvamento de Quebra soma 1 evento de co
 apurado por inspeção humana no relatório de Entrega, mesma natureza do item (b) da §1.3 de
 SPEC-005. Prazo: Entrega de F3.
 
+**Veredito de métrica** (item b, apurado 2026-09-06 na Entrega de F3): 🤔 **inconclusiva por
+ausência de uso real, não por falha do mecanismo** — inspeção do Postgres de dev encontrou
+1 `RawContent`/`RuleBreakdown` (autoria ADMIN, `createdAt` 2026-09-05T16:53, residual da
+sessão de gate 9 de PLAN-006/F2) com **0** eventos — coerente e esperado: foi criado ANTES
+da migração desta fatia existir (aplicada em 2026-09-06), então a ausência de instrumentação
+ali é a garantia de A-011 funcionando ao contrário (nada se reconstrói retroativamente,
+exatamente o problema que esta fatia resolve dali em diante). **0** conteúdos novos foram
+produzidos pela tela desde que a instrumentação entrou no ar — mesma natureza pré-lançamento
+de MET-002-001/item (b) de SPEC-005 (§1.3). A razão esperada (3 eventos por criação, +1 por
+1º salvamento de Quebra) está provada pela suíte automatizada (item a) e pelo gate 9 ao vivo
+— a série passa a acumular com o 1º uso real pós-Entrega.
+
 ## 2. Personas e jobs-to-be-done
 
 Como gestor/ADMIN da fábrica (consumidor futuro, via F10), preciso que o tempo gasto em

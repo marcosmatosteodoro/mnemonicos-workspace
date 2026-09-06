@@ -598,8 +598,9 @@ exigir prova formal (não palpite — Charter Art. 8).
   (b) observacional — nº de eventos emitidos vs. nº de
   Conteúdos brutos/Quebras produzidos pela tela na janela, com a razão esperada (3 eventos
   por criação de Conteúdo bruto, +1 por 1º salvamento de Quebra) apurada por inspeção
-  humana no relatório de Entrega — **item (b) pendente, fica para o relatório de
-  Entrega** (mesma natureza do
+  humana no relatório de Entrega — **item (b) apurado: inconclusiva por ausência de uso
+  real (0 conteúdos produzidos pela tela desde a instrumentação), veredito gravado em
+  SPEC-009 §1.3** (mesma natureza do
   item (b) de SPEC-005/§1.3).
 
 ## 10. Não coberto por este PLAN
