@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -144,26 +144,37 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T12:02:44-03:00
+**Data conclusão**: 2026-09-06T12:36:55-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 1102525
 **Jira**: KAN-47
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer, performance-engineer
+**Tentativas**: 2 (1ª rodada: reprovado por duplicação de fixture; retry: aprovado)
+**Cobertura final**: 217/217 unit (20 suítes) · 221/221 integração (13 suítes)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/production-events/production-events.service.ts
+  - mnemonicos-backend/tests/unit/production-events.rule.test.ts
+  - mnemonicos-backend/tests/integration/production-events.service.integration.test.ts
+  - mnemonicos-backend/tests/support/production-events-fixtures.ts (novo — dedup com a Wave 1)
+  - mnemonicos-backend/tests/integration/production-events.model.integration.test.ts (carona: migrado para o helper novo)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — sem superfície sensível canônica (módulo interno, sem auth/injeção/PII/crypto/sessão/endpoint/exec/dependência nova)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-009 sem FEATs
 
-**Notas**:
+**Notas**: Achado real do gate 1-7 na 1ª rodada: o Escopo>Inclui da TASK mandava "usar o
+padrão de fixture de `contents.service.integration.test.ts`", que tinha fixture local —
+o developer seguiu à risca e duplicou byte-a-byte o irmão da Wave 1. Corrigido com
+`tests/support/production-events-fixtures.ts` (helper único, perfil §7), com o irmão da
+Wave 1 migrado de carona. `licao_candidata` (alvo processo) roteada ao `agile-coach`:
+`PROPOSTA_PLUGIN` para `commands/tasks.md` (item (h) da Etapa 3 deveria confrontar molde
+citado também contra a doutrina do perfil, não só contra `lessons.md`) — registrada em
+`docs/_meta/learning-log.md` (LRN-009), vai para "Mensagem ao mantenedor" na Entrega.

@@ -84,3 +84,13 @@ artefato_patchado: proposta_doutrina (não aplicado) — `docs/_meta/conventions
 patch: brief cuja execução refuta a premissa do "Pedido como dito" ganha seção `## Resultado` (o "Pedido como dito" permanece intacto — é o registro do que foi dito) declarando: a premissa refutada, desde quando estava certo (com o SHA), e quais Critérios de aceite já eram satisfeitos antes do diff; regra companheira: o assunto do commit descreve o que o diff FAZ, nunca o que o brief supunha — `test:` quando nenhuma linha de produção muda, nunca `fix:`. Referência: BRIEF-007 (workspace `18a29e8`) + backend `9b2ddef` (amend `fix:`→`test:`)
 reincidencia: 0
 estado: ativa
+
+## LRN-009: item (h) de `tasks.md` (molde citado como exemplar) só confronta contra `lessons.md`, não contra a doutrina já instituída pelo perfil
+data: 2026-09-06
+gatilho: gate_reprovado
+origem: PLAN-010 (slug producao-material), Wave 2, TASK-010-002 — o gate 1-7 do `code-reviewer` reprovou a 1ª rodada por `createUser`/`createTopic`/`createRawContent` copiados byte-a-byte do irmão da wave anterior; a TASK mandava, em "Escopo > Inclui", "usar o padrão de fixture de `contents.service.integration.test.ts` (createUser/createTopic/testPrisma direto)" — o developer cumpriu à risca e produziu a cópia que o gate reprova, custando 1 retry
+causa_raiz: instrucao_ausente — o item (h) da Etapa 3 (`commands/tasks.md`, decisão 4.307) já obriga confrontar arquivo citado como molde/exemplar contra toda lição `Estado: ativa` de `lessons.md` antes de virar instrução de cópia, mas não estende a mesma confrontação à doutrina **já instituída pelo perfil de linguagem** (não uma lição emergente): a TASK citou um ENDEREÇO (arquivo de teste com fixture local) onde a cláusula "Fixtures compartilhadas" do perfil (`guidelines/project/backend/node-22.md` §7, Art. 3) pede uma CONDIÇÃO (helper único exportado em `tests/support/`) — o artefato instruiu exatamente o que o gate reprova, sem que nada no gerador confrontasse o molde contra essa cláusula
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor)
+patch: proposta de extensão do item (h) em `commands/tasks.md` (Etapa 3, "resistir a contorno") — molde citado como padrão também se confronta, antes de virar instrução de cópia, contra a doutrina de teste já instituída pelo perfil de linguagem ativo (não só contra `lessons.md`); molde cujo conteúdo diverge dessa doutrina (ex.: fixture local em vez do helper canônico de `tests/support/`) não sustenta "seguir o padrão de X" — o item passa a citar/mandar criar o helper canônico, nunca aponta a função local como molde de cópia
+reincidencia: 0
+estado: ativa
