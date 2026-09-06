@@ -119,3 +119,13 @@ artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensa
 patch: proposta de item novo (j) no catálogo de "resistir a contorno" de `commands/tasks.md` (Etapa 3, mesmo parágrafo dos itens a–i): critério composto por 2+ sub-oráculos nomeia, para CADA sub-oráculo, o invariante de domínio que ele prova — nunca "existe o artefato X" como proxy; sub-oráculo cuja satisfação depende de artefato de implementação contingente é red flag na fixação, resolvido nomeando a condição que o artefato hoje satisfaz, nunca a presença dele
 reincidencia: 0
 estado: ativa
+
+## LRN-011: Etapa 1 de `commands/auto.md` justapõe dois enums homônimos-na-forma (`edits|reescrita` do pacote de correção × `mecânico|julgamento` da revalidação) sem marcar que pertencem a réguas diferentes
+data: 2026-09-06
+gatilho: verificacao_falhou
+origem: SPEC-013 (slug producao-material) — ao despachar o pacote de correção ao `scribe`, o Tech Lead declarou `modo: julgamento` (vocabulário de `validator-protocol.md` §4.5, revalidação) no campo que exige `modo: edits|reescrita` (vocabulário de `graph-contract.md` §4.1, pacote de correção); o `scribe` (`agents/scribe.md` passo 4) tratou o rótulo como fora do enum, re-derivou `reescrita` corretamente e declarou a divergência com motivo em `modo_aplicado` — nenhum dano, mas é a classe de ambiguidade de instrução que a Etapa 4.5 pede para rotear
+causa_raiz: instrucao_ambigua — `commands/auto.md`, Etapa 1 (linha do "pacote de correção", em torno da l.77 da v0.156.0), descreve as duas réguas no MESMO parágrafo, em sequência direta: primeiro o `modo:` do pacote de correção (`graph-contract.md` §4.1), depois "a revalidação que se segue obedece `validator-protocol.md` §4.5: ramo mecânico ... para julgamento" — os rótulos "mecânico"/"julgamento" aparecem span da fôlego de uma frase de distância do `modo:` que na verdade é `edits|reescrita`, sem nada no texto que avise "são enums diferentes, não confunda o vocabulário de um com o do outro"; leitura corrida do parágrafo é o bastante para transpor o rótulo errado. `agents/scribe.md` passo 4 já é explícito (nomeia o enum certo) — o ponto de leitura que falhou é o do orquestrador (`auto.md`), não o do scribe.
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor)
+patch: proposta de inserção in-line em `commands/auto.md` Etapa 1, logo após a citação de `graph-contract.md` §4.1: parêntese nomeando o enum (`edits|reescrita`, sobre a FORMA da edição) e alertando para não confundir com o `mecânico|julgamento` da frase seguinte (revalidação, régua distinta) — saldo 0 (mesma linha, mais caracteres)
+reincidencia: 0
+estado: ativa
