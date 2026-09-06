@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: In Progress
 
 ## Convenções (do projeto)
 
