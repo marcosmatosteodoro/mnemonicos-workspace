@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -63,23 +63,17 @@ mesma régua de PLAN-006/TASK-006-001) — ato do Diretor, não desta TASK.
   `mnemonicos-frontend/src/types/domain.ts` nesta fatia (DEC-010-006, YAGNI: sem
   consumidor). Só backend; `mnemonicos-frontend/` não é tocado por esta TASK.
 - `mnemonicos-backend/tests/unit/domain-types-parity.test.ts`: 2 blocos `it()` novos para
-  `PRODUCTION_STAGE_TYPES`/`PRODUCTION_EVENT_TRANSITIONS`, reusando `extractConstArray`
-  (mesmo mecanismo de extração textual já usado para os 3 enums existentes, linhas 45-53).
-  **Diferença deliberada dos blocos existentes** (molde citado: linhas 79-90, bloco de
-  `PROOF_RADAR_CLASSES`) — confrontado com a lição ativa "[Testes] Comentário que afirma
-  paridade entre os dois repos só vale se o teste LER as duas fontes"
-  (`guidelines/project/lessons.md`): os blocos novos **não** leem
-  `mnemonicos-frontend/src/types/domain.ts` nem comparam `frontendX` com `backendX` — não
-  há PRODUCTION_STAGE_TYPES/PRODUCTION_EVENT_TRANSITIONS do lado do frontend ainda
-  (DEC-010-006). O `it()` prova só **autoconsistência**: o array exportado por
-  `src/domain/types.ts` bate com o conjunto de valores lido como texto do próprio arquivo
-  (`extractConstArray(backendSource, 'PRODUCTION_STAGE_TYPES')` comparado a
-  `[...PRODUCTION_STAGE_TYPES]`), e o comentário/nome do `it()` diz explicitamente
-  "autoconsistência backend-only (DEC-010-006) — comparação cross-repo entra quando o
-  frontend espelhar (F10)" — nunca a frase "nos dois repositórios" que os blocos de F2 usam,
-  para não afirmar uma paridade que ainda não existe (a régua exata da lição: comentário
-  suaviza para descrever só o que o teste garante, já que a paridade cross-repo não é
-  requisito desta fatia).
+  `PRODUCTION_STAGE_TYPES`/`PRODUCTION_EVENT_TRANSITIONS`, comparando **dois eixos reais**:
+  `extractConstArray` (texto de `src/domain/types.ts`) contra uma nova `extractPrismaEnum`
+  (texto do `enum` correspondente em `prisma/schema.prisma`) — fecha a paridade intra-repo
+  schema↔tipos que o 3º Critério de pronto exige (achado do gate 1-7 na 1ª rodada: a versão
+  anterior só comparava o símbolo importado com o texto do MESMO arquivo, tautologia que um
+  valor novo no enum Prisma não derrubaria). **Sem** 2º lado no frontend ainda — os blocos
+  não leem `mnemonicos-frontend/src/types/domain.ts` nem afirmam "nos dois repositórios"
+  (DEC-010-006: comparação cross-repo entra quando o frontend espelhar, F10) — a lição ativa
+  "[Testes] Comentário que afirma paridade entre os dois repos só vale se o teste LER as duas
+  fontes" (`guidelines/project/lessons.md`) segue respeitada: o teste lê exatamente as fontes
+  que o nome do `it()` promete, nem mais nem menos.
 - `mnemonicos-backend/tests/integration/production-events.model.integration.test.ts`
   (novo): prova de constraint do model — FK `Restrict` de `rawContentId` (item sem AC — ver
   abaixo) e coluna `sequence` autoincrementando de forma monotônica e estável para eventos
@@ -136,8 +130,12 @@ nunca siga um passo que enfraqueça um critério.
       production-events.model` → suíte verde, incluindo o caso que tenta
       `testPrisma.rawContent.delete({ where: { id } })` sobre um `RawContent` com
       `ProductionStageEvent` associado (inserido direto via `testPrisma`) e espera a
-      exceção `Prisma.PrismaClientKnownRequestError` com `code === 'P2003'` (violação de FK)
-      — o mesmo mecanismo de baseline verde real já confirmado na Entrega de PLAN-006
+      exceção `Prisma.PrismaClientKnownRequestError` com `code === 'P2039'` (SQLSTATE
+      `23001` restrict_violation — FK `Restrict` no Postgres é não-adiável, distinto de
+      `23503` que o adapter-pg mapeia para `P2003`; achado na implementação, confirmado
+      independentemente pelo gate 1-7 via sonda `pg` própria) e o `RawContent` sobrevive
+      (`findUniqueOrThrow` resolve) — o mesmo mecanismo de baseline verde real já
+      confirmado na Entrega de PLAN-006
       (INDEX: "backend integração 213/213 (11 suítes)", 2026-09-06) prova que o harness
       (`resetDb`/`closeTestDb`) está operante; a suíte nova soma a essa base sem reduzi-la.
 - [ ] Testes cobrem AC-009-008 (parte — faceta de desempate determinístico no nível do
@@ -173,26 +171,38 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T02:53:30-03:00
+**Data conclusão**: 2026-09-06T11:59:28-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: e378e63 (schema/tipos prep) · de721ef (migração aplicada + correção de testes)
 **Jira**: KAN-46
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer + Tech Lead (correção de teste de FK pós-descoberta P2039, autorizada pelo achado do gate 1-7)
+**Revisado por**: code-reviewer, security-engineer, performance-engineer
+**Tentativas**: 2 (1ª rodada: reprovado por format:check; retry: aprovado)
+**Cobertura final**: 210/210 unit (19 suítes) · 215/215 integração (12 suítes)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/prisma/schema.prisma
+  - mnemonicos-backend/prisma/migrations/20260906143159_add_production_stage_event/migration.sql
+  - mnemonicos-backend/src/domain/types.ts
+  - mnemonicos-backend/tests/unit/domain-types-parity.test.ts
+  - mnemonicos-backend/tests/integration/production-events.model.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer, 0 achados
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-009 sem FEATs
 
-**Notas**:
+**Notas**: Bloqueio ambiental (Docker Desktop indisponível nesta sessão) resolvido com
+autorização do Diretor para reiniciar o Docker + autorização da migração. Achado real
+durante a implementação: FK `onDelete: Restrict` no Postgres levanta SQLSTATE 23001, que
+o adapter-pg não mapeia — chega como `P2039`, não `P2003` como o critério original
+presumia; corrigido no teste e no critério da TASK, e registrado como lição em
+`guidelines/project/lessons.md` (categoria `[Dados/Persistência]`) + gotcha em
+`guidelines/project/backend/node-22.md` §11. Rede de paridade de tipos estendida para
+fechar uma tautologia apontada pelo gate 1-7 (comparava só consigo mesma; agora lê
+`schema.prisma` de verdade).

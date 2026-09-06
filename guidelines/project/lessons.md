@@ -706,3 +706,27 @@ Referência: `core/DESIGN.md` "Tokens, não literais" + "Contraste AA".
 **Validade:** geral (qualquer cor de texto com significado semântico).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Dados/Persistência] FK `onDelete: Restrict` no Postgres não gera `P2003` — SQLSTATE 23001, não 23503
+
+**Erro:** o critério de pronto de TASK-010-001 (PLAN-010) fixou `err.code === 'P2003'`
+como oráculo de "hard-delete bloqueado por FK `Restrict`". O comportamento real do motor
+é `err.code === 'P2039'` (código genérico) — o teste escrito ao pé da letra nasceria
+vermelho contra código correto.
+**Causa:** `P2003` é o mapeamento de SQLSTATE `23503` (`foreign_key_violation`), levantado
+por FK `NO ACTION`/adiável. FK `onDelete: Restrict` no Postgres é **não-adiável** e
+levanta `23001` (`restrict_violation`) — o `@prisma/adapter-pg` só mapeia
+`23502`/`23503`/`23505` explicitamente; `23001` cai no `default` genérico, chegando ao
+cliente como `P2039` com a mensagem crua do servidor. "Violação de FK ⇒ P2003" é uma
+generalização que o Prisma nunca prometeu — confirmado ao vivo (Postgres 18 +
+`@prisma/adapter-pg` 7.9.1) e por leitura do switch de mapeamento do adapter.
+**Solução:** para constraint com `onDelete: Restrict`, o oráculo estável é o **par
+comportamental** — a operação rejeita **e** a linha protegida sobrevive
+(`findUniqueOrThrow` resolve) — mais, se quiser granularidade, a mensagem do Postgres
+citando a constraint por nome. Nunca fixar o código de erro do Prisma como asserção
+primária para RESTRICT; se travar o código mesmo assim (sinal de regressão de
+mapeamento), documentar que é travamento de versão, não garantia estável. Exemplar:
+`mnemonicos-backend/tests/integration/production-events.model.integration.test.ts`.
+**Validade:** geral (qualquer FK `onDelete: Restrict` no schema Prisma sobre Postgres).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

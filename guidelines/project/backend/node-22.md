@@ -581,11 +581,11 @@ cinco arquivos — coluna nova no modelo quebraria as cinco cópias uma a uma.
 `collectCoverageFrom`). O piso é rede de segurança contra regressão de disciplina — **não**
 é meta: 100% de linhas com asserção fraca não prova nada, e a régua real é o Art. 1.
 
-**Teste que toca o banco:** não existe hoje (a suíte não abre conexão). Quando existir,
-roda contra o **Postgres real** do `docker-compose.yml` em schema/base descartável, nunca
-contra outro motor — dialeto, constraint e transação só falham no motor de verdade. Rodar
-serialmente (`--runInBand`) ou com base por worker, e o setup/teardown por arquivo, nunca
-por caso.
+**Teste que toca o banco:** existe desde F1 — `tests/integration/` roda contra o
+**Postgres real** do `docker-compose.yml` (`mnemonicos_test`, schema/base descartável),
+nunca contra outro motor: dialeto, constraint e transação só falham no motor de verdade.
+Serial (`--runInBand`), setup/teardown por arquivo (`resetDb`/`closeTestDb`), nunca por
+caso.
 
 **Mutation testing (`quality.mutation`, opt-in):** a ferramenta canônica em TS/Node é o
 **Stryker** (`@stryker-mutator/core` + `@stryker-mutator/jest-runner`), tipicamente
@@ -816,6 +816,11 @@ qualquer otimização não óbvia **cita a medição** que a justifica (no comen
 - **`prisma generate` depois de mexer no `schema.prisma`**, sempre; e migração é `prisma
   migrate dev` (arquivo versionado, revisável, **com autorização do Diretor** — ver
   [`README.md`](README.md)).
+- **FK `onDelete: Restrict` não gera `P2003`** — Postgres levanta SQLSTATE `23001`
+  (`restrict_violation`, não-adiável), que o `@prisma/adapter-pg` não mapeia (só
+  `23502`/`23503`/`23505`); cai no genérico `P2039` com a mensagem crua do servidor.
+  Oráculo estável para RESTRICT: o par rejeição + linha protegida sobrevive — nunca o
+  código de erro como asserção primária (lição em `lessons.md`, "[Dados/Persistência]").
 
 **Zod 4**
 
