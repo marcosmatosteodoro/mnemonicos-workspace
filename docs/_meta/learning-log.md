@@ -109,3 +109,47 @@ PENDENTES do mesmo PLAN contra a mesma condição antes do despacho da próxima 
 Escopo>Inclui delas, citando o artefato novo em vez do molde superado. Não bloqueou a Entrega
 (dedup registrado como pendência de consolidação, não gap) — mas é a mesma causa-raiz, 2ª vez
 no mesmo PLAN.
+
+## LRN-010: esqueleto de brief avulso não pede declarar oráculo quando o critério central só é verificável pós-deploy
+data: 2026-09-06
+gatilho: gate_reprovado
+origem: BRIEF-010 (slug producao-material) — mudança avulsa no `mnemonicos-backend`
+(`vercel-build` passa a rodar `prisma migrate deploy`); o `code-reviewer` (gate 1-7) achou que a
+rodada local (lint, typecheck, 217 testes) fechou verde sem exercitar a mudança, porque o
+critério central ("o build passa a aplicar as migrações") só tem oráculo no deploy real contra
+um Postgres — que o próprio brief proíbe tocar durante a execução
+causa_raiz: instrucao_ausente — o esqueleto de "Variação avulsa" (`docs/_meta/conventions/index-contract.md`)
+pede só "<observável e verificável>" no Critério de aceite, sem distinguir o caso em que o único
+oráculo é o efeito do deploy (config lida em build/runtime de produção, script de infra, env do
+painel); quem preenche o brief (Tech Lead) segue o esqueleto à risca e não é levado a declarar
+essa lacuna nem a nomear a verificação pós-deploy — gates verdes locais provam ausência de
+regressão, e essa concordância foi confundida com verificação até o gate 1-7 apontar
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`docs/_meta/conventions/index-contract.md`, esqueleto "Variação avulsa" § Critério de aceite
+patch: proposta de expansão do comentário-placeholder do bullet "## Critério de aceite" — quando
+o oráculo central só existe pós-deploy, o brief nomeia ali a verificação observável que o fecha;
+sem ela, o fecho da rodada não reporta Done, reporta PARCIAL
+reincidencia: 0
+estado: ativa
+
+## LRN-011: esqueleto de brief avulso não tem seção formal para "risco aceito", e a captura em prosa livre omite custo de recuperação
+data: 2026-09-06
+gatilho: gate_reprovado
+origem: BRIEF-010 (slug producao-material) — o `security-engineer` (gate 8) achou que o risco
+aceito declarado pelo Diretor ("migração quebrada derruba o build — fail secure, o deployment
+anterior segue servindo") registrou só a consequência otimista, omitindo que o estado FAILED em
+`_prisma_migrations` (P3009, confirmado contra o engine instalado) trava TODOS os deploys
+seguintes — inclusive hotfix de segurança — até `prisma migrate resolve --rolled-back` rodar à
+mão contra produção
+causa_raiz: instrucao_ausente — o esqueleto de "Variação avulsa" (`docs/_meta/conventions/index-contract.md`)
+não tem seção "Riscos aceitos": quem precisa registrar um risco aceito pelo Diretor improvisa
+formato livre (como o BRIEF-010 fez), e prosa livre captura o evento sem forçar o custo de
+recuperação nem quem pode executá-lo — risco "aceito" sem esses dois campos não é risco aceito,
+é risco não medido
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`docs/_meta/conventions/index-contract.md`, esqueleto "Variação avulsa" (nova seção)
+patch: proposta de seção opcional "## Riscos aceitos" no esqueleto — cada item com 3 campos:
+consequência · custo de recuperação (comando/runbook + onde está documentado) · quem pode
+executar; sem os três campos, o risco não está aceito
+reincidencia: 0
+estado: ativa

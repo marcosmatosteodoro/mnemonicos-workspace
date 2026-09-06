@@ -730,3 +730,28 @@ mapeamento), documentar que é travamento de versão, não garantia estável. Ex
 **Validade:** geral (qualquer FK `onDelete: Restrict` no schema Prisma sobre Postgres).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Mudança no que roda no build enumera as env vars que passam a ser OBRIGATÓRIAS ali, não só as que o diff acrescenta
+
+**Erro:** o BRIEF-010 recusou colocar o seed no `vercel-build` justamente para não fixar
+`SEED_ADMIN_PASSWORD` no ambiente de build de todo deploy — e, na mesma mudança, tornou
+`DIRECT_URL` obrigatória e permanente nesse mesmo ambiente, sem que a comparação fosse
+feita. `DIRECT_URL` é credencial de conexão **direta**, com DDL/DML sobre o banco de
+produção: em risco comparado ela domina a senha do primeiro ADMIN que a decisão recusou —
+com ela se cria o ADMIN, e qualquer outro. O Diretor decidiu com metade do trade-off.
+**Causa:** o raciocínio de segredo foi aplicado ao que a mudança **adiciona
+explicitamente** (o comando de seed, visível no diff), não ao que ela passa a **exigir
+como pré-requisito de ambiente**. Pré-requisito não aparece no diff, então não entrou na
+balança. Agrava: quem lê esse ambiente não é só o comando alterado — `postinstall` e os
+install scripts de toda a árvore npm rodam com `process.env` acessível, e
+`@prisma/client` puxa o CLI `prisma` completo para as dependências de produção.
+**Solução:** mudança que altera o que roda no build/CI enumera, no próprio brief, as
+variáveis que passam a ser obrigatórias ali — cada uma pesada na mesma balança usada para
+recusar as outras. Credencial de migração usa **role dedicado**, distinto do role de
+runtime da `DATABASE_URL`: DDL no schema da aplicação, sem ser superusuário, marcada como
+Sensitive no painel e com rotação registrada. Referência: `core/SECURITY.md` ("Segredos
+vêm de configuração/secret store") + `guidelines/project/backend/node-22.md` §6.4.
+**Validade:** geral (qualquer mudança em script de build/CI que passe a exigir segredo de
+ambiente). Ver [[BRIEF-010]].
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

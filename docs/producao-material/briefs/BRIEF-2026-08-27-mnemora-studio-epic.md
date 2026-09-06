@@ -148,5 +148,7 @@ fora do MVP).
   disponibilidade) respondidas pelo Diretor na Entrega — ambos os defaults confirmados,
   já implementados de fato. Branch `feat/producao-material-mnemora-studio` mergeada em
   `main` (backend, PR #3, `6541d49`) — frontend sem mudança nesta fatia. Migração aditiva
-  aplicada em dev/teste e agora em `main`; **aplicação em produção segue pendente** (sem
-  pipeline de CI/CD, RISK-006-009 — ato manual do Diretor). Próxima elegível: F4.
+  aplicada em dev/teste e agora em `main`; aplicação em produção **automatizada em 2026-09-06**
+  (BRIEF-010: o `vercel-build` do backend roda `prisma migrate deploy` a cada deploy,
+  `2bb9dc0`) — deixa de ser ato manual do Diretor. RISK-006-009 segue aberto: sem CI,
+  o DDL alcança produção sem teste automatizado antes. Próxima elegível: F4.
