@@ -11,6 +11,12 @@ keelson.local.json
 
 .DS_Store
 
+# Nomes de arquivo com cara de caminho Windows quebrado ou de token — nunca deixar
+# um deles virar portador acidental de segredo real (achado do security-engineer,
+# Wave 3/BRIEF-007 de PLAN-006; 2 arquivos deste tipo encontrados e removidos em 2026-09-05)
+*.gh-token
+C:*
+
 # Despejo bruto do Playwright MCP: fica em thoughts/ (artifactsDir da ficha), nunca em docs/
 docs/**/qa-evidencias/**/console-*.log
 docs/**/qa-evidencias/**/snapshot-*
