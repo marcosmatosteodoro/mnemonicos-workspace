@@ -105,3 +105,10 @@ agregação/painel — isso é F10, que só existe quando F6 definir o denominad
   registrados como E-02 no INDEX, ambos seguidos pelo default, parqueados para a Entrega),
   resolveu os demais 8 dentro do brief. Pacote de correção (11 edições) aplicado pelo
   `scribe`; revalidação mecânica limpa (0 ERROR). SPEC → **Approved** v0.2.
+- 2026-09-06T02:25:59-03:00 — **Etapa 2 (PLAN) concluída.** `code-scout` (antecipado na
+  Etapa 1) reusado sem re-despacho. `scribe` redigiu PLAN-010 (6 COMPs, 6 DECs — todas
+  reversíveis). `plan-validator`: 0 ERROR após 1 volta de correção de forma (enum
+  `Irreversível` em ASCII `nao`; listas `FRs/NFRs cobertos` reformatadas 1-por-linha; §7
+  ganhou linhas de NFR além de FR — bug de parser em campo com quebra de linha,
+  corrigido). `plan-dec-alternativa-unica` (4 DECs) calibrado como WARNING aceito, mesmo
+  padrão de PLAN-006. PLAN → **Approved** v0.2.
