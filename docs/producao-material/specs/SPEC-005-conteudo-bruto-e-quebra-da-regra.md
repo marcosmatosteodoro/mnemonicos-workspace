@@ -463,7 +463,12 @@ de numeração é mantido de propósito — os ACs seguintes não são renumerad
   selecionados de registros **já existentes** (semeados); o cadastro de nova
   disciplina/tema pela tela de produção fica fora desta fatia. Default: reaproveitar o
   acervo de disciplinas/temas. **Reabrir se:** E-01 (Q-005-004) for respondida permitindo
-  cadastro de tema pelo EDITOR.
+  cadastro de tema pelo EDITOR. **REABERTA 2026-09-06** — o Diretor respondeu Q-005-004
+  autorizando o cadastro. Vale só para o que PLAN-006 ainda NÃO construiu (a tela de
+  produção já foi implementada e entregue com o select restrito ao acervo semeado — não é
+  retrofit deste PLAN): entra como capacidade nova, "Especificada, ainda não planejada" no
+  INDEX do slug, para um PLAN/brief futuro decidir a forma real (endpoint de criação de
+  tema, validação/dedup, UI inline na tela `content/new`).
 - **A-005-008** [assumido] [evidência: crença] — A fonte normativa é **opcional** no
   registro do Conteúdo bruto nesta fatia; quando informada, é estruturada (tipo + citação;
   link opcional). A obrigatoriedade entra no gate de "Versão aprovada" (F9). Default: não
@@ -537,11 +542,13 @@ de numeração é mantido de propósito — os ACs seguintes não são renumerad
 - **Q-005-003** — A migração de dados (aditiva) e a sua execução dependem de confirmação do
   Diretor quando a wave de schema for alcançada (regra do projeto / BRIEF-005 P-05). Não é
   decisão desta SPEC.
-- **Q-005-004 (E-01)** — O EDITOR pode criar um tema/assunto novo dentro de uma disciplina
-  existente, ou só escolhe entre os semeados? **Proposta (recomendada)**: permitir criação
-  mínima de tema na própria tela "Novo Conteúdo" — só criar, dentro de disciplina já
-  existente, sem gestão. **Default sem resposta**: segue A-005-007 como está, com
-  AC-005-027 reforçado (registro em cada tema semeado). Prazo natural: confirmação da
+- **Q-005-004 (E-01)** — **RESPONDIDA 2026-09-06 (Entrega de PLAN-006)**: o Diretor
+  confirmou que o EDITOR PODE criar um tema/assunto novo dentro de uma disciplina
+  existente. PLAN-006 já foi implementado e entregue sob o default anterior (só escolha
+  do acervo semeado — AC-005-027 provado); a resposta reabre A-005-007 para um ciclo
+  futuro decidir a forma da criação (proposta original: mínima, na própria tela "Novo
+  Conteúdo", dentro de disciplina já existente, sem gestão). Não bloqueia nem reabre
+  PLAN-006. Prazo natural: confirmação da
   migração (Q-005-003 / BRIEF-005 P-05). Não bloqueia a SPEC.
 
 ## 10. Fora deste documento
