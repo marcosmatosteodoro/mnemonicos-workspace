@@ -45,7 +45,7 @@ fora do MVP).
 |---|---|---|---|
 | 1 | Acesso interno e papéis de produção | producao-material | entregue (BRIEF-002 · SPEC-002 · PLAN-003 Done 16/16; mergeado PR #1; HANDOFF-PLAN-003 fechado 2026-09-01) |
 | 2 | Conteúdo bruto, quebra da regra e fonte normativa | producao-material | entregue (BRIEF-005 · SPEC-005 · PLAN-006 Done 14/14; mergeado PR #2 backend/#3 frontend 2026-09-06) |
-| 3 | Instrumentação de etapas da fábrica | producao-material | entregue (BRIEF-009 · SPEC-009 · PLAN-010 Done 3/3; branch pushada, aguardando PR/merge do Diretor, 2026-09-06) |
+| 3 | Instrumentação de etapas da fábrica | producao-material | entregue e mergeada (BRIEF-009 · SPEC-009 · PLAN-010 Done 3/3; PR #3 backend `6541d49`, 2026-09-06) |
 | 4 | Tira mnemônica como sequência de quadros | producao-material | pendente |
 | 5 | Biblioteca visual reutilizável | producao-material | pendente |
 | 6 | Pipeline de publicação — PDF (rascunho) | producao-material | pendente |
@@ -140,12 +140,13 @@ fora do MVP).
   nos dois repos, DoD (Etapa 4) 6/6 verificada, gate 9 VERIFICADO. Próximas elegíveis: F3
   (depende só de F2) e F4 (depende de F2; A-002 contestada pelo product-analyst, atenção
   na largada).
-- 2026-09-06: **F3 entregue** (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done) — mecanismo
-  append-only de evento de etapa de produção, emissão transacional fail-secure integrada
-  em `contents.service.ts`. 3 waves, 1 retry (dedup de fixture). Gates 1-7/8/10 aprovados
-  em todas as waves; gate 9 verificado ao vivo; convergência de fecho CONVERGIU. PO:
-  ACEITA_COM_RESSALVAS. Migração aditiva aplicada em dev, **pendente de deploy em
-  produção**. 2 escalações do PO (lead-time × esforço; fail-secure × disponibilidade)
-  seguidas pelo default, confirmadas implementadas de fato pela convergência — parqueadas
-  para resposta do Diretor na Entrega. Branch pushada (`feat/producao-material-mnemora-studio`),
-  merge/PR pendente do Diretor. Próxima elegível após F3 mergear: F4.
+- 2026-09-06: **F3 entregue e mergeada** (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done) —
+  mecanismo append-only de evento de etapa de produção, emissão transacional fail-secure
+  integrada em `contents.service.ts`. 3 waves, 1 retry (dedup de fixture). Gates 1-7/8/10
+  aprovados em todas as waves; gate 9 verificado ao vivo; convergência de fecho CONVERGIU.
+  PO: ACEITA_COM_RESSALVAS. 2 escalações do PO (lead-time × esforço; fail-secure ×
+  disponibilidade) respondidas pelo Diretor na Entrega — ambos os defaults confirmados,
+  já implementados de fato. Branch `feat/producao-material-mnemora-studio` mergeada em
+  `main` (backend, PR #3, `6541d49`) — frontend sem mudança nesta fatia. Migração aditiva
+  aplicada em dev/teste e agora em `main`; **aplicação em produção segue pendente** (sem
+  pipeline de CI/CD, RISK-006-009 — ato manual do Diretor). Próxima elegível: F4.

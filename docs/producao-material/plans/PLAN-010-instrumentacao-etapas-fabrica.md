@@ -1,7 +1,7 @@
 # PLAN-010: Instrumentação de etapas da fábrica
 
 **Slug**: producao-material
-**Status**: Approved
+**Status**: Done
 **Versão**: 0.2
 **Autor**: keelson (scribe)
 **Data**: 2026-09-06
