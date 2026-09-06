@@ -11,9 +11,9 @@ A-009-004/A-009-005); nenhuma TASK gera Roteiro do gate 9.
 
 ## Status agregado
 
-- Todo: 1
+- Todo: 0
 - In Progress: 0
-- Done: 2
+- Done: 3
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -24,8 +24,8 @@ A-009-004/A-009-005); nenhuma TASK gera Roteiro do gate 9.
 ### Wave 2 (depende de Wave 1) — ✅ concluída 2026-09-06
 - [x] TASK-010-002 ✅ Done
 
-### Wave 3 (depende de Wave 2)
-- [ ] TASK-010-003 ⏸ Todo
+### Wave 3 (depende de Wave 2) — ✅ concluída 2026-09-06
+- [x] TASK-010-003 ✅ Done
 
 ## Cobertura de FRs
 

@@ -533,11 +533,15 @@ exigir prova formal (não palpite — Charter Art. 8).
 
 ## 8. Riscos técnicos
 
-- **TRISK-010-001** A transação interativa introduzida em `createRawContent`/
-  `updateRawContent`/`saveRuleBreakdown` mantém uma conexão do pool presa por mais tempo
-  que o statement único de F2 (perfil §10: "transação interativa mantém conexão presa —
-  mantenha-a curta") (mitigação: nenhuma chamada de I/O externo dentro do callback; só
-  Prisma sobre o mesmo `tx`; medir round-trips se o volume real justificar).
+- ~~TRISK-010-001~~ **RESOLVIDO 2026-09-06 — medido, não mais risco teórico** (performance-engineer,
+  gate 10 da Wave 3, banco isolado `mnemonicos_perfgate`, n=300): criação passou de
+  4,16 ms/1 round-trip (baseline F2) para 21,74 ms/8 round-trips (p50) — conexão presa
+  ~16–22 ms contra ~4 ms; edição de 8,86 ms/2 para 13,83 ms/5. Sob pool de produção
+  (`max: 3`), throughput por instância cai de ~1.500 para ~175 criações/s — folga de
+  ~3 ordens de grandeza sobre o uso real da fábrica (dezenas de EDITORes, criação sob
+  ação humana). Nenhuma chamada de I/O externo dentro do callback, confirmado. `Reabrir
+  se:` F10 introduzir emissão automatizada/em lote (não-humana) — aí o throughput medido
+  aqui deixa de ter a mesma folga.
 - **TRISK-010-002** A leitura interna (`listProductionStageEvents`) não pagina — FR-009-010
   proíbe agregação/cálculo, mas também não previu paginação; um conteúdo com muitíssimos
   retrabalhos leria todos os eventos de uma vez (mitigação: aceito nesta fatia — sem
@@ -551,12 +555,33 @@ exigir prova formal (não palpite — Charter Art. 8).
   (DEC-010-006) — risco de a rede "esfriar" (não pegar drift real com o frontend) até o
   dia em que o espelho existir (mitigação: comentário explícito no teste apontando a
   condição de upgrade; DEC-010-006 registra o gatilho).
-- **TRISK-010-005** A serialização do "1º salvamento" concorrente da Quebra da regra
-  (nenhuma 2ª `CONCLUSAO` para o mesmo `rawContentId`) depende de uma propriedade
-  emergente do schema (lock de índice único de `RuleBreakdown.rawContentId`, F2), não de
-  um mecanismo desta fatia (mitigação: DEC-010-007 aceita e documenta a dependência sem
-  lock explícito adicional; teste de concorrência real com `Promise.all` em
-  TASK-010-003/AC-009-003 prova o comportamento observável).
+- ~~TRISK-010-005~~ **RESOLVIDO 2026-09-06 — provado, não mais aceito por raciocínio**
+  (security-engineer, gate 8 da Wave 3): mutante que move a emissão para antes do
+  `upsert` (isolando a dependência de DEC-010-007) mata o teste de concorrência real
+  (`Promise.all`) com a assinatura exata prevista (2 `CONCLUSAO` em vez de 1) — a
+  serialização pelo lock de índice único de `RuleBreakdown.rawContentId` é load-bearing
+  e detectada, não coincidência. Nota do gate 8: a garantia é **emergente por chamador**
+  — um 3º consumidor futuro (F4-F9) que emita ANTES de escrever sua própria linha
+  reintroduz o risco. `Reabrir se:` `stageType` novo cujo chamador decida emitir antes da
+  escrita de negócio — nesse caso considerar índice único parcial em
+  `(rawContentId, stageType) WHERE transitionType='CONCLUSAO'` (fecho canônico de corrida
+  de unicidade).
+- **TRISK-010-006** O 1º salvamento de cada estação relê, dentro da mesma transação, o
+  histórico que a própria criação acabou de escrever (3 `SELECT`s de decisão por criação,
+  já sabendo a resposta pelos comentários do próprio código) — medido em 24% do tempo/3
+  dos 8 round-trips da criação (performance-engineer, gate 10 da Wave 3, n=300).
+  Eliminar exigiria o chamador conhecer a transição, o que DEC-010-005 proíbe de
+  propósito (mitigação: custo aceito como preço da decisão centralizada no mecanismo;
+  `Reabrir se:` medição em produção mostrar que a taxa de criação real esbarra no teto de
+  conexões do pool — hoje há ~3 ordens de grandeza de folga).
+- **TRISK-010-007** `recordProductionStageEvent` materializa todo o histórico do par
+  (`rawContentId`, `stageType`) para decidir entre 3 estados — O(n²) acumulado ao longo
+  da vida de um conteúdo com muito retrabalho (medido: 2,0 ms/3 eventos → 13,0 ms/5.002
+  eventos, plano do servidor sub-ms nos dois casos — custo é materialização no cliente,
+  não plano ruim). Correção de 1 linha disponível (`distinct: ['transitionType']`) se o
+  volume real de retrabalho justificar (mitigação: aceito nesta fatia — faixa medida hoje
+  é barata; `Reabrir se:` F10/emissão automatizada elevar o retrabalho por conteúdo muito
+  acima de ~100).
 
 ## 9. Definition of Done deste PLAN
 

@@ -7,7 +7,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -173,26 +173,43 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T12:40:31-03:00
+**Data conclusão**: 2026-09-06T13:20:32-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: c50448e
 **Jira**: KAN-48
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer, security-engineer, performance-engineer
+**Tentativas**: 1 (aprovado de primeira nos 3 gates)
+**Cobertura final**: 217/217 unit (20 suítes) · 231/231 integração (13 suítes)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/contents/contents.service.ts
+  - mnemonicos-backend/tests/integration/contents.service.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer, 0 achados, 4 mutantes mortos (fail-secure + concorrência real confirmados por mutation testing)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-009 sem FEATs
 
-**Notas**:
+**Notas**: Última task de PLAN-010. TRISK-010-001 e TRISK-010-005 fechados com medição
+real (gates 8/10) em vez de aceitos por raciocínio — PLAN-010 §8 atualizado. 3 achados
+`media` não-bloqueantes do gate 10 (recomputo do histórico na criação — custo de
+DEC-010-005, não do developer; materialização sem teto do `findMany` de decisão;
+contagem de round-trips não fixada em teste) registrados como TRISK-010-006/007, ambos
+com `Reabrir se:` explícito, nenhum bloqueante. **Incidente de processo durante a
+rodada de gates**: os 3 gates rodaram em paralelo sobre a mesma working tree principal
+sem `git worktree` própria por gate (violação de 4.134/4.361/4.334) — o
+`performance-engineer` truncou o banco de teste compartilhado no meio de sondas de
+outro gate, e o `code-reviewer` flagrou a árvore em 3 conteúdos distintos do mesmo
+arquivo (só não emitiu veredito falso porque ancorou por hash de conteúdo, não só
+HEAD+porcelain). Eu (Tech Lead) agravei removendo arquivos de sonda `zz-*.ts` da
+árvore com base no report de UM gate já concluído, sem confirmar que outro gate ainda
+em voo os usava. Todos os vereditos finais são confiáveis (cada gate corrigiu por
+conta própria — worktree, banco isolado, hash de conteúdo), mas o processo de
+paralelização de gates com mutation testing precisa de isolamento real. Lição roteada
+ao `agile-coach` (processo).
