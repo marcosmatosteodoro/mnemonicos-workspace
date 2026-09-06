@@ -46,7 +46,7 @@ fora do MVP).
 | 1 | Acesso interno e papéis de produção | producao-material | entregue (BRIEF-002 · SPEC-002 · PLAN-003 Done 16/16; mergeado PR #1; HANDOFF-PLAN-003 fechado 2026-09-01) |
 | 2 | Conteúdo bruto, quebra da regra e fonte normativa | producao-material | entregue (BRIEF-005 · SPEC-005 · PLAN-006 Done 14/14; mergeado PR #2 backend/#3 frontend 2026-09-06) |
 | 3 | Instrumentação de etapas da fábrica | producao-material | entregue e mergeada (BRIEF-009 · SPEC-009 · PLAN-010 Done 3/3; PR #3 backend `6541d49`, 2026-09-06) |
-| 4 | Tira mnemônica como sequência de quadros | producao-material | pendente |
+| 4 | Tira mnemônica como sequência de quadros | producao-material | em ciclo (docs/producao-material/briefs/BRIEF-011.md) |
 | 5 | Biblioteca visual reutilizável | producao-material | pendente |
 | 6 | Pipeline de publicação — PDF (rascunho) | producao-material | pendente |
 | 7 | Contrastes, pegadinhas, flashcards e protocolos impressos | producao-material | pendente |
@@ -150,3 +150,6 @@ fora do MVP).
   `main` (backend, PR #3, `6541d49`) — frontend sem mudança nesta fatia. Migração aditiva
   aplicada em dev/teste e agora em `main`; **aplicação em produção segue pendente** (sem
   pipeline de CI/CD, RISK-006-009 — ato manual do Diretor). Próxima elegível: F4.
+- 2026-09-06: **F4 largada** via `/keelson:continue` → `/keelson:auto` (BRIEF-011.md) —
+  sync de largada dos dois repos de código com `main` (backend fast-forward `6541d49`;
+  frontend já atualizado).
