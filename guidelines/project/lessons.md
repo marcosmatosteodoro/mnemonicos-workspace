@@ -587,9 +587,25 @@ agora comparando conjuntos de campos de interface. Limite conhecido (não fechad
 compara DECLARAÇÃO×DECLARAÇÃO, não `select`×declaração — uma chave nova no `select` do
 Prisma sem a mesma chave na interface do frontend passa pelo typecheck (extra property em
 valor não-literal) e por este teste; revisitar se doer.
-**Validade:** enquanto houver constantes OU interfaces espelhadas à mão entre `mnemonicos-backend` e `mnemonicos-frontend`.
+**Reincidência (code-reviewer, Wave 1 de PLAN-012 — extensão para FAIXA DE VALORES, não só
+nome/forma):** o fixture de tipo espelhado `mnemonicos-frontend/tests/types/
+mnemonic-strip.test.ts` fixou `position: 0` — valor que a SPEC (AC-011-001/008/010,
+"posições de 1 a N") e o schema Zod do backend da MESMA wave (`tira.schema.ts`,
+`z.number().int().min(1, ...)`) proíbem. `number` × `number` casa na rede de paridade
+declaração×declaração — o tipo bate, o VALOR de exemplo não. O fixture de contrato é lido
+como exemplo canônico por quem escrever o consumidor (UI 0-based levaria 400 no caminho
+feliz). Corolário: a rede de paridade prova nome e tipo, nunca a faixa de valores que o
+outro lado aceita — isso é responsabilidade do fixture, não do teste de contrato.
+**Solução aplicável a este eixo:** fixture de teste de tipo espelhado usa valor que
+PASSARIA no schema Zod correspondente do backend — a fonte é o `*.schema.ts` do módulo,
+não a assinatura do tipo. Régua de revisão: para cada campo numérico/enumerado do
+fixture, localizar o `min`/`max`/`z.enum` do backend e conferir; onde a faixa for regra de
+domínio afirmada por AC, citá-la no docblock do fixture. Exemplar correto já no repo:
+`tests/types/raw-content.test.ts` (valores de domínio reais — `'PEGADINHA'`,
+`'art. 113, CTN'`).
+**Validade:** enquanto houver constantes, interfaces OU valores de fixture espelhados à mão entre `mnemonicos-backend` e `mnemonicos-frontend`.
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0
+**Contadores:** confirmada 2 · contestada 0
 
 ## [Segurança] Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos
 
@@ -729,4 +745,62 @@ mapeamento), documentar que é travamento de versão, não garantia estável. Ex
 `mnemonicos-backend/tests/integration/production-events.model.integration.test.ts`.
 **Validade:** geral (qualquer FK `onDelete: Restrict` no schema Prisma sobre Postgres).
 **Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Config] Config de plataforma de deploy só prova o que fica público após o deploy real
+**Erro:** `GET /` respondeu 500 em produção por semanas (KAN-49): a autodetecção de
+framework da Vercel casou com `src/app.ts` (só exports nomeados, sem `export default`) e
+serviu a raiz **antes** do rewrite `/(.*) -> /api` que serve o entrypoint real
+(`api/index.ts`). Só `/` quebrou — todo outro caminho não casa com o filesystem e cai no
+rewrite —, o que fez o defeito passar despercebido com `/api/v1/health` verde.
+**Causa:** o config de plataforma dependia de um comportamento por OMISSÃO (nada dito
+sobre `framework` = detecção ligada). Autodetecção é heurística sobre nomes de arquivo do
+repo: qualquer arquivo novo em `src/` chamado `app`/`index`/`server` altera o roteamento
+de produção sem que uma linha de config, teste ou lint mude. Nenhum oráculo local alcança
+isso — a suíte não lê `vercel.json`, e o consumidor é o build da plataforma.
+**Solução:** config de plataforma de deploy declara explicitamente o que desliga a
+autodetecção — `"framework": null` no `vercel.json` quando o entrypoint é servido por
+rewrite — e o porquê nasce no doc de deploy do repo, porque JSON não comporta comentário e
+o config é invisível para teste e lint. A prova de config consumida em tempo de
+build/deploy é sempre um oráculo que passa pelo build ou um smoke pós-deploy que distingue
+a resposta da APP da resposta da PLATAFORMA pelo **corpo** (não só pelo status) — princípio
+irmão de "[Testes] Valor de configuração lido por analisador de build só é provado por
+oráculo que passe pelo build" (lá restrita ao frontend Next; este é o mesmo eixo no
+backend/Vercel). Concretamente, mudança em `vercel.json` que mexa em
+`framework`/`outputDirectory`/`rewrites` fecha com verificação pós-deploy por `curl` de uma
+lista fixa de caminhos sensíveis do root (`/package.json`, `/prisma/schema.prisma`,
+`/src/app.ts`, `/.env.example`) esperando o 404 do `notFoundHandler` — e prefere fixar
+`outputDirectory` num diretório vazio a depender do fallback do preset de estático.
+Referência: `mnemonicos-backend/vercel.json` + `README.md` §Deploy (Vercel); KAN-49.
+**Validade:** enquanto o backend publicar na Vercel com autodetecção de framework
+relevante (Express/Node).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Código] Lista de "Interface pública" do PLAN é contrato mínimo, não gabarito de transcrição
+
+**Erro:** ao criar `mnemonicos-backend/src/modules/tira/tira.schema.ts` (TASK-012-003,
+arquivo de fronteira novo), o developer transcreveu a lista de "Interface pública" de
+COMP-012-003 quase item a item: (1) duplicou a regra+mensagem de validação do campo
+`text` entre `addMnemonicFrameSchema` e `updateMnemonicFrameSchema` — o que o PLAN listava
+como "mesma regra de X" virou cópia literal em vez de fonte única (achado A2, gate 6/7 —
+node-22.md §9 já manda "Regra repetida → schema base reusado/`.extend()`, não copiado",
+e o exemplar mergeado da mesma camada, `contents.schema.ts:41-62`, já fazia a extração
+correta); (2) reexportou `rawContentIdParamSchema` de outro módulo sem nenhum consumidor
+no diff, porque a TASK mencionava o reuso e o developer criou um endereço público extra
+"para garantir" (achado A1, gate 4 — abstração especulativa, zero consumidor).
+**Causa:** a lista de "Interface pública" do PLAN é levantamento de alto nível (o que o
+componente expõe), não uma especificação de forma de código — mas ao gerar um arquivo
+novo do zero (sem histórico a seguir), ela é o único texto concreto à mão, e vira template
+por default. Duas leituras erradas do mesmo hábito: "o que a lista repete, eu repito"
+(→ duplicação) e "o que eu acho que falta, eu adiciono" (→ export especulativo).
+**Solução:** ao redigir um arquivo de fronteira novo (schema/service/routes que ainda não
+existem), comparar contra o **irmão canônico já mergeado da mesma camada** no repo (aqui,
+`contents.schema.ts`) ANTES de commitar, perguntando duas coisas: "o que ele extraiu que
+eu copiei?" (→ regra repetida vira fonte única) e "o que eu exportei que ninguém pediu?"
+(→ remover, import direto do módulo de origem quando o consumidor existir). A lista do
+PLAN entra como checklist de cobertura, nunca como texto a reproduzir.
+**Validade:** todo arquivo de fronteira novo (schema/service/routes) gerado a partir de um
+PLAN, neste projeto.
+**Estado:** em-observacao
 **Contadores:** confirmada 0 · contestada 0

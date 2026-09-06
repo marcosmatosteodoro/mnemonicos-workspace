@@ -9,18 +9,18 @@ backend, Server Components por padrão + RTK Query para estado de servidor no fr
 
 ## Status agregado
 
-- Todo: 13
+- Todo: 9
 - In Progress: 0
-- Done: 0
+- Done: 4
 - Blocked: 0
 
 ## Ordem de execução (waves)
 
-### Wave 1 (paralelizável, setup-first)
-- [ ] TASK-012-001 ⏸ Todo — Migrar schema: `MnemonicStrip`/`MnemonicFrame` + `TIRA_MNEMONICA` aditivo (fatia sensível — migração)
-- [ ] TASK-012-002 ⏸ Todo — Exportar `assertRawContentReachable` de `contents.service.ts` (fatia sensível — segurança)
-- [ ] TASK-012-003 ⏸ Todo — Criar `tira.schema.ts` — validação Zod de Quadro
-- [ ] TASK-012-009 ⏸ Todo — Estender `types/domain.ts` (frontend) com `MnemonicStrip`/`MnemonicFrame`
+### Wave 1 (paralelizável, setup-first) — ✅ concluída
+- [x] TASK-012-001 ✅ Done — Migrar schema: `MnemonicStrip`/`MnemonicFrame` + `TIRA_MNEMONICA` aditivo (fatia sensível — migração)
+- [x] TASK-012-002 ✅ Done — Exportar `assertRawContentReachable` de `contents.service.ts` (fatia sensível — segurança)
+- [x] TASK-012-003 ✅ Done — Criar `tira.schema.ts` — validação Zod de Quadro
+- [x] TASK-012-009 ✅ Done — Estender `types/domain.ts` (frontend) com `MnemonicStrip`/`MnemonicFrame`
 
 ### Wave 2 (depende de Wave 1)
 - [ ] TASK-012-004 ⏸ Todo — Estender `domain/types.ts` (backend) com `TIRA_MNEMONICA` e confirmar paridade

@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -124,26 +124,27 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T19:00:58-0300
+**Data conclusão**: 2026-09-06T19:04:23-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 60be101
 **Jira**: KAN-52
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (aprovado sem achados, Wave 1) · security-engineer (gate 8 aprovado, Wave 1 — diff de 1 linha confirmado byte-idêntico)
+**Tentativas**: 1
+**Cobertura final**: n/a (item do Inclui sem AC — oráculo é o contrato do próprio item)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/contents/contents.service.ts
+  - mnemonicos-backend/tests/unit/contents-service-exports.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (47/47, mesma contagem da baseline + 1 novo)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados (n/a — sem AC numerado)
+- [x] Segurança (gate 8): aprovado — export aditivo puro, ordem de guardas e mensagens byte-idênticas confirmadas por diff
+- [x] Comportamento (gate 9): n/a — chore de visibilidade, sem efeito observável
 
 **Notas**:

@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -133,26 +133,29 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T19:13:24-0300
+**Data conclusão**: 2026-09-06T19:33:33-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 8191deb (implementação inicial `ae259c0`, retry `8191deb`)
 **Jira**: KAN-59
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (REPROVADO na 1ª rodada — achado A3; CONVERGIU no re-review delta-scoped)
+**Tentativas**: 2 (1 retry, roteado pelo achado A3 do code-reviewer)
+**Cobertura final**: n/a (item do Inclui sem AC — oráculo é o contrato do próprio item)
 **Arquivos modificados**:
-  -
+  - mnemonicos-frontend/src/types/domain.ts
+  - mnemonicos-frontend/tests/types/mnemonic-strip.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (1/1, typecheck exit 0)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (convergiu após retry — fixture de `position` corrigido para valores válidos de domínio)
+- [x] ACs verificados (n/a — sem AC numerado)
+- [x] Segurança (gate 8): n/a — declaração de tipo pura, sem lógica
+- [x] Comportamento (gate 9): n/a — tipos de domínio, sem efeito observável
+
+**Notas**: achado A3 (fixture com `position: 0`, inválido pelo domínio — SPEC AC-011-001/008/010 e `tira.schema.ts` da mesma wave exigem posição ≥ 1) corrigido no retry; lição registrada em `guidelines/project/lessons.md` (reincidência da lição "paridade cross-repo" — a rede de paridade prova nome/tipo, nunca faixa de valores).
 
 **Notas**:

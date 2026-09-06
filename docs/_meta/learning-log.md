@@ -109,3 +109,13 @@ PENDENTES do mesmo PLAN contra a mesma condição antes do despacho da próxima 
 Escopo>Inclui delas, citando o artefato novo em vez do molde superado. Não bloqueou a Entrega
 (dedup registrado como pendência de consolidação, não gap) — mas é a mesma causa-raiz, 2ª vez
 no mesmo PLAN.
+
+## LRN-010: critério composto por dois oráculos (grep de presença + grep de ausência) vira estruturalmente insatisfazível quando a correção do gate remove o artefato do oráculo de presença
+data: 2026-09-06
+gatilho: verificacao_falhou
+origem: PLAN-012 (slug producao-material), Wave 1, TASK-012-003 — o code-reviewer (achado A1) determinou que o import citado pelo critério (item 5, "reuso de `rawContentIdParamSchema`") era re-export especulativo sem consumidor real e mandou REMOVÊ-LO; a metade do critério que checava "presença do import" ficou insatisfazível por desenho (o import não deve mais existir), enquanto a condição de domínio real ("não redeclara o parâmetro `:id`", 2º grep) seguia satisfeita — quase virou checkbox verde sobre critério de fato quebrado, só pego na convergência
+causa_raiz: instrucao_ausente — o catálogo "resistir a contorno" (Etapa 3, `commands/tasks.md`, decisão 4.107 + família) não tem item cobrindo critério composto por 2+ sub-oráculos onde um deles verifica a PRESENÇA de um artefato de implementação (import/chamada específica) como proxy de conveniência para o invariante de domínio, em vez do invariante em si; a decisão 4.321 ("condição, nunca endereço") já cobre "arquivo nomeado de memória" (item citado na linha do critério de lint) e "consumidor citado de memória" (item d), mas nenhum item do catálogo nomeia a composição de sub-oráculos heterogêneos (um address-based, outro domain-based) nem o red flag de que correção legítima do próprio review pode invalidar o primeiro sem tocar o segundo
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor)
+patch: proposta de item novo (j) no catálogo de "resistir a contorno" de `commands/tasks.md` (Etapa 3, mesmo parágrafo dos itens a–i): critério composto por 2+ sub-oráculos nomeia, para CADA sub-oráculo, o invariante de domínio que ele prova — nunca "existe o artefato X" como proxy; sub-oráculo cuja satisfação depende de artefato de implementação contingente é red flag na fixação, resolvido nomeando a condição que o artefato hoje satisfaz, nunca a presença dele
+reincidencia: 0
+estado: ativa

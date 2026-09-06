@@ -83,6 +83,17 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
 
 ## Critérios de pronto
 
+- [ ] **Confused deputy no `:frameId` (achado do security-engineer, gate 8 da Wave 1 —
+      pendência herdada, decisão 4.140)**: `updateMnemonicFrameText`/`removeMnemonicFrame`
+      recebem `rawContentId` (do `:id` da rota) **e** `frameId` (do `:frameId`) — o
+      `rawContentId` a autorizar (`assertRawContentReachable`) é sempre o resolvido a
+      partir da CADEIA do próprio Frame (Frame → Strip → RuleBreakdown → RawContent),
+      nunca aceito cru do parâmetro da URL sem essa amarração. Teste: EDITOR dono de
+      `rawContentId` A tenta mutar um `frameId` que pertence à Tira de `rawContentId` B
+      (do mesmo EDITOR ou de outro) usando a URL `/contents/A/strip/frames/<frameId-de-B>`
+      → rejeitado (404, mesma mensagem de "não encontrado" — nunca sucesso nem 403
+      distinguível). Comando: mesmo arquivo de integração acima, caso
+      "rejeita frameId que não pertence à cadeia do rawContentId da URL".
 - [ ] Testes cobrem AC-011-004, AC-011-005 (add): novo Quadro aparece na posição
       informada, deslocando os Quadros seguintes sem lacuna nem duplicidade (reusa
       `reassignPositions` de TASK-012-006 — a prova de atomicidade da primitiva em si

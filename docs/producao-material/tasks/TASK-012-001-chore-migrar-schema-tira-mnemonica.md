@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -180,26 +180,30 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T18:49:49-0300
+**Data conclusão**: 2026-09-06T18:58:12-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 4cb86c4
 **Jira**: KAN-51
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (aprovado sem achados, Wave 1) · security-engineer (gate 8 aprovado, Wave 1)
+**Tentativas**: 1
+**Cobertura final**: n/a (item do Inclui sem AC — oráculo é o contrato do próprio item)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/prisma/schema.prisma
+  - mnemonicos-backend/prisma/migrations/20260906215101_add_mnemonic_strip_and_frame/migration.sql
+  - mnemonicos-backend/tests/integration/production-events.model.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (232/232 integração pós-migração; TRISK-012-001 mitigado — grava/lê TIRA_MNEMONICA na mesma sessão)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados (n/a — sem AC numerado)
+- [x] Segurança (gate 8): aprovado — migração 100% aditiva, `Mnemonic` legado intocado, 0 FK Restrict nova
+- [x] Comportamento (gate 9): n/a — chore de schema, sem efeito observável direto (DoD do PLAN cobre)
+
+**Notas**: vermelho conhecido e sancionado até TASK-012-004 (wave 2): `domain-types-parity.test.ts` e `typecheck` (backend) — o enum ganhou `TIRA_MNEMONICA` no schema, mas o espelho em `domain/types.ts` é escopo de TASK-012-004 (dependência declarada no PLAN, "Bloqueia: TASK-012-004").
 
 **Notas**:

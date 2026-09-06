@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -56,8 +56,11 @@ contents.schema.ts:103-107`, `{ id: z.uuid('Identificador de conteúdo bruto inv
     F-5 do PLAN).
   - `mnemonicFrameIdParamSchema` — `frameId` (`z.uuid('Identificador de quadro
     inválido.')`).
-  - Import de `rawContentIdParamSchema` de `../contents/contents.schema` — reuso
-    explícito, sem redeclarar o parâmetro `:id`.
+  - Nenhuma declaração local do parâmetro `:id` — o consumidor real
+    (`tira.routes.ts`, COMP-012-006) importa `rawContentIdParamSchema` direto de
+    `contents.schema`, quando existir; `tira.schema.ts` não precisa importar nem
+    reexportar um símbolo que ele mesmo não consome (achado A1 do code-reviewer,
+    convergência da Wave 1 — endereço especulativo removido).
   - Tipos-união inferidos (`z.infer<typeof ...>`) para cada schema, no mesmo padrão de
     `CreateRawContentInput`/`SaveRuleBreakdownInput`.
 - `mnemonicos-backend/tests/unit/tira.schema.test.ts` (novo): caso válido e caso inválido
@@ -103,14 +106,15 @@ nunca siga um passo que enfraqueça um critério.
 - [ ] `mnemonicFrameIdParamSchema` aceita um UUID v7 válido e rejeita
       `{ frameId: 'nao-e-uuid' }` com mensagem pt-BR (`'Identificador de quadro
       inválido.'` ou equivalente) — mesma verificação executável.
-- [ ] `tira.schema.ts` importa `rawContentIdParamSchema` de `../contents/contents.schema`
-      em vez de redeclarar o parâmetro `:id` — verificação executável (padrão ancorado em
-      import, contrato §273(b)): `grep -n "import.*rawContentIdParamSchema.*contents\
-      .schema" mnemonicos-backend/src/modules/tira/tira.schema.ts` → 1 linha; `grep -cE
-      "^export const \w*[Ii]d[Pp]aram[Ss]chema" mnemonicos-backend/src/modules/tira/
-      tira.schema.ts` → `1` (só `mnemonicFrameIdParamSchema`, nenhum outro param schema
-      declarado localmente). Falsificável: redeclarar `{ id: z.uuid(...) }` local faria o
-      2º `grep` casar 2, vermelho.
+- [x] `tira.schema.ts` NÃO redeclara nem reexporta o parâmetro `:id` (condição do
+      domínio, não endereço de import — corrigido na convergência da Wave 1, achado
+      R1: a metade que exigia grep de import virou insatisfazível quando A1 removeu o
+      único consumidor) — verificação executável: `grep -cE "^export const
+      \w*[Ii]d[Pp]aram[Ss]chema" mnemonicos-backend/src/modules/tira/tira.schema.ts`
+      → `1` (só `mnemonicFrameIdParamSchema`); controle positivo do mesmo grep em
+      `contents.schema.ts` → `1` (o padrão bate onde deve). Falsificável: redeclarar
+      `{ id: z.uuid(...) }` local faria o grep casar `2`, vermelho. Confirmado
+      cumprido pelo `code-reviewer` na convergência (commit `24f7cf3`).
 - [ ] Todo texto de mensagem de validação está em português do Brasil (NFR-011-005, parte)
       — verificação executável: `grep -oE "'[^']*'" mnemonicos-backend/src/modules/tira/
       tira.schema.ts | grep -vE "informe|inválid|obrigat|posição|sequência|identificador"`
@@ -134,26 +138,29 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T19:10:02-0300
+**Data conclusão**: 2026-09-06T19:35:45-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 24f7cf3 (implementação inicial `19e5834`, retry de convergência `24f7cf3`)
 **Jira**: KAN-53
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (REPROVADO na 1ª rodada — achados A1/A2; CONVERGIU no re-review delta-scoped)
+**Tentativas**: 2 (1 retry, roteado pelos achados A1/A2 do code-reviewer)
+**Cobertura final**: n/a (item do Inclui sem AC — oráculo é o contrato do próprio item; override `task-criterio-sem-ac` registrado no topo da TASK)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/tira/tira.schema.ts
+  - mnemonicos-backend/tests/unit/tira.schema.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (10/10, mesma contagem antes/depois do retry)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (convergiu após retry — export especulativo removido, regra `text` deduplicada em `frameTextSchema`)
+- [x] ACs verificados (n/a — sem AC numerado)
+- [x] Segurança (gate 8): n/a — refactor puro de schema, sem I/O/authz/cripto (nota do security-engineer na Wave 1: nenhuma superfície nova)
+- [x] Comportamento (gate 9): n/a — schema de validação, sem efeito observável
+
+**Notas**: achados A1 (export especulativo de `rawContentIdParamSchema`) e A2 (duplicação da regra `text`) corrigidos no retry; critério de pronto #5 e o Escopo>Inclui desta TASK foram emendados na convergência (achado R1 do code-reviewer) para descrever a condição do domínio em vez do endereço de import que a própria correção invalidou.
 
 **Notas**:
