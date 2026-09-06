@@ -133,7 +133,11 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
       diferentes, cada uma com Quadros); chamar `reorderMnemonicFrames` no `rawContentId`
       de A com um `order` que inclui 1 id de Quadro de B → rejeitado, e as posições de A
       **e** de B permanecem intocadas (nenhum vazamento de escrita cross-tenant). 1
-      método nesta TASK toca esse predicado (`reorderMnemonicFrames`) → 1 prova.
+      método nesta TASK toca esse predicado (`reorderMnemonicFrames`) → 1 prova. Caso de
+      borda adicional (achado do `qa`, Etapa 3.5): `order` com 1 id **duplicado** e outro
+      id existente **ausente** (mesmo tamanho do conjunto real, conjunto errado) →
+      rejeitado (400/409), posições intocadas — cenário distinto do "id de outra Tira"
+      acima (aqui todos os ids pertencem à Tira certa, só a multiplicidade está errada).
 - [ ] Testes cobrem AC-011-020, AC-011-022 (parte — estrutural): `assertRawContentReachable`
       é a 1ª chamada dentro do corpo de `reorderMnemonicFrames` — teste de leitura
       textual (mesmo mecanismo de `extractInterfaceFields` de

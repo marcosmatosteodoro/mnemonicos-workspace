@@ -50,6 +50,13 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 ## Critérios de pronto
 
+**Gate 9 (screenVerify)**: `n/a` para esta TASK, declarado — o passo 1 do "Roteiro do gate 9"
+de TASK-012-012 já exercita este exato link em browser real (login → tela da Quebra da
+regra com Quebra salva e Tira ainda não gerada → link visível → clique navega para
+`/content/<id>/tira`), na mesma sessão/fixture da jornada da Tira. Criar um 2º roteiro
+duplicaria ambiente/sujeito/pré-condição sem provar nada de novo — achado do `qa`
+(pré-código, Etapa 3.5), resolvido apontando para o roteiro já fixado em vez de duplicá-lo.
+
 - [ ] **AC-011-023 (parte — faceta UI, fechamento)**: extensão de `rule-breakdown-form.test.tsx`, montado com `makeStore()` + `Provider` + `fetch` mockado (harness já existente no arquivo, `mount()`/`handler()`), com 2 casos novos:
   1. Resposta `GET /api/v1/contents/<id>/breakdown` = 200 com o fixture `breakdown()` já existente no arquivo → `screen.getByRole('link', { name: 'Ir para a Tira mnemônica' })` presente, com `href` igual a `/content/content-1/tira` (usando o `CONTENT_ID` já constante no arquivo).
   2. Resposta `GET /api/v1/contents/<id>/breakdown` = `NOT_FOUND_RESPONSE` (404, já existente no arquivo) → texto exato "Conclua a Quebra da regra antes de gerar a Tira mnemônica." visível, **e** `screen.queryByRole('link', { name: 'Ir para a Tira mnemônica' })` é `null` (o link fica AUSENTE, não apenas desabilitado — AC-011-023 exige "sem oferecer a ação").

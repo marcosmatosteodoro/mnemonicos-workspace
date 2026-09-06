@@ -112,12 +112,19 @@ DELETE FROM raw_contents WHERE id = '<rawContentId>';
 
 **Passos (um por AC)**:
 
-1. **AC-011-001**: login na UI (`http://localhost:3000/login`, credenciais do realm `editor`); navegar para `http://localhost:3000/content/<rawContentId>/tira`. Esperado: geração automática de **exatamente 5 Quadros**, ordem CONCEITO→AÇÃO→OBJETO→CONDIÇÃO→EXCEÇÃO, cada um com o texto do Bloco correspondente da fixture, posições 1 a 5 sem lacuna.
-2. **AC-011-003**: recarregar a página (F5). Esperado: nenhuma segunda geração — os mesmos 5 Quadros reaparecem, mesmos textos/posições, sem duplicata.
-3. **AC-011-004/AC-011-006/AC-011-008/AC-011-010** (os 3 estados via interceptação de rede, decisão 4.319): nas devtools do browser, usar a aba Network para segurar/atrasar a resposta de UMA mutação por vez (adicionar, editar, remover, reordenar) — "Block request URL" temporário ou throttling custom para atraso; durante a resposta pendente, observar o controle da ação correspondente desabilitado com indicador visível ("Adicionando…"/"Salvando…"/"Removendo…"/"Reordenando…"); liberar a resposta e confirmar o sucesso refletido no Quadro. Repetir para cada uma das 4 ações forçando uma resposta de erro (bloqueio permanente da URL ou parar o backend momentaneamente) e observar o estado de falha (mensagem de erro visível, pt-BR, dado local intacto).
-4. **AC-011-012**: após as mutações do passo 3, recarregar a página (F5). Esperado: a ordem/posição dos Quadros reflete a última mutação bem-sucedida.
-5. **AC-011-017**: em aba anônima (sem cookie de sessão), navegar direto para `http://localhost:3000/content/<rawContentId>/tira`. Esperado: redireciona para `/login?next=...` (guard de `proxy.ts`, mesmo mecanismo já provado para `/studio` em F1) — a barreira real (401/403) é confirmada no backend por TASK-012-008; este passo confirma o guard de navegação da tela.
-6. **AC-011-024**: remover os 5 Quadros um a um pelos controles de remoção, até a Tira ficar vazia. Esperado: ao remover o último, a tela mostra o estado de "Tira vazia" com a ação de criar Quadro disponível, sem regeneração automática (nenhum Quadro novo aparece sozinho).
+1. **AC-011-023 (parte — faceta UI, entrada da jornada; provada aqui, não em TASK-012-013,
+   que só cobre a mesma faceta em componente montado/gate 1 — este é o único roteiro de
+   gate 9 da dupla, mesma pré-condição/sessão)**: login na UI; navegar para
+   `http://localhost:3000/content/<rawContentId>/breakdown` (Quebra já salva pela
+   pré-condição, Tira ainda **não** gerada). Esperado: o link "Ir para a Tira mnemônica"
+   está visível; clicar nele navega para `http://localhost:3000/content/<rawContentId>/tira`
+   (a mesma tela que os passos seguintes exercitam).
+2. **AC-011-001**: login na UI (`http://localhost:3000/login`, credenciais do realm `editor`); navegar para `http://localhost:3000/content/<rawContentId>/tira`. Esperado: geração automática de **exatamente 5 Quadros**, ordem CONCEITO→AÇÃO→OBJETO→CONDIÇÃO→EXCEÇÃO, cada um com o texto do Bloco correspondente da fixture, posições 1 a 5 sem lacuna.
+3. **AC-011-003**: recarregar a página (F5). Esperado: nenhuma segunda geração — os mesmos 5 Quadros reaparecem, mesmos textos/posições, sem duplicata.
+4. **AC-011-004/AC-011-006/AC-011-008/AC-011-010** (os 3 estados via interceptação de rede, decisão 4.319): nas devtools do browser, usar a aba Network para segurar/atrasar a resposta de UMA mutação por vez (adicionar, editar, remover, reordenar) — "Block request URL" temporário ou throttling custom para atraso; durante a resposta pendente, observar o controle da ação correspondente desabilitado com indicador visível ("Adicionando…"/"Salvando…"/"Removendo…"/"Reordenando…"); liberar a resposta e confirmar o sucesso refletido no Quadro. Repetir para cada uma das 4 ações forçando uma resposta de erro (bloqueio permanente da URL ou parar o backend momentaneamente) e observar o estado de falha (mensagem de erro visível, pt-BR, dado local intacto).
+5. **AC-011-012**: após as mutações do passo 4, recarregar a página (F5). Esperado: a ordem/posição dos Quadros reflete a última mutação bem-sucedida.
+6. **AC-011-017**: em aba anônima (sem cookie de sessão), navegar direto para `http://localhost:3000/content/<rawContentId>/tira`. Esperado: redireciona para `/login?next=...` (guard de `proxy.ts`, mesmo mecanismo já provado para `/studio` em F1) — a barreira real (401/403) é confirmada no backend por TASK-012-008; este passo confirma o guard de navegação da tela.
+7. **AC-011-024**: remover os 5 Quadros um a um pelos controles de remoção, até a Tira ficar vazia. Esperado: ao remover o último, a tela mostra o estado de "Tira vazia" com a ação de criar Quadro disponível, sem regeneração automática (nenhum Quadro novo aparece sozinho).
 
 ## Riscos específicos
 
