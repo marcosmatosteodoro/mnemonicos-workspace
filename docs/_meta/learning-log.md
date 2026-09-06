@@ -92,5 +92,20 @@ origem: PLAN-010 (slug producao-material), Wave 2, TASK-010-002 — o gate 1-7 d
 causa_raiz: instrucao_ausente — o item (h) da Etapa 3 (`commands/tasks.md`, decisão 4.307) já obriga confrontar arquivo citado como molde/exemplar contra toda lição `Estado: ativa` de `lessons.md` antes de virar instrução de cópia, mas não estende a mesma confrontação à doutrina **já instituída pelo perfil de linguagem** (não uma lição emergente): a TASK citou um ENDEREÇO (arquivo de teste com fixture local) onde a cláusula "Fixtures compartilhadas" do perfil (`guidelines/project/backend/node-22.md` §7, Art. 3) pede uma CONDIÇÃO (helper único exportado em `tests/support/`) — o artefato instruiu exatamente o que o gate reprova, sem que nada no gerador confrontasse o molde contra essa cláusula
 artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor)
 patch: proposta de extensão do item (h) em `commands/tasks.md` (Etapa 3, "resistir a contorno") — molde citado como padrão também se confronta, antes de virar instrução de cópia, contra a doutrina de teste já instituída pelo perfil de linguagem ativo (não só contra `lessons.md`); molde cujo conteúdo diverge dessa doutrina (ex.: fixture local em vez do helper canônico de `tests/support/`) não sustenta "seguir o padrão de X" — o item passa a citar/mandar criar o helper canônico, nunca aponta a função local como molde de cópia
-reincidencia: 0
+reincidencia: 1
 estado: ativa
+
+**Atualização 2026-09-06 (reincidência 1, achada pelo code-reviewer em modo convergência de fecho)**:
+a Wave 3 (TASK-010-003) duplicou o MESMO padrão de novo — `contents.service.integration.test.ts`
+usa fixtures locais pré-existentes (não o helper `tests/support/production-events-fixtures.ts`
+criado no retry da Wave 2) porque o Escopo>Inclui de TASK-010-003 já estava escrito citando
+"fixture já em uso no arquivo" ANTES de a lição existir. Causa adicional: rotear a lição corrige
+o artefato de processo (`tasks.md`) para o PRÓXIMO ciclo, mas não toca as TASKs já escritas das
+waves seguintes do MESMO PLAN — o developer da wave seguinte segue a instrução à risca e reverte
+na prática o que o retry anterior consolidou. Extensão do patch proposto: quando um retry produz
+`licao_candidata` sobre a INSTRUÇÃO de uma TASK (molde citado, padrão a seguir), o fecho da wave
+(régua do `/keelson:implement`, §3.6 item 7 "Refino das waves seguintes") confronta as TASKs
+PENDENTES do mesmo PLAN contra a mesma condição antes do despacho da próxima wave — e corrige o
+Escopo>Inclui delas, citando o artefato novo em vez do molde superado. Não bloqueou a Entrega
+(dedup registrado como pendência de consolidação, não gap) — mas é a mesma causa-raiz, 2ª vez
+no mesmo PLAN.
