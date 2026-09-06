@@ -50,4 +50,5 @@ fechamento legislativo (F8), gate de qualidade/aprovação (F9), painel estraté
 
 - specify: 2026-09-06T19:46:48+0000 · correções: 1 · classes: spec-ac-fora-gwt(25) · spec-ears-nao-casa(1) · spec-must-ratio(1) · spec-sem-should-may(1)
 - plan: 2026-09-06T20:16:11+0000 · correções: 1 · classes: plan-dec-alternativa-unica(8) · realiza-vs-mapeamento(5) · plan-reabrir-nunca-sem-motivo(1)
+- tasks: 2026-09-06T21:03:31+0000 · correções: 1 · classes: task-criterio-grep-nao-ancorado(9) · task-overlap-fr(9) · task-criterio-sem-ac(3, overridden) · task-nome-tipo(5) · task-mutacao-sem-contagem(1) · task-secao-ausente(1)
 
