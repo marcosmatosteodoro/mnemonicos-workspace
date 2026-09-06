@@ -8,7 +8,9 @@
 
 - [2026-08-27 · epico] `Mnemonic.hook`/`Mnemonic.decoding` são campos de texto único — a tira mnemônica como sequência ordenada de quadros não tem representação estrutural ainda; F4 substitui, não estende — mnemonicos-backend/prisma/schema.prisma:96-120
 - [2026-08-27 · epico] Não existe modelo para radar de prova/priorização, contraste, pegadinha nem associação visual/imagem no schema atual — 4 das 10 camadas do método sem cobertura, nenhuma na forma que a TAP pede — mnemonicos-backend/prisma/schema.prisma:1-189
-- [2026-08-27 · epico] Seed carrega Direito Administrativo e Constitucional, não Direito Tributário (A-003 exige trocar para Obrigação Tributária em F2) — mnemonicos-backend/prisma/seed.ts:28-101
+- [2026-09-06 · PLAN-006] **Corrige entrada acima**: seed trocado para Direito Tributário/Obrigação Tributária + EDITOR de dev (`seedMaterial`, `authorId` = ADMIN; distinto do `authorId` do EDITOR que a tela produz) — mnemonicos-backend/prisma/seed-material.ts:126-168
+- [2026-09-06 · PLAN-006] `RawContent` (texto normativo + disciplina/tema + `radarClass`, soft-delete via `deletedAt`) e `RuleBreakdown` 1:1 (5 blocos + síntese, sem `deletedAt` própria — herda inalcançabilidade do pai) são o modelo novo da fábrica de F2 — mnemonicos-backend/prisma/schema.prisma:263-331
+- [2026-09-06 · PLAN-006] Filtro `deletedAt: null` centralizado em `contents.service.ts` (não redeclarado por chamador) — todo caminho de leitura novo (listagem/detalhe/Quebra/censo) herda daqui, não reimplementa — mnemonicos-backend/src/modules/contents/contents.service.ts:1-408
 
 ## Identidade e autorização
 
@@ -35,8 +37,15 @@
 
 - [2026-08-27 · epico] Rotas montadas hoje: só `health`, `health/db` e `disciplines` — F1/F2 partem de uma superfície quase vazia — mnemonicos-backend/src/http/routes.ts:9-10
 - [2026-08-31 · F1] `apiRoutes` monta em ordem: `healthRoutes` (público) → auth pública (`POST /auth/login`, `/auth/refresh`) → `requireAuth` → auth protegida (`/auth/logout`, `/auth/me`, `/auth/change-password`) → `usersRoutes` (`requireRole('ADMIN')`) → `disciplinesRoutes` (`requireRole('EDITOR','ADMIN')`); `verifyOrigin` em toda mutação autenticada por cookie — mnemonicos-backend/src/http/routes.ts:1-60
+- [2026-09-06 · PLAN-006] `contentsRoutes` acrescenta 7 rotas sob a mesma barreira (`requireRole('EDITOR','ADMIN')`), tripwire de `route-authz-matrix` atualizado de 12 para 19 pares — mnemonicos-backend/src/modules/contents/contents.routes.ts:1-144
+- [2026-09-06 · PLAN-006] Rede de paridade cross-repo cobre DECLARAÇÃO×DECLARAÇÃO (enums + interfaces), não `select`×declaração — chave nova só no `select` do Prisma sem a mesma chave no frontend passa pelo typecheck e pelos 2 testes (RISK-006-006, gap conhecido, não fechado nesta fatia) — mnemonicos-backend/tests/unit/contents-frontend-contract.test.ts:1-40
 - [2026-08-27 · epico] Frontend já chama `/mnemonics` e `/flashcards/due`, que não existem no backend — contrato adiantado, quebra em runtime sem o typecheck acusar; F2 precisa fechar isso primeiro — mnemonicos-frontend/src/store/api.ts:28-35
 - [2026-08-27 · epico] Tipos de domínio do frontend não têm `CardState`/`Review` — espelho do `USER_ROLES` ausente do lado do backend — mnemonicos-frontend/src/types/domain.ts:41-83
+
+## Produção de conteúdo bruto e Quebra da regra (F2 · PLAN-006)
+
+- [2026-09-06 · PLAN-006] Telas `(interno)/content` (listagem), `/content/new` (formulário) e `/content/[id]/breakdown` (Quebra da regra) — Server Component default, `'use client'` só onde há estado/evento — mnemonicos-frontend/src/app/(interno)/content/page.tsx:1-40
+- [2026-09-06 · PLAN-006] Tokens de cor semântica `--link`/`--danger` (light/dark em `:root`/`@media (prefers-color-scheme: dark)`, expostos via `@utility text-link`/`@utility text-danger`) — padrão canônico do produto para texto de erro/sucesso/link, substitui literal de paleta Tailwind (`text-brand-500`/`text-red-500`, que falhava contraste AA num dos 2 temas) — mnemonicos-frontend/src/app/globals.css:31-78
 
 ## Publicação (ausente)
 
