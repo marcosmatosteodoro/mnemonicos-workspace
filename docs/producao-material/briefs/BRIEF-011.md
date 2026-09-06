@@ -49,4 +49,5 @@ fechamento legislativo (F8), gate de qualidade/aprovação (F9), painel estraté
 ## Cronologia
 
 - specify: 2026-09-06T19:46:48+0000 · correções: 1 · classes: spec-ac-fora-gwt(25) · spec-ears-nao-casa(1) · spec-must-ratio(1) · spec-sem-should-may(1)
+- plan: 2026-09-06T20:16:11+0000 · correções: 1 · classes: plan-dec-alternativa-unica(8) · realiza-vs-mapeamento(5) · plan-reabrir-nunca-sem-motivo(1)
 
