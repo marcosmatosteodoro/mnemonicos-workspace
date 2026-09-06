@@ -41,20 +41,23 @@ reaproveitar em outro projeto do mesmo site, mesmo com o mesmo nome de tipo.
 via `/keelson:specify-epic` (BRIEF-2026-08-27-mnemora-studio-epic.md, slug
 `producao-material`). https://mp-consultoria.atlassian.net/browse/KAN-6
 
-## 🔴 Ainda pendente de medição
+## ✅ Transições medidas (2026-09-06)
 
-### 1. Medir as transições
+`jira.transition` está **`"auto"`** na ficha desde 2026-09-06 (trocado pelo Diretor). Ids
+medidos via `getTransitionsForJiraIssue` em 3 cards reais de 2 tipos (`KAN-29`/`KAN-42`
+Subtask, `KAN-27` História) — **idênticos nos 3**, mesmo workflow global para os dois
+tipos (`isGlobal: true`, `hasScreen: false` em todas, nenhum validator/post-function com
+tela própria encontrado):
 
-Os ids de transição **têm de ser medidos card a card**, nunca deduzidos do nome da coluna:
-instância com validator ou post-function recusa transição que "deveria" funcionar.
+| id | Nome da transição | Status-alvo | `statusCategory` |
+|----|--------------------|-------------|-------------------|
+| `11` | Itens Pendentes | Tarefas pendentes (`10004`) | Itens Pendentes (`new`) |
+| `21` | Em andamento | Em andamento (`10005`) | Em andamento (`indeterminate`) |
+| `31` | In Review | Em análise (`10006`) | Em andamento (`indeterminate`) |
+| `41` | Itens concluídos | Concluído (`10007`) | Itens concluídos (`done`) |
 
-```
-mcp__atlassian__getTransitionsForJiraIssue   # num card real de cada tipo
-```
-
-Cada id medido vira linha na seção *Trilho do board* abaixo. A ficha está em
-`transition: "comment"` (só comenta, não move) — só troque para `"auto"` depois de os ids
-estarem medidos e registrados aqui.
+Não medido ainda para o tipo **Epic** nem **Tarefa** (`standalone`) — meça antes de mover
+um card desses tipos; não assuma os mesmos ids só porque bateram em Subtask/História.
 
 ## Campos
 
@@ -68,9 +71,11 @@ por tipo de issue.*
 
 ## Trilho do board
 
-*A preencher: ids de transição medidos, na ordem do trilho, por tipo de issue. Validators e
-post-functions descobertos entram aqui como regra — sem a narrativa do card em que foram
-vistos.*
+Uso do trilho nesta primeira aplicação (`transition: "auto"`, 2026-09-06): subtask com
+TASK `Done` → id `41` (Concluído); História com todas as subtasks fechadas → id `31` (Em
+análise, não Concluído — decisão do Diretor: a História só fecha depois de revisão
+própria, mesmo com as subtasks todas prontas). Epic não movido nesta rodada (fora do
+pedido).
 
 ## Achados de config
 

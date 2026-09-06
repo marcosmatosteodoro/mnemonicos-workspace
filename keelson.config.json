@@ -77,7 +77,7 @@
     },
     "epicPolicy": "multi-feature",
     "standaloneParent": null,
-    "transition": "comment",
+    "transition": "auto",
     "mapFile": "docs/_meta/jira.KAN.md",
     "boardId": 2
   }
