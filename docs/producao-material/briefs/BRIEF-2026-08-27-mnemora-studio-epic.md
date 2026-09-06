@@ -44,8 +44,8 @@ fora do MVP).
 | # | Fatia | Slug de destino | Estado |
 |---|---|---|---|
 | 1 | Acesso interno e papéis de produção | producao-material | entregue (BRIEF-002 · SPEC-002 · PLAN-003 Done 16/16; mergeado PR #1; HANDOFF-PLAN-003 fechado 2026-09-01) |
-| 2 | Conteúdo bruto, quebra da regra e fonte normativa | producao-material | em ciclo (docs/producao-material/briefs/BRIEF-005.md) |
-| 3 | Instrumentação de etapas da fábrica | producao-material | pendente |
+| 2 | Conteúdo bruto, quebra da regra e fonte normativa | producao-material | entregue (BRIEF-005 · SPEC-005 · PLAN-006 Done 14/14; mergeado PR #2 backend/#3 frontend 2026-09-06) |
+| 3 | Instrumentação de etapas da fábrica | producao-material | em ciclo (docs/producao-material/briefs/BRIEF-009.md) |
 | 4 | Tira mnemônica como sequência de quadros | producao-material | pendente |
 | 5 | Biblioteca visual reutilizável | producao-material | pendente |
 | 6 | Pipeline de publicação — PDF (rascunho) | producao-material | pendente |
@@ -134,3 +134,9 @@ fora do MVP).
   como `em ciclo (BRIEF-002.md)` mas os artefatos filhos mostram **entregue** — PLAN-003
   Done 16/16, PR #1 mergeado (backend `25cdafd` · frontend `834f117`), HANDOFF-PLAN-003
   fechado 2026-09-01, Stories KAN-8/9/10 Concluído. Próxima: F2.
+- 2026-09-06: `/keelson:continue` — correção declarada da fila (princípio 2): F2 estava
+  como `em ciclo (BRIEF-005.md)` mas os artefatos filhos mostram **entregue** — PLAN-006
+  Done 14/14, PR #2 (backend `ac5c4f8`) e PR #3 (frontend `0bcbacd`) mergeados em `main`
+  nos dois repos, DoD (Etapa 4) 6/6 verificada, gate 9 VERIFICADO. Próximas elegíveis: F3
+  (depende só de F2) e F4 (depende de F2; A-002 contestada pelo product-analyst, atenção
+  na largada).
