@@ -329,9 +329,16 @@ sem estado de configuração runtime, sem superfície de rede adicional a proteg
       precedente `HANDOFF-PLAN-003`), não por teste automatizado — prompt de instalação e
       chrome do sistema operacional não são simuláveis (nota da própria SPEC, §7). Os
       demais ACs (003–012) são cobertos por teste automatizado das funções puras extraídas
-      (COMP-013-003) e do componente de registro (COMP-013-004), complementado por inspeção
-      manual no painel Application (DevTools) onde o comportamento depende do ciclo de vida
-      real do service worker no navegador (TRISK-013-001).
+      (COMP-013-003) e do componente de registro (COMP-013-004), complementado por
+      **roteiro concreto** de inspeção manual no fecho do ciclo (TRISK-013-001 — achado do
+      `qa` pré-código de TASK-013-INDEX: "inspeção manual" genérica não é prova fixada) —
+      build de produção local (`npm run build && npm run start`, worktree
+      `C:/kwt/pwa/mnemonicos-frontend`): (1) com uma aba aberta e um formulário de EDITOR
+      não salvo, publicar nova versão do `sw.js` sem recarregar — esperado: aba continua na
+      versão antiga, sem perda do formulário, SW novo em "waiting" (não "activated"); (2)
+      reabrir a aba — esperado: SW novo assume, versão atualizada servida; (3) publicar
+      versão de `KILL_VERSION` e reabrir — esperado: nenhum SW registrado após o reload
+      forçado, Cache Storage vazio, navegação normal direto da rede.
 - [ ] Métrica da SPEC operacional (§1.3, natureza mista) — este DoD cobre **só o item (a)**:
       conformidade externa apurada por inspeção manual no painel Application do Chrome/Edge
       DevTools (Manifest + Service Workers), rodada no fecho do ciclo (gate 9); dono

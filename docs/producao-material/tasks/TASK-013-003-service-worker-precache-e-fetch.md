@@ -78,7 +78,12 @@ nunca siga um passo que enfraqueça um critério.
 - [ ] `isStaticAssetRequest`/`isNavigationRequest` implementadas e exportadas de
       `src/lib/service-worker-policy.ts`.
 - [ ] `sw.js` liga as duas funções aos eventos `install`/`fetch`, sem lógica de decisão
-      própria fora delas.
+      própria fora delas — verificação executável (achado do `qa` pré-código: sem isso, os
+      testes das funções puras isoladas não confirmam que `sw.js` de fato as chama, em vez
+      de reimplementar lógica divergente inline): teste estrutural lendo `public/sw.js`
+      como texto, confirmando as chamadas literais `isStaticAssetRequest(`/
+      `isNavigationRequest(` dentro dos blocos dos listeners `addEventListener('install'`/
+      `addEventListener('fetch'` — mesmo comando/arquivo de teste do critério seguinte.
 - [ ] Testes cobrem AC-013-004 (nunca cacheia rota de API/HTML autenticado) —
       verificação executável: `npx jest --runTestsByPath
       src/lib/service-worker-policy.test.ts` → `OK (N tests)`, com casos:

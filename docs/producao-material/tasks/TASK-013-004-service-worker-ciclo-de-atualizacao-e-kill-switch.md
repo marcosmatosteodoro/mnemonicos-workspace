@@ -80,7 +80,15 @@ nunca siga um passo que enfraqueça um critério.
       (isKillVersion(...))` do `activate` (contagem de ocorrências fora desse bloco === 0)
       — fixada antes do código.
 - [ ] Testes cobrem AC-013-009 (ramo de kill-switch) — mesmo comando acima:
-      `isKillVersion(KILL_VERSION)` → `true`.
+      `isKillVersion(KILL_VERSION)` → `true`; **e** teste estrutural com controle
+      **positivo** (achado do `qa` pré-código, decisão 4.107(a) — o teste acima só prova
+      ausência fora do bloco, nunca presença dentro dele; passaria com o kill-switch
+      inteiramente não implementado): dentro do bloco `if (isKillVersion(...))`, a
+      contagem de ocorrências de `self.registration.unregister(`, `caches.delete(` (ou
+      `caches.keys(...).then(...delete...)`) e do envio de mensagem de reload aos
+      clientes (`postMessage`/`clients.claim()` seguido do sinal de reload) é **≥ 1 cada**
+      — mutante que remove qualquer uma das três chamadas do bloco deve reprovar este
+      teste.
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff
       (`git diff --name-only main...HEAD`), produção e teste.
 - [ ] Padrão de commit respeitado.
@@ -91,9 +99,14 @@ nunca siga um passo que enfraqueça um critério.
 ## Riscos específicos
 
 - **TRISK-013-001**: o efeito real do `activate` (caches efetivamente limpos,
-  `clients.claim()` disparando o reload de fato) não é simulável em `jsdom` — confirmado
-  por inspeção manual no painel Application (DevTools), DoD item (a) do PLAN, no fecho do
-  ciclo; não é um Roteiro de gate 9 desta TASK.
+  `clients.claim()` disparando o reload de fato) não é simulável em `jsdom` — o gate 1
+  acima prova a estrutura do código (presença das chamadas certas, dentro do bloco certo,
+  falsificável por mutante), mas não o efeito real no navegador. Confirmado pelo roteiro
+  concreto do DoD item (a) do PLAN §9 (não é um Roteiro de gate 9 desta TASK — é
+  confirmação única no fecho do ciclo, cobrindo esta e as demais TASKs afetadas por
+  TRISK-013-001).
+- **TRISK-013-003**: o kill-switch depende de um segundo deploy manual do frontend (sem
+  CI/CD, RISK-006-009) — aceito nesta fatia, sem mitigação adicional nesta TASK.
 - **TRISK-013-003**: o kill-switch depende de um segundo deploy manual do frontend (sem
   CI/CD, RISK-006-009) — aceito nesta fatia, sem mitigação adicional nesta TASK.
 
