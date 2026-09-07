@@ -9,9 +9,9 @@ isolado (`C:/kwt/pwa`) — nunca na working tree principal
 
 ## Status agregado
 
-- Todo: 2
+- Todo: 1
 - In Progress: 0
-- Done: 4
+- Done: 5
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -29,7 +29,7 @@ isolado (`C:/kwt/pwa`) — nunca na working tree principal
 - [x] TASK-013-004 ✅ Done — Service worker: ciclo de atualização e kill-switch
 
 ### Wave 5 (depende de Wave 4)
-- [ ] TASK-013-005 ⏸ Todo — Registro do service worker e verificação de instalabilidade
+- [x] TASK-013-005 ✅ Done — Registro do service worker e verificação de instalabilidade (gate 9 parcial — ver HANDOFF-PLAN-013, a consolidar)
 
 ### Wave 6 (depende de Wave 5)
 - [ ] TASK-013-006 ⏸ Todo — Verificação de não-regressão de sessão com SW ativo (fatia

@@ -7,7 +7,7 @@
 **Wave**: 5
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -137,26 +137,31 @@ obrigatório).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-07T03:41:09+0000
+**Data conclusão**: 2026-09-07T04:25:51+0000
+**Branch**: feat/producao-material-pwa-support
+**Commit SHA**: 95b95a8
 **Jira**: KAN-69
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer, qa
+**Tentativas**: 2
+**Cobertura final**: 100% (componente novo); global ~91%
 **Arquivos modificados**:
-  - 
+  - src/components/service-worker-registration.tsx
+  - src/components/service-worker-registration.test.tsx
+  - src/app/layout.tsx
+  - src/app/layout.test.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (235/235, 22 suítes)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (rodada 2 — 1 achado bloqueante: montagem em `layout.tsx` sem prova de wiring, mutante sobrevivia; fechado com teste de wiring + mutante confirmado morto)
+- [x] ACs verificados (AC-013-003 completo; AC-013-001/002 parcial, ver gate 9)
+- [ ] Segurança (gate 8): n/a — task não toca NFR-013-001/002/005/006/007/008 diretamente (só chama `.register()`)
+- [x] Comportamento (gate 9): **pendente_handoff** — AC-013-007 (contexto seguro) e a confirmação de que o SW registra/ativa de fato (residual do gate 1) VERIFICADOS via Playwright contra build de produção real. AC-013-001 (prompt nativo de instalação) e AC-013-002 (ícone/nome no app instalado) ficam pendentes — UI nativa do navegador fora do alcance de automação headless (causa `runtime_browser`, sondagem provada). `handoff_seed` guardado em `thoughts/local/sessions/20260906-202402-6346522c/handoff-seed-plan-013.md` para consolidação em `HANDOFF-PLAN-013.md` na Etapa 4 (após Wave 6).
+
+**Notas**: Rodada 1 reprovada pelo code-reviewer: a linha que monta `<ServiceWorkerRegistration />` em `layout.tsx` não tinha nenhum teste que provasse sua existência (apagar linha+import deixava tudo verde) — reincidência da lição ativa "função + wiring" (lessons.md:190), agora em composition root de React. Retry: `layout.test.tsx` chama `RootLayout` diretamente e percorre a árvore de elementos procurando o componente, com mutante confirmado. Gate 9 rodou em build de produção real (porta 3001, worktree isolado) — a confirmação de que o SW efetivamente ativa fecha a limitação residual que o próprio code-reviewer declarou (o teste de wiring prova presença na árvore, não renderização real). Achado de processo roteado ao `agile-coach`: bug de encoding em `scripts/probe-env.sh` (não lê `keelson.local.json` com UTF-8 explícito no Windows, mascarando erro de parse como "credencial ausente").
 
 **Notas**: 
