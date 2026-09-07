@@ -11,17 +11,17 @@ sem worktree dedicado).
 
 ## Status agregado
 
-- Todo: 2
+- Todo: 0
 - In Progress: 0
-- Done: 0
+- Done: 2
 - Blocked: 0
 
 ## Ordem de execução (waves)
 
 ### Wave 1 (paralelizável)
-- [ ] TASK-020-001 ⏸ Todo — Criar a página 404 personalizada (`not-found.tsx`) e seu
+- [x] TASK-020-001 ✅ Done — Criar a página 404 personalizada (`not-found.tsx`) e seu
       teste unitário
-- [ ] TASK-020-002 ⏸ Todo — Provar o status HTTP 404 real e a não-regressão do guard de
+- [x] TASK-020-002 ✅ Done — Provar o status HTTP 404 real e a não-regressão do guard de
       sessão (`proxy.ts`)
 
 > As duas TASKs são independentes por desenho: TASK-020-002 verifica um comportamento
@@ -47,7 +47,7 @@ provados via os ACs que os cobrem, tabela abaixo): NFR-019-001 → AC-019-001
 
 | AC | TASKs |
 |----|-------|
-| AC-019-001 | TASK-020-001 |
+| AC-019-001 | TASK-020-001 (área pública/interna herdada do layout), TASK-020-002 (caso 3 — prova ponta-a-ponta com sessão real via HTTP) |
 | AC-019-001b | TASK-020-002 (não-regressão — reexecução de `proxy.test.ts`, sem código novo) |
 | AC-019-002 | TASK-020-001 |
 | AC-019-003 | TASK-020-001 |

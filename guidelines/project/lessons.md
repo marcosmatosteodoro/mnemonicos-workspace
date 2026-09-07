@@ -1229,3 +1229,103 @@ concorrente) e `content-form.tsx:129-144` (efeito de foco em estado único).
 de mais de um estado local.
 **Estado:** em-observacao
 **Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Teste de integração HTTP contra o App Router: `toContain` de corpo não discrimina qual rota respondeu — use o `<title>` da rota resolvida
+
+**Erro:** `not-found.integration.test.ts` (TASK-020-002, PLAN-020) provou o status HTTP
+404 de uma rota inexistente e, para confirmar que era a página 404 PERSONALIZADA (não o
+404 genérico do framework), asseriu `expect(body).toContain('Página não encontrada')`.
+Levou 3 rodadas de code review para o defeito aparecer: essa string aparece no corpo de
+QUALQUER resposta do app — inclusive `/` e `/login`, ambas 200 —, porque o App Router
+embute o payload RSC da árvore inteira (inclusive o boundary `not-found`) no HTML de
+qualquer rota sob o mesmo root layout. A asserção passava mesmo se o roteamento
+estivesse errado.
+**Causa:** `toContain` de um trecho do CORPO mede "esse texto existe em algum lugar do
+payload", não "esta URL resolveu para este componente". No App Router (Server
+Components + payload RSC serializado), corpo de página não é sinal confiável de
+cabeamento — ele carrega fragmentos de rotas irmãs.
+**Solução:** teste de integração HTTP que precisa provar QUAL rota/página respondeu
+assere um marcador que só a rota **efetivamente resolvida** produz — o `<title>` do
+`<head>`, derivado da `metadata` da rota (o `template` do layout raiz torna cada título
+único), nunca substring do corpo. Fechamento falsificável: a asserção escolhida tem que
+FALHAR contra uma resposta 200 de outra rota conhecida (controle positivo já executado:
+`/` e `/login` contêm a string do corpo, mas não o `<title>` da 404). E a asserção nasce
+em TODOS os casos do describe de uma vez — aplicá-la só ao 1º caso e deixar os demais
+com o oráculo fraco é o mesmo defeito, um nível abaixo. Referência:
+`src/app/not-found.integration.test.ts:105,118,130` (asserção de `<title>`) +
+`src/app/layout.tsx:15-18` (`template: '%s · <appName>'`, o que dá poder discriminante
+ao título).
+**Validade:** todo teste de integração HTTP contra rota do App Router (Next 16) que
+precise provar qual página/boundary respondeu, não apenas o código de status.
+**Estado:** em-observacao
+**Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Servidor real subido em teste de integração (`next start`) deve bindar em `127.0.0.1` explicitamente — o default é `0.0.0.0`
+
+**Erro:** `not-found.integration.test.ts` (TASK-020-002, PLAN-020) subiu `next start`
+com `-p 0` (porta dinâmica) mas sem `-H`, herdando o default de hostname do Next
+(`0.0.0.0`) — o build de produção ficou alcançável de qualquer interface de rede do
+host (LAN, runner de CI compartilhado) pela duração do teste (até 360s de timeout).
+**Causa:** a revisão de "porta efêmera, nunca fixa" tratou o bind (hostname) como o
+mesmo eixo da porta; são eixos independentes, e o default do framework é permissivo —
+a omissão não quebra o teste, só amplia a exposição em silêncio.
+**Solução:** todo teste/script que sobe servidor HTTP real local (`next start`,
+`next dev`, listener Node de fixture) fixa o bind em loopback explicitamente
+(`-H 127.0.0.1` no Next; `host: '127.0.0.1'` em `server.listen`) junto da porta
+dinâmica, e ancora a descoberta de porta/URL no mesmo literal `127.0.0.1` (nunca
+`localhost`, que pode resolver diferente). Referência:
+`src/app/not-found.integration.test.ts:74-80`.
+**Validade:** todo teste ou script deste projeto (frontend ou backend) que sobe um
+servidor HTTP real como parte da suíte.
+**Estado:** em-observacao
+**Contadores:** confirmada 0 · contestada 0
+
+## [Design] Arquivo de convenção do App Router (`not-found.tsx`, `error.tsx`) é rota alcançável por URL e precisa declarar `metadata.title` como qualquer `page.tsx`
+
+**Erro:** `not-found.tsx` (TASK-020-001, PLAN-020) foi entregue sem `export const
+metadata`, então a aba do navegador, o histórico, o favorito salvo e o anúncio de
+título do leitor de tela herdavam o `title.default` do root layout — o título da HOME —
+numa página que diz ao usuário "página não encontrada". Duas afirmações contraditórias
+sobre onde o usuário está, com a falsa chegando primeiro a quem navega por teclado/leitor
+de tela.
+**Causa:** o padrão "toda rota declara seu título" existe de fato no produto (7/7
+`page.tsx` declaravam `metadata.title`, e o `template` do root layout existe
+especificamente para recebê-lo) mas não estava escrito em nenhuma guideline — e
+`not-found.tsx`/`error.tsx` não são `page.tsx`, então passam despercebidos do reflexo de
+"toda tela nova declara título". A ausência é invisível no markup e só aparece no
+`<title>` renderizado; nenhum teste de componente isolado a pega.
+**Solução:** toda superfície de rota alcançável por URL — inclusive os arquivos de
+convenção do App Router (`not-found.tsx`, `error.tsx`, `global-error.tsx`) — declara
+`export const metadata: Metadata = { title: '<pt-BR>' }`, no mesmo formato de
+`src/app/login/page.tsx:6-8`, preenchendo o `template: '%s · <appName>'` do root layout.
+Prova barata: asserção de `<title>` num teste de integração HTTP real (Next aplica
+metadata do boundary `not-found`/`error` — comportamento confirmado em
+`next/dist/server/app-render/app-render.js` e `next/dist/lib/metadata/resolve-metadata.js`
+da versão instalada, não presumido pela documentação). Referência:
+`src/app/not-found.tsx:4-6`.
+**Validade:** toda rota nova do `mnemonicos-frontend` (App Router), incluindo arquivos
+de convenção (`not-found.tsx`, `error.tsx`, `global-error.tsx`) além de `page.tsx`.
+**Estado:** em-observacao
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Parser de token sobre buffer acumulado de stream nunca aceita fim-de-buffer como delimitador
+
+**Erro:** `not-found.integration.test.ts` (TASK-020-002, PLAN-020) extraía a porta
+anunciada pelo `next start` no stdout com a regex `/https?:\/\/127\.0\.0\.1:(\d+)(?:[^\d]|$)/`
+— a alternativa `$` casa o FIM DO BUFFER ACUMULADO, que é justamente a condição de corte
+de chunk que a âncora deveria excluir (um buffer que ainda pode crescer não é fim de
+token). O comentário ao lado afirmava a garantia oposta à que o código de fato dava.
+**Causa:** ao ancorar um token lido de um stream incremental (stdout de processo filho,
+socket, leitura em chunks), "fim de string" foi tratado como delimitador válido. Num
+buffer que ainda pode crescer, fim de string significa "ainda não sei se o token
+acabou" — o oposto de fronteira. A falha é intermitente (depende de onde o SO corta o
+chunk), então nenhuma execução isolada a pega.
+**Solução:** parser de token sobre buffer acumulado de stream só aceita o match quando
+um delimitador NÃO-DÍGITO (ou o caractere de fronteira apropriado) já chegou de fato
+depois do token — nunca `$`/fim-de-buffer como fronteira, e nunca `^` como início por
+simetria. Prefira esperar o próximo chunk a resolver com o que já veio. Referência:
+`src/app/not-found.integration.test.ts:41` (regex corrigida, sem a alternativa `$`).
+**Validade:** todo código deste projeto que faz parsing incremental de stdout/stderr de
+processo filho ou de socket lido em chunks.
+**Estado:** em-observacao
+**Contadores:** confirmada 0 · contestada 0

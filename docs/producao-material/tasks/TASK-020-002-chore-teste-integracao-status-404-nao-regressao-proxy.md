@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -57,7 +57,11 @@ slug com o padrão "servidor real dentro do próprio processo de teste" (TRISK-0
   (porta 0 ou faixa reservada de teste — TRISK-020-001) via `child_process.spawn`,
   aguardando o processo sinalizar pronto (parse do stdout, ex. `"Ready in"`/`"started
   server on"`) antes de prosseguir; `afterAll` encerra o processo filho
-  (`child.kill()`) mesmo em caso de falha do teste, liberando a porta. 2 casos:
+  (`child.kill()`) mesmo em caso de falha do teste, liberando a porta. 3 casos — todos
+  com asserção de `<title>Página não encontrada · Mnemônicos</title>` no corpo, não só
+  `toContain` de texto solto (achado do code-reviewer, rodada 3: o payload RSC do App
+  Router embute a string do `not-found` em QUALQUER resposta, inclusive `/`/`/login`
+  200 — só o `<title>` da rota efetivamente resolvida discrimina):
   (1) `fetch` contra uma rota que não existe (`/rota-inexistente-<sufixo>`, fora de
   `/studio`/`/content`) e assere `response.status === 404`; (2) `fetch` contra um
   segmento malformado, **também fora** de `/studio`/`/content` (ex.:
@@ -78,10 +82,14 @@ slug com o padrão "servidor real dentro do próprio processo de teste" (TRISK-0
   conhecida (ex. 3000) reintroduziria o conflito já registrado em `lessons.md`
   ("`CORS_ORIGINS` de origem única quebra silenciosamente o padrão de porta alternativa
   entre sessões paralelas") e colidiria com qualquer `next dev` local em execução.
-- Rota sob prefixo guardado (`/studio/**`, `/content/**`) como alvo do teste de status —
-  essas retornam 307 (redirect do guard), não 404; usá-las aqui provaria o guard, não a
-  convenção 404 (AC-019-001b é a asserção correta para elas, coberta abaixo pela
-  reexecução de `proxy.test.ts`).
+- Rota sob prefixo guardado (`/studio/**`, `/content/**`) **sem sessão** como alvo do
+  teste de status — sem cookie `mnemo_access`, essas retornam 307 (redirect do guard),
+  não 404; usá-las aqui provaria o guard, não a convenção 404 (AC-019-001b é a asserção
+  correta para elas, coberta abaixo pela reexecução de `proxy.test.ts`). **Ressalva
+  (achado do code-reviewer, rodada 2)**: rota sob prefixo guardado **com** sessão ativa
+  não está excluída — é o 3º caso do Escopo/Inclui acima, exigido por AC-019-001/
+  FR-019-004 ("interna com sessão ativa"); a exclusão desta linha vale só para o
+  cenário sem sessão.
 
 ## Implementação sugerida
 
@@ -126,18 +134,20 @@ nunca siga um passo que enfraqueça um critério.
 - [ ] Testes cobrem AC-019-004, TRISK-020-002/RISK-019-001 e a não-regressão de
       AC-019-001b — verificação executável:
       (a) `npx jest --runTestsByPath src/app/not-found.integration.test.ts` (cwd
-      `mnemonicos-frontend`) → `PASS` (2 testes: o `fetch` real com `status === 404` da
-      rota simples, e o `fetch` do segmento malformado com `status === 404`) —
+      `mnemonicos-frontend`) → `PASS` (3 testes, cada um com asserção de
+      `<title>Página não encontrada · Mnemônicos</title>` — não só `status === 404`,
+      que o 404 default do framework também satisfaz: rota pública simples, segmento
+      malformado, e rota sob prefixo interno com sessão ativa) —
       fixada antes do código (arquivo-alvo ainda não existe; mesmo mecanismo de override
       `@jest-environment node` já em produção nesta base — `src/proxy.test.ts`, que já
       roda hoje sob esse ambiente); (b) `npx jest --runTestsByPath src/proxy.test.ts`
       (cwd `mnemonicos-frontend`) → `PASS`, baseline capturada ANTES de qualquer mudança
-      desta TASK (contagem esperada pela leitura estática do arquivo em 2026-09-07: 23
-      casos — 4 do describe "guard de navegação" + 8 do `it.each` de
-      `isSafeRelativePath` + 7 de "config.matcher — derivado" + 3 de "config.matcher —
-      literal estático" + 1 de "home pública não é guardada" —, **confirmar a contagem
-      real na execução, não assumir**, e a mesma contagem se repete ao final da TASK,
-      sem alteração de asserção).
+      desta TASK — baseline **atualizada** (a contagem original de 23, de 2026-09-07,
+      ficou obsoleta pelo merge de `origin/main`/KAN-75, que estendeu `proxy.test.ts`
+      com o guard de open-redirect por resolução WHATWG: `password-field.tsx`/
+      `login-form.tsx` etc.): confirmado por execução real em 2026-09-07 (rodada de
+      code review, pós-merge) **54 casos**, todos verdes, sem alteração de arquivo — a
+      mesma contagem se repete ao final da TASK, sem alteração de asserção).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff
       (`git diff --name-only main...HEAD`), produção e teste —
       `npx eslint src/app/not-found.integration.test.ts` (cwd `mnemonicos-frontend`) → 0
@@ -168,26 +178,36 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-07T15:18:00-0300
+**Data conclusão**: 2026-09-07T16:27:22-0300
+**Branch**: feat/pagina-404-personalizada
+**Commit SHA**: c96239c
 **Jira**: KAN-82
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer (+ ajuste mecânico final aplicado pelo Tech Lead, item roteado abaixo)
+**Revisado por**: code-reviewer, security-engineer
+**Tentativas**: 4 (implementação + 3 rodadas de correção — 2 pelo developer, 1 mecânica pelo Tech Lead após o `code-reviewer` propor "aplicar e fechar" sem decisão de arquitetura pendente)
+**Cobertura final**: n/a (critérios da TASK não exigem `--coverage`)
 **Arquivos modificados**:
-  -
+  - mnemonicos-frontend/src/app/not-found.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1, 2 achados média fechados: bind loopback + branch defasada, resolvida por merge de `origin/main`)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-019 sem FEATs
 
-**Notas**:
+**Notas**: Rodadas de convergência acima do teto padrão de 1 retry (4 no total) — todos os
+achados residuais das rodadas 2-4 foram mecânicos (âncora de regex, asserção de corpo
+não-discriminante, reconciliação de contagem no artefato), sem nenhuma decisão de
+arquitetura ou produto pendente; o `code-reviewer` propôs explicitamente "aplicar e
+fechar" nas duas últimas rodadas. Decisão registrada em nome do Diretor (Tech Lead,
+degrau 1 da escada de reação): prosseguir com a correção mecânica final em vez de
+escalar — opção segura e reversível, sem ambiguidade de produto. Branch sincronizada com
+`origin/main` (merge fast-forward, sem conflito) antes do fecho da wave — achado do
+`security-engineer` (proxy.ts da branch estava pré-KAN-75). 4 lições registradas em
+`guidelines/project/lessons.md` (discriminação de rota por `<title>` em teste HTTP;
+bind loopback em servidor de teste; parser de token sobre buffer de stream).

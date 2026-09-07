@@ -224,7 +224,7 @@ tests/**          provas, espelhando a estrutura de src/
 | `loading.tsx` | fallback de `<Suspense>` do segmento | é o que torna o streaming visível |
 | `error.tsx` | error boundary do segmento (**client**, recebe `reset`) | não captura erro do layout do mesmo nível |
 | `global-error.tsx` | boundary do root layout (substitui `<html>`) | último recurso |
-| `not-found.tsx` | par de `notFound()` | 404 semântico, não redirect |
+| `not-found.tsx` | par de `notFound()` | 404 semântico, não redirect — **é rota alcançável por URL: declara `export const metadata` (`title`) como `page.tsx`, senão herda o `title.default` do layout raiz (lição, SPEC-019)** |
 | `route.ts` | Route Handler (API) | **não coexiste** com `page.tsx` no mesmo segmento |
 | `(grupo)` · `_pasta` · `[slug]` · `[...all]` · `@slot` | agrupamento sem URL · pasta privada · dinâmico · catch-all · slot paralelo | `(grupo)` não aparece na URL; `_pasta` nunca vira rota |
 
@@ -602,6 +602,10 @@ primeira rota autenticada.
   direta na sessão de quem estuda. Ver §8.
 - **`postMessage` / `iframe` / storage:** se algum dia entrarem, valide `event.origin` sempre;
   `X-Frame-Options: DENY` já bloqueia o *clickjacking* da nossa página.
+- **Anti-padrão (lição, SPEC-019):** teste/script que sobe `next start`/`next dev` real
+  (integração) sem `-H 127.0.0.1` herda o bind default `0.0.0.0` do Next, expondo o build
+  na rede do host pela duração da execução. Fixe o bind em loopback explicitamente, sempre
+  junto da porta dinâmica (`-p 0`).
 
 ---
 

@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -178,26 +178,31 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-07T15:20:31-0300
+**Data conclusão**: 2026-09-07T15:49:28-0300
+**Branch**: feat/pagina-404-personalizada
+**Commit SHA**: 06a5999
 **Jira**: KAN-81
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer, security-engineer, product-designer
+**Tentativas**: 2
+**Cobertura final**: 100% stmts/branch/funcs/lines em `not-found.tsx`
 **Arquivos modificados**:
-  -
+  - mnemonicos-frontend/src/app/not-found.tsx
+  - mnemonicos-frontend/src/app/not-found.test.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-019 sem FEATs
 
-**Notas**:
+**Notas**: 1 retry — product-designer reprovou a 1ª rodada (sem `metadata.title`, título
+herdava o da home; className do link divergia do padrão canônico); ambos corrigidos e
+aprovados na 2ª rodada. 2 lições registradas em `guidelines/project/lessons.md`
+(metadata.title em arquivo de convenção do App Router; bind loopback em teste de
+integração, esta última também citada em TASK-020-002).
