@@ -82,6 +82,50 @@
   `auth.service`, `contents`, `contents.service`, `disciplines`, `users`) — consolidação
   pendente, fora do escopo desta fatia.
 
+## Tira mnemônica como sequência de quadros (F4 · PLAN-012)
+
+- [2026-09-07 · PLAN-012] **Corrige a entrada da linha 9 acima**: `MnemonicStrip` (1:1
+  `RuleBreakdown`, `@@unique(ruleBreakdownId)`) + `MnemonicFrame` (N:1, posição indexada,
+  `@@unique([stripId,position])` como defesa em profundidade contra duplicidade) substituem
+  `Mnemonic.hook`/`Mnemonic.decoding` para o fluxo novo — o modelo legado permanece intacto no
+  schema (migração 100% aditiva, DEC-012-010), sem consumidor de código — mnemonicos-backend/prisma/schema.prisma (models MnemonicStrip/MnemonicFrame).
+- [2026-09-07 · PLAN-012] `tira.service.ts` — módulo em camadas (schema Zod → service com
+  `$transaction` → routes), reusa `assertRawContentReachable` de `contents.service.ts` (F2,
+  exportado por TASK-012-002) como guarda de alcance por autoria — nunca reescrita. Funções:
+  `buildInitialFrames` (pura, deriva Quadros dos Blocos não-vazios da Quebra), `openMnemonicStrip`
+  (get-or-generate idempotente, chamada só pelo `POST`, DEC-012-008 concorrência via P2002-catch-fora-da-transação),
+  `getMnemonicStrip` (leitura pura, 404 se ainda não aberta — nasceu na EMENDA de Wave 6/DEC-012-011),
+  `assertStripPrerequisites` (guarda comum extraída, chamada por ambas as funções de abertura),
+  `reassignPositions`/`applyPositions` (primitiva de reindexação atômica em 2 fases, DEC-012-003 —
+  offset para faixa negativa antes das posições finais, evita colisão de unique constraint),
+  `reorderMnemonicFrames`/`addMnemonicFrame`/`updateMnemonicFrameText`/`removeMnemonicFrame` (CRUD,
+  todos reusando a primitiva de reindexação) — mnemonicos-backend/src/modules/tira/tira.service.ts:1-250.
+- [2026-09-07 · PLAN-012] **DEC-012-011 supersede DEC-012-009** (furo no plano, Wave 5): a geração
+  da Tira nasceu como `GET /contents/:id/strip` get-or-generate — achado de CSRF do
+  `security-engineer` (cookie de sessão `sameSite: 'lax'` acompanha navegação top-level, e a regra
+  repo-wide do projeto proíbe `verifyOrigin` em `GET`) forçou a migração: `GET` virou leitura pura
+  (404 se ainda não aberta), a geração migrou para `POST /contents/:id/strip` (com `verifyOrigin`).
+  Qualquer novo endpoint get-or-generate futuro no projeto segue este padrão desde a largada, não o
+  padrão antigo de `DEC-012-009` — mnemonicos-backend/src/modules/tira/tira.routes.ts:1-160.
+- [2026-09-07 · PLAN-012] `tira.routes.ts` — 6 rotas em árvore plana sob a mesma barreira
+  deny-by-default de `/contents` (tripwire `route-authz-matrix` 19→25): `GET`/`POST .../strip`,
+  `POST/PATCH/DELETE .../strip/frames[/:frameId]`, `PUT .../strip/frames/order`. Confused deputy
+  no `:frameId` (o `rawContentId` a autorizar é sempre resolvido pela CADEIA Frame→Strip→RuleBreakdown→RawContent,
+  nunca aceito cru do path) — pendência herdada da Wave 1, fechada na faceta HTTP em TASK-012-008 —
+  mnemonicos-backend/src/modules/tira/tira.routes.ts:1-160.
+- [2026-09-07 · PLAN-012] Tela `(interno)/content/[id]/tira` — Server Component puro
+  (`page.tsx`, cabeçalho canônico `h1`+`Link` de saída) + client component
+  `mnemonic-strip-board.tsx` (CRUD/reordenação, 3 estados por ação, diálogo de confirmação de
+  remoção com gestão de foco explícita — régua: todo setter de estado que decide o RAMO onde um
+  diálogo condicional vive precisa de destino de foco, não só o setter que "parece dono" do
+  diálogo). Link condicional de entrada em `rule-breakdown-form.tsx` (habilitado só com Quebra
+  salva) — mnemonicos-frontend/src/components/mnemonic-strip-board.tsx:1-100.
+- [2026-09-07 · PLAN-012] Lição recorrente nesta fatia (3 ocorrências, `lessons.md`): guarda de
+  autoria reusada de outro módulo exige prova COMPORTAMENTAL própria por CADA novo método que lê
+  ou escreve o dado escopado (leitura inclusive, não só escrita) — prova estrutural (leitura
+  textual do fonte) é complemento de ORDEM, nunca substituto de alcance; fechamento contável
+  reconferido a cada TASK que adiciona um método, nunca herdado do denominador da TASK anterior.
+
 ## Publicação (ausente)
 
 - [2026-08-27 · epico] Nenhuma geração ou exportação de PDF existe nos dois repos — nem dependência, nem rota, nem script; F6 é greenfield total nesta área — busca em ambos os repos não retornou nada
