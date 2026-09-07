@@ -9,9 +9,9 @@ isolado (`C:/kwt/pwa`) — nunca na working tree principal
 
 ## Status agregado
 
-- Todo: 1
+- Todo: 0
 - In Progress: 0
-- Done: 5
+- Done: 6
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -32,8 +32,8 @@ isolado (`C:/kwt/pwa`) — nunca na working tree principal
 - [x] TASK-013-005 ✅ Done — Registro do service worker e verificação de instalabilidade (gate 9 parcial — ver HANDOFF-PLAN-013, a consolidar)
 
 ### Wave 6 (depende de Wave 5)
-- [ ] TASK-013-006 ⏸ Todo — Verificação de não-regressão de sessão com SW ativo (fatia
-      sensível)
+- [x] TASK-013-006 ✅ Done — Verificação de não-regressão de sessão com SW ativo (fatia
+      sensível; gate 9 parcial — ver HANDOFF-PLAN-013, a consolidar)
 
 > Waves de tamanho 1: a cadeia de dependência de componentes do PLAN (COMP-013-002 →
 > COMP-013-001 → COMP-013-003 → COMP-013-004) é linear (PLAN §3/§7), sem paralelismo real

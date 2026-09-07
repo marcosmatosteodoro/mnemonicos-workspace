@@ -7,7 +7,7 @@
 **Wave**: 6
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -161,26 +161,26 @@ próxima sessão de verificação. Fechar `npm run start`.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-07T04:29:34+0000
+**Data conclusão**: 2026-09-07T04:54:00+0000
+**Branch**: feat/producao-material-pwa-support
+**Commit SHA**: — (nenhum — chore de verificação, sem código de produção; baseline confirmado sem divergência)
 **Jira**: KAN-70
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer (baseline), qa (roteiro), security-engineer (revisão focada)
+**Revisado por**: security-engineer
+**Tentativas**: 1
+**Cobertura final**: n/a
 **Arquivos modificados**:
-  - 
+  - (nenhum)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa (baseline automatizada confirmada, sem divergência)
+- [x] Testes passando (9/9 herdados, sem alteração)
+- [x] Lint limpo (n/a — sem código novo)
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (n/a — sem diff a revisar; revisão de segurança cobriu o mecanismo)
+- [x] ACs verificados (parcial — ver gate 9)
+- [x] Segurança (gate 8): aprovado — revisão focada do Cache Storage (critério próprio da TASK): garantia de NFR-013-001 é estrutural (2 pontos de escrita, 2 camadas independentes — origem + allowlist de path), nenhuma lacuna nova exposta pela integração das 5 waves, NFR-013-002 não sobre-promete
+- [x] Comportamento (gate 9): **pendente_handoff** — AC-013-011 (guarda de rota, V3) VERIFICADO idêntico a `HANDOFF-PLAN-003`; AC-013-005 controle positivo confirmado (cache do app-shell populado, sem API/HTML pré-login). Ciclo completo login→uso→logout (V1/V2/V4/V5) bloqueado por ambiente (`CORS_ORIGINS` do backend fixo em `:3000`, porta ocupada por sessão paralela) — `handoff_seed` consolidado em `thoughts/local/sessions/20260906-202402-6346522c/handoff-seed-plan-013.md` para `HANDOFF-PLAN-013.md`.
 
-**Notas**: 
+**Notas**: Baseline automatizada (developer): suíte de sessão (9/9) confirmada verde sem alteração — `internal-shell.integration.test.tsx` monta `InternalShell` isolado, não exercita o SW real (limitação já prevista, TRISK-013-001). Gate 9 (qa): identidade do ambiente verificada antes de exercitar (porta 3000 pertencia a processo de outra sessão, não tocado; build própria subiu em `:3001`); nenhum efeito colateral no backend compartilhado, sessão nova do EDITOR não foi criada (tentativa via UI nunca completou por CORS). Nova lição registrada em `guidelines/project/lessons.md` ("[Config] CORS_ORIGINS de origem única quebra silenciosamente o padrão de porta alternativa entre sessões paralelas", estado `em-observacao`).
