@@ -7,7 +7,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -83,7 +83,7 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
 
 ## Critérios de pronto
 
-- [ ] **Confused deputy no `:frameId` (achado do security-engineer, gate 8 da Wave 1 —
+- [x] **Confused deputy no `:frameId` (achado do security-engineer, gate 8 da Wave 1 —
       pendência herdada, decisão 4.140)**: `updateMnemonicFrameText`/`removeMnemonicFrame`
       recebem `rawContentId` (do `:id` da rota) **e** `frameId` (do `:frameId`) — o
       `rawContentId` a autorizar (`assertRawContentReachable`) é sempre o resolvido a
@@ -94,7 +94,7 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
       → rejeitado (404, mesma mensagem de "não encontrado" — nunca sucesso nem 403
       distinguível). Comando: mesmo arquivo de integração acima, caso
       "rejeita frameId que não pertence à cadeia do rawContentId da URL".
-- [ ] Testes cobrem AC-011-004, AC-011-005 (add): novo Quadro aparece na posição
+- [x] Testes cobrem AC-011-004, AC-011-005 (add): novo Quadro aparece na posição
       informada, deslocando os Quadros seguintes sem lacuna nem duplicidade (reusa
       `reassignPositions` de TASK-012-006 — a prova de atomicidade da primitiva em si
       não se repete aqui, só o uso correto pela nova função); falha simulada (ver
@@ -103,16 +103,16 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
       arquivo de TASK-012-005/006). Comando: `npm --prefix mnemonicos-backend run
       test:integration -- --testPathPatterns=tira.service.integration.test.ts` → `OK (N
       tests)`.
-- [ ] Testes cobrem AC-011-006, AC-011-007 (edit): novo texto persistido com posição
+- [x] Testes cobrem AC-011-006, AC-011-007 (edit): novo texto persistido com posição
       intocada; tentativa que falha preserva o texto anterior — mesmo comando acima.
-- [ ] Testes cobrem AC-011-008, AC-011-009 (remove): remover Quadro do meio (Tira com 4
+- [x] Testes cobrem AC-011-008, AC-011-009 (remove): remover Quadro do meio (Tira com 4
       Quadros, remover a posição 2) recompõe 1,2,3 sem lacuna; tentativa que falha não
       remove nem reposiciona nenhum Quadro — mesmo comando acima.
-- [ ] Testes cobrem AC-011-024 (completo): remover o ÚLTIMO Quadro restante → Tira fica
+- [x] Testes cobrem AC-011-024 (completo): remover o ÚLTIMO Quadro restante → Tira fica
       com `frames: []`; reabrir a Tira em seguida (`openMnemonicStrip`, TASK-012-005) NÃO
       dispara nova geração automática (a Tira permanece vazia, não os 5 Quadros da
       geração inicial) — mesmo comando acima.
-- [ ] Testes cobrem AC-011-012 (completo — round-trip de sessão): sequência real com as
+- [x] Testes cobrem AC-011-012 (completo — round-trip de sessão): sequência real com as
       5 operações (`openMnemonicStrip` de TASK-012-005 → `addMnemonicFrame` →
       `updateMnemonicFrameText` → `removeMnemonicFrame` → `reorderMnemonicFrames` de
       TASK-012-006, nesta ordem, todas bem-sucedidas) sobre a MESMA Tira; ao final, uma
@@ -121,21 +121,21 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
       última mutação bem-sucedida, com o texto atual de cada um. Mesmo comando acima →
       `OK (N tests)`, incluindo "round-trip completo: add+edit+remove+reorder sobrevivem
       à reabertura (AC-011-012)".
-- [ ] Testes cobrem AC-011-014 (parte — via add/edit/remove), **um caso por sujeito**
+- [x] Testes cobrem AC-011-014 (parte — via add/edit/remove), **um caso por sujeito**
       (FR-011-009 nomeia 4 sujeitos — reorder já coberto por TASK-012-006): Tira
       recém-gerada, sem mutação humana → 1ª chamada de `addMnemonicFrame` OU
       `updateMnemonicFrameText` OU `removeMnemonicFrame` (3 testes distintos, um por
       função) registra CONCLUSAO; a 2ª mutação humana subsequente (de qualquer um dos 4
       tipos) registra RETRABALHO, nunca uma 2ª CONCLUSAO. Mesmo comando acima → `OK (N
       tests)`.
-- [ ] Testes cobrem AC-011-015 (parte — fail-secure), **um caso por função** (mesmo
+- [x] Testes cobrem AC-011-015 (parte — fail-secure), **um caso por função** (mesmo
       padrão de `contents.service.integration.test.ts`, describe "Fail-secure"):
       `jest.spyOn(productionEventsService, 'recordProductionStageEvent')
       .mockRejectedValueOnce(...)` durante `addMnemonicFrame`/`updateMnemonicFrameText`/
       `removeMnemonicFrame` (3 testes) — cada chamada propaga o erro e o estado da Tira
       (Quadros, textos, posições) permanece EXATAMENTE o de antes da tentativa. Mesmo
       comando acima → `OK (N tests)`.
-- [ ] Testes cobrem a **guarda de pertencimento `frameId`→`stripId`** (defesa contra
+- [x] Testes cobrem a **guarda de pertencimento `frameId`→`stripId`** (defesa contra
       substituição de id, A01) com **mutação contável** (decisão 4.139/4.232 — mesma
       régua aplicada em TASK-012-006 ao array `order`): 2 Tiras distintas A e B (2
       `RawContent`s diferentes, cada uma com ao menos 1 Quadro); para CADA uma das 2
@@ -145,26 +145,34 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
       `NotFoundError('Quadro não encontrado.')` (mesma mensagem de "id inexistente" —
       nunca distinguir), e os Quadros de A **e** de B permanecem intocados. Mesmo
       comando acima → `OK (N tests)`.
-- [ ] Testes cobrem AC-011-020, AC-011-022 (parte — estrutural, mesma régua de
-      TASK-012-006): `assertRawContentReachable` é a 1ª chamada dentro do corpo de CADA
-      uma das 3 funções (`addMnemonicFrame`, `updateMnemonicFrameText`,
-      `removeMnemonicFrame`) — mesmo teste de leitura textual (regex ancorada por
-      função, comentários excluídos) do arquivo
-      `mnemonicos-backend/tests/unit/tira.service.guard-order.test.ts`, estendido com as
-      3 novas funções. Comando: `npm --prefix mnemonicos-backend test --
-      tira.service.guard-order.test.ts` → `OK (N tests)`. A prova comportamental
-      completa de alcance já foi feita em TASK-012-005 — não duplicar.
-- [ ] Testes cobrem NFR-011-002 (consumo da primitiva) e a lição "[Performance]
+- [x] Testes cobrem AC-011-020, AC-011-022 — **duas camadas de prova, ambas exigidas**
+      (correção de closure, decisão 4.140-símile: o texto original desta TASK mandava
+      prova só estrutural e dispensava a comportamental "por já feita em TASK-012-005",
+      o que contraria a lição ativa "[Segurança] Guarda reusada continua exigindo prova
+      comportamental própria por novo método de escrita", `guidelines/project/lessons.md`
+      — reincidência confirmada pelo gate 8/code-reviewer na Wave 4, corrigida no retry):
+      (a) estrutural — `assertRawContentReachable` é a 1ª chamada dentro do corpo de
+      CADA uma das 3 funções (`addMnemonicFrame`, `updateMnemonicFrameText`,
+      `removeMnemonicFrame`), provado por leitura textual em
+      `mnemonicos-backend/tests/unit/tira.service.guard-order.test.ts`; (b)
+      comportamental — cada uma das 3 funções tem teste de integração PRÓPRIO provando
+      negação cross-tenant (EDITOR B com argumentos válidos de EDITOR A → rejeitado com
+      a MESMA mensagem literal do id inexistente) e o vetor soft-delete do próprio dono,
+      em `tests/integration/tira.service.integration.test.ts`. Comando: `npm --prefix
+      mnemonicos-backend test -- tira.service.guard-order.test.ts` → `OK (4 tests)` e
+      `npm --prefix mnemonicos-backend run test:integration -- --testPathPatterns=tira.service.integration.test.ts`
+      → `OK (39 tests)`.
+- [x] Testes cobrem NFR-011-002 (consumo da primitiva) e a lição "[Performance]
       `include`/`select` aninhado de relação não é 1 statement por padrão": cada uma das
       3 funções devolve `MnemonicStripDetail` inteiro com round-trips fixados em teste
       via `withQueryProbe` — confirma **1 round-trip de leitura final** (o `findMany`/
       `select` que monta o `MnemonicStripDetail` devolvido), não N+1 por Quadro. Mesmo
       comando acima → `OK (N tests)`.
-- [ ] Sem warnings/lints novos sobre todos os arquivos do diff (`git diff --name-only
+- [x] Sem warnings/lints novos sobre todos os arquivos do diff (`git diff --name-only
       main...HEAD`) — `npm --prefix mnemonicos-backend run lint` → exit 0.
-- [ ] Padrão de commit respeitado.
-- [ ] Aderência à stack/padrões da ficha e do perfil `node-22.md`.
-- [ ] Code review aprovado.
+- [x] Padrão de commit respeitado.
+- [x] Aderência à stack/padrões da ficha e do perfil `node-22.md`.
+- [x] Code review aprovado.
 
 ## Riscos específicos
 
@@ -179,26 +187,39 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T23:30:00-0300
+**Data conclusão**: 2026-09-07T00:15:00-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 51c23fe (implementação) + 2a8e42f (retry — prova comportamental)
 **Jira**: KAN-57
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer + security-engineer (convergência delta-scoped, 1 retry)
+**Tentativas**: 2 (1ª rodada REPROVADA gates 1/6/7/8 — alcance por autoria só estrutural
+  nos 3 métodos novos; retry adicionou prova comportamental cross-tenant + soft-delete;
+  re-review delta APROVADO nos dois gates)
+**Cobertura final**: 25/25 ACs desta TASK cobertos (AC-011-004/005/006/007/008/009/012/
+  014/015/020/022/024 + confused deputy :frameId)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/tira/tira.service.ts
+  - mnemonicos-backend/tests/integration/tira.service.integration.test.ts
+  - mnemonicos-backend/tests/unit/tira.service.guard-order.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando (39/39 integração escopada · 271/271 integração completa · 238/238 unit · 4/4 guard-order)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (convergência delta 51c23fe..2a8e42f, 1 retry)
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer, convergência delta, mutação `{...actor, role:'ADMIN'}` reproduzida com controle negativo/positivo
+- [x] Comportamento (gate 9): n/a — SPEC-011 sem FEATs (verificação consolidada na Etapa 4/DoD do PLAN)
 
-**Notas**:
+**Notas**: 1ª rodada reprovada por reincidência exata da lição ativa "[Segurança] Guarda
+reusada continua exigindo prova comportamental própria por novo método de escrita" —
+o próprio card desta TASK (linha 148-156, corrigida acima) instruía prova só estrutural
+e dispensava a comportamental "por já feita em TASK-012-005". 2 achados não-bloqueantes
+ficam como pendência (carona no próximo retry da wave): separar o vetor soft-delete num
+`it` próprio por método (atualmente 2 vetores num `it` composto) e 2 comentários
+residuais de narrativa de processo. Achado fora de escopo do code-reviewer: rodar jest
+de uma 2ª worktree dentro do repo envenena o cache haste compartilhado (`%TEMP%\jest`) —
+sinal ao Tech Lead, não é defeito desta TASK.

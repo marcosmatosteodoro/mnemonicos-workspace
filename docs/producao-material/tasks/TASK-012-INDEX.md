@@ -9,9 +9,9 @@ backend, Server Components por padrão + RTK Query para estado de servidor no fr
 
 ## Status agregado
 
-- Todo: 4
+- Todo: 3
 - In Progress: 0
-- Done: 9
+- Done: 10
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -31,8 +31,8 @@ backend, Server Components por padrão + RTK Query para estado de servidor no fr
 - [x] TASK-012-006 ✅ Done — Reindexar posições em duas fases e reordenar Quadros (fatia sensível — DEC-012-003/RISK-011-003)
 - [x] TASK-012-011 ✅ Done — Criar `tira-frontend-contract.test.ts` — paridade cross-repo
 
-### Wave 4 (depende de Wave 3)
-- [ ] TASK-012-007 ⏸ Todo — CRUD de Quadro — adicionar, editar e remover
+### Wave 4 (depende de Wave 3) — ✅ concluída
+- [x] TASK-012-007 ✅ Done — CRUD de Quadro — adicionar, editar e remover
 
 ### Wave 5 (depende de Wave 4)
 - [ ] TASK-012-008 ⏸ Todo — Expor `tira.routes.ts` sob a barreira EDITOR/ADMIN (fatia sensível — gate 8 obrigatório)

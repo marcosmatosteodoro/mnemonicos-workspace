@@ -720,10 +720,27 @@ diferentes** (esta e uma sessão paralela do mesmo workspace, PLAN-013/PWA) roda
 integração contra o mesmo `mnemonicos_test` ao mesmo tempo — não é só "gates da mesma
 rodada", é qualquer processo concorrente na máquina, inclusive de outra sessão/ciclo. A
 fixação da lição (exclusividade real) continua sem estar implementada.
+**Reincidência (security-engineer, re-review delta de TASK-012-007, Wave 4 de
+PLAN-012):** 3 resultados divergentes (8, 23 e 28 falhas) antes de estabilizar — desta
+vez a causa não foi outra sessão concorrente, mas processo `jest` **zumbi no Windows**:
+`npm run test:integration` retorna mas o processo não encerra de forma confiável (handle
+aberto no pool do driver adapter), e segue truncando/inserindo no mesmo banco
+`mnemonicos_test` por trás da execução seguinte — produzindo deadlock (`40P01`),
+violação de FK entre dois creates sequenciais, e falha em sonda de contagem de queries.
+O agent matou os processos zumbis manualmente antes de estabilizar em 39/39. **Terceira
+manifestação da mesma causa-raiz** (nome fixo + TRUNCATE compartilhado): a 1ª foi
+runners concorrentes na mesma máquina, a 2ª foi sessões paralelas do workspace, esta é
+processo que sobrevive ao próprio comando que o lançou. Antes de tratar vermelho/verde de
+suíte de integração como evidência de gate — sobretudo prova de mutação de guarda de
+autorização, onde um zumbi pode tanto mascarar um vermelho real quanto fabricar um falso
+vermelho — verificar isolamento: `pg_stat_activity WHERE datname='mnemonicos_test'` deve
+estar em 0 conexões e não deve haver processo `node`/`jest` órfão na linha de comando.
+Fixação sugerida (ainda não implementada): `--forceExit` no script `test:integration` ou
+banco por worker.
 **Validade:** enquanto `tests/integration/db.ts`/`jest.integration.config.ts` usarem
 `TRUNCATE` num banco compartilhado por nome fixo.
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0
+**Contadores:** confirmada 2 · contestada 0
 
 ## [Código] Correção de duplicação (DRY) introduz nova re-derivação do canônico no mesmo diff
 **Erro:** o retry que eliminou a redeclaração de dois enums de domínio (`contents.schema.ts`
@@ -910,9 +927,26 @@ alcance. O fechamento contável do gate 8 enumera MÉTODOS que tocam o dado esco
 reconferido a cada TASK que adiciona um — não fica congelado no número da TASK anterior.
 Referência: `guidelines/project/backend/node-22.md` §6.3 e `core/SECURITY.md`, "Guarda no
 sink, não na superfície".
+**Reincidência (security-engineer + code-reviewer, Wave 4 de PLAN-012, mesmo arquivo):**
+TASK-012-007 adicionou 3 novos métodos de escrita (`addMnemonicFrame`,
+`updateMnemonicFrameText`, `removeMnemonicFrame`) e o próprio critério de pronto da TASK
+mandava provar o alcance por autoria só estruturalmente, dispensando a prova
+comportamental "por já feita em TASK-012-005" — exatamente a justificativa que esta
+lição refuta. O denominador foi de 2 para 5 métodos; o numerador de provas
+comportamentais ficou em 2 até o gate pegar. Confirmado por mutação
+(`{ ...actor, role: 'ADMIN' }`) com controle negativo e positivo em worktree isolada:
+suíte fica 100% verde com o alcance por autoria desligado nos 3 métodos novos. Corrigido
+no retry (commit `2a8e42f`, TASK-012-007) — 5/5 métodos com prova comportamental própria.
+Causa desta 2ª ocorrência: a lição existia e estava `ativa`, mas a GERAÇÃO da TASK (que
+espelhou o critério da TASK anterior) não a consultou antes de escrever o card — a lição
+só chegou ao código pelo gate, um retry depois. Lição de processo derivada (roteada ao
+agile-coach): ao gerar TASK que adiciona método de escrita sobre dado escopado por
+autoria, o "Critério de pronto" deriva a exigência das lições `ativas` do projeto ANTES
+de espelhar o critério da TASK anterior — nunca aceita "estrutural" nem "já provado —
+não duplicar" como fechamento de alcance.
 **Validade:** todo módulo backend com dado escopado por autoria/dono, neste projeto.
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0
+**Contadores:** confirmada 2 · contestada 0
 
 ## [Testes] Predicado de conjunto composto por `&&` exige um caso por EIXO discriminável, não por método que o invoca
 
