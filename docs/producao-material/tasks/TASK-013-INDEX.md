@@ -9,9 +9,9 @@ isolado (`C:/kwt/pwa`) — nunca na working tree principal
 
 ## Status agregado
 
-- Todo: 4
+- Todo: 3
 - In Progress: 0
-- Done: 2
+- Done: 3
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -23,7 +23,7 @@ isolado (`C:/kwt/pwa`) — nunca na working tree principal
 - [x] TASK-013-002 ✅ Done — Criar manifesto de aplicação (`app/manifest.ts`)
 
 ### Wave 3 (depende de Wave 2)
-- [ ] TASK-013-003 ⏸ Todo — Service worker: precache do app-shell e política de fetch
+- [x] TASK-013-003 ✅ Done — Service worker: precache do app-shell e política de fetch
 
 ### Wave 4 (depende de Wave 3)
 - [ ] TASK-013-004 ⏸ Todo — Service worker: ciclo de atualização e kill-switch

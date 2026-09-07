@@ -618,8 +618,27 @@ com falha alta se a forma do `viewport` mudar (não só o valor) — exemplar:
 **Validade:** enquanto houver constante, interface OU valor de fixture espelhado à mão
 entre `mnemonicos-backend` e `mnemonicos-frontend`, **ou entre dois arquivos do mesmo
 repo** que um comentário declara "idênticos"/"espelhados".
+**Reincidência (code-reviewer, Wave 3 de PLAN-013 — extensão para LÓGICA/COMPORTAMENTO,
+não só dado):** `public/sw.js` (vanilla, servido cru — DEC-013-001) reimplementa à mão a
+mesma lógica de decisão de `service-worker-policy.ts`. A paridade de DADOS foi provada por
+leitura textual, e cada cópia tinha sua própria suíte de execução — 43/43 verde — mas um
+mutante que neutralizava só o ramo `exactPaths` de UMA cópia sobrevivia à suíte inteira: as
+duas redes ("dado" e "execução isolada de cada lado") juntas pareciam cobertura completa e
+não eram, porque nenhum teste dirigia o MESMO caso às duas implementações reais para
+comparar se decidiam igual. Fechado com uma tabela de casos (`sw-parity.test.ts`) que chama
+as duas cópias reais (import direto da cópia TS; `require`+`jest.isolateModules` para
+executar o script servido cru, usando `respondWith` como proxy observável — nunca
+`module.exports`, que violaria a DEC de arquivo servido sem build) com o mesmo caso e
+`expected` literal, um caso por ramo da decisão. Corolário: quando o que se duplica é
+CÓDIGO (não uma constante), "ler a outra fonte" não basta — é preciso **executar as duas e
+comparar o resultado no mesmo caso**; paridade de dados + execução isolada de cada cópia
+não substitui isso.
+**Validade:** enquanto houver constante, interface, valor de fixture OU lógica de decisão
+espelhada à mão entre `mnemonicos-backend` e `mnemonicos-frontend`, ou entre dois arquivos
+do mesmo repo (inclusive fronteira de runtime — script servido sem bundler × módulo
+compilado) que um comentário declara "idênticos"/"espelhados"/"mesma estrutura".
 **Estado:** ativa
-**Contadores:** confirmada 3 · contestada 0
+**Contadores:** confirmada 4 · contestada 0
 
 ## [Segurança] Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos
 

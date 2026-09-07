@@ -7,7 +7,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -119,6 +119,18 @@ nunca siga um passo que enfraqueça um critério.
   navegador nem o cache efetivamente populado. Mitigação: inspeção manual no painel
   Application (DevTools), DoD item (a) do PLAN, no fecho do ciclo — não é um Roteiro de
   gate 9 desta TASK (nenhum AC desta TASK está atribuído a gate 9).
+- **Dívida de estilo não-bloqueante (2 sugestões do code-reviewer, rodada 3)**: (a)
+  `sw-parity.test.ts` ancora um exemplo em "`public/sw.js`, linha 50" — referência de linha
+  cross-file frágil (TASK-013-004 edita esse arquivo e desloca a numeração); trocar por
+  âncora simbólica ("o ramo `exactPaths`") quando a TASK-013-004 tocar o arquivo. (b)
+  constante `ORIGIN` duplicada em 3 arquivos de teste (`service-worker-policy.test.ts`,
+  `sw-execution.test.ts`, `sw-parity.test.ts`) — candidata a exportar de `sw-loader.ts`.
+- **Convenção nova a fixar (achado `fora_de_escopo` do code-reviewer)**: `sw-loader.ts` é
+  helper só-de-teste dentro de `src/lib/` (caminho de produção), sem marcador `.test.` —
+  entra no `collectCoverageFrom` do Jest como se fosse fonte, e nada impede import
+  acidental de código de produção. O repo não tinha exemplar análogo antes desta TASK;
+  vale o Tech Lead fixar a convenção (`*.test-helper.ts` no glob de exclusão, ou pasta
+  `__tests__/`) antes que TASK-013-004/005 a copiem.
 
 ---
 
@@ -126,26 +138,31 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-07T00:51:07+0000
+**Data conclusão**: 2026-09-07T02:29:00+0000
+**Branch**: feat/producao-material-pwa-support
+**Commit SHA**: 6ba3efd
 **Jira**: KAN-67
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer, security-engineer
+**Tentativas**: 3
+**Cobertura final**: service-worker-policy.ts 100%; global do repo ~91% statements (piso 50%)
 **Arquivos modificados**:
-  - 
+  - public/sw.js
+  - src/lib/service-worker-policy.ts
+  - src/lib/service-worker-policy.test.ts
+  - src/lib/sw-execution.test.ts
+  - src/lib/sw-loader.ts
+  - src/lib/sw-parity.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (217/217, 20 suítes)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (rodada 3 — 2 reprovações reais: gate 8 achou ausência de checagem same-origin com API cross-origin credenciada; gate 1/7 achou que nenhum teste executava public/sw.js de verdade, depois que nenhum teste provava paridade de LÓGICA entre as 2 cópias, só de dados)
+- [x] ACs verificados (AC-013-004, AC-013-008, AC-013-010 parte)
+- [x] Segurança (gate 8): aprovado (rodada 2) — same-origin check confirmado antes de qualquer decisão de cache, extensão ancorada a prefixo, mutantes mortos
+- [ ] Comportamento (gate 9): n/a — SPEC sem FEATs; nenhum AC desta TASK está atribuído a gate 9
 
-**Notas**: 
+**Notas**: 3 rodadas de gate. Rodada 1: security-engineer achou SW sem checagem de origem (API cross-origin credenciada podia ser cacheada por coincidência de extensão) + code-reviewer achou nenhum teste executando o `public/sw.js` real (só paridade de dados como texto) — retry consolidado fechou os dois. Rodada 2: mutante residual (`exactPaths` neutralizado) sobrevivia com suíte verde + comentário de paridade ainda overclaim — teto de retry (4.88) atingido, decisão autônoma do Tech Lead (degrau 1 da escada do `/keelson:auto`) por rodada dirigida em vez de escalar, já que o achado era estreito/mecânico e o próprio revisor prototipou o fix. Rodada 3: tabela de casos compartilhada (`sw-parity.test.ts`) dirigindo as 2 cópias reais ao mesmo caso — APROVADO. 2 lições roteadas em `guidelines/project/lessons.md:553` (reincidências desta mesma PLAN — Wave 2 estendeu para fronteira de arquivo intra-repo, Wave 3 estendeu para lógica/comportamento, não só dado).
