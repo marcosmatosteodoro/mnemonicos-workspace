@@ -9,9 +9,9 @@ isolado (`C:/kwt/pwa`) — nunca na working tree principal
 
 ## Status agregado
 
-- Todo: 3
+- Todo: 2
 - In Progress: 0
-- Done: 3
+- Done: 4
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -26,7 +26,7 @@ isolado (`C:/kwt/pwa`) — nunca na working tree principal
 - [x] TASK-013-003 ✅ Done — Service worker: precache do app-shell e política de fetch
 
 ### Wave 4 (depende de Wave 3)
-- [ ] TASK-013-004 ⏸ Todo — Service worker: ciclo de atualização e kill-switch
+- [x] TASK-013-004 ✅ Done — Service worker: ciclo de atualização e kill-switch
 
 ### Wave 5 (depende de Wave 4)
 - [ ] TASK-013-005 ⏸ Todo — Registro do service worker e verificação de instalabilidade

@@ -7,7 +7,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -114,26 +114,33 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-07T02:33:09+0000
+**Data conclusão**: 2026-09-07T03:38:00+0000
+**Branch**: feat/producao-material-pwa-support
+**Commit SHA**: 50f1d8f
 **Jira**: KAN-68
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer, security-engineer
+**Tentativas**: 2
+**Cobertura final**: n/a (231/231 → 232/232 testes verdes na suíte completa)
 **Arquivos modificados**:
-  - 
+  - public/sw.js
+  - src/lib/service-worker-policy.ts
+  - src/lib/service-worker-policy.test.ts
+  - src/lib/sw-loader.ts
+  - src/lib/sw-parity.test.ts
+  - src/lib/sw-execution.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (232/232, 21 suítes)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (rodada 2 — 3 achados bloqueantes: universo de leitura estrutural estreito demais, ramo normal do activate sem prova de efeito, `new Function()` violando perfil §6.1; todos fechados com mutante morto)
+- [x] ACs verificados (AC-013-006, AC-013-009, AC-013-012)
+- [x] Segurança (gate 8): aprovado — gatilho de kill-switch sem vetor remoto, fail-secure confirmado, blast radius restrito à própria origem
+- [ ] Comportamento (gate 9): n/a — SPEC sem FEATs; nenhum AC desta TASK atribuído a gate 9 (TRISK-013-001, ciclo real confirmado no DoD item (a) do PLAN, no fecho do ciclo)
+
+**Notas**: Rodada 1 reprovada pelo code-reviewer (gates 1 e 6): prova estrutural de ausência de `skipWaiting`/`clients.claim` lia só o corpo do handler `activate`, não o arquivo inteiro (mutante no handler `install` sobrevivia); ramo normal do `activate` sem teste de efeito (2 mutantes sobreviviam); `new Function()` em `sw-loader.ts` violava o perfil §6.1. Retry: universo ampliado para arquivo inteiro (`stripComments` passou a tratar `/* */` também), novo teste expõe `CachesStub` e prova limpeza seletiva do ramo normal, `new Function` trocado por arquivo temporário (`mkdtempSync`) + `require()` sem rastro. Nova lição registrada em `guidelines/project/lessons.md` ("Prova de ausência por leitura de texto-fonte precisa declarar o universo lido"). Achado `fora_de_escopo` do gate 1: `CACHE_NAME` sem versionamento faz o ramo normal do `activate` ser no-op em produção hoje — decisão futura do Tech Lead/PO (versionar a chave ou aceitar).
 
 **Notas**: 

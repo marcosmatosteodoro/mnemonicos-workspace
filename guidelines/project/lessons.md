@@ -1008,3 +1008,31 @@ injetável prova-se com stub em teste unitário, sem precisar de banco real.
 despacho, neste projeto.
 **Estado:** em-observacao
 **Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Prova de ausência por leitura de texto-fonte precisa declarar o universo lido, derivado do quantificador do critério
+
+**Erro:** `service-worker-policy.test.ts` provava "nenhuma ocorrência de `skipWaiting()`/
+`clients.claim()` fora do bloco de kill-switch" lendo só o corpo do handler `activate`
+(`extractListenerBody(SW_SOURCE, 'activate')`) — mas o Critério de pronto da TASK-013-004
+dizia "**toda** ocorrência" / "nenhum outro ponto **do arquivo**". Um mutante que planta
+`self.skipWaiting(); clients.claim();` no handler `install` (fora do universo lido)
+sobrevivia com a suíte inteira verde — 0 ocorrências encontradas, com ar de prova, porque
+o teste nunca olhou para onde o mutante estava.
+**Causa:** o universo de leitura foi herdado do recorte que já estava à mão (reusado da
+asserção vizinha de presença, que legitimamente só precisa olhar dentro do bloco) em vez
+de derivado do quantificador literal do critério. Prova de ausência por leitura de texto
+não tem controle negativo natural: o resultado "0" é idêntico quando o universo está certo
+e quando está estreito demais — só um mutante plantado FORA da região esperada revela a
+diferença.
+**Solução:** todo teste que assere ausência sobre texto-fonte declara o universo lido no
+próprio código (variável nomeada + comentário) e o deriva do quantificador do critério —
+"nenhum outro ponto do arquivo" ⇒ arquivo inteiro menos a região permitida, nunca o corpo
+de uma função/handler específico; e fecha com um mutante que planta a ocorrência FORA de
+onde o autor esperava encontrá-la (outro handler, outra função, topo do arquivo), não só
+dentro dela. Exemplar correto no repo: `mnemonicos-frontend/src/lib/service-worker-policy.test.ts`
+(universo = `SW_SOURCE` inteiro menos o bloco de kill, com o comentário que declara a
+escolha).
+**Validade:** todo teste estrutural (leitura de arquivo como texto) que prova ausência de
+um padrão, neste projeto.
+**Estado:** ativa
+**Contadores:** confirmada 1 · contestada 0
