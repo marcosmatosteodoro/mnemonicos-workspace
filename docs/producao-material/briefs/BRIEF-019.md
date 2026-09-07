@@ -47,3 +47,4 @@ segmento/rota, telemetria/analytics de acesso a rota inexistente.
 ## Cronologia
 - Largada: 2026-09-07T14:26:32-0300
 - SPEC: 2026-09-07T14:41:00-0300 · correções: 1 (precedência guard×404, não-regressão, selos, marcas observáveis — po ESCALAR não-bloqueante, E-019-01, default seguido) · classes: spec-ac-fora-gwt(5, falso-positivo de acentuação em ferramenta), spec-must-ratio(1), spec-sem-should-may(1)
+- PLAN: 2026-09-07T15:05:00-0300 · correções: 2 (4× `Irreversível: não`→`nao` — mesmo bug de acentuação da ferramenta de lint; §7 com linha malformada + NFRs ausentes do mapeamento) · classes: plan-dec-irreversivel-enum(4, falso-positivo de acentuação em ferramenta), nao-parseavel(1), realiza-vs-mapeamento(2), plan-dec-alternativa-unica(2, aceito — decisão de caminho único legítima)
