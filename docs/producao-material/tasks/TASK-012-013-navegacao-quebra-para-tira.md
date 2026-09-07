@@ -7,7 +7,7 @@
 **Wave**: 7
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -57,15 +57,16 @@ regra com Quebra salva e Tira ainda não gerada → link visível → clique nav
 duplicaria ambiente/sujeito/pré-condição sem provar nada de novo — achado do `qa`
 (pré-código, Etapa 3.5), resolvido apontando para o roteiro já fixado em vez de duplicá-lo.
 
-- [ ] **AC-011-023 (parte — faceta UI, fechamento)**: extensão de `rule-breakdown-form.test.tsx`, montado com `makeStore()` + `Provider` + `fetch` mockado (harness já existente no arquivo, `mount()`/`handler()`), com 2 casos novos:
+- [x] **AC-011-023 (parte — faceta UI, fechamento)**: extensão de `rule-breakdown-form.test.tsx`, montado com `makeStore()` + `Provider` + `fetch` mockado (harness já existente no arquivo, `mount()`/`handler()`), com 2 casos novos:
   1. Resposta `GET /api/v1/contents/<id>/breakdown` = 200 com o fixture `breakdown()` já existente no arquivo → `screen.getByRole('link', { name: 'Ir para a Tira mnemônica' })` presente, com `href` igual a `/content/content-1/tira` (usando o `CONTENT_ID` já constante no arquivo).
   2. Resposta `GET /api/v1/contents/<id>/breakdown` = `NOT_FOUND_RESPONSE` (404, já existente no arquivo) → texto exato "Conclua a Quebra da regra antes de gerar a Tira mnemônica." visível, **e** `screen.queryByRole('link', { name: 'Ir para a Tira mnemônica' })` é `null` (o link fica AUSENTE, não apenas desabilitado — AC-011-023 exige "sem oferecer a ação").
   Comando: `npm --prefix mnemonicos-frontend test -- rule-breakdown-form.test` → os 2 casos novos verdes, junto dos já existentes (nenhuma regressão nos casos herdados do arquivo).
-- [ ] Token `text-link` reusado para o novo `<Link>` (mesmo token do `<Link>` "Ir para o Conteúdo bruto" já presente no arquivo) — confirmado por leitura: `grep -c 'text-link' mnemonicos-frontend/src/components/rule-breakdown-form.tsx` → contagem cresce de 1 (o link existente) para 2 (o novo), nunca introduz classe literal de paleta.
-- [ ] Sem warnings/lints novos sobre `git diff --name-only main...HEAD` (produção e teste).
-- [ ] Padrão de commit respeitado (Conventional Commits).
-- [ ] Aderência à stack/padrões da ficha e do perfil (`guidelines/project/frontend/next-16.md`).
-- [ ] Code review aprovado.
+- [x] Token `text-link` reusado para o novo `<Link>` (mesmo token do `<Link>` "Ir para o Conteúdo bruto" já presente no arquivo) — confirmado por leitura: `grep -c 'text-link' mnemonicos-frontend/src/components/rule-breakdown-form.tsx` → contagem cresce de 1 (o link existente) para 2 (o novo), nunca introduz classe literal de paleta.
+- [x] Sem warnings/lints novos sobre `git diff --name-only main...HEAD` (produção e teste).
+- [x] Padrão de commit respeitado (Conventional Commits).
+- [x] Aderência à stack/padrões da ficha e do perfil (`guidelines/project/frontend/next-16.md`).
+- [x] Code review aprovado.
+- [x] Design/UX (gate 11) aprovado — superfície de interface tocada (link + copy).
 
 ## Riscos específicos
 
@@ -78,26 +79,27 @@ duplicaria ambiente/sujeito/pré-condição sem provar nada de novo — achado d
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-07T14:48:28-0300
+**Data conclusão**: 2026-09-07T18:04:38-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: c5e274c (implementação) + closure (correção de exclusividade mútua, sugestão não-bloqueante do code-reviewer)
 **Jira**: KAN-63
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer + product-designer (gate 11), 1 rodada, ambos aprovados de primeira
+**Tentativas**: 1
+**Cobertura final**: AC-011-023 (parte, fechamento) — 25/25 ACs de SPEC-011 cobertos, PLAN-012 convergido 13/13
 **Arquivos modificados**:
-  -
+  - mnemonicos-frontend/src/components/rule-breakdown-form.tsx
+  - mnemonicos-frontend/src/components/rule-breakdown-form.test.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando (20/20)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — nenhum backend tocado
+- [x] Comportamento (gate 9): n/a — já exercitado pelo roteiro de TASK-012-012 (passo 1)
 
-**Notas**:
+**Notas**: Última TASK do PLAN-012 — convergiu de primeira nos 2 gates (code-reviewer + product-designer/gate 11), depois de 4 rodadas em cada um nas 2 waves anteriores. 1 sugestão não-bloqueante aplicada na closure: as condições `data !== undefined`/`isNotFound` não eram mutuamente exclusivas por construção (RTK Query preserva `data` em cache num refetch com erro) — provado por sonda do próprio revisor (link e orientação contraditória coexistindo, alcançável só por uma janela estreita de corrida). Corrigido para `data === undefined && isNotFound`, 20/20 verde após. Sinal fora de escopo, mesma classe, PRÉ-EXISTENTE em `mnemonic-strip-board.tsx` (TASK-012-012, já Done): o efeito que dispara `openMnemonicStrip` em `isNotFound` não checa `!hasData` — mesma forma "data em cache + 404", mas exigiria o RawContent ficar soft-deletado no meio da sessão para ser alcançável; registrado como pendência para a Entrega, não corrigido aqui (fora do escopo desta TASK e da TASK-012-012, já fechada e convergida).
