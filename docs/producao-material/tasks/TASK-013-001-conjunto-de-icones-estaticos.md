@@ -7,13 +7,13 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
 **Branch sugerida**: `feat/producao-material-pwa-support` (já criada a partir de
 `origin/main` pelo PLAN-013) — **cwd obrigatório do `developer`**:
-`C:/kwt/pwa/mnemonicos-frontend` (worktree isolado). **NUNCA** rodar `dev`/`test`/`lint`/
+`C:/kwt/pwa` (worktree isolado). **NUNCA** rodar `dev`/`test`/`lint`/
 `typecheck`/`build` em `mnemonicos-frontend/` da working tree principal — outra sessão
 executa PLAN-012/F4 ali concorrentemente (RISK-013-005, TRISK-013-002).
 **Padrão de commit**: Conventional Commits (`feat:`).
@@ -85,6 +85,14 @@ nunca siga um passo que enfraqueça um critério.
 
 - Nenhum ícone `maskable` nesta fatia — Android pode recortar o ícone de forma menos
   previsível sem essa variante (aceito, Out-of-scope SPEC-013 §4.2).
+- **Placeholder documentado (achado do code-reviewer, medição direta dos PNGs gerados)**:
+  `icon-192.png`/`icon-512.png` são um quadrado 100% sólido na cor `--color-brand-500`
+  (`#4f6ef7`), sem marca gráfica, letra ou glifo — cumprem A-013-002 ("asset simples...
+  gerar/placeholder documentado"), mas a sanção da premissa exige que o placeholder fique
+  **documentado**, não só produzido. Este parágrafo é o registro: refinamento de design
+  (nova arte) fica para quando houver pedido explícito (Out-of-scope SPEC-013 §4.2). Quem
+  fizer a caminhada manual de AC-013-002 em TASK-013-005 verá um quadrado azul liso na
+  tela inicial/dock — comportamento esperado nesta fatia, não regressão.
 
 ---
 
@@ -92,26 +100,28 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-06T20:51:20-0300
+**Data conclusão**: 2026-09-06T20:55:06-0300
+**Branch**: feat/producao-material-pwa-support
+**Commit SHA**: 56daad8
 **Jira**: KAN-65
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer
+**Tentativas**: 1
+**Cobertura final**: 89.32% statements (npm run test:ci; piso global 50%)
 **Arquivos modificados**:
-  - 
+  - public/icons/icon-192.png
+  - public/icons/icon-512.png
+  - tests/assets/app-icons.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (168/168, 17 suítes)
+- [x] Lint limpo (eslint + prettier, 0 warnings novos)
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados (AC-013-002, parte)
+- [ ] Segurança (gate 8): n/a — task não toca NFR-013-001/002/005/006/007/008 (superfície sensível), só assets estáticos de ícone
+- [ ] Comportamento (gate 9): n/a — SPEC sem FEATs; AC-013-002 (parte restante, identidade visual) fecha por gate 9 em TASK-013-005
 
-**Notas**: 
+**Notas**: 3 achados não-bloqueantes do code-reviewer (ponto cego de assinatura PNG no teste, convenção `node:fs`/`node:path` ausente do perfil, ambiente jsdom desnecessário) roteados como `acoes_sugeridas` — pegam carona no fecho da Wave 1 (§3.6 item 3), não abriram retry. Dívida de formatação pré-existente na base confirmada (55 arquivos, nenhum deste diff) — registrada no INDEX, decisão do Diretor. Ícones são placeholder de cor sólida documentado (ver Riscos específicos) — refinamento de design fica para pedido futuro.

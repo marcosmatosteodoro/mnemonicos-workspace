@@ -12,7 +12,7 @@
 ## Convenções (do projeto)
 
 **Branch sugerida**: `feat/producao-material-pwa-support` — **cwd obrigatório do
-`developer`**: `C:/kwt/pwa/mnemonicos-frontend` (worktree isolado). **NUNCA** rodar
+`developer`**: `C:/kwt/pwa` (worktree isolado). **NUNCA** rodar
 `dev`/`test`/`lint`/`typecheck`/`build` em `mnemonicos-frontend/` da working tree
 principal — outra sessão executa PLAN-012/F4 ali concorrentemente (RISK-013-005,
 TRISK-013-002).

@@ -4,20 +4,20 @@
 **Tamanho dominante**: small
 **Convenções aplicadas**: Conventional Commits · Jest 30 + Testing Library (`jsdom`,
 `next/jest`) · branch única `feat/producao-material-pwa-support`, executada em worktree
-isolado (`C:/kwt/pwa/mnemonicos-frontend`) — nunca na working tree principal
+isolado (`C:/kwt/pwa`) — nunca na working tree principal
 (`mnemonicos-frontend/`), onde PLAN-012/F4 executa concorrentemente.
 
 ## Status agregado
 
-- Todo: 6
+- Todo: 5
 - In Progress: 0
-- Done: 0
+- Done: 1
 - Blocked: 0
 
 ## Ordem de execução (waves)
 
 ### Wave 1 (paralelizável)
-- [ ] TASK-013-001 ⏸ Todo — Criar conjunto de ícones estáticos do app-shell
+- [x] TASK-013-001 ✅ Done — Criar conjunto de ícones estáticos do app-shell
 
 ### Wave 2 (depende de Wave 1)
 - [ ] TASK-013-002 ⏸ Todo — Criar manifesto de aplicação (`app/manifest.ts`)

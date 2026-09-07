@@ -45,7 +45,7 @@ hoje no workspace.
    `origin/main`) — **não** em `mnemonicos-frontend/` da working tree principal, onde outra
    sessão executa PLAN-012/F4 (Tira mnemônica) concorrentemente (RISK-013-005, SPEC-013 §9).
    O `developer` do `/keelson:tasks`/`/keelson:implement` deste PLAN roda todo comando
-   (`dev`, `test`, `lint`, `typecheck`, `build`) com cwd em `C:/kwt/pwa/mnemonicos-frontend`,
+   (`dev`, `test`, `lint`, `typecheck`, `build`) com cwd em `C:/kwt/pwa`,
    nunca na árvore principal. Ordem de merge das duas branches é ato do Diretor
    (RISK-013-005).
 2. **Pasta `public/` nasce nesta fatia**: `mnemonicos-frontend` hoje não tem `public/` além
@@ -333,7 +333,7 @@ sem estado de configuração runtime, sem superfície de rede adicional a proteg
       **roteiro concreto** de inspeção manual no fecho do ciclo (TRISK-013-001 — achado do
       `qa` pré-código de TASK-013-INDEX: "inspeção manual" genérica não é prova fixada) —
       build de produção local (`npm run build && npm run start`, worktree
-      `C:/kwt/pwa/mnemonicos-frontend`): (1) com uma aba aberta e um formulário de EDITOR
+      `C:/kwt/pwa`): (1) com uma aba aberta e um formulário de EDITOR
       não salvo, publicar nova versão do `sw.js` sem recarregar — esperado: aba continua na
       versão antiga, sem perda do formulário, SW novo em "waiting" (não "activated"); (2)
       reabrir a aba — esperado: SW novo assume, versão atualizada servida; (3) publicar

@@ -12,7 +12,7 @@
 ## Convenções (do projeto)
 
 **Branch sugerida**: `feat/producao-material-pwa-support` — **cwd obrigatório do
-`developer`**: `C:/kwt/pwa/mnemonicos-frontend` (worktree isolado). **NUNCA** rodar
+`developer`**: `C:/kwt/pwa` (worktree isolado). **NUNCA** rodar
 `dev`/`test`/`lint`/`typecheck`/`build` em `mnemonicos-frontend/` da working tree
 principal — outra sessão executa PLAN-012/F4 ali concorrentemente (RISK-013-005,
 TRISK-013-002).
@@ -97,7 +97,7 @@ nunca siga um passo que enfraqueça um critério.
 ## Roteiro do gate 9 (fixado ANTES do código)
 
 **Ambiente**: build de produção local — dentro do worktree
-(`C:/kwt/pwa/mnemonicos-frontend`): `npm run build && npm run start` →
+(`C:/kwt/pwa`): `npm run build && npm run start` →
 `http://localhost:3000`. Backend em `http://localhost:3333` (`npm run dev` em
 `mnemonicos-backend/`). `localhost` como contexto seguro (mesma nota da TASK-013-005).
 
