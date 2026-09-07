@@ -311,14 +311,14 @@ HTTP via servidor real).
 
 ## 9. Definition of Done deste PLAN
 
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs — FR-019-001 a FR-019-004.
-- [ ] Todos os NFRs cobertos têm verificação — NFR-019-001 a NFR-019-004.
-- [ ] Decisões DEC refletidas no código — DEC-020-001 a DEC-020-004.
-- [ ] Aderência à ficha/perfil validada (guideline de projeto frontend + perfil `next-16.md`).
-- [ ] Todos os ACs cobertos por teste (gate 1 dos quality gates) — AC-019-001, AC-019-001b,
+- [x] Todos os FRs cobertos têm implementação satisfazendo os ACs — FR-019-001 a FR-019-004.
+- [x] Todos os NFRs cobertos têm verificação — NFR-019-001 a NFR-019-004.
+- [x] Decisões DEC refletidas no código — DEC-020-001 a DEC-020-004.
+- [x] Aderência à ficha/perfil validada (guideline de projeto frontend + perfil `next-16.md`).
+- [x] Todos os ACs cobertos por teste (gate 1 dos quality gates) — AC-019-001, AC-019-001b,
       AC-019-002 a AC-019-005, via `not-found.test.tsx` (novo) + teste de integração dedicado
       (DEC-020-004) + reexecução verde de `proxy.test.ts` (não-regressão, sem alteração).
-- [ ] Métrica da SPEC operacional (§1.3: `Fonte de medição: instrumentação — suíte de teste
+- [x] Métrica da SPEC operacional (§1.3: `Fonte de medição: instrumentação — suíte de teste
       automatizado cobrindo os ACs desta SPEC`, dono Tech Lead/QA) — mesma suíte do item
       anterior é a própria fonte de medição desta métrica de conformidade; não há evento de
       produto/telemetria a instrumentar (fora de escopo, §4.2 da SPEC — natureza de
