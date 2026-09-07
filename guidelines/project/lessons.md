@@ -1094,3 +1094,32 @@ regressão do código sob teste.
 com backend fixo por `CORS_ORIGINS`, neste projeto.
 **Estado:** em-observacao
 **Contadores:** confirmada 0 · contestada 0
+
+## [Arquitetura] Rota pública não monta consumidor de endpoint autenticado — o 401 esperado vira "sessão expirada"
+
+**Erro:** o CTA da rota pública `/` (KAN-74, BRIEF-015) nasceu como componente cliente
+consumindo `useMeQuery()` (`GET /auth/me`) para escolher o destino do link. Como
+`/auth/me` não está em `PUBLIC_AUTH_PATHS`, o 401 do visitante anônimo atravessou o
+`baseQueryWithReauth` (refresh silencioso → falha → `resetApiState()` + redirect
+`/login?sessao=expirada`) e expulsou **todo** visitante anônimo da home para uma tela
+que afirma "sua sessão expirou" — para quem nunca teve sessão. 4 testes verdes (mock do
+hook) não acusaram: o oráculo mockava o hook inteiro e não podia ver o efeito colateral
+do 401 na máquina de reauth. Pego no gate 11 (product-designer) e confirmado por
+execução no gate 1-7 (code-reviewer: mutante + probe HTTP mostrando o loop de redirect).
+**Causa:** confundiu-se "preciso saber se há sessão" com "preciso perguntar ao servidor
+se há sessão" numa rota que não pressupõe sessão. Numa rota pública, qualquer consumidor
+de endpoint autenticado torna o 401 o caminho **esperado** — mas o interceptador de
+reauth, desenhado para a área interna (onde 401 sempre significa sessão expirada), trata
+esse 401 do mesmo jeito e navega.
+**Solução:** rota pública (fora de `src/app/(interno)/`) não monta nenhum hook de
+`src/store/api.ts` cujo path não esteja em `PUBLIC_AUTH_PATHS` — regra, não lista fechada.
+Quando o destino de um link depende da sessão, delegue a decisão ao guard de navegação já
+existente (`src/proxy.ts`) com um `<Link>` incondicional para a rota interna: anônimo é
+desviado pelo proxy (`/login?next=<rota>`), autenticado entra direto — zero chamada de
+sessão na rota pública. Verificação mecânica de não-reincidência:
+`grep -rn "useMeQuery\|use[A-Z].*Query" src/app/page.tsx src/components/site-header.tsx`
+deve devolver só hooks de path público (hoje: `useGetHealthQuery`).
+**Validade:** todo componente renderizado fora de `src/app/(interno)/` que precisa variar
+por estado de sessão, neste projeto.
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
