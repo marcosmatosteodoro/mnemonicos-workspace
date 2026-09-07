@@ -263,18 +263,25 @@ idêntica à atual, só a visibilidade muda.
 **Dependências**: COMP-006-003
 
 ### COMP-012-006: `tira.routes.ts` — superfície HTTP sob a barreira deny-by-default
-**Responsabilidade**: expõe as 5 rotas da Tira mnemônica, cada uma com declaração
-explícita de papéis na montagem (mesmo padrão de `contents.routes.ts`), `verifyOrigin`
-como 1º handler nas 4 mutações; monta o router em `src/http/routes.ts` (`apiRoutes.use
+**Responsabilidade**: expõe as 6 rotas da Tira mnemônica (EMENDA DEC-012-011: geração
+migrou de `GET` para `POST`, `GET` vira leitura pura — 5 rotas originais + 1 nova),
+cada uma com declaração explícita de papéis na montagem (mesmo padrão de
+`contents.routes.ts`), `verifyOrigin` como 1º handler nas 5 mutações (agora incluindo o
+`POST` de geração); monta o router em `src/http/routes.ts` (`apiRoutes.use
 (tiraRoutes)`, depois de `contentsRoutes`), árvore plana (nenhum `.use('/prefixo',
 sub)`). `PUT /contents/:id/strip/frames/order` e `PATCH|DELETE
 /contents/:id/strip/frames/:frameId` não colidem por serem métodos distintos — a
-suíte `route-authz-matrix` precisa registrar as 5 chaves exatas, sem depender de
+suíte `route-authz-matrix` precisa registrar as 6 chaves exatas, sem depender de
 match de padrão entre a rota estática (`order`) e a rota `:frameId`.
 **Realiza**: FR-011-001, FR-011-002, FR-011-003, FR-011-004, FR-011-005, FR-011-006, FR-011-007, NFR-011-001
 **Interface pública** (árvore plana; caminho completo em cada `requireRole`):
 - `GET /contents/:id/strip` → `requireRole('GET','/contents/:id/strip','EDITOR',
-  'ADMIN')` — get-or-generate (FR-011-001/002/007/008).
+  'ADMIN')` — leitura pura (404 se ainda não aberta, 409 se a Quebra da regra ainda
+  não foi salva); NUNCA gera (DEC-012-011).
+- `POST /contents/:id/strip` → `verifyOrigin` + `requireRole('POST',
+  '/contents/:id/strip','EDITOR','ADMIN')` — abre/gera a Tira, get-or-generate
+  idempotente (FR-011-001/002/007/008; DEC-012-011, EMENDA Wave 5 — migrado de `GET`
+  por achado de CSRF do security-engineer).
 - `POST /contents/:id/strip/frames` → `verifyOrigin` + `requireRole('POST',
   '/contents/:id/strip/frames','EDITOR','ADMIN')` — adicionar Quadro (FR-011-003).
 - `PATCH /contents/:id/strip/frames/:frameId` → `verifyOrigin` + `requireRole('PATCH',
@@ -755,6 +762,53 @@ de implementação.
 **Irreversível**: nao
 **Aderência à ficha/perfil**: nova (primeiro `GET` idempotente com efeito colateral
 explicitamente documentado como decisão, não só herdado por analogia)
+
+<!-- EMENDA Wave 5 (furo no plano de TASK-012-008, achado do security-engineer, gate 8):
+esta DEC previu só o risco de CACHE/expectativa de idempotência (Consequências acima),
+não o de CSRF — o cookie de sessão é `sameSite: 'lax'` (acompanha navegação top-level),
+e um `GET` que ESCREVE (cria Tira+Quadros+evento ABERTURA) fica sem a defesa de
+`verifyOrigin` que o projeto já reserva para mutações, porque a regra repo-wide do
+projeto (`route-authz-matrix.integration.test.ts`) proíbe `verifyOrigin` em qualquer
+`GET`. Sonda provou: uma página atacante, navegando o browser da vítima para o `GET`
+sem Origin/Referer, gera a Tira e grava o evento ABERTURA com o `actorId` da VÍTIMA —
+forjando a atribuição de quem abriu, de onde sai a métrica CONCLUSAO/RETRABALHO
+(DEC-012-006). Não é o risco que esta DEC descartou (não é ambiguidade de modelagem de
+produto) — é uma superfície de ataque concreta que a DEC não previu. Superseded por
+DEC-012-011, decisão do Diretor. -->
+
+### DEC-012-011: Geração migra para `POST /contents/:id/strip`; `GET` vira leitura pura
+**Contexto**: DEC-012-009 previu risco de cache/idempotência para o `GET` get-or-generate,
+mas não previu CSRF — achado do `security-engineer` na Wave 5 (gate 8, TASK-012-008):
+o cookie de sessão `sameSite: 'lax'` acompanha navegação top-level, e o `GET` que
+escreve fica sem defesa (regra repo-wide do projeto proíbe `verifyOrigin` em `GET`).
+Sonda provou exploração real (ver EMENDA acima).
+**Decisão**: `GET /contents/:id/strip` passa a ser leitura pura — devolve a Tira
+existente (200) ou recusa (404 se a Tira ainda não foi aberta; 409 se a Quebra da
+regra ainda não foi salva, herdado de `openMnemonicStrip`), nunca gera. A geração
+(idempotente, get-or-generate) migra para `POST /contents/:id/strip`, com
+`verifyOrigin` — o browser sempre envia `Origin` em requisições `POST`, então a defesa
+que o projeto já usa nas demais mutações passa a valer de fato aqui.
+**Alternativas consideradas**:
+- Manter o `GET` único e blindar com CSRF real (cookie `sameSite: 'strict'` ou token
+  anti-CSRF dedicado), descartada: exigiria reescrever o invariante repo-wide "nenhum
+  GET não-público tem `verifyOrigin`" para uma condição de duas metades (GET só lê ∧
+  handler-que-grava tem defesa), abrindo uma exceção nova e permanente à regra mais
+  simples que o projeto já tem — mais superfície para testar e mais fácil de violar de
+  novo na próxima rota get-or-generate. A migração para POST reusa a defesa existente
+  sem exceção.
+**Consequências**: contrato HTTP muda — `tira.service.ts` ganha uma função de LEITURA
+separada de `openMnemonicStrip` (que continua a ser a geração, agora só chamada pelo
+`POST`); o frontend (TASK-012-010, RTK Query, já Done) precisa de um endpoint de
+mutação novo para o `POST` e o endpoint de leitura existente passa a tratar 404 como
+"ainda não aberta" (estado da UI antes do primeiro render dos Quadros) em vez de nunca
+ocorrer — pendência explícita para TASK-012-010 (ajuste) e TASK-012-012 (tela, ainda
+não implementada — já nasce com o contrato novo, sem retrabalho).
+**Reabrir se**: nunca — a migração de GET-com-efeito para POST+GET-leitura é a forma
+canônica do projeto para todo endpoint que grava; qualquer novo endpoint get-or-generate
+futuro segue este padrão desde a largada, não o de DEC-012-009.
+**Irreversível**: nao
+**Aderência à ficha/perfil**: nova (fecha a exceção que DEC-012-009 abria; alinha ao
+invariante repo-wide de `verifyOrigin` só em mutação, sem exceção)
 
 ### DEC-012-010: Migração 100% aditiva — `Mnemonic` legado intocado nesta fatia
 **Contexto**: FR-011-010/A-011-007 encerram o **uso** do modelo `Mnemonic` legado pela
