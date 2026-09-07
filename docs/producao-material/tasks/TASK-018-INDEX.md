@@ -9,15 +9,15 @@ há estado/evento, Jest 30 + Testing Library (`jsdom`, `next/jest`), branch úni
 
 ## Status agregado
 
-- Todo: 2
+- Todo: 1
 - In Progress: 0
-- Done: 0
+- Done: 1
 - Blocked: 0
 
 ## Ordem de execução (waves)
 
 ### Wave 1 (paralelizável)
-- [ ] TASK-018-001 ⏸ Todo — Criar o componente `PasswordField` com toggle de
+- [x] TASK-018-001 ✅ Done — Criar o componente `PasswordField` com toggle de
       visibilidade
 
 ### Wave 2 (depende de Wave 1)

@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -166,26 +166,27 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-07
+**Data conclusão**: 2026-09-07
+**Branch**: feat/campos-senha-toggle
+**Commit SHA**: abbfea6 (fix pos-review; base a33a848)
 **Jira**: KAN-79
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer, product-designer
+**Tentativas**: 2 (1 retry - 2 achados bloqueantes do code-reviewer + 2 de severidade alta do product-designer, todos corrigidos e reverificados por mutacao/CSS compilado na rodada 2)
+**Cobertura final**: 8/8 ACs (AC-016-001 a 006 parte, 008, 010) - 8/8 testes, suite completa 24/243 sem regressao
 **Arquivos modificados**:
-  -
+  - src/components/password-field.tsx (novo)
+  - src/components/password-field.test.tsx (novo)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a - sem I/O, sem endpoint, sem dado de sessão; toggle é atributo `type` client-side sobre input já existente
+- [x] Comportamento (gate 9): n/a - ação síncrona local sem I/O (nota FR-016-003, decisão 4.67); todos os ACs desta TASK fecham por gate 1 (teste automatizado)
 
 **Notas**:

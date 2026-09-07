@@ -26,7 +26,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 ### Em desenvolvimento
 - Tira mnemônica como sequência de quadros (SPEC-011/**PLAN-012**, F4 do épico MNEMORA STUDIO, Approved 2026-09-06) — models `MnemonicStrip` (1:1 `RuleBreakdown`) + `MnemonicFrame` (N:1, posição indexada, `@@unique([stripId,position])`), geração automática de Quadros a partir dos Blocos não-vazios da Quebra na ordem canônica, CRUD completo + reordenação atômica (reindexação em 2 fases), valor aditivo `TIRA_MNEMONICA` no `ProductionStageType`, fronteira abertura/conclusão/retrabalho na 1ª mutação humana (correção do PO), alcance por autoria herdado de F2 (`assertRawContentReachable` exportado), tela `(interno)/content/[id]/tira`. 14 COMPs, 10 DECs (todas reversíveis), 5 TRISKs. PO da SPEC: ESCALAR (E-01, não-bloqueante, vai à Entrega). 13 TASKs em 7 waves (`/keelson:tasks`, rota fan-out — decisão 4.310), 0/13 Done. Aguarda `/keelson:implement`.
-- Toggle de mostrar/ocultar senha nos campos de senha (SPEC-016/**PLAN-018**, Approved 2026-09-07) — componente `PasswordField` reutilizável (SVG inline, sem dependência nova), toggle por `useState` local, atributos anti-canal fixos (`autoComplete`, sem spellcheck/autocorreção), aplicado ao campo de senha do `LoginForm` (único hoje), sem alterar o fluxo de autenticação de SPEC-002. 2 COMPs, 5 DECs (todas reversíveis), 2 TRISKs. Demanda avulsa fora do épico MNEMORA STUDIO — brief BRIEF-016, Jira KAN-72. 2 TASKs em 2 waves (`/keelson:tasks`), 0/2 Done. Aguarda `/keelson:implement`.
+- Toggle de mostrar/ocultar senha nos campos de senha (SPEC-016/**PLAN-018**, Approved 2026-09-07) — componente `PasswordField` reutilizável (SVG inline, sem dependência nova), toggle por `useState` local, atributos anti-canal fixos (`autoComplete`, sem spellcheck/autocorreção), aplicado ao campo de senha do `LoginForm` (único hoje), sem alterar o fluxo de autenticação de SPEC-002. 2 COMPs, 5 DECs (todas reversíveis), 2 TRISKs. Demanda avulsa fora do épico MNEMORA STUDIO — brief BRIEF-016, Jira KAN-72. 2 TASKs em 2 waves (`/keelson:tasks`), 1/2 Done (TASK-018-001 Wave 1 concluida, gates code-reviewer + product-designer aprovados apos 1 retry). Wave 2 (TASK-018-002) em andamento.
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
@@ -53,7 +53,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-010 | SPEC-009 | 10/10 FRs + 5/5 NFRs (mecanismo append-only de evento de etapa, emissão transacional nas 2 estações existentes, rede de paridade cross-repo backend-only) | 3/3 ✅ | Done |
 | PLAN-012 | SPEC-011 | 11/11 FRs + 6/6 NFRs (models `MnemonicStrip`/`MnemonicFrame`, geração automática + CRUD + reordenação atômica, instrumentação aditiva `TIRA_MNEMONICA`, alcance por autoria herdado) | 11/13 🟡 | Approved |
 | PLAN-013 | SPEC-013 | 6/6 FRs + 8/8 NFRs (manifesto, ícones 192/512, service worker artesanal restrito a assets estáticos, kill-switch por autodesregistro, postura de exposição, não-regressão de sessão) | 6/6 ✅ | Done (sugerido) |
-| PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 0/2 ⏸ | Approved |
+| PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 1/2 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -168,6 +168,22 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-07 15:10: **Wave 1 de PLAN-018 concluída via `/keelson:implement`** (TASK-018-001,
+  KAN-79 — componente `PasswordField`). Gate 1-7 (code-reviewer) REPROVOU na 1ª rodada: 2
+  achados bloqueantes — AC-016-005 tinha oráculo morto (`<input required>` vazio no harness
+  bloqueava toda submissão nativa no jsdom, então o mutante `type="button"`→`type="submit"`
+  sobrevivia) e AC-016-008/DEC-018-005 sem asserção nenhuma dos 3 atributos anti-canal. Gate
+  11 (product-designer) REPROVOU no mesmo turno: foco visível ausente (`outline-none` sem
+  substituto, único caso em `src/`) e alvo de toque do botão de alternância abaixo do piso
+  WCAG 2.2 SC 2.5.8 (20×20, mínimo 24×24). 1 retry consolidado corrigiu os 4 — developer
+  confirmou cada mutante morto manualmente antes de reverter, e ambos os revisores
+  reconfirmaram por si mesmos na rodada 2 (mutação real / CSS compilado com
+  `tailwindcss@4.3.3`), não por relato. Bônus aplicado (convergência dos 2 revisores): label
+  e botão deixaram de ser aninhados (risco de content model inválido + contaminação de nome
+  acessível). 2 lições candidatas registradas pelos revisores: `[Testes]` teste de
+  ausência-de-efeito exige controle positivo no mesmo harness; `[Design]` produto sem token/
+  utilitário de foco declarado, cada componente improvisa o próprio anel. Suíte completa
+  24/243, 0 regressão. TASK-018-001 → Done.
 - 2026-09-07 14:20: **QA pré-código (Etapa 3.5) de TASK-018-001/002** — 5 achados
   (nenhum bloqueante): AC-016-006 tinha prova "code review only", não executável, nos
   dois lados — trocado por checagem estrutural determinística (`grep` confirmando 0
