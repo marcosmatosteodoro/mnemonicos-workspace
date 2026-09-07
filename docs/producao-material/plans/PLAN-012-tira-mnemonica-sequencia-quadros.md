@@ -890,21 +890,34 @@ projeto — autorização do Diretor antes de gerar/aplicar)
 
 ## 9. Definition of Done deste PLAN
 
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs
-- [ ] Todos os NFRs cobertos têm verificação
-- [ ] Decisões DEC refletidas no código
-- [ ] Aderência à ficha/perfil validada
-- [ ] Todos os ACs cobertos por teste (gate 1 dos quality gates)
-- [ ] Métrica da SPEC operacional (SPEC-011 §1.3 declara `Fonte de medição`): (a)
+- [x] Todos os FRs cobertos têm implementação satisfazendo os ACs — 11/11 FRs, 25/25 ACs.
+- [x] Todos os NFRs cobertos têm verificação — 6/6 NFRs, provados via os ACs que os cobrem
+  (ver TASK-012-INDEX.md, "NFRs").
+- [x] Decisões DEC refletidas no código — 11/11 DECs (DEC-012-001..010 originais +
+  DEC-012-011, EMENDA Wave 5), todas reversíveis, nenhuma condição `Reabrir se:` satisfeita
+  além da própria DEC-012-011 (que reabriu DEC-012-009).
+- [x] Aderência à ficha/perfil validada — confirmada por todos os 7 code-reviews de wave.
+- [x] Todos os ACs cobertos por teste (gate 1 dos quality gates) — 25/25, mais o gate 9
+  consolidado abaixo.
+- [x] Métrica da SPEC operacional (SPEC-011 §1.3 declara `Fonte de medição`): (a)
   instrumentação — os eventos de etapa "Tira mnemônica" (abertura, conclusão,
-  retrabalho) emitidos por COMP-012-004 e provados por COMP-012-014 (gate 9 exibe o
-  evento existindo, mesmos 3 gatilhos de FR-011-008/009); dono: time de engenharia —
-  item de instrumentação **entra nos componentes deste PLAN** (COMP-012-004),
-  não é opcional; (b) observacional — apuração por inspeção humana na Entrega (proporção
-  de Tiras que alcançaram conclusão; nº de Quadros com carimbo de proveniência cujo
-  texto diverge do Bloco de origem) fica para o ato do Tech Lead/PO na Entrega, mesmo
-  molde de SPEC-005/§1.3 item (b) e SPEC-009/§1.3 item (b) — não é um componente a
-  construir neste PLAN.
+  retrabalho) emitidos por `openMnemonicStrip`/`addMnemonicFrame`/`updateMnemonicFrameText`/
+  `removeMnemonicFrame` (COMP-012-004) e provados por 12+ testes de integração (COMP-012-014,
+  gate 9 exibe o evento existindo, mesmos 3 gatilhos de FR-011-008/009) — **entregue**; (b)
+  observacional — apuração por inspeção humana na Entrega (proporção de Tiras que alcançaram
+  conclusão; nº de Quadros com carimbo de proveniência cujo texto diverge do Bloco de
+  origem) — **pendente, ato da Entrega** (Etapa 5), mesmo molde de SPEC-005/§1.3 item (b) e
+  SPEC-009/§1.3 item (b).
+
+**Verificação (gate 9)**: VERIFICADO (2026-09-07) — SPEC-011 sem FEATs, consolidado 1×
+contra esta DoD. Roteiro de 7 passos fixado em TASK-012-012 executado via Playwright contra
+ambiente local real (`localhost:3000`/`3333`, branch `feat/producao-material-mnemora-studio`,
+backend HEAD `3558605`, frontend HEAD `42c0a90`). Todos os ACs do roteiro confirmados:
+AC-011-023, AC-011-001, AC-011-003, AC-011-004/005/006/007/008/009/010/011, AC-011-012,
+AC-011-017, AC-011-024. Identidade do código provada por processo + marcador comportamental
+DEC-012-011 (GET `/strip` devolveu 404 puro antes da 1ª abertura — comportamento só existe
+pós-Wave-5). Estabilidade da árvore confirmada (HEAD/status idênticos abertura→fecho).
+Fixture (`rawContentId` `01a07d14-cc3f-71ce-8f98-018ec90db72e`) restaurado ao fim.
 
 ## 10. Não coberto por este PLAN
 
