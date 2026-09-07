@@ -24,16 +24,23 @@ por padrão + `'use client'` só no componente com estado (precedente
 `(interno)/content/[id]/breakdown/page.tsx` + `rule-breakdown-form.tsx`); estado de
 servidor via RTK Query, nunca slice manual.
 **Decisões irreversíveis do slug tocadas**: nenhuma (INDEX.md declara nenhuma DEC
-irreversível até aqui — as 12 DECs de PLAN-003 são todas reversíveis; as 10 DECs deste
-PLAN também nascem reversíveis, §6).
+irreversível até aqui — as 12 DECs de PLAN-003 são todas reversíveis; as 11 DECs deste
+PLAN também nascem reversíveis, §6 — DEC-012-011 incluída, EMENDA da Wave 5).
 **Decisões irreversíveis de outros slugs em conflito**: nenhuma — nenhum outro slug deste
 workspace tem `INDEX.md` com a seção "Decisões irreversíveis" hoje (`docs/infra-vercel/`
 ainda não tem `INDEX.md`).
-**Exceções aos guidelines**: nenhuma. `GET /contents/:id/strip` com efeito colateral de
-geração (get-or-generate idempotente) não é desvio do padrão REST do projeto — mesmo
-espírito do `PUT` idempotente de `saveRuleBreakdown` (upsert com efeito colateral de
-criação, `contents.service.ts:459-494`); a escolha e o trade-off ficam documentados em
-DEC-012-009, não como exceção silenciosa.
+**Exceções aos guidelines**: nenhuma.
+
+<!-- CORRIGIDO na Entrega (ressalva R-1 do PO): o parágrafo original desta seção defendia
+`GET /contents/:id/strip` com efeito colateral de geração como não-desvio do padrão REST
+do projeto — essa decisão (DEC-012-009) foi SUPERSEDIDA por DEC-012-011 na Wave 5 (achado
+de CSRF do security-engineer: o cookie de sessão `sameSite: 'lax'` + a regra repo-wide que
+proíbe `verifyOrigin` em GET deixavam o efeito colateral sem defesa). A partir de
+DEC-012-011: `GET /contents/:id/strip` é leitura pura; a geração migrou para
+`POST /contents/:id/strip`, com `verifyOrigin` como as demais mutações — não há mais
+exceção a documentar aqui, o padrão REST do projeto (mutação só em POST/PATCH/PUT/DELETE)
+está intacto. Ver EMENDA em DEC-012-009 e o texto de DEC-012-011, §6. -->
+
 
 ## Cobertura
 
@@ -879,14 +886,14 @@ projeto — autorização do Diretor antes de gerar/aplicar)
   RISK-011-004, já aceito na SPEC) não distingue qual ação de CRUD (criar, editar,
   remover, reordenar) gerou um retrabalho de "Tira mnemônica" — este PLAN não resolve
   isso, só herda a limitação. Mitigação: aceita, mesmo raciocínio de RISK-011-004.
-- **TRISK-012-005** `GET /contents/:id/strip` com efeito colateral de geração
+- **TRISK-012-005** ~~`GET /contents/:id/strip` com efeito colateral de geração
   (DEC-012-009) foge da expectativa estrita de idempotência "sem efeito" de um `GET`
-  REST — um cliente HTTP ou cache intermediário que repita a chamada automaticamente
-  (retry de rede) dispara uma tentativa de geração extra. Mitigação: a geração em si é
-  idempotente por desenho (constraint `@unique` + captura de violação, DEC-012-008), e
-  RTK Query (frontend) não faz retry automático de `query` por padrão — o risco é
-  teórico para um cliente HTTP externo hipotético, não para a superfície real desta
-  fatia.
+  REST~~ — **EXTINTO na Entrega (ressalva R-1 do PO)**: DEC-012-009 foi supersedida por
+  DEC-012-011 na Wave 5 (achado de CSRF do security-engineer, não o risco de
+  cache/idempotência que este TRISK previa). `GET /contents/:id/strip` é leitura pura
+  desde então; a geração migrou para `POST /contents/:id/strip`. O risco que este item
+  descrevia não existe mais na superfície atual — mantido riscado, não apagado, por
+  rastro histórico da decisão que o extinguiu.
 
 ## 9. Definition of Done deste PLAN
 
