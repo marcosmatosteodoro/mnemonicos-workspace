@@ -946,7 +946,25 @@ de espelhar o critério da TASK anterior — nunca aceita "estrutural" nem "já 
 não duplicar" como fechamento de alcance.
 **Validade:** todo módulo backend com dado escopado por autoria/dono, neste projeto.
 **Estado:** ativa
-**Contadores:** confirmada 2 · contestada 0
+**Reincidência (code-reviewer, Wave 5 de PLAN-012, 3ª ocorrência):** `getMnemonicStrip`
+(TASK-012-008, EMENDA/DEC-012-011 — função de LEITURA nova, extraída de
+`openMnemonicStrip` para separar GET de POST por achado de CSRF) recebeu prova de
+negação por autoria só no fixture em que a VÍTIMA AINDA NÃO tinha o recurso criado — 404
+igual com ou sem a guarda de alcance, guarda invisível ao teste. Denominador foi de 5
+para 6 métodos (5 de escrita + 1 de leitura nova); a prova do 6º não discriminava.
+Confirmado por mutação (fast-path de leitura antes de `assertStripPrerequisites`):
+sobrevive a 241/241+238/238. Corrigido no retry (commit `9537824`) — a vítima passou a
+ter a Tira REALMENTE aberta (via `POST` legítimo) antes da leitura do não-dono, e a
+suíte passou a discriminar. **Extensão da lição**: para método de LEITURA (não só
+escrita), a prova comportamental de negação exige fixture DISCRIMINANTE — a linha da
+vítima criada e persistida pelo caminho legítimo ANTES da chamada do não-dono, nunca o
+cenário "recurso inexistente" (onde os dois ramos, com e sem guarda, convergem na mesma
+resposta). Fechamento contável: N = todo método que LÊ ou ESCREVE o dado escopado
+(grep `assertRawContentReachable(`/guarda equivalente no módulo) → N provas, cada uma
+com fixture que muda de resposta ao remover a guarda — nunca herdado do denominador da
+TASK anterior. Exemplar correto no repo:
+`tira.service.integration.test.ts:265` (discriminante por `expect(count).toBe(0)`).
+**Contadores:** confirmada 3 · contestada 0
 
 ## [Testes] Predicado de conjunto composto por `&&` exige um caso por EIXO discriminável, não por método que o invoca
 
@@ -1035,7 +1053,21 @@ escolha).
 **Validade:** todo teste estrutural (leitura de arquivo como texto) que prova ausência de
 um padrão, neste projeto.
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0
+**Reincidência (code-reviewer, Wave 5 de PLAN-012):** `tira.service.guard-order.test.ts`
+provava "nenhuma chamada Prisma no preâmbulo" (universo derivado do quantificador,
+corpo EXTERNO da função, não só o callback da transação — correção do achado anterior
+desta mesma wave) lendo só `/\b(tx|db)\.\w+\.\w+\(/` — mas o critério real era "nenhuma
+chamada Prisma", e `prisma` (o cliente de módulo, importado no topo do arquivo e default
+do próprio parâmetro `db`) não casava o padrão. Mutante plantado com `prisma.` em vez de
+`db.`/`tx.` sobreviveu ao teste estrutural (9/9 verde) e só morreu na camada de
+integração — o universo estava certo (corpo externo), mas o VOCABULÁRIO do padrão
+textual não cobria todos os identificadores pelos quais o quantificador "nenhuma chamada
+Prisma" se manifesta. Corrigido na closure (1 linha, `/\b(tx|db|prisma)\.\w+\.\w+\(/`),
+verificado 9/9 verde. Extensão da lição: declarar o universo certo não basta — o padrão
+textual que varre esse universo precisa enumerar TODOS os identificadores pelos quais o
+quantificador do critério pode se manifestar (todo cliente de dados alcançável no
+escopo), não só o mais óbvio/injetado.
+**Contadores:** confirmada 2 · contestada 0
 
 ## [Config] `CORS_ORIGINS` de origem única quebra silenciosamente o padrão de porta alternativa entre sessões paralelas
 

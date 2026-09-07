@@ -7,7 +7,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -78,14 +78,14 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 ## Critérios de pronto
 
-- [ ] As 6 rotas de `tira.routes.ts` montadas em árvore plana, cada uma com `requireRole` declarado na chamada de montagem (nunca no handler) e `verifyOrigin` como 1º handler nas 5 mutações (`POST /contents/:id/strip`/`POST .../frames`/`PATCH`/`DELETE`/`PUT`), ausente na leitura (`GET`).
-- [ ] **CSRF/DEC-012-011 (achado do security-engineer, gate 8 — bloqueante desta rodada)**: `POST /contents/:id/strip` (geração, antiga responsabilidade do `GET`) tem `verifyOrigin` como 1º handler. `GET /contents/:id/strip` vira leitura pura — teste de integração prova que uma chamada de `GET` **sobre uma Tira ainda não aberta** (Quebra da regra salva, Tira inexistente) devolve 404 e **não cria** `MnemonicStrip`/`MnemonicFrame`/evento de produção (consulta direta ao banco após a chamada confirma 0 linhas) — nem mesmo chamando duas vezes seguidas. Comando: `npm run test:integration` → suíte nomeada verde.
-- [ ] **AC-011-017** — topologia adversarial completa (gate 1, integração): `route-authz-matrix.integration.test.ts` ganha o bloco `describe('TASK-012-008 — as 6 rotas da Tira sob a barreira (topologia adversarial)')` com estas asserções: (a) as 6 chaves — `GET /contents/:id/strip`, `POST /contents/:id/strip`, `POST /contents/:id/strip/frames`, `PATCH /contents/:id/strip/frames/:frameId`, `DELETE /contents/:id/strip/frames/:frameId`, `PUT /contents/:id/strip/frames/order` — declaradas como `{EDITOR, ADMIN}` em `ROUTE_ROLES` (`REGISTRY.get(key)` igual a `new Set(['EDITOR','ADMIN'])` para cada uma); (b) sessão STUDENT → 403 nas 6 (mesmo padrão do bloco `TASK-006-011`: `send(app, route.method, ...)` sobre cada rota concreta); (c) `ROUTE_ROLES.has('PUT /contents/:id/strip/frames/order')` **e** `ROUTE_ROLES.has('PATCH /contents/:id/strip/frames/:frameId')`/`ROUTE_ROLES.has('DELETE /contents/:id/strip/frames/:frameId')` **e** `ROUTE_ROLES.has('GET /contents/:id/strip')`/`ROUTE_ROLES.has('POST /contents/:id/strip')` são chaves independentes — nenhuma herda a declaração da vizinha (rota estática `order` ao lado da rota `:frameId`; `GET`/`POST` no mesmo caminho — 2º método no mesmo path, mesma topologia adversarial da lição ativa — ver Riscos específicos). Comando: `npm run test:integration` (dentro de `mnemonicos-backend/`) → esperado `PASS ... route-authz-matrix.integration.test.ts`, com o describe novo nomeado no relatório de execução (o nome do teste aparecendo, não só a contagem agregada — o alvo isolado precisa constar no relatório). A metade "sem sessão → 401" do AC não precisa de caso novo: o describe pré-existente `AC-002-010/NFR-002-001` deriva `NON_PUBLIC` dinamicamente de `collectRoutes(apiRoutes)` contra o app real, então as 6 rotas novas entram automaticamente no loop assim que montadas (achado do `qa`, Etapa 3.5 — confirmado por leitura, não é lacuna, só falta de menção explícita neste critério).
-- [ ] **Tripwire `route-authz-matrix` (19→25, fechamento)** — o `it('a árvore montada é exatamente estes 19 pares...')` (`route-authz-matrix.integration.test.ts:154-178`) é editado para 25 pares, `.sort()`, comparado por igualdade estrita (`toEqual`, nunca `expect.arrayContaining`). Inventário ANTES (19, herdado, inalterado): `GET /health`, `GET /health/db`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/change-password`, `GET /auth/me`, `GET /users`, `POST /users`, `PATCH /users/:id/disable`, `POST /users/:id/reset-password`, `GET /disciplines`, `GET /contents`, `POST /contents`, `GET /contents/:id`, `PATCH /contents/:id`, `DELETE /contents/:id`, `GET /contents/:id/breakdown`, `PUT /contents/:id/breakdown`. Inventário DEPOIS (25 — os 19 acima **mais** os 6 novos): `GET /contents/:id/strip`, `POST /contents/:id/strip`, `POST /contents/:id/strip/frames`, `PATCH /contents/:id/strip/frames/:frameId`, `DELETE /contents/:id/strip/frames/:frameId`, `PUT /contents/:id/strip/frames/order`. Comando: `npm run test:integration` → o `it` (descrição atualizada para "...estes 25 pares...") verde.
-- [ ] **Achado bloqueante — regressão de prova em `route-authz-matrix.integration.test.ts:421`** (compartilhado pelos 2 gates da 1ª rodada): trocar `NON_PUBLIC.filter((route) => CONTENT_ROUTE_KEYS.includes(key(route)))` por `NON_PUBLIC.filter((route) => route.path.startsWith('/contents') && !route.path.startsWith('/contents/:id/strip'))`, mantendo o `toEqual` estrito contra `CONTENT_ROUTE_KEYS.sort()`. Aceite (mutante já executado pelo code-reviewer, reproduzir): declarar uma rota nova hipotética `GET /contents/:id/export` com papéis incluindo `STUDENT` (buraco de autz) e atualizar o censo para 26 — o `it` de STUDENT→403 do bloco `TASK-006-011` deve ficar VERMELHO; removida a rota hipotética, suíte volta a 25/25 verde.
-- [ ] **Achado bloqueante — DRY em `tira.routes.integration.test.ts`**: `BREAKDOWN_FIELDS`/`seedRuleBreakdown` (duplicados byte-a-byte de `tira.service.integration.test.ts`) são promovidos para `tests/support/production-events-fixtures.ts` e consumidos pelos DOIS arquivos de integração da Tira, sem alterar nenhuma asserção. Verificação: `grep -rn "BREAKDOWN_FIELDS\|seedRuleBreakdown" mnemonicos-backend/tests/` → só o helper (`production-events-fixtures.ts`) e os dois imports.
-- [ ] **AC-011-022 (parte — faceta de transporte)**: teste de integração prova que `GET /api/v1/contents/:id/strip` autenticado como EDITOR B sobre um `rawContentId` de autoria de EDITOR A devolve **404** com a mensagem literal exata `"Conteúdo bruto não encontrado."` (igualdade de string sobre `res.body.error.message`, nunca só `res.status === 404` nem `instanceof AppError` — corolário de segurança da lição "árvore de decisão com precedência" já ativa neste projeto, que exige comparar a mensagem por igualdade literal entre as duas recusas de não-alcance). Mesmo caso, agora também para `POST /contents/:id/strip` (a geração). Comando: `npm run test:integration` → suíte nomeada verde.
-- [ ] **Confused deputy no `:frameId`, faceta HTTP (achado do security-engineer, gate 8
+- [x] As 6 rotas de `tira.routes.ts` montadas em árvore plana, cada uma com `requireRole` declarado na chamada de montagem (nunca no handler) e `verifyOrigin` como 1º handler nas 5 mutações (`POST /contents/:id/strip`/`POST .../frames`/`PATCH`/`DELETE`/`PUT`), ausente na leitura (`GET`).
+- [x] **CSRF/DEC-012-011 (achado do security-engineer, gate 8 — bloqueante desta rodada)**: `POST /contents/:id/strip` (geração, antiga responsabilidade do `GET`) tem `verifyOrigin` como 1º handler. `GET /contents/:id/strip` vira leitura pura — teste de integração prova que uma chamada de `GET` **sobre uma Tira ainda não aberta** (Quebra da regra salva, Tira inexistente) devolve 404 e **não cria** `MnemonicStrip`/`MnemonicFrame`/evento de produção (consulta direta ao banco após a chamada confirma 0 linhas) — nem mesmo chamando duas vezes seguidas. Comando: `npm run test:integration` → suíte nomeada verde.
+- [x] **AC-011-017** — topologia adversarial completa (gate 1, integração): `route-authz-matrix.integration.test.ts` ganha o bloco `describe('TASK-012-008 — as 6 rotas da Tira sob a barreira (topologia adversarial)')` com estas asserções: (a) as 6 chaves — `GET /contents/:id/strip`, `POST /contents/:id/strip`, `POST /contents/:id/strip/frames`, `PATCH /contents/:id/strip/frames/:frameId`, `DELETE /contents/:id/strip/frames/:frameId`, `PUT /contents/:id/strip/frames/order` — declaradas como `{EDITOR, ADMIN}` em `ROUTE_ROLES` (`REGISTRY.get(key)` igual a `new Set(['EDITOR','ADMIN'])` para cada uma); (b) sessão STUDENT → 403 nas 6 (mesmo padrão do bloco `TASK-006-011`: `send(app, route.method, ...)` sobre cada rota concreta); (c) `ROUTE_ROLES.has('PUT /contents/:id/strip/frames/order')` **e** `ROUTE_ROLES.has('PATCH /contents/:id/strip/frames/:frameId')`/`ROUTE_ROLES.has('DELETE /contents/:id/strip/frames/:frameId')` **e** `ROUTE_ROLES.has('GET /contents/:id/strip')`/`ROUTE_ROLES.has('POST /contents/:id/strip')` são chaves independentes — nenhuma herda a declaração da vizinha (rota estática `order` ao lado da rota `:frameId`; `GET`/`POST` no mesmo caminho — 2º método no mesmo path, mesma topologia adversarial da lição ativa — ver Riscos específicos). Comando: `npm run test:integration` (dentro de `mnemonicos-backend/`) → esperado `PASS ... route-authz-matrix.integration.test.ts`, com o describe novo nomeado no relatório de execução (o nome do teste aparecendo, não só a contagem agregada — o alvo isolado precisa constar no relatório). A metade "sem sessão → 401" do AC não precisa de caso novo: o describe pré-existente `AC-002-010/NFR-002-001` deriva `NON_PUBLIC` dinamicamente de `collectRoutes(apiRoutes)` contra o app real, então as 6 rotas novas entram automaticamente no loop assim que montadas (achado do `qa`, Etapa 3.5 — confirmado por leitura, não é lacuna, só falta de menção explícita neste critério).
+- [x] **Tripwire `route-authz-matrix` (19→25, fechamento)** — o `it('a árvore montada é exatamente estes 19 pares...')` (`route-authz-matrix.integration.test.ts:154-178`) é editado para 25 pares, `.sort()`, comparado por igualdade estrita (`toEqual`, nunca `expect.arrayContaining`). Inventário ANTES (19, herdado, inalterado): `GET /health`, `GET /health/db`, `POST /auth/login`, `POST /auth/refresh`, `POST /auth/logout`, `POST /auth/change-password`, `GET /auth/me`, `GET /users`, `POST /users`, `PATCH /users/:id/disable`, `POST /users/:id/reset-password`, `GET /disciplines`, `GET /contents`, `POST /contents`, `GET /contents/:id`, `PATCH /contents/:id`, `DELETE /contents/:id`, `GET /contents/:id/breakdown`, `PUT /contents/:id/breakdown`. Inventário DEPOIS (25 — os 19 acima **mais** os 6 novos): `GET /contents/:id/strip`, `POST /contents/:id/strip`, `POST /contents/:id/strip/frames`, `PATCH /contents/:id/strip/frames/:frameId`, `DELETE /contents/:id/strip/frames/:frameId`, `PUT /contents/:id/strip/frames/order`. Comando: `npm run test:integration` → o `it` (descrição atualizada para "...estes 25 pares...") verde.
+- [x] **Achado bloqueante — regressão de prova em `route-authz-matrix.integration.test.ts:421`** (compartilhado pelos 2 gates da 1ª rodada): trocar `NON_PUBLIC.filter((route) => CONTENT_ROUTE_KEYS.includes(key(route)))` por `NON_PUBLIC.filter((route) => route.path.startsWith('/contents') && !route.path.startsWith('/contents/:id/strip'))`, mantendo o `toEqual` estrito contra `CONTENT_ROUTE_KEYS.sort()`. Aceite (mutante já executado pelo code-reviewer, reproduzir): declarar uma rota nova hipotética `GET /contents/:id/export` com papéis incluindo `STUDENT` (buraco de autz) e atualizar o censo para 26 — o `it` de STUDENT→403 do bloco `TASK-006-011` deve ficar VERMELHO; removida a rota hipotética, suíte volta a 25/25 verde.
+- [x] **Achado bloqueante — DRY em `tira.routes.integration.test.ts`**: `BREAKDOWN_FIELDS`/`seedRuleBreakdown` (duplicados byte-a-byte de `tira.service.integration.test.ts`) são promovidos para `tests/support/production-events-fixtures.ts` e consumidos pelos DOIS arquivos de integração da Tira, sem alterar nenhuma asserção. Verificação: `grep -rn "BREAKDOWN_FIELDS\|seedRuleBreakdown" mnemonicos-backend/tests/` → só o helper (`production-events-fixtures.ts`) e os dois imports.
+- [x] **AC-011-022 (parte — faceta de transporte)**: teste de integração prova que `GET /api/v1/contents/:id/strip` autenticado como EDITOR B sobre um `rawContentId` de autoria de EDITOR A devolve **404** com a mensagem literal exata `"Conteúdo bruto não encontrado."` (igualdade de string sobre `res.body.error.message`, nunca só `res.status === 404` nem `instanceof AppError` — corolário de segurança da lição "árvore de decisão com precedência" já ativa neste projeto, que exige comparar a mensagem por igualdade literal entre as duas recusas de não-alcance). Mesmo caso, agora também para `POST /contents/:id/strip` (a geração). Comando: `npm run test:integration` → suíte nomeada verde.
+- [x] **Confused deputy no `:frameId`, faceta HTTP (achado do security-engineer, gate 8
       da Wave 1 — pendência herdada, decisão 4.140)**: teste de integração prova que
       `PATCH`/`DELETE /contents/:id/strip/frames/:frameId` recusam (404, mesma mensagem)
       quando `:frameId` pertence à Tira de um `rawContentId` **diferente** do `:id` da
@@ -93,17 +93,17 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
       amarração feita pelo service (TASK-012-007), este teste prova a faceta HTTP
       ponta-a-ponta. Comando: mesma suíte de integração acima, caso
       "rejeita :frameId fora da cadeia do :id da URL, mesmo autor".
-- [ ] **AC-011-023 (parte — faceta HTTP)**: teste de integração prova que `GET /api/v1/contents/:id/strip` **e** `POST /api/v1/contents/:id/strip` sobre um `rawContentId` alcançável mas **sem** Quebra da regra salva devolvem **409** com `res.body.error.code === 'CONFLICT'` — status derivado automaticamente do `statusCode` de `ConflictError` (`mnemonicos-backend/src/http/errors.ts:41-45`) pelo `errorHandler`, sem mapeamento manual na rota (a guarda de 409 é comum às duas funções do service — leitura e geração — por herdarem a mesma ordem de checagem). Comando: `npm run test:integration` → suíte verde.
-- [ ] **AC-011-016 (fechamento)** — grep estrutural ancorado sobre os 3 arquivos do módulo `tira/`:
+- [x] **AC-011-023 (parte — faceta HTTP)**: teste de integração prova que `GET /api/v1/contents/:id/strip` **e** `POST /api/v1/contents/:id/strip` sobre um `rawContentId` alcançável mas **sem** Quebra da regra salva devolvem **409** com `res.body.error.code === 'CONFLICT'` — status derivado automaticamente do `statusCode` de `ConflictError` (`mnemonicos-backend/src/http/errors.ts:41-45`) pelo `errorHandler`, sem mapeamento manual na rota (a guarda de 409 é comum às duas funções do service — leitura e geração — por herdarem a mesma ordem de checagem). Comando: `npm run test:integration` → suíte verde.
+- [x] **AC-011-016 (fechamento)** — grep estrutural ancorado sobre os 3 arquivos do módulo `tira/`:
   ```
   grep -nE '\b(Mnemonic|hook|decoding)\b' mnemonicos-backend/src/modules/tira/tira.service.ts mnemonicos-backend/src/modules/tira/tira.schema.ts mnemonicos-backend/src/modules/tira/tira.routes.ts | grep -vE ':[[:space:]]*(//|\*|/\*)'
   ```
   Esperado: saída vazia. Fixado contra o molde equivalente (decisão de ancoragem em arquivo-exemplar — os 3 arquivos-alvo desta wave ainda não existem): `grep -nE '\b(Mnemonic|hook|decoding)\b' mnemonicos-backend/src/modules/contents/contents.service.ts mnemonicos-backend/src/modules/contents/contents.routes.ts` → confirmado **vazio** nos dois, rodado nesta fixação (2026-09-06) — o padrão não falso-positiva em código real e equivalente do projeto.
-- [ ] Sem warnings/lints novos sobre `git diff --name-only main...HEAD` (produção e teste).
-- [ ] Padrão de commit respeitado (Conventional Commits).
-- [ ] Aderência à stack/padrões da ficha e do perfil (`guidelines/project/backend/node-22.md`).
-- [ ] Code review aprovado.
-- [ ] Segurança (gate 8) aprovado — fatia sensível (endpoint novo + authz).
+- [x] Sem warnings/lints novos sobre `git diff --name-only main...HEAD` (produção e teste).
+- [x] Padrão de commit respeitado (Conventional Commits).
+- [x] Aderência à stack/padrões da ficha e do perfil (`guidelines/project/backend/node-22.md`).
+- [x] Code review aprovado.
+- [x] Segurança (gate 8) aprovado — fatia sensível (endpoint novo + authz).
 
 ## Riscos específicos
 
@@ -125,26 +125,34 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-07T00:18:37-0300
+**Data conclusão**: 2026-09-07T13:17:11-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: be9da85 (implementação) + ea8411c (retry 1 — GET/POST split, DEC-012-011) + 37468de (retry 2 — prova de sucesso do GET + ordem de guardas) + 9537824 (retry 3 — fixture discriminante) + closure (endurecimento de 1 linha do regex estrutural)
 **Jira**: KAN-58
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (4 rodadas — convergência delta-scoped) + security-engineer (2 rodadas)
+**Tentativas**: 4 (1ª REPROVADA gates 1/6/7/8 — CSRF em GET get-or-generate + regressão de prova + DRY; 2ª REPROVADA gate 1 — GET perdeu prova de sucesso após split; 3ª REPROVADA gate 1 — fixture de negação por autoria não-discriminante + universo do teste estrutural incompleto; 4ª APROVADA nos 2 gates). Furo no plano: DEC-012-009 superseded por DEC-012-011 (Diretor decidiu mover geração GET→POST). 1 escalação ao Diretor (3ª reprovação, achado real porém não-bloqueante em produção — Diretor aprovou o retry).
+**Cobertura final**: 25/25 critérios de pronto (6 rotas, CSRF/DEC-012-011, AC-011-016/017/022/023, confused deputy HTTP, tripwire 19→25, regressão de prova corrigida, DRY corrigido)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/http/routes.ts
+  - mnemonicos-backend/src/modules/tira/tira.routes.ts
+  - mnemonicos-backend/src/modules/tira/tira.service.ts
+  - mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts
+  - mnemonicos-backend/tests/integration/tira.routes.integration.test.ts
+  - mnemonicos-backend/tests/integration/tira.service.integration.test.ts
+  - mnemonicos-backend/tests/unit/tira.service.guard-order.test.ts
+  - mnemonicos-backend/tests/support/production-events-fixtures.ts
+  - docs/producao-material/plans/PLAN-012-tira-mnemonica-sequencia-quadros.md (DEC-012-011)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando (243/243 unit + 283/283 integração)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (4ª rodada, delta 37468de..9537824)
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer, 2ª rodada, vetor de CSRF fechado e confirmado por sonda própria
+- [x] Comportamento (gate 9): n/a — SPEC-011 sem FEATs (verificação consolidada na Etapa 4/DoD do PLAN)
 
-**Notas**:
+**Notas**: Task mais disputada do PLAN-012 até aqui (4 rodadas de code-reviewer). Achado de CSRF genuíno (GET get-or-generate sem defesa, cookie sameSite=lax) escalado ao Diretor, que decidiu mover a geração para POST — DEC-012-011 supersede DEC-012-009 no PLAN. Retry da mudança arquitetural levou consigo as únicas 2 asserções de sucesso do GET (achado 2, fechado); o fechamento desse achado usou fixture não-discriminante (achado 3, escalado ao Diretor — não é vulnerabilidade viva, produção confirmada correta por sonda, só faltava a prova de teste — Diretor aprovou aplicar). Pendência explícita para TASK-012-012 (Wave 6): o endpoint RTK Query de TASK-012-010 (Done) ainda espera o contrato antigo (GET get-or-generate) — a tela já nasce consumindo o contrato novo (POST gera, GET lê). Pendência fora de escopo: `tira-frontend-contract.test.ts` não roda em git worktree (resolve caminho relativo ao checkout) — sinal para correção futura. 2 lições de segurança atualizadas em `lessons.md` (reincidência da guarda reusada, 3ª ocorrência; reincidência do universo do teste estrutural, 2ª ocorrência).
