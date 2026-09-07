@@ -7,7 +7,7 @@
 **Wave**: 3
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -141,26 +141,26 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T21:32:48-0300
+**Data conclusão**: 2026-09-06T21:39:01-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 4557a51
 **Jira**: KAN-61
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (aprovado sem achados, Wave 3)
+**Tentativas**: 1
+**Cobertura final**: n/a (item do Inclui sem AC — oráculo é o contrato do próprio item)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/tests/unit/tira-frontend-contract.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando (2/2)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados (n/a — sem AC numerado)
+- [x] Segurança (gate 8): n/a — teste puro de paridade, sem código de produção
+- [x] Comportamento (gate 9): n/a — chore de teste, sem efeito observável
 
 **Notas**:

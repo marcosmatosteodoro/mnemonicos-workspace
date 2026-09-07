@@ -692,10 +692,19 @@ mesmo banco ao mesmo tempo — exclusividade aparente, não real.
 **Nota:** complementa — não substitui — "[Testes] Infra de teste que faz DDL/TRUNCATE
 valida o alvo na carga do módulo, fail-closed" (acima): aquela cobre truncar o banco
 **errado**; esta cobre truncar o banco **certo, mas ao mesmo tempo que outro processo**.
+**Reincidência (security-engineer + code-reviewer, Wave 3 de PLAN-012):** o
+`code-reviewer`, revisando a convergência de TASK-012-006, rodou a mesma suíte 3× e obteve
+7, 10 e 1 falhas por violação de FK (`raw_contents_authorId_fkey` logo após `createUser`,
+"Conteúdo bruto não encontrado" para linha recém-criada, `deadlock detected` no
+`TRUNCATE`) — quase reprovou o commit por regressão falsa. Causa provável: **duas sessões
+diferentes** (esta e uma sessão paralela do mesmo workspace, PLAN-013/PWA) rodando
+integração contra o mesmo `mnemonicos_test` ao mesmo tempo — não é só "gates da mesma
+rodada", é qualquer processo concorrente na máquina, inclusive de outra sessão/ciclo. A
+fixação da lição (exclusividade real) continua sem estar implementada.
 **Validade:** enquanto `tests/integration/db.ts`/`jest.integration.config.ts` usarem
 `TRUNCATE` num banco compartilhado por nome fixo.
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
 
 ## [Código] Correção de duplicação (DRY) introduz nova re-derivação do canônico no mesmo diff
 **Erro:** o retry que eliminou a redeclaração de dois enums de domínio (`contents.schema.ts`
@@ -855,4 +864,94 @@ afirma existir. Referência: `mnemonicos-backend/README.md` §Deploy (Vercel), m
 **Validade:** geral (qualquer resolução de conflito de merge em texto/documentação com mais
 de uma claim por frase).
 **Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Guarda reusada continua exigindo prova comportamental própria por novo método de escrita
+
+**Erro:** `reorderMnemonicFrames` (TASK-012-006, PLAN-012) é um novo entry point de escrita
+sobre tabela escopada por autoria herdada, e nasceu com prova de guarda apenas ESTRUTURAL
+(casamento textual de `assertRawContentReachable(` na 1ª linha do corpo, em
+`tira.service.guard-order.test.ts`) — sob a justificativa de que a guarda é "reusada, não
+nova". O fechamento contável do gate 8 tinha ficado em "1 método toca tabela escopada → 1
+prova" quando a wave já passara o denominador para 2 métodos (`openMnemonicStrip` +
+`reorderMnemonicFrames`) sem mover o numerador. Achado do `security-engineer` (gate 8, Wave
+3): trocar o ator ou o `rawContentId` por um valor escalado mantém a string de guard na 1ª
+linha, e o teste estrutural segue verde com o alcance por autoria efetivamente desligado.
+**Causa:** o que pode regredir num chamador novo não é o corpo da função de guard (que de
+fato é reusado sem alteração) — são os ARGUMENTOS que o novo chamador passa a ela. Prova
+estrutural (leitura textual do fonte, "a chamada existe") não vê isso; só prova
+comportamental (negação real com credencial de outro dono, mais asserção de estado
+intocado) vê.
+**Solução:** todo método NOVO que lê ou escreve tabela escopada por autoria herdada exige
+prova COMPORTAMENTAL própria de negação — dono diferente → mesma mensagem literal de "não
+encontrado" que o caso de id inexistente + asserção de que o estado da vítima permanece
+intocado —, mesmo quando a guarda invocada é reusada de outro módulo. Prova estrutural é
+complemento de ORDEM (confirma que a guarda é a 1ª chamada), nunca substituto da prova de
+alcance. O fechamento contável do gate 8 enumera MÉTODOS que tocam o dado escopado, e é
+reconferido a cada TASK que adiciona um — não fica congelado no número da TASK anterior.
+Referência: `guidelines/project/backend/node-22.md` §6.3 e `core/SECURITY.md`, "Guarda no
+sink, não na superfície".
+**Validade:** todo módulo backend com dado escopado por autoria/dono, neste projeto.
+**Estado:** ativa
+**Contadores:** confirmada 1 · contestada 0
+
+## [Testes] Predicado de conjunto composto por `&&` exige um caso por EIXO discriminável, não por método que o invoca
+
+**Erro:** o critério de pronto de TASK-012-006 (PLAN-012) fechou a prova de
+`isExactFrameSet` (predicado de conjunto: `order` tem exatamente os ids da Tira, nem falta
+nem sobra nem duplicidade) contando MÉTODOS ("1 método nesta TASK toca esse predicado → 1
+prova"), e o developer entregou exatamente os 2 casos concretos que o texto da TASK
+enumerava (id de outra Tira + duplicata). O 3º eixo do predicado — cardinalidade (id
+faltando, subconjunto estrito sem duplicata) — ficou sem prova, e o `code-reviewer` (Wave
+3) confirmou por mutação real: remover a condição `order.length === existingIds.size` do
+código deixa a suíte inteira 100% verde, embora o serviço passe a aceitar silenciosamente
+uma reordenação parcial.
+**Causa:** o fechamento contável (decisões 4.139/4.232) foi instanciado na unidade errada.
+"Método que toca o predicado" mede a superfície de CHAMADA; o que precisa de um caso cada
+são os eixos DISCRIMINÁVEIS do próprio predicado — um predicado de conjunto tem sempre três
+por construção: cardinalidade (falta/sobra), multiplicidade (duplicata sob mesmo tamanho) e
+pertencimento (elemento de fora do escopo). Como a TASK já vinha com 2 casos concretos e
+nomeados, a lista parecia exaustiva — ninguém comparou contra a enumeração completa do
+próprio predicado.
+**Solução:** ao gerar TASK cujo critério exige recusa de um valor COMPOSTO (conjunto, faixa,
+combinação de campos), declarar a condição E a enumeração dos eixos que a discriminam, com
+o fechamento contável na unidade "eixo", nunca "método" ou "instância citada no texto": para
+predicado de conjunto, os eixos são sempre cardinalidade + multiplicidade + pertencimento —
+3 eixos, 3 casos, aceite = "cada condição da cadeia `&&`, removida isoladamente, faz a suíte
+reprovar pelo comando do critério". Sinal mecânico para quem revisa o card ou implementa: se
+um comentário/docblock do próprio diff ENUMERA N condições distintas, esse texto é o
+gabarito de mutação — N condições declaradas exigem N mutantes mortos, não menos. Mesma
+família da lição ativa "[Testes] Árvore de decisão com precedência: um caso por PAR de
+ramos que coincide" (que trata precedência entre ramos); esta é o eixo irmão para conjunção
+sem precedência. Referência: `mnemonicos-backend/src/modules/tira/tira.service.ts:266-279`
+(`isExactFrameSet`).
+**Validade:** toda TASK cujo critério de pronto recusa um valor composto (conjunto, faixa,
+combinação de campos validados em conjunto), neste projeto.
+**Estado:** ativa
+**Contadores:** confirmada 1 · contestada 0
+
+## [Testes] Correção acrescentada de carona num retry passa pela MESMA régua do achado original
+
+**Erro:** no retry de TASK-012-006 (PLAN-012, Wave 3), o Tech Lead pediu — junto da
+correção dos 2 achados bloqueantes — um endurecimento não-bloqueante do
+security-engineer: `applyPositions` passou a conferir o `count` de cada `updateMany` e
+lançar se não bater. O developer implementou corretamente, mas sem teste. O
+`code-reviewer`, na convergência, encontrou o guard sem prova — mutante que remove o
+`throw` inteiro sobrevive a 17/17 integração + toda a suíte unitária.
+**Causa:** a atenção do retry (developer e do primeiro re-review) foi para os achados
+NOMEADOS (cardinalidade, cross-autor); o código que veio "de carona" no mesmo commit,
+embora solicitado com pai claro, não foi conferido pela mesma régua de falsificabilidade
+que se aplica a qualquer comportamento de produção novo. Código nascido em retry não é
+"já revisado" só porque chegou dentro de uma correção — cada trecho de comportamento
+novo no diff, mesmo pequeno e defensivo, precisa do próprio mutante morto.
+**Solução:** ao despachar retry consolidado com múltiplos achados, cada item que introduz
+comportamento de produção (mesmo pedidos de dureza/defesa, mesmo pequenos) carrega a
+mesma exigência de teste falsificável dos achados bloqueantes — nunca "é só um guard,
+óbvio que funciona". Guard de invariante que lança é comportamento: o padrão já aprovado
+no repo (`tests/unit/db-url-guard.test.ts`, `tests/integration/route-authz-matrix.
+integration.test.ts:467`) prova esses throws com `.toThrow()`; primitiva com client
+injetável prova-se com stub em teste unitário, sem precisar de banco real.
+**Validade:** todo retry que consolida mais de um achado ou pedido de correção no mesmo
+despacho, neste projeto.
+**Estado:** em-observacao
 **Contadores:** confirmada 0 · contestada 0

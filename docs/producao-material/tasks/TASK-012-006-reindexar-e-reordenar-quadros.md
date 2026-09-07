@@ -7,7 +7,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -97,7 +97,7 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
       um caso por PAR de ramos que coincide" — aqui aplicada à precedência Fase 1 → Fase
       2: sem ela, o par de posições que troca de lugar é exatamente o caso que expõe a
       falta de offset). Verificação executável: `npm --prefix mnemonicos-backend run
-      test:integration -- --testPathPattern=tira.service.integration.test.ts` → `OK (N
+      test:integration -- --testPathPatterns=tira.service.integration.test.ts` → `OK (N
       tests)`, incluindo o teste "reorder inverte a sequência completa: posições finais
       1..5 sem lacuna nem duplicidade, inclusive com swap genuíno".
 - [ ] Testes cobrem AC-011-011 (atomicidade REAL, RISK-011-003): teste de integração
@@ -151,12 +151,20 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
       mnemonicos-backend test -- tira.service.guard-order.test.ts` → `OK (N tests)`. A
       prova COMPORTAMENTAL completa de alcance (EDITOR não alcança Tira de outro EDITOR;
       soft-delete torna inalcançável) já foi feita em TASK-012-005 — não duplicar aqui.
-- [ ] Testes cobrem NFR-011-002 e a lição "[Performance] `include`/`select` aninhado de
+- [x] Testes cobrem NFR-011-002 e a lição "[Performance] `include`/`select` aninhado de
       relação não é 1 statement por padrão": `reorderMnemonicFrames` devolve
       `MnemonicStripDetail` com round-trips fixados em teste via `withQueryProbe` (mesmo
-      helper de `contents.service.integration.test.ts`) — nº de queries **estável**, não
-      cresce com o nº de Quadros (semear 3 e depois 5 Quadros na Tira, mesma contagem de
-      eventos `query`). Comando acima → `OK (N tests)`.
+      helper de `contents.service.integration.test.ts`). **Furo no plano corrigido
+      (decisão do Tech Lead, ajuste localizado — decisão registrada 2026-09-06)**: o
+      texto original pedia contagem ABSOLUTA estável entre 3 e 5 Quadros — mas
+      AC-011-011 exige que a Fase 2 seja um LAÇO de N invocações Prisma SEPARADAS (para
+      permitir injeção de falha numa invocação intermediária), então a contagem
+      absoluta CRESCE com N por desenho, não por regressão. Critério correto, medido
+      contra Postgres real: o DELTA marginal entre N=3 e N=5 é exatamente `2×(5-3)=4`
+      (2 queries por Quadro adicional — 1 por fase — nunca mais, DEC-012-003), e a
+      leitura final da relação `frames` via `relationLoadStrategy: 'join'` não soma
+      query extra por Quadro (se somasse, o delta seria maior que 4). Comando acima →
+      `OK (N tests)`, incluindo o teste de delta marginal.
 - [ ] Sem warnings/lints novos sobre todos os arquivos do diff (`git diff --name-only
       main...HEAD`, produção e teste) — `npm --prefix mnemonicos-backend run lint` →
       exit 0.
@@ -178,26 +186,29 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-06T21:26:37-0300
+**Data conclusão**: 2026-09-06T22:34:03-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: ea094d4 (implementação inicial `ff09eb5`, retry consolidado `916d5a6`, correção pontual `ea094d4`)
 **Jira**: KAN-56
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (REPROVADO 2x — cardinalidade + guard sem teste; CONVERGIU) · security-engineer (REPROVADO 1x — cross-autor; CONVERGIU) · performance-engineer (aprovado sem achados)
+**Tentativas**: 3 (1 retry consolidado + 1 correção pontual, ambos roteados por achados de gate)
+**Cobertura final**: n/a (item do Inclui sem AC próprio — prova pelos ACs abaixo)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/tira/tira.service.ts
+  - mnemonicos-backend/tests/integration/tira.service.integration.test.ts
+  - mnemonicos-backend/tests/unit/tira.service.guard-order.test.ts
+  - mnemonicos-backend/tests/unit/tira.service.apply-positions.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando (17/17 integração + suíte unitária completa 235/235)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (2 rodadas de retry, ambas com mutation testing confirmando morte do mutante)
+- [x] ACs verificados (AC-011-010, AC-011-011, AC-011-014, AC-011-015, AC-011-020, AC-011-022)
+- [x] Segurança (gate 8): aprovado — prova comportamental de negação cross-autor para `reorderMnemonicFrames` adicionada no retry; guard de `count` em `applyPositions` provado por stub
+- [x] Comportamento (gate 9): n/a — regra de negócio backend, sem tela (fica com TASK-012-012)
 
 **Notas**:

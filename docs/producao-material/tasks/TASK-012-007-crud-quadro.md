@@ -101,7 +101,7 @@ prevalecem; nunca siga um passo que enfraqueça um critério.
       AC-011-015 abaixo) não deixa Quadro parcial. Arquivo:
       `mnemonicos-backend/tests/integration/tira.service.integration.test.ts` (estende o
       arquivo de TASK-012-005/006). Comando: `npm --prefix mnemonicos-backend run
-      test:integration -- --testPathPattern=tira.service.integration.test.ts` → `OK (N
+      test:integration -- --testPathPatterns=tira.service.integration.test.ts` → `OK (N
       tests)`.
 - [ ] Testes cobrem AC-011-006, AC-011-007 (edit): novo texto persistido com posição
       intocada; tentativa que falha preserva o texto anterior — mesmo comando acima.

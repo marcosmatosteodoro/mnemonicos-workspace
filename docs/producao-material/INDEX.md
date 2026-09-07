@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-07T00:49:11+0000
+**Última atualização**: 2026-09-07T01:43:03+0000
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -49,7 +49,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-003 | SPEC-002 | 24/24 FRs + 9 NFRs (autenticação de sessão, autorização deny-by-default, gestão de contas por ADMIN) | 16/16 ✅ | Done |
 | PLAN-006 | SPEC-005 | 24/24 FRs + 7/7 NFRs (conteúdo bruto, quebra da regra 1:1, fonte normativa estruturada, radar de prova, saneamento do contrato fantasma, semente de Obrigação Tributária) | 14/14 ✅ | Approved |
 | PLAN-010 | SPEC-009 | 10/10 FRs + 5/5 NFRs (mecanismo append-only de evento de etapa, emissão transacional nas 2 estações existentes, rede de paridade cross-repo backend-only) | 3/3 ✅ | Done |
-| PLAN-012 | SPEC-011 | 11/11 FRs + 6/6 NFRs (models `MnemonicStrip`/`MnemonicFrame`, geração automática + CRUD + reordenação atômica, instrumentação aditiva `TIRA_MNEMONICA`, alcance por autoria herdado) | 7/13 🟡 | Approved |
+| PLAN-012 | SPEC-011 | 11/11 FRs + 6/6 NFRs (models `MnemonicStrip`/`MnemonicFrame`, geração automática + CRUD + reordenação atômica, instrumentação aditiva `TIRA_MNEMONICA`, alcance por autoria herdado) | 9/13 🟡 | Approved |
 | PLAN-013 | SPEC-013 | 6/6 FRs + 8/8 NFRs (manifesto, ícones 192/512, service worker artesanal restrito a assets estáticos, kill-switch por autodesregistro, postura de exposição, não-regressão de sessão) | 2/6 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
@@ -160,6 +160,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-07 01:43: **Wave 3 de PLAN-012 concluída via `/keelson:implement`** (9/13 TASKs Done — 006 `reassignPositions`/`reorderMnemonicFrames` (reindexação em 2 fases) · 011 paridade cross-repo `tira-frontend-contract.test.ts`). A wave mais disputada do PLAN até aqui: security-engineer REPROVOU (falta prova comportamental de negação cross-autor para `reorderMnemonicFrames` — só havia prova estrutural) e code-reviewer REPROVOU no mesmo turno (eixo de cardinalidade de `isExactFrameSet` sem prova, mutante sobrevivia) — 1 retry consolidado corrigiu os 2 + 1 achado médio de segurança (guard de `count` em `applyPositions`). Na convergência, code-reviewer achou um 2º problema (o próprio guard de `count`, pedido de carona no retry, sem teste próprio) — 2ª reprovação do gate 1 na mesma wave, teto de retry atingido; escalou com proposta+default, decisão aceita (degrau 1, ação pequena e reversível) sem subir ao Diretor. Correção pontual (1 teste + mutation testing) fechou por reverificação de delta inerte. Performance: APROVADO (delta de custo exatamente 2×N medido contra Postgres real, 3 pontos de volume). 4 lições novas/reincidentes em `lessons.md` (guarda reusada exige prova própria; predicado de conjunto exige prova por eixo, não por método; código de carona em retry passa pela mesma régua; reincidência de TRUNCATE concorrente — possivelmente agravada pela sessão paralela de PLAN-013). 2 `PROPOSTA_PLUGIN` novas do `agile-coach` (LRN-013 e o incidente de ambiente do worktree de mutação), vão ao Diretor na Entrega. Achado de higiene fechado (git reset de sujeira CRLF staged); achado de higiene aberto (ESLint sem `ignores` para o worktree residual `.claude/worktrees/kan-49-vercel-entrypoint/`, degradando `quality.lint` de toda wave futura — sinal ao Diretor).
 - 2026-09-07 00:49: **Wave 2 de PLAN-013 concluída via `/keelson:implement`** (2/6 TASKs Done — TASK-013-002, manifesto de aplicação). Gate 1-7 (code-reviewer): REPROVOU na 1ª rodada — 2 achados reais de falsificabilidade ("teste que não pode falhar"): paridade de cor com `layout.tsx` provada só por literal transcrito (mutante em `layout.tsx` sozinho deixava a suíte verde), e NFR-013-007 provado só pelas 2 instâncias nomeadas, não pela condição universal (mutante `scope: '/studio'` vazava sem ser pego). 1 retry: paridade agora lê `viewport` de `./layout`; NFR-013-007 agora deriva `INTERNAL_ROUTE_PREFIXES` e prova ausência na serialização JSON inteira, com controle positivo. Re-review delta-scoped (rodada 2): APROVADO, 6 mutantes confirmados matando a suíte no eixo certo. Gate 8 n/a (task não toca NFRs sensíveis de cache/rede). Lição roteada como reincidência em `guidelines/project/lessons.md` (linha 553 — Validade estendida de cross-repo para qualquer fronteira de arquivo, contadores 2→3). 3 comentários de narrativa de processo removidos no fecho (Art. 7).
 - 2026-09-07 00:10: **Furo no plano em TASK-012-006** (PLAN-012) — o critério de
   NFR-011-002 pedia contagem ABSOLUTA de queries estável entre 3 e 5 Quadros, mas
