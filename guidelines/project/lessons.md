@@ -1036,3 +1036,29 @@ escolha).
 um padrão, neste projeto.
 **Estado:** ativa
 **Contadores:** confirmada 1 · contestada 0
+
+## [Config] `CORS_ORIGINS` de origem única quebra silenciosamente o padrão de porta alternativa entre sessões paralelas
+
+**Erro:** o roteiro de gate 9 de `TASK-013-005` (PLAN-013) prescreveu "se a porta 3000
+recusar, use 3001 e ajuste as URLs" como se fosse substituto direto — funcionou lá
+(gate que não toca o backend). O mesmo fallback em `TASK-013-006` (gate que precisa de
+login real) travou o formulário indefinidamente em "Entrando…", sem nenhuma mensagem de
+erro: `mnemonicos-backend/.env` tem `CORS_ORIGINS` como allowlist de uma única origem
+(`http://localhost:3000`), então toda chamada do browser a partir de `:3001` é recusada
+pelo CORS antes de chegar à lógica de negócio — sintoma indistinguível, à primeira vista,
+de uma regressão real de sessão introduzida pelo service worker.
+**Causa:** o padrão "porta alternativa quando 3000 está ocupada" já foi usado 2× neste
+ciclo (duas sessões paralelas do mesmo host, cada uma rodando `/keelson:implement` num
+slug diferente), mas nasceu sem verificar a dependência oculta — o backend só aceita UMA
+origem fixa, e nada no roteiro nomeava essa restrição antes de prescrever a porta
+alternativa como equivalente.
+**Solução:** dev-only, dois caminhos: (a) `CORS_ORIGINS` aceitar lista de origens
+(`http://localhost:3000,http://localhost:3001`) — nunca em produção; ou (b) todo roteiro
+de gate 9 que precisa de login real nomeia explicitamente a dependência de porta fixa do
+backend ANTES de sugerir porta alternativa, e trata "login preso sem erro" como sintoma
+de CORS a checar (console do browser — `Access-Control-Allow-Origin`), não como
+regressão do código sob teste.
+**Validade:** todo roteiro de gate 9 (`screenVerify`) que sobe frontend em porta não-padrão
+com backend fixo por `CORS_ORIGINS`, neste projeto.
+**Estado:** em-observacao
+**Contadores:** confirmada 0 · contestada 0

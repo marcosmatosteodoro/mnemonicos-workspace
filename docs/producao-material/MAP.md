@@ -87,6 +87,34 @@
 - [2026-08-27 · epico] Nenhuma geração ou exportação de PDF existe nos dois repos — nem dependência, nem rota, nem script; F6 é greenfield total nesta área — busca em ambos os repos não retornou nada
 - [2026-08-27 · epico] Nenhum versionamento editorial existe — sem data de fechamento de legislação, sem histórico de revisão, sem fonte normativa estruturada (só `source` como texto livre em `Mnemonic`) — mnemonicos-backend/prisma/schema.prisma:96-120
 
+## Instalabilidade PWA (avulso · PLAN-013)
+
+- [2026-09-07 · PLAN-013] `mnemonicos-frontend` ganhou manifesto (`app/manifest.ts`),
+  ícones (`public/icons/icon-{192,512}.png`, placeholder de cor sólida documentado —
+  A-013-002) e service worker artesanal (`public/sw.js`) que cacheia **só** o app-shell
+  estático (JS/CSS/ícones/manifesto), com same-origin check antes de qualquer decisão
+  de cache e kill-switch por autodesregistro (`isKillVersion`, sem endpoint novo) —
+  mnemonicos-frontend/public/sw.js:1-196.
+- [2026-09-07 · PLAN-013] Lógica de decisão do SW espelhada em
+  `src/lib/service-worker-policy.ts` (funções puras testáveis) — a paridade entre a
+  cópia servida crua e o espelho TS exige teste que EXECUTA as duas com o mesmo caso
+  (`src/lib/sw-parity.test.ts`), nunca só leitura textual — mnemonicos-frontend/src/lib/service-worker-policy.ts:1-90.
+- [2026-09-07 · PLAN-013] `public/` nasceu nesta fatia — não existia antes (só
+  `src/app/favicon.ico`) — mnemonicos-frontend/public/icons/.
+- [2026-09-07 · PLAN-013] Registro do SW em componente `'use client'` mínimo
+  (`ServiceWorkerRegistration`, guardado por `'serviceWorker' in navigator`), montado em
+  `layout.tsx` — a montagem em composition root de React exige teste de WIRING (importar
+  `./layout` sob Jest e confirmar a presença na árvore), não só teste do componente
+  isolado — mnemonicos-frontend/src/app/layout.tsx:1-40.
+- [2026-09-07 · PLAN-013] `CORS_ORIGINS` do backend (`mnemonicos-backend/.env`) é
+  allowlist de origem única (`http://localhost:3000`) — qualquer verificação de tela
+  que precise de porta alternativa do frontend (padrão comum quando 2+ sessões disputam
+  a porta 3000) trava silenciosamente o login sem erro visível, até essa config aceitar
+  lista de origens — mnemonicos-backend/.env.
+- [2026-09-07 · PLAN-013] Verificação de tela pendente: instalação nativa
+  (`chrome://apps`, prompt do navegador) e ciclo completo login/logout com SW ativo —
+  ver `docs/producao-material/handoffs/HANDOFF-PLAN-013.md`.
+
 ## Tamanho do código (linha de base do épico)
 
 - [2026-08-27 · epico] 13 arquivos de produção + 3 de teste no backend, 12 + 2 no frontend, uma única página (`/`), nenhuma tela de estudo; `study-slice` existe e não é consumido por ninguém — contagem via ferramentas de busca, sem arquivo único âncora

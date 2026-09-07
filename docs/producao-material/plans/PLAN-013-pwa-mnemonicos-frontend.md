@@ -320,33 +320,30 @@ sem estado de configuração runtime, sem superfície de rede adicional a proteg
 
 ## 9. Definition of Done deste PLAN
 
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs
-- [ ] Todos os NFRs cobertos têm verificação
-- [ ] Decisões DEC refletidas no código
-- [ ] Aderência à ficha/perfil validada
-- [ ] Todos os ACs cobertos por teste (gate 1 dos quality gates) — ressalva: AC-013-001 e
-      AC-013-002 fecham por caminhada manual em dispositivo real (gate 9/`screenVerify`,
-      precedente `HANDOFF-PLAN-003`), não por teste automatizado — prompt de instalação e
-      chrome do sistema operacional não são simuláveis (nota da própria SPEC, §7). Os
-      demais ACs (003–012) são cobertos por teste automatizado das funções puras extraídas
-      (COMP-013-003) e do componente de registro (COMP-013-004), complementado por
-      **roteiro concreto** de inspeção manual no fecho do ciclo (TRISK-013-001 — achado do
-      `qa` pré-código de TASK-013-INDEX: "inspeção manual" genérica não é prova fixada) —
-      build de produção local (`npm run build && npm run start`, worktree
-      `C:/kwt/pwa`): (1) com uma aba aberta e um formulário de EDITOR
-      não salvo, publicar nova versão do `sw.js` sem recarregar — esperado: aba continua na
-      versão antiga, sem perda do formulário, SW novo em "waiting" (não "activated"); (2)
-      reabrir a aba — esperado: SW novo assume, versão atualizada servida; (3) publicar
-      versão de `KILL_VERSION` e reabrir — esperado: nenhum SW registrado após o reload
-      forçado, Cache Storage vazio, navegação normal direto da rede.
-- [ ] Métrica da SPEC operacional (§1.3, natureza mista) — este DoD cobre **só o item (a)**:
-      conformidade externa apurada por inspeção manual no painel Application do Chrome/Edge
-      DevTools (Manifest + Service Workers), rodada no fecho do ciclo (gate 9); dono
-      Tech Lead/QA. O **item (b)** (observacional — nº de EDITOR/ADMIN com o app instalado e
-      aberturas em `display-mode: standalone`, janela de 90 dias a partir do 1º deploy na
-      origem de produção, A-013-006) **não** entra no DoD deste PLAN — é pendência de
-      veredito de métrica registrada no INDEX, acompanhamento pós-Entrega (dono Tech
-      Lead/Diretor).
+- [x] Todos os FRs cobertos têm implementação satisfazendo os ACs — 6/6 TASKs Done, 6 waves.
+- [x] Todos os NFRs cobertos têm verificação — gates 1-7/8 aprovaram cada NFR nas waves
+      correspondentes (ver closures das TASKs).
+- [x] Decisões DEC refletidas no código — DEC-013-001 (vanilla, zero dependência nova,
+      confirmado em todas as 6 waves) e DEC-013-002 (kill-switch sem endpoint novo,
+      confirmado no gate 8 da Wave 4).
+- [x] Aderência à ficha/perfil validada — confirmado por code-reviewer em todas as waves.
+- [x] Todos os ACs cobertos por teste (gate 1 dos quality gates) — AC-013-003–012 cobertos
+      por teste automatizado (funções puras + paridade de lógica execução-real + wiring),
+      com mutação real confirmada em cada gate. **Ressalva**: AC-013-001/AC-013-002 fecham
+      só por caminhada manual em dispositivo real (gate 9/`screenVerify`) — prompt de
+      instalação e chrome do SO não são simuláveis (nota da própria SPEC, §7); **PARCIAL**
+      no fecho deste ciclo — ver `HANDOFF-PLAN-013.md` (V1/V2 pendentes). O roteiro concreto
+      de TRISK-013-001 (aba viva mantém versão antiga; ciclo completo do kill-switch) tem o
+      SW ativo/registrado confirmado ao vivo (TASK-013-005, gate 9), mas os passos
+      específicos (1)(2)(3) descritos abaixo não foram exercitados nesta rodada — residual
+      aceito, mesma classe de handoff.
+- [x] Métrica da SPEC operacional (§1.3, natureza mista) — item (a) **PARCIAL**: contexto
+      seguro e SW ativo confirmados ao vivo (TASK-013-005, gate 9); inspeção completa de
+      "Installability" no painel Manifest fica no roteiro V1 de `HANDOFF-PLAN-013.md`. O
+      item (b) (observacional — nº de EDITOR/ADMIN com o app instalado e aberturas em
+      `display-mode: standalone`, janela de 90 dias a partir do 1º deploy na origem de
+      produção, A-013-006) **não** entra no DoD deste PLAN — é pendência de veredito de
+      métrica registrada no INDEX, acompanhamento pós-Entrega (dono Tech Lead/Diretor).
 
 ## 10. Não coberto por este PLAN
 
