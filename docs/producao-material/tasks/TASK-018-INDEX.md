@@ -42,7 +42,7 @@ há estado/evento, Jest 30 + Testing Library (`jsdom`, `next/jest`), branch úni
 **NFRs** (não são aresta formal do grafo de TASK — campo `Realiza (FRs)` é FR-only;
 provados via os ACs que os cobrem, tabela abaixo): NFR-016-001 → AC-016-004/010
 (TASK-018-001) · NFR-016-002 → AC-016-008 (TASK-018-001) · NFR-016-003 → AC-016-007/009
-(TASK-018-002) · NFR-016-004 → AC-016-005 (TASK-018-001).
+(TASK-018-002) · NFR-016-004 → AC-016-005 (TASK-018-001, TASK-018-002).
 
 ## Cobertura de ACs
 
@@ -52,7 +52,7 @@ provados via os ACs que os cobrem, tabela abaixo): NFR-016-001 → AC-016-004/01
 | AC-016-002 | TASK-018-001 |
 | AC-016-003 | TASK-018-001 |
 | AC-016-004 | TASK-018-001 |
-| AC-016-005 | TASK-018-001 |
+| AC-016-005 | TASK-018-001, TASK-018-002 |
 | AC-016-006 | TASK-018-001 (parte — implementação única, sem duplicação), TASK-018-002 (parte — LoginForm de fato consome) |
 | AC-016-007 | TASK-018-002 |
 | AC-016-008 | TASK-018-001 |

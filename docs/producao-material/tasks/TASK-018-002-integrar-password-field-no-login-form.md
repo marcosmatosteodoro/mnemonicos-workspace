@@ -88,11 +88,15 @@ nunca siga um passo que enfraqueça um critério.
    a mensagem de erro (`findByText`/`findByRole('alert')`, padrão já usado nos casos
    existentes) e então afirmar que o campo de senha **continua** com `type="text"` (o
    estado do toggle não foi revertido pela submissão recusada).
-5. Para a faceta restante de AC-016-006, um caso estrutural simples: `login-form.tsx`
-   não declara nenhum `useState` de visibilidade próprio nem lógica de alternância fora
-   de `PasswordField` — pode ser conferido por leitura do próprio diff no code review
-   (nenhum símbolo `visible`/`showPassword`/handler de toggle é introduzido em
-   `login-form.tsx`), sem exigir teste dedicado além dos já listados.
+5. Escrever o caso de AC-016-005 no `LoginForm` real (achado do QA pré-código — o teste
+   isolado de TASK-018-001 prova só a forma genérica, não o cenário literal do AC): montar
+   `LoginForm`, preencher e-mail e senha, clicar/ativar por teclado o botão de alternância
+   e então afirmar que o mock de `useLoginMutation`/`login` **não** foi chamado (o mesmo
+   mock já usado nos 7 casos existentes) — nenhuma submissão foi disparada pelo toggle.
+6. Para a faceta restante de AC-016-006, um comando estrutural determinístico (achado do
+   QA pré-código — "conferido no code review" não é verificação executável): nenhum outro
+   `<input type="password">` do `mnemonicos-frontend` implementa alternância própria —
+   ver Critérios de pronto para o comando exato.
 
 ## Critérios de pronto
 
@@ -109,15 +113,21 @@ nunca siga um passo que enfraqueça um critério.
       credencial inválida, quando a mensagem de erro é exibida, então o campo de senha
       permanece com `type="text"` (visível) — o estado do toggle não é revertido pela
       submissão recusada.
-- [ ] AC-016-006 (faceta restante — fecha nesta TASK): `login-form.tsx` não declara
-      `useState`/handler de alternância de visibilidade próprio; o único caminho para
-      `type="password"`/`type="text"` no formulário é o `PasswordField` importado —
-      conferido por leitura do diff no code review (nenhum símbolo de toggle fora de
-      `password-field.tsx` no `git diff main...HEAD -- src/components/login-form.tsx`).
-- [ ] Testes cobrem AC-016-006 (faceta restante), AC-016-007, AC-016-009 — verificação
-      executável: `npx jest --runTestsByPath src/components/login-form.test.tsx` (cwd
-      `C:/kwt/kan72-toggle-senha`) → `PASS ... Tests: 9 passed, 9 total` (7 pré-existentes
-      + 2 novos) — fixada antes do código; comando já roda hoje contra o `login-form.tsx`
+- [ ] AC-016-005 (cenário literal do AC, no `LoginForm` real — achado do QA pré-código):
+      dado o `LoginForm` com e-mail e senha preenchidos, quando o botão de alternância é
+      acionado (clique ou teclado), então o mock de `login`/`useLoginMutation` NÃO é
+      chamado — nenhuma submissão ocorre.
+- [ ] AC-016-006 (faceta restante — fecha nesta TASK, verificação executável, não só code
+      review — achado do QA pré-código): nenhum outro `<input type="password">` do
+      `mnemonicos-frontend` implementa alternância própria —
+      `grep -rn 'type="password"' mnemonicos-frontend/src --include='*.tsx' | grep -v
+      password-field.tsx` (cwd `C:/kwt/kan72-toggle-senha`) → saída vazia (o único
+      `type="password"` do código-fonte vive dentro de `password-field.tsx`; `login-form.tsx`
+      não declara mais o atributo diretamente, só via `<PasswordField>`).
+- [ ] Testes cobrem AC-016-005, AC-016-007, AC-016-009 — verificação executável:
+      `npx jest --runTestsByPath src/components/login-form.test.tsx` (cwd
+      `C:/kwt/kan72-toggle-senha`) → `PASS ... Tests: 10 passed, 10 total` (7 pré-existentes
+      + 3 novos) — fixada antes do código; comando já roda hoje contra o `login-form.tsx`
       atual com `Tests: 7 passed, 7 total` (baseline capturada nesta TASK, antes da
       integração — não-regressão via NFR-016-003).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff
@@ -146,7 +156,7 @@ nunca siga um passo que enfraqueça um critério.
 **Data conclusão**:
 **Branch**:
 **Commit SHA**:
-**Jira**:
+**Jira**: KAN-80
 **Implementado por**:
 **Revisado por**:
 **Tentativas**:

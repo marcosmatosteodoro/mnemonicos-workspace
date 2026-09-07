@@ -168,6 +168,16 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-07 14:20: **QA pré-código (Etapa 3.5) de TASK-018-001/002** — 5 achados
+  (nenhum bloqueante): AC-016-006 tinha prova "code review only", não executável, nos
+  dois lados — trocado por checagem estrutural determinística (`grep` confirmando 0
+  `type="password"` fora de `password-field.tsx`); AC-016-005 só era provado num form
+  genérico isolado, não no `LoginForm` real — TASK-018-002 ganhou caso próprio (mock de
+  `login` não chamado ao acionar o toggle); AC-016-010 fortalecido para exigir foco E
+  valor no mesmo teste; resíduo de encaminhamento de foco cross-browser (`<button>`
+  aninhado em `<label>`) declarado fora do escopo da prova (PLAN §10, mesma classe de
+  RISK-016-001). Jira: subtasks KAN-79 (TASK-018-001) e KAN-80 (TASK-018-002) criadas
+  sob KAN-72; KAN-72 movida para "Em andamento".
 - 2026-09-07: **PLAN-018 decomposto em 2 TASKs via `/keelson:tasks`** (rota única, 2
   waves sequenciais — a cadeia de dependência dos 2 COMPs é linear: `PasswordField`
   isolado → integração no `LoginForm`). TASK-018-001 (Wave 1) cria o componente + teste

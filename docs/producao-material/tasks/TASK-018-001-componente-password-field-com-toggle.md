@@ -119,8 +119,15 @@ nunca siga um passo que enfraqueça um critério.
 - [ ] Acionar o toggle não dispara nenhuma chamada de rede/mock de `fetch`, não escreve em
       `console.*`, e o `<input>` mantém `name`/`autoComplete` fornecidos via props em
       ambos os estados de `type` — AC-016-008.
-- [ ] Após ativação por teclado (Enter ou Espaço), `document.activeElement` continua
-      sendo o próprio botão de alternância — AC-016-010.
+- [ ] Após ativação por teclado (Enter ou Espaço), no MESMO caso de teste:
+      `document.activeElement` continua sendo o próprio botão de alternância E o valor
+      exibido no `<input>` permanece o mesmo digitado antes da ativação (nenhum
+      remount/perda de valor) — AC-016-010. Resíduo declarado (não coberto por este
+      critério, achado do QA pré-código): `jsdom` não reproduz com fidelidade total o
+      encaminhamento de foco/clique de um `<button>` aninhado em `<label>` entre motores
+      de navegador reais (Safari/Firefox vs. Chrome) — mesma classe de RISK-016-001/
+      TRISK-018-001 (conformidade automatizada, não caminhada real em navegador);
+      registrado no PLAN §10 como fora do alcance desta prova.
 - [ ] Testes cobrem AC-016-001, AC-016-002, AC-016-003, AC-016-004, AC-016-005,
       AC-016-006 (parte), AC-016-008, AC-016-010 — verificação executável:
       `npx jest --runTestsByPath src/components/password-field.test.tsx` (cwd
@@ -163,7 +170,7 @@ nunca siga um passo que enfraqueça um critério.
 **Data conclusão**:
 **Branch**:
 **Commit SHA**:
-**Jira**:
+**Jira**: KAN-79
 **Implementado por**:
 **Revisado por**:
 **Tentativas**:

@@ -371,3 +371,7 @@ nenhum custo observável (os atributos são no-op quando já cobertos nativament
   principais (TRISK-018-001) — resíduo de verificação manual, fora do alcance de `jsdom`.
 - Posição exata do caret/cursor de texto ao trocar `type` do input (A-016-005, SPEC-016) —
   comportamento best-effort do navegador, não é objeto de AC.
+- Encaminhamento de foco/clique de um `<button>` aninhado em `<label>` entre motores de
+  navegador reais (Safari/Firefox vs. Chrome) — achado do QA pré-código (Etapa 3.5):
+  `jsdom` prova AC-016-010 por simulação (`userEvent` + `document.activeElement`), não por
+  caminhada real; mesma classe de RISK-016-001/TRISK-018-001 (conformidade automatizada).
