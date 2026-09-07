@@ -603,9 +603,23 @@ fixture, localizar o `min`/`max`/`z.enum` do backend e conferir; onde a faixa fo
 domínio afirmada por AC, citá-la no docblock do fixture. Exemplar correto já no repo:
 `tests/types/raw-content.test.ts` (valores de domínio reais — `'PEGADINHA'`,
 `'art. 113, CTN'`).
-**Validade:** enquanto houver constantes, interfaces OU valores de fixture espelhados à mão entre `mnemonicos-backend` e `mnemonicos-frontend`.
+**Reincidência (code-reviewer, Wave 2 de PLAN-013 — extensão para FRONTEIRA DE ARQUIVO
+dentro do MESMO repo, não só cross-repo):** `mnemonicos-frontend/src/app/manifest.ts`
+comentava que `theme_color`/`background_color` eram "idênticos aos literais de
+`layout.tsx:24-25`", e o teste (`manifest.test.ts`) comparava `manifest()` contra literais
+transcritos no próprio arquivo — snapshot local contra ele mesmo, mesma armadilha da lição
+original, agora entre dois arquivos do mesmo app. Mutante em `layout.tsx` sozinho (cor
+alterada, `manifest.ts` intocado) deixava a suíte verde. Corolário: a régua "o teste lê a
+fonte, nunca transcreve" vale por **qualquer fronteira de arquivo que separe quem afirma
+paridade de quem a prova** — repositório é só o caso mais visível, não o único. Fechado
+importando `viewport` de `./layout` e derivando o valor esperado dele (`themeColorFor`),
+com falha alta se a forma do `viewport` mudar (não só o valor) — exemplar:
+`src/app/manifest.test.ts:6-25`.
+**Validade:** enquanto houver constante, interface OU valor de fixture espelhado à mão
+entre `mnemonicos-backend` e `mnemonicos-frontend`, **ou entre dois arquivos do mesmo
+repo** que um comentário declara "idênticos"/"espelhados".
 **Estado:** ativa
-**Contadores:** confirmada 2 · contestada 0
+**Contadores:** confirmada 3 · contestada 0
 
 ## [Segurança] Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos
 

@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -96,26 +96,27 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-07T00:13:01+0000
+**Data conclusão**: 2026-09-07T00:48:24+0000
+**Branch**: feat/producao-material-pwa-support
+**Commit SHA**: 0e42a14
 **Jira**: KAN-66
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer
+**Tentativas**: 2
+**Cobertura final**: n/a (arquivo de função pura, 100% exercitado pelos 5 testes)
 **Arquivos modificados**:
-  - 
+  - src/app/manifest.ts
+  - src/app/manifest.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (173/173, 18 suítes)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (rodada 2, delta-scoped — rodada 1 reprovou por 2 achados de falsificabilidade, ambos fechados com mutação real confirmada)
+- [x] ACs verificados (AC-013-010, parte)
+- [ ] Segurança (gate 8): n/a — task não toca NFR-013-001/002/005/006/007/008 diretamente (manifesto estático, sem cache/rede)
+- [ ] Comportamento (gate 9): n/a — SPEC sem FEATs; facetas de identidade/instalação (AC-013-001/002) fecham por gate 9 em TASK-013-005
 
-**Notas**: 
+**Notas**: Rodada 1 reprovada: teste de paridade de cor comparava contra literal transcrito (não a fonte real `layout.tsx`), e o teste de NFR-013-007 só provava as 2 instâncias nomeadas, não a condição universal. Retry: paridade agora lê `viewport` de `./layout`; NFR-013-007 agora prova ausência de qualquer prefixo de `INTERNAL_ROUTE_PREFIXES` na serialização JSON inteira, com controle positivo. Lição roteada como reincidência em `guidelines/project/lessons.md` (linha 553, "paridade só vale se o teste LER a fonte" — Validade estendida de cross-repo para qualquer fronteira de arquivo). 3 comentários de narrativa de processo removidos no fecho da wave (Art. 7).
