@@ -16,7 +16,7 @@
 subcaminho `mnemonicos-frontend/`).
 **Padrão de commit**: Conventional Commits (`feat:`).
 **Framework de teste**: Jest 30 + Testing Library — mesma suíte que já existe em
-`src/components/login-form.test.tsx` (7 casos, ver Contexto), estendida por esta TASK.
+`src/components/login-form.test.tsx` (8 casos, ver Contexto), estendida por esta TASK.
 
 ## Dependências
 
@@ -34,7 +34,7 @@ muda. O estado de visibilidade do toggle vive dentro do próprio `PasswordField`
 e, como o componente nunca desmonta durante o ciclo de submit-falha (`hasFailed` é um
 `useState` irmão que só condiciona a mensagem de erro — `login-form.tsx:85-89` —, o
 `<form>` inteiro permanece montado), sobrevive naturalmente a uma submissão recusada
-(AC-016-009) sem exigir estado elevado ao `LoginForm`. `login-form.test.tsx` já tem 7
+(AC-016-009) sem exigir estado elevado ao `LoginForm`. `login-form.test.tsx` já tem 8
 casos verdes (estados em andamento/falha/sucesso de AC-002-009, destino de sucesso pelo
 símbolo canônico, submit seguro pré-hidratação) que não podem regredir.
 
@@ -49,10 +49,10 @@ símbolo canônico, submit seguro pré-hidratação) que não podem regredir.
   type="password".../></label>` atual (PLAN §3, COMP-018-002). Nenhuma outra linha de
   `login-form.tsx` muda — `email`, `hasFailed`, `handleSubmit`, `hydrated` e o botão de
   submit permanecem intocados.
-- Extensão de `mnemonicos-frontend/src/components/login-form.test.tsx`: os 7 casos
-  existentes continuam intactos (nenhuma asserção removida ou enfraquecida) + 2 casos
-  novos cobrindo AC-016-007 e AC-016-009, mais a faceta restante de AC-016-006 (ver
-  Critérios).
+- Extensão de `mnemonicos-frontend/src/components/login-form.test.tsx`: os 8 casos
+  existentes continuam intactos (nenhuma asserção removida ou enfraquecida) + 3 casos
+  novos cobrindo AC-016-005, AC-016-007 e AC-016-009, mais a faceta restante de
+  AC-016-006 (ver Critérios).
 
 ### Não inclui
 
@@ -72,8 +72,8 @@ nunca siga um passo que enfraqueça um critério.
    substituir o `<label>` do campo de senha pela chamada descrita no Escopo — preservando
    o texto visível "Senha" como rótulo do campo (prop `label`).
 2. Conferir que `screen.getByLabelText('Senha')` continua resolvendo o `<input>` real nos
-   7 casos existentes de `login-form.test.tsx` (o rótulo acessível do campo não muda,
-   só ganha o botão de alternância ao lado) — sem isso, os 7 casos existentes quebram por
+   8 casos existentes de `login-form.test.tsx` (o rótulo acessível do campo não muda,
+   só ganha o botão de alternância ao lado) — sem isso, os 8 casos existentes quebram por
    mudança de contrato de acessibilidade, não por regressão de comportamento.
 3. Escrever o caso de AC-016-007: percorrer o fluxo de login completo (preencher
    e-mail/senha, submeter, sucesso ou falha) com `PasswordField` aplicado — mesmo
@@ -92,7 +92,7 @@ nunca siga um passo que enfraqueça um critério.
    isolado de TASK-018-001 prova só a forma genérica, não o cenário literal do AC): montar
    `LoginForm`, preencher e-mail e senha, clicar/ativar por teclado o botão de alternância
    e então afirmar que o mock de `useLoginMutation`/`login` **não** foi chamado (o mesmo
-   mock já usado nos 7 casos existentes) — nenhuma submissão foi disparada pelo toggle.
+   mock já usado nos 8 casos existentes) — nenhuma submissão foi disparada pelo toggle.
 6. Para a faceta restante de AC-016-006, um comando estrutural determinístico (achado do
    QA pré-código — "conferido no code review" não é verificação executável): nenhum outro
    `<input type="password">` do `mnemonicos-frontend` implementa alternância própria —
@@ -100,8 +100,8 @@ nunca siga um passo que enfraqueça um critério.
 
 ## Critérios de pronto
 
-- [ ] Os 7 casos pré-existentes de `login-form.test.tsx` continuam verdes, sem nenhuma
-      asserção removida/enfraquecida (baseline capturada antes desta TASK: 7/7 passando
+- [ ] Os 8 casos pré-existentes de `login-form.test.tsx` continuam verdes, sem nenhuma
+      asserção removida/enfraquecida (baseline capturada antes desta TASK: 8/8 passando
       contra o `login-form.tsx` atual, comando abaixo).
 - [ ] AC-016-007: dado o `LoginForm` com `PasswordField` aplicado, o fluxo de login
       completo (sucesso navega para `INTERNAL_HOME`; falha mostra a mensagem genérica
@@ -120,15 +120,16 @@ nunca siga um passo que enfraqueça um critério.
 - [ ] AC-016-006 (faceta restante — fecha nesta TASK, verificação executável, não só code
       review — achado do QA pré-código): nenhum outro `<input type="password">` do
       `mnemonicos-frontend` implementa alternância própria —
-      `grep -rn 'type="password"' mnemonicos-frontend/src --include='*.tsx' | grep -v
-      password-field.tsx` (cwd `C:/kwt/kan72-toggle-senha`) → saída vazia (o único
+      `grep -rn 'type="password"' src --include='*.tsx' | grep -v password-field.tsx`
+      (cwd `C:/kwt/kan72-toggle-senha` — raiz do `mnemonicos-frontend`, sem subcaminho)
+      → saída vazia (o único
       `type="password"` do código-fonte vive dentro de `password-field.tsx`; `login-form.tsx`
       não declara mais o atributo diretamente, só via `<PasswordField>`).
 - [ ] Testes cobrem AC-016-005, AC-016-007, AC-016-009 — verificação executável:
       `npx jest --runTestsByPath src/components/login-form.test.tsx` (cwd
-      `C:/kwt/kan72-toggle-senha`) → `PASS ... Tests: 10 passed, 10 total` (7 pré-existentes
+      `C:/kwt/kan72-toggle-senha`) → `PASS ... Tests: 11 passed, 11 total` (8 pré-existentes
       + 3 novos) — fixada antes do código; comando já roda hoje contra o `login-form.tsx`
-      atual com `Tests: 7 passed, 7 total` (baseline capturada nesta TASK, antes da
+      atual com `Tests: 8 passed, 8 total` (baseline capturada nesta TASK, antes da
       integração — não-regressão via NFR-016-003).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff
       (`git diff --name-only main...HEAD`), produção e teste —
