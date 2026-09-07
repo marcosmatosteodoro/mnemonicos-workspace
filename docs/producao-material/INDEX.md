@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-07 (scribe sem shell — hora não medida, `TZ=America/Sao_Paulo date` indisponível nesta janela)
+**Última atualização**: 2026-09-07T14:41:00-0300 (SPEC-019 via `/keelson:specify`)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -30,6 +30,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
+- Página 404 personalizada com identidade visual da aplicação e link/botão de volta para a home pública (`/`), para qualquer rota inexistente da área pública ou da área interna com sessão ativa (SPEC-019, Approved 2026-09-07) — rota inexistente sob prefixo guardado (`/studio/**`, `/content/**`) sem sessão continua indo para `/login?next=<path>` (SPEC-002 prevalece, decisão do PO E-019-01). Demanda avulsa fora do épico MNEMORA STUDIO — brief BRIEF-019, Jira Story KAN-76. Aguarda `/keelson:plan`.
 
 _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 em ciclo (BRIEF-011/SPEC-011/PLAN-012, Approved, 13 TASKs) — aguardando `/keelson:implement`._
 
@@ -43,6 +44,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | SPEC-011 | Tira mnemônica como sequência de quadros | Approved | 2026-09-06 |
 | SPEC-013 | Suporte a PWA no mnemonicos-frontend | Approved | 2026-09-06 |
 | SPEC-016 | Toggle de mostrar/ocultar senha nos campos de senha | Approved | 2026-09-07 |
+| SPEC-019 | Página 404 personalizada com volta à home | Approved | 2026-09-07 |
 
 ## PLANs
 
@@ -104,6 +106,9 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | Toggle de visibilidade de senha | Controle (ícone de "olho") que alterna a exibição do valor de um campo de senha entre oculto (mascarado) e texto plano, sem alterar o valor digitado | SPEC-016 |
 | Campo de senha (componente) | Componente de entrada reutilizável que encapsula um `<input>` de senha e o toggle de visibilidade associado — usado pelo `LoginForm` hoje e por qualquer campo de senha futuro | SPEC-016 |
 | Rótulo acessível dinâmico (do toggle) | Texto acessível (ex.: `aria-label`) do controle de alternância, que muda conforme o estado atual do campo — "mostrar senha" quando oculto, "ocultar senha" quando visível | SPEC-016 |
+| Página 404 (personalizada) | Tela exibida quando o usuário acessa uma rota inexistente, com a identidade visual da aplicação (paleta, tipografia, componentes de marca) e um link/botão de volta — em contraste com a página de erro genérica do framework | SPEC-019 |
+| Rota inexistente | Qualquer URL solicitada na aplicação que não corresponde a nenhuma rota definida — cai na 404 personalizada na área pública sempre, e na área interna só com sessão ativa (sem sessão, o guard de SPEC-002 prevalece) | SPEC-019 |
+| Home pública | A página inicial da aplicação em `/`, destino fixo do link/botão de volta da 404 personalizada, independente de sessão ou área de origem | SPEC-019 |
 
 ## Decisões irreversíveis
 
@@ -165,9 +170,23 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | RISK-013-006 | Sob aba viva, o navegador pode pedir um chunk já purgado pelo servidor (condição pré-existente, agravada pela expectativa de continuidade de NFR-013-003) | aceito nesta fatia; se ocorrer, o usuário recarrega a aba | SPEC-013 §9 |
 | E-01 (SPEC-013) | PO escalou (não-bloqueante, vai à Entrega): qual a origem HTTPS real de produção do `mnemonicos-frontend` — não confirmada em nenhum artefato do workspace (único deploy registrado é do backend, `infra-vercel/BRIEF-001`) | Default do PO: seguir com A-013-006 registrando "não confirmada"; AC-013-001/002 fecham em `localhost`; prova na origem real e início da janela de 90 dias da métrica ficam como pendência de handoff ao deploy | PO, aprovação de SPEC-013 |
 | E-01 (SPEC-016) | PO escalou (não-bloqueante, vai à Entrega): KAN-72 fecha entregando só o toggle no `LoginForm`, ou nasce card de follow-up para as telas de troca de senha/gestão de contas — a capacidade já existe na API (`POST /auth/change-password`, `POST /users/:id/reset-password`) e nos hooks RTK Query (`api.ts:406,430`), só falta a tela | Default do PO: fechar KAN-72 com o `LoginForm` e não criar card novo — expectativa registrada em Q-016-001 | PO, aprovação de SPEC-016 |
+| E-019-01 (SPEC-019) | PO escalou (não-bloqueante, vai à Entrega): aceita que a 404 personalizada NÃO apareça para quem não tem sessão e erra a URL sob `/studio/**` ou `/content/**` (continua indo para `/login?next=<path>`, como hoje) — servir 404 antes do guard exigiria tirar os prefixos internos do matcher de `proxy.ts:56`, regredindo SPEC-002/FEAT-002-002 e revelando rotas internas a anônimo (A01) | Default do PO: manter SPEC-002 prevalecendo, AC-019-001 partido em 2 cenários (público sempre; interno com sessão) — não bloqueia o `/keelson:plan` | PO, aprovação de SPEC-019 |
+| RISK-019-002 | A home pública (`/`) hoje não tem link de volta à área interna (`/studio`) — o CTA sensível a sessão de BRIEF-015/KAN-74 está implementado mas ainda não mergeado no `main` do frontend; até lá, EDITOR/ADMIN que sai da 404 personalizada chega a `/` sem caminho direto a `/studio` (2 cliques via `/login`, não 1) | Nenhuma ação desta SPEC; merge de KAN-74 fecha a lacuna por conta própria | SPEC-019 §9, sugestão S-01 do PO |
 
 ## Histórico recente
 
+- 2026-09-07 14:41: **SPEC-019 criada via `/keelson:specify`** (BRIEF-019, Jira KAN-76) —
+  página 404 personalizada com identidade visual da aplicação e link/botão de volta para
+  `/`. Validator de forma: 0 errors (WARNINGs não-bloqueantes: `spec-ac-fora-gwt` x5 —
+  falso-positivo de acentuação da ferramenta de lint, ACs conferidos manualmente em forma
+  Dado/Quando/Então —, `spec-must-ratio`, `spec-sem-should-may`). Crítica de mérito do
+  `product-analyst` identificou conflito real com o guard de sessão de SPEC-002
+  (`proxy.ts:56` redireciona rota interna inexistente sem sessão para `/login`, nunca
+  404) — resolvido pelo `po` (ESCALAR não-bloqueante, E-019-01, default seguido):
+  AC-019-001 partido em 2 cenários (pública sempre; interna com sessão ativa), 2 exclusões
+  novas em §4.2, não-regressão de SPEC-002/`proxy.test.ts` nomeada em §1.3, marcas visuais
+  observáveis enumeradas em AC-019-001/NFR-019-001. Aprovada (`Approved`). Aguarda
+  `/keelson:plan`.
 - 2026-09-07 15:10: **Wave 1 de PLAN-018 concluída via `/keelson:implement`** (TASK-018-001,
   KAN-79 — componente `PasswordField`). Gate 1-7 (code-reviewer) REPROVOU na 1ª rodada: 2
   achados bloqueantes — AC-016-005 tinha oráculo morto (`<input required>` vazio no harness
