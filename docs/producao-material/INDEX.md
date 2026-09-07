@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-07T04:54:00+0000
+**Última atualização**: 2026-09-07T13:31:49+0000
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -29,6 +29,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
+- Toggle de mostrar/ocultar senha nos campos de senha (SPEC-016, ⏸ aguardando /keelson:plan) — componente reutilizável de campo de senha com ícone de olho acessível (teclado + rótulo dinâmico), aplicado ao campo de senha do `LoginForm` (único hoje), sem alterar o fluxo de autenticação de SPEC-002. Demanda avulsa fora do épico MNEMORA STUDIO — brief BRIEF-016, Jira KAN-72.
 
 _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 em ciclo (BRIEF-011/SPEC-011/PLAN-012, Approved, 13 TASKs) — aguardando `/keelson:implement`._
 
@@ -41,6 +42,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | SPEC-009 | Instrumentação de etapas da fábrica | Approved | 2026-09-06 |
 | SPEC-011 | Tira mnemônica como sequência de quadros | Approved | 2026-09-06 |
 | SPEC-013 | Suporte a PWA no mnemonicos-frontend | Approved | 2026-09-06 |
+| SPEC-016 | Toggle de mostrar/ocultar senha nos campos de senha | Approved | 2026-09-07 |
 
 ## PLANs
 
@@ -98,6 +100,9 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | Modo standalone | Modo de exibição do app instalado sem a barra de endereço/navegação do navegador, declarado no manifesto de aplicação | SPEC-013 |
 | Instalabilidade | Conjunto de critérios do navegador (manifesto válido, ícones nos tamanhos exigidos, service worker registrado, contexto seguro) que habilitam o prompt nativo de instalação/"Adicionar à tela inicial" | SPEC-013 |
 | Service worker | Script registrado pelo navegador que intercepta requisições do app instalado para controlar cache e ciclo de vida do app-shell — restrito a assets estáticos, nunca navegação (NFR-013-005) | SPEC-013 |
+| Toggle de visibilidade de senha | Controle (ícone de "olho") que alterna a exibição do valor de um campo de senha entre oculto (mascarado) e texto plano, sem alterar o valor digitado | SPEC-016 |
+| Campo de senha (componente) | Componente de entrada reutilizável que encapsula um `<input>` de senha e o toggle de visibilidade associado — usado pelo `LoginForm` hoje e por qualquer campo de senha futuro | SPEC-016 |
+| Rótulo acessível dinâmico (do toggle) | Texto acessível (ex.: `aria-label`) do controle de alternância, que muda conforme o estado atual do campo — "mostrar senha" quando oculto, "ocultar senha" quando visível | SPEC-016 |
 
 ## Decisões irreversíveis
 
@@ -158,9 +163,26 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | RISK-013-005 | Ordem de merge com PLAN-012 (F4, mesma superfície `app/`/layout do frontend) | branches isoladas em worktrees distintas evitam conflito no desenvolvimento; ordem de merge é ato do Diretor | SPEC-013 §9 |
 | RISK-013-006 | Sob aba viva, o navegador pode pedir um chunk já purgado pelo servidor (condição pré-existente, agravada pela expectativa de continuidade de NFR-013-003) | aceito nesta fatia; se ocorrer, o usuário recarrega a aba | SPEC-013 §9 |
 | E-01 (SPEC-013) | PO escalou (não-bloqueante, vai à Entrega): qual a origem HTTPS real de produção do `mnemonicos-frontend` — não confirmada em nenhum artefato do workspace (único deploy registrado é do backend, `infra-vercel/BRIEF-001`) | Default do PO: seguir com A-013-006 registrando "não confirmada"; AC-013-001/002 fecham em `localhost`; prova na origem real e início da janela de 90 dias da métrica ficam como pendência de handoff ao deploy | PO, aprovação de SPEC-013 |
+| E-01 (SPEC-016) | PO escalou (não-bloqueante, vai à Entrega): KAN-72 fecha entregando só o toggle no `LoginForm`, ou nasce card de follow-up para as telas de troca de senha/gestão de contas — a capacidade já existe na API (`POST /auth/change-password`, `POST /users/:id/reset-password`) e nos hooks RTK Query (`api.ts:406,430`), só falta a tela | Default do PO: fechar KAN-72 com o `LoginForm` e não criar card novo — expectativa registrada em Q-016-001 | PO, aprovação de SPEC-016 |
 
 ## Histórico recente
 
+- 2026-09-07 13:45: **SPEC-016 promovida a Approved** — crítica de mérito do
+  product-analyst (5 riscos de produto) resolvida pelo PO (`decisao: ESCALAR`, 1 item
+  não-bloqueante — E-01 acima). Aplicado: §4.2/A-016-002 precisam distinguir "tela" de
+  "capacidade" (API de troca/reset de senha já existe); NFR-016-003 declara que o tab-stop
+  extra do toggle não é regressão; NFR-016-002/AC-016-008 ampliados para cobrir atributos
+  anti-canal do navegador (`type="text"`); 2 ACs novos (AC-016-009 estado do toggle
+  sobrevive a login recusado; AC-016-010 continuidade de foco pós-teclado); 2 premissas
+  novas (A-016-005 caret best-effort; A-016-006 autofill revelado é aceitável).
+- 2026-09-07: **SPEC-016 criada via `/keelson:specify`** (BRIEF-016, KAN-72) — toggle de
+  mostrar/ocultar senha nos campos de senha: componente reutilizável de campo de senha com
+  ícone de olho, operável por teclado, rótulo acessível dinâmico, aplicado ao campo de
+  senha do `LoginForm` (único campo de senha existente hoje), sem alterar o fluxo de
+  autenticação de SPEC-002 (não-regressão formalizada em NFR-016-003/AC-016-007). 7 FRs, 4
+  NFRs, 8 ACs, 4 premissas `[assumido]` (sem `[confirmar]`), 1 risco, 1 questão aberta.
+  Sem meta de negócio numérica associada (A-016-001) — régua de conformidade via teste
+  automatizado.
 - 2026-09-07 13:17: **Wave 5 de PLAN-012 concluída via `/keelson:implement`** (11/13 TASKs Done — 008 rotas HTTP da Tira sob a barreira EDITOR/ADMIN). A wave mais disputada do PLAN até aqui: 4 rodadas de code-reviewer. 1ª: REPROVADO nos 2 gates — security-engineer achou CSRF real (GET /contents/:id/strip get-or-generate, cookie sameSite=lax, sonda provou forjar actorId da vítima no evento ABERTURA) e recusou rotular como conserto de developer, escalando ao Tech Lead; code-reviewer achou regressão de prova (route-authz-matrix:421 virou tautológico) + duplicação DRY. Diretor decidiu mover a geração para POST /contents/:id/strip (GET vira leitura pura) — **DEC-012-011 supersede DEC-012-009** no PLAN (furo no plano documentado com EMENDA). Retry 1 fechou os 3 achados, mas levou consigo as únicas 2 asserções de sucesso do GET (2ª REPROVAÇÃO). Retry 2 corrigiu isso, mas usou fixture não-discriminante na prova de negação por autoria de `getMnemonicStrip` (3ª REPROVAÇÃO — não vulnerabilidade viva, produção confirmada correta por sonda do revisor, só faltava a prova de teste; code-reviewer recusou se autorrotular "mecânico" por decisão de processo e **escalou ao Diretor**, que aprovou o retry). Retry 3 fechou com fixture discriminante (vítima com Tira realmente aberta via POST antes da leitura do não-dono) — 4ª rodada **APROVADA** nos 2 gates. Endurecimento de 1 linha aplicado na closure (regex do teste estrutural passa a cobrir o cliente de módulo `prisma`, não só `tx`/`db`). 2 lições de segurança atualizadas (guarda reusada — 3ª ocorrência, agora estendida a métodos de LEITURA; universo do teste estrutural — 2ª ocorrência, vocabulário do padrão textual incompleto). Pendência explícita para TASK-012-012 (Wave 6): TASK-012-010 (RTK Query, Done) ainda espera o contrato antigo — a tela já nasce consumindo POST-gera/GET-lê. Pendência fora de escopo: `tira-frontend-contract.test.ts` não roda em git worktree (resolve caminho relativo ao checkout) — sinal para correção futura.
 - 2026-09-07 04:54: **PLAN-013 implementado (6/6 tasks Done), aguardando promoção manual de Status.** Wave 6 (TASK-013-006, fatia sensível — verificação de não-regressão de sessão com SW ativo) fechou o ciclo: baseline automatizada verde (9/9, sem alteração), gate 8 (security-engineer) APROVADO — Cache Storage sob duas camadas independentes (origem + allowlist de path), nenhuma lacuna nova exposta pela integração das 5 waves anteriores. Gate 9 (qa) **PARCIAL** — AC-013-011 (guarda de rota) VERIFICADO idêntico ao precedente de `HANDOFF-PLAN-003`; AC-013-005 (controle positivo, cache do app-shell sem API/HTML pré-login) confirmado; o ciclo completo login→uso→logout (V1/V2/V4/V5) ficou bloqueado por ambiente — `CORS_ORIGINS` do backend fixo em origem única (`:3000`), porta ocupada pela sessão paralela de PLAN-012/F4, sem fallback possível sem alterar `.env` (decisão do Diretor, não tomada). Nova lição registrada (`em-observacao`, `lessons.md`): `CORS_ORIGINS` de origem única quebra silenciosamente o padrão de porta alternativa entre sessões concorrentes. Etapa 4 (DoD): `npm run build`/`test`/`lint`/`typecheck` limpos (235/235 testes), `diff-facts.sh --deploy-pending` sem pendência (fatia pura de assets estáticos, sem migração/env). DoD do PLAN-013 fechado com ressalva declarada nos 2 últimos itens (AC-013-001/002 e a métrica operacional item (a) ficam PARCIAIS, mesma classe de `HANDOFF-PLAN-013.md`). `HANDOFF-PLAN-013.md` criado consolidando os 2 handoff_seeds das Waves 5 e 6 (V1–V4). Branch `feat/producao-material-pwa-support` no worktree `C:/kwt/pwa`, ainda **não pushada** — Entrega segue com push + tracker-sync + relatório de fecho ao Diretor (E-01 de SPEC-013 + 4 `PROPOSTA_PLUGIN` acumuladas na sessão).
 - 2026-09-07 04:27: **Wave 5 de PLAN-013 concluída via `/keelson:implement`** (5/6 TASKs Done — TASK-013-005, registro do service worker + instalabilidade). Gate 1-7 (code-reviewer): REPROVOU — montagem de `<ServiceWorkerRegistration />` em `layout.tsx` sem prova de wiring (apagar linha+import deixava 234/234 verde); reincidência da lição ativa "função + wiring" (lessons.md:190), agora em composition root de React. 1 retry: `layout.test.tsx` prova a presença do componente na árvore devolvida por `RootLayout`, mutante confirmado morto — CONVERGIU. Gate 9 (qa, `screenVerify`): **PARCIAL** — AC-013-007 (contexto seguro) e a confirmação de que o SW registra/ativa de fato (fechando o resíduo declarado pelo code-reviewer) VERIFICADOS via Playwright contra build de produção real (worktree isolado). AC-013-001 (prompt nativo de instalação) e AC-013-002 (ícone/nome no app instalado) ficam `pendente_handoff` — UI nativa do navegador fora do alcance de automação headless (causa `runtime_browser`, sondagem provada, não presumida). Risco ativo registrado; seed guardado para `HANDOFF-PLAN-013.md` (consolidação após Wave 6). Achado de processo roteado ao mantenedor (LRN-014): `scripts/probe-env.sh` mascara erro de encoding (UTF-8 não lido no Windows) como "credencial ausente".
