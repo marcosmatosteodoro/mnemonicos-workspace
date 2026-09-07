@@ -1,7 +1,7 @@
 # PLAN-018: Toggle de mostrar/ocultar senha nos campos de senha
 
 **Slug**: producao-material
-**Status**: Approved
+**Status**: Done (sugerido)
 **Versão**: 0.1
 **Autor**: keelson (scribe)
 **Data**: 2026-09-07

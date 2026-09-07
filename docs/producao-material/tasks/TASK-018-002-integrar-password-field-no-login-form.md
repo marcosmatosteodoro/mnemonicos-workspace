@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -118,19 +118,24 @@ nunca siga um passo que enfraqueça um critério.
       acionado (clique ou teclado), então o mock de `login`/`useLoginMutation` NÃO é
       chamado — nenhuma submissão ocorre.
 - [ ] AC-016-006 (faceta restante — fecha nesta TASK, verificação executável, não só code
-      review — achado do QA pré-código): nenhum outro `<input type="password">` do
-      `mnemonicos-frontend` implementa alternância própria —
-      `grep -rn 'type="password"' src --include='*.tsx' | grep -v password-field.tsx`
-      (cwd `C:/kwt/kan72-toggle-senha` — raiz do `mnemonicos-frontend`, sem subcaminho)
-      → saída vazia (o único
-      `type="password"` do código-fonte vive dentro de `password-field.tsx`; `login-form.tsx`
-      não declara mais o atributo diretamente, só via `<PasswordField>`).
-- [ ] Testes cobrem AC-016-005, AC-016-007, AC-016-009 — verificação executável:
-      `npx jest --runTestsByPath src/components/login-form.test.tsx` (cwd
-      `C:/kwt/kan72-toggle-senha`) → `PASS ... Tests: 11 passed, 11 total` (8 pré-existentes
-      + 3 novos) — fixada antes do código; comando já roda hoje contra o `login-form.tsx`
-      atual com `Tests: 8 passed, 8 total` (baseline capturada nesta TASK, antes da
-      integração — não-regressão via NFR-016-003).
+      review — achado do QA pré-código; comando de grep original substituído no retry
+      pós gate 1-7 por não ser confiável — ver Notas de correção abaixo): nenhum arquivo
+      de produção `.ts`/`.tsx` sob `src/` (fora de `password-field.tsx`, único componente
+      autorizado, TASK-018-001) declara um input de senha com alternância própria, na
+      forma literal (`type="password"`) OU na forma dinâmica
+      (`type={cond ? 'text' : 'password'}`) — teste estrutural que lê o código-fonte real
+      (mesmo padrão de `service-worker-policy.test.ts`), com controles positivo/negativo
+      embutidos provando que o detector de fato casa as duas formas —
+      `npx jest --runTestsByPath src/components/login-form.test.tsx -t "AC-016-006"` (cwd
+      `C:/kwt/kan72-toggle-senha`) → `PASS`, todos os casos do describe verdes.
+- [ ] Testes cobrem AC-016-005, AC-016-006, AC-016-007, AC-016-009 — verificação
+      executável: `npx jest --runTestsByPath src/components/login-form.test.tsx` (cwd
+      `C:/kwt/kan72-toggle-senha`) → `PASS ... Tests: 16 passed, 16 total` (8
+      pré-existentes + 3 de AC-016-005/007/009 + 5 do describe estrutural de AC-016-006:
+      universo não vazio, ausência de ofensor, 2 controles positivos e 1 negativo) —
+      fixada antes do código; comando já roda hoje contra o `login-form.tsx` atual com
+      `Tests: 8 passed, 8 total` (baseline capturada nesta TASK, antes da integração —
+      não-regressão via NFR-016-003).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff
       (`git diff --name-only main...HEAD`), produção e teste —
       `npx eslint src/components/login-form.tsx src/components/login-form.test.tsx` →
@@ -147,32 +152,37 @@ nunca siga um passo que enfraqueça um critério.
   (TRISK-018-001/002, PLAN §8) — esta TASK não introduz componente novo, só consome o
   já testado.
 
+**Notas de correcao (retry pos gate 1-7, 2 rodadas)**: o comando de grep original substituido por teste estruturado em login-form.test.tsx cobre a forma literal e a dinamica de type=password. Na revalidacao (rodada 2), o revisor achou e o Tech Lead corrigiu no mesmo commit: a exclusao de password-field.tsx era por nome de arquivo, nao por caminho - uma copia do componente em outro diretorio com o mesmo nome escapava da exclusao. Corrigido para comparar o caminho completo.
+
+**Divida declarada (nao fechada nesta TASK, teto de 2 rodadas de varredura)**: o detector ainda nao cobre a forma indireta - type atribuido a partir de uma variavel ou constante nomeada fora do proprio atributo JSX. Fechar essa classe pede analise sintatica (AST) ou uma regra ESLint dedicada, nao mais uma regex sobre o texto-fonte. Registrado como risco tecnico residual - ver INDEX do slug.
+
 ---
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-07
+**Data conclusão**: 2026-09-07
+**Branch**: feat/campos-senha-toggle
+**Commit SHA**: fed03e3 (fix pos-review; base 8b8ed16, 8a97ddc)
 **Jira**: KAN-80
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer, product-designer
+**Tentativas**: 3 (2 retries — AC-016-006 sem prova executavel real na 1a rodada, corrigido com teste estrutural; exclusao por basename em vez de caminho completo achada na revalidacao da 2a rodada e corrigida no fecho, sem nova rodada de gate)
+**Cobertura final**: 4/4 ACs desta TASK (005 cenario real, 006 faceta restante, 007, 009) + 8/8 pre-existentes preservados — 16/16 testes no arquivo, suite completa 24/251 sem regressao
 **Arquivos modificados**:
-  -
+  - src/components/login-form.tsx
+  - src/components/login-form.test.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a - sem I/O, sem endpoint, sem dado de sessao; integracao so troca o campo de senha nu pelo componente ja aprovado
+- [x] Comportamento (gate 9): n/a - acao sincrona local sem I/O (nota FR-016-003, decisao 4.67); todos os ACs desta TASK fecham por gate 1 (teste automatizado)
 
 **Notas**:

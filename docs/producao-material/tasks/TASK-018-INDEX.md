@@ -9,9 +9,9 @@ há estado/evento, Jest 30 + Testing Library (`jsdom`, `next/jest`), branch úni
 
 ## Status agregado
 
-- Todo: 1
+- Todo: 0
 - In Progress: 0
-- Done: 1
+- Done: 2
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -21,7 +21,7 @@ há estado/evento, Jest 30 + Testing Library (`jsdom`, `next/jest`), branch úni
       visibilidade
 
 ### Wave 2 (depende de Wave 1)
-- [ ] TASK-018-002 ⏸ Todo — Integrar `PasswordField` no `LoginForm`
+- [x] TASK-018-002 ✅ Done — Integrar `PasswordField` no `LoginForm`
 
 > Wave única de tamanho 1 em cada nível: a cadeia de dependência dos 2 COMPs do PLAN
 > (COMP-018-002 → COMP-018-001, PLAN §3/§7) é linear, sem paralelismo real disponível
