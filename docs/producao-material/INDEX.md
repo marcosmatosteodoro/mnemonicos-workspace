@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-07T13:31:49+0000
+**Última atualização**: 2026-09-07 (scribe sem shell — hora não medida, `TZ=America/Sao_Paulo date` indisponível nesta janela)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -26,7 +26,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 ### Em desenvolvimento
 - Tira mnemônica como sequência de quadros (SPEC-011/**PLAN-012**, F4 do épico MNEMORA STUDIO, Approved 2026-09-06) — models `MnemonicStrip` (1:1 `RuleBreakdown`) + `MnemonicFrame` (N:1, posição indexada, `@@unique([stripId,position])`), geração automática de Quadros a partir dos Blocos não-vazios da Quebra na ordem canônica, CRUD completo + reordenação atômica (reindexação em 2 fases), valor aditivo `TIRA_MNEMONICA` no `ProductionStageType`, fronteira abertura/conclusão/retrabalho na 1ª mutação humana (correção do PO), alcance por autoria herdado de F2 (`assertRawContentReachable` exportado), tela `(interno)/content/[id]/tira`. 14 COMPs, 10 DECs (todas reversíveis), 5 TRISKs. PO da SPEC: ESCALAR (E-01, não-bloqueante, vai à Entrega). 13 TASKs em 7 waves (`/keelson:tasks`, rota fan-out — decisão 4.310), 0/13 Done. Aguarda `/keelson:implement`.
-- Toggle de mostrar/ocultar senha nos campos de senha (SPEC-016/**PLAN-018**, Approved 2026-09-07) — componente `PasswordField` reutilizável (SVG inline, sem dependência nova), toggle por `useState` local, atributos anti-canal fixos (`autoComplete`, sem spellcheck/autocorreção), aplicado ao campo de senha do `LoginForm` (único hoje), sem alterar o fluxo de autenticação de SPEC-002. 2 COMPs, 5 DECs (todas reversíveis), 2 TRISKs. Demanda avulsa fora do épico MNEMORA STUDIO — brief BRIEF-016, Jira KAN-72. Aguarda `/keelson:tasks`.
+- Toggle de mostrar/ocultar senha nos campos de senha (SPEC-016/**PLAN-018**, Approved 2026-09-07) — componente `PasswordField` reutilizável (SVG inline, sem dependência nova), toggle por `useState` local, atributos anti-canal fixos (`autoComplete`, sem spellcheck/autocorreção), aplicado ao campo de senha do `LoginForm` (único hoje), sem alterar o fluxo de autenticação de SPEC-002. 2 COMPs, 5 DECs (todas reversíveis), 2 TRISKs. Demanda avulsa fora do épico MNEMORA STUDIO — brief BRIEF-016, Jira KAN-72. 2 TASKs em 2 waves (`/keelson:tasks`), 0/2 Done. Aguarda `/keelson:implement`.
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
@@ -53,7 +53,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-010 | SPEC-009 | 10/10 FRs + 5/5 NFRs (mecanismo append-only de evento de etapa, emissão transacional nas 2 estações existentes, rede de paridade cross-repo backend-only) | 3/3 ✅ | Done |
 | PLAN-012 | SPEC-011 | 11/11 FRs + 6/6 NFRs (models `MnemonicStrip`/`MnemonicFrame`, geração automática + CRUD + reordenação atômica, instrumentação aditiva `TIRA_MNEMONICA`, alcance por autoria herdado) | 11/13 🟡 | Approved |
 | PLAN-013 | SPEC-013 | 6/6 FRs + 8/8 NFRs (manifesto, ícones 192/512, service worker artesanal restrito a assets estáticos, kill-switch por autodesregistro, postura de exposição, não-regressão de sessão) | 6/6 ✅ | Done (sugerido) |
-| PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 0/? ⏸ | Approved |
+| PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 0/2 ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -168,6 +168,16 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-07: **PLAN-018 decomposto em 2 TASKs via `/keelson:tasks`** (rota única, 2
+  waves sequenciais — a cadeia de dependência dos 2 COMPs é linear: `PasswordField`
+  isolado → integração no `LoginForm`). TASK-018-001 (Wave 1) cria o componente + teste
+  próprio (`password-field.test.tsx`, 8 ACs); TASK-018-002 (Wave 2, depende da 001)
+  substitui o campo de senha nu do `LoginForm` e estende `login-form.test.tsx` (7 casos
+  pré-existentes preservados + 2 novos). Cobertura 7/7 FRs, 10/10 ACs — AC-016-006 split
+  entre as duas TASKs (parte "implementação única" na 001, parte "LoginForm de fato
+  consome" na 002), sem duplicar cobertura. Todos os ACs fecham por gate 1 (teste
+  automatizado); nenhum exige gate 9 apesar de `gates.screenVerify` ativo na ficha (toggle
+  síncrono, local, sem I/O). Aguarda `/keelson:implement`.
 - 2026-09-07 14:05: **PLAN-018 criado via `/keelson:plan`** (cobre SPEC-016) — 2 COMPs
   (`PasswordField` + integração no `LoginForm`), 5 DECs (todas reversíveis: SVG inline em
   vez de lib de ícones nova; toggle via `useState` local sem elevar estado ao `LoginForm`;
