@@ -7,7 +7,7 @@
 **Wave**: 6
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -54,24 +54,25 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 ## Critérios de pronto
 
-- [ ] **EMENDA Wave 6/DEC-012-011 (contrato GET-leitura/POST-gera, gate 1, componente montado)**: `describe('abertura da Tira')` com 3 casos — (a) 1ª visita: mock do `fetch` responde 404 ao `GET .../strip` seguido de 200 ao `POST .../strip` (com os 5 Quadros) → a tela mostra indicador de "em andamento" durante a sequência e renderiza os Quadros ao final, SEM erro visível ao usuário no meio do caminho (o 404 intermediário é implementação, não estado observável); (b) reabertura: mock do `fetch` responde 200 direto ao `GET .../strip` → a tela renderiza os Quadros sem nenhuma chamada a `POST .../strip` (contagem de chamadas ao mock confirma 0 POSTs); (c) falha na abertura: `GET` 404 seguido de `POST` não-2xx → `role="alert"` com mensagem pt-BR visível, nenhum Quadro renderizado. Comando: `npm --prefix mnemonicos-frontend test -- mnemonic-strip-board.test.tsx` → `PASS`, com os 3 casos nomeados no relatório.
-- [ ] **AC-011-004/AC-011-005** (Adicionar Quadro, gate 1, componente montado): `describe('adicionar Quadro')` com 3 casos — (a) em andamento: após clicar "Adicionar Quadro", o botão fica `disabled` e um indicador `role="status"` com texto pt-BR ("Adicionando…") fica visível enquanto o `fetch` da mutação está pendente (resposta segurada por uma Promise não resolvida na fixação do teste); (b) sucesso: resposta 200 com o Quadro novo → ele aparece na posição informada, indicador de "em andamento" some; (c) falha: resposta não-2xx → `role="alert"` com mensagem pt-BR visível, nenhum Quadro novo renderizado, a Tira permanece como estava antes da tentativa.
-- [ ] **AC-011-006/AC-011-007** (Editar texto, gate 1, componente montado): `describe('editar texto de Quadro')` com os mesmos 3 casos — indicador "Salvando…" em andamento; sucesso persiste e exibe o novo texto; falha mantém o texto anterior com `role="alert"` visível.
-- [ ] **AC-011-008/AC-011-009** (Remover Quadro, gate 1, componente montado): `describe('remover Quadro')` com os mesmos 3 casos — indicador "Removendo…" em andamento; sucesso remove o Quadro e recompõe a lista; falha mantém o Quadro e a posição, com `role="alert"` visível.
-- [ ] **AC-011-010/AC-011-011** (Reordenar, gate 1, componente montado): `describe('reordenar Quadros')` com os mesmos 3 casos — indicador "Reordenando…" (ou controles de mover desabilitados) em andamento; sucesso persiste a nova ordem; falha mantém a ordem anterior íntegra, com `role="alert"` visível.
-- [ ] **AC-011-024** (Tira vazia, gate 1, componente montado): teste que remove (mocka sucesso) todos os Quadros um a um até `frames.length === 0` — a tela mostra o estado de "Tira vazia" com a ação de criar Quadro disponível, e nenhuma nova chamada à query de abertura (`useOpenMnemonicStripQuery`) é disparada (contagem de chamadas ao `fetch` para `GET .../strip` não cresce além da 1ª montagem).
-- [ ] **AC-011-019** (pt-BR completo): todo rótulo/mensagem/indicador citado nos testes acima usa string literal em português do Brasil, conferida por igualdade exata (`getByText`/`getByRole(..., { name: '<string exata>' })`, nunca `expect.stringContaining` parcial) — nenhum texto em inglês na interface.
-- [ ] **AC-011-016 (parte — grep frontend)**: grep estrutural ancorado sobre os 2 arquivos novos do frontend:
+- [x] **EMENDA Wave 6/DEC-012-011 (contrato GET-leitura/POST-gera, gate 1, componente montado)**: `describe('abertura da Tira')` com 3 casos — (a) 1ª visita: mock do `fetch` responde 404 ao `GET .../strip` seguido de 200 ao `POST .../strip` (com os 5 Quadros) → a tela mostra indicador de "em andamento" durante a sequência e renderiza os Quadros ao final, SEM erro visível ao usuário no meio do caminho (o 404 intermediário é implementação, não estado observável); (b) reabertura: mock do `fetch` responde 200 direto ao `GET .../strip` → a tela renderiza os Quadros sem nenhuma chamada a `POST .../strip` (contagem de chamadas ao mock confirma 0 POSTs); (c) falha na abertura: `GET` 404 seguido de `POST` não-2xx → `role="alert"` com mensagem pt-BR visível, nenhum Quadro renderizado. Comando: `npm --prefix mnemonicos-frontend test -- mnemonic-strip-board.test.tsx` → `PASS`, com os 3 casos nomeados no relatório.
+- [x] **AC-011-004/AC-011-005** (Adicionar Quadro, gate 1, componente montado): `describe('adicionar Quadro')` com 3 casos — (a) em andamento: após clicar "Adicionar Quadro", o botão fica `disabled` e um indicador `role="status"` com texto pt-BR ("Adicionando…") fica visível enquanto o `fetch` da mutação está pendente (resposta segurada por uma Promise não resolvida na fixação do teste); (b) sucesso: resposta 200 com o Quadro novo → ele aparece na posição informada, indicador de "em andamento" some; (c) falha: resposta não-2xx → `role="alert"` com mensagem pt-BR visível, nenhum Quadro novo renderizado, a Tira permanece como estava antes da tentativa.
+- [x] **AC-011-006/AC-011-007** (Editar texto, gate 1, componente montado): `describe('editar texto de Quadro')` com os mesmos 3 casos — indicador "Salvando…" em andamento; sucesso persiste e exibe o novo texto; falha mantém o texto anterior com `role="alert"` visível.
+- [x] **AC-011-008/AC-011-009** (Remover Quadro, gate 1, componente montado): `describe('remover Quadro')` com os mesmos 3 casos — indicador "Removendo…" em andamento; sucesso remove o Quadro e recompõe a lista; falha mantém o Quadro e a posição, com `role="alert"` visível.
+- [x] **AC-011-010/AC-011-011** (Reordenar, gate 1, componente montado): `describe('reordenar Quadros')` com os mesmos 3 casos — indicador "Reordenando…" (ou controles de mover desabilitados) em andamento; sucesso persiste a nova ordem; falha mantém a ordem anterior íntegra, com `role="alert"` visível.
+- [x] **AC-011-024** (Tira vazia, gate 1, componente montado) — **critério corrigido na closure**: o texto original citava `useOpenMnemonicStripQuery` (símbolo apagado pela EMENDA Wave 6/DEC-012-011) e pedia como prova mecânica "a contagem de chamadas ao GET não cresce", o que contradiz a mecânica pré-existente de `invalidatesTags: ['MnemonicStrip']` nas 4 mutations de Quadro (TASK-012-010, Done — cada remoção bem-sucedida dispara refetch automático do `getMnemonicStrip`). O AC real (SPEC-011: "não dispara nenhuma regeneração automática") é provado pela ausência de REGENERAÇÃO, não de leitura: teste que remove todos os Quadros um a um até `frames.length === 0` — a tela mostra o estado de "Tira vazia" com a ação de criar Quadro disponível, e **nenhuma chamada a `POST /contents/:id/strip`** ocorre durante ou após a sequência de remoção (`countCalls('POST', STRIP_PATH) === 0`) — mutante que reintroduz regeneração automática nesse caminho morre.
+- [x] **AC-011-019** (pt-BR completo): todo rótulo/mensagem/indicador citado nos testes acima usa string literal em português do Brasil, conferida por igualdade exata (`getByText`/`getByRole(..., { name: '<string exata>' })`, nunca `expect.stringContaining` parcial) — nenhum texto em inglês na interface.
+- [x] **AC-011-016 (parte — grep frontend)**: grep estrutural ancorado sobre os 2 arquivos novos do frontend:
   ```
   grep -nE '\b(Mnemonic|MnemonicTechnique)\b' "mnemonicos-frontend/src/app/(interno)/content/[id]/tira/page.tsx" mnemonicos-frontend/src/components/mnemonic-strip-board.tsx | grep -vE ':[[:space:]]*(//|\*|/\*)'
   ```
   Esperado: saída vazia (note: `\bMnemonic\b` não casa `MnemonicStrip`/`MnemonicFrame` — limite de palavra não fecha entre "Mnemonic" e "Strip"/"Frame", que são o mesmo token; casa apenas o símbolo isolado `Mnemonic`/`MnemonicTechnique`). Fixado contra o molde (arquivos-alvo ainda não existem nesta wave): `grep -nE '\b(Mnemonic|MnemonicTechnique)\b' mnemonicos-frontend/src/components/rule-breakdown-form.tsx "mnemonicos-frontend/src/app/(interno)/content/[id]/breakdown/page.tsx"` → confirmado **vazio** nos dois, rodado nesta fixação (2026-09-06).
-- [ ] **Cor semântica (lição [Design])**: `grep -nE 'text-(red|green|blue|yellow|orange|purple|pink)-[0-9]' mnemonicos-frontend/src/components/mnemonic-strip-board.tsx` → esperado vazio; `grep -c 'text-danger' mnemonicos-frontend/src/components/mnemonic-strip-board.tsx` → esperado `>= 1` (usado nos estados de falha).
-- [ ] **Guard de navegação (n/a confirmado)**: `npm --prefix mnemonicos-frontend test -- proxy.test` → verde, sem alteração no arquivo (confirma que `/content/[id]/tira` já cai sob o prefixo coberto).
-- [ ] Sem warnings/lints novos sobre `git diff --name-only main...HEAD` (produção e teste).
-- [ ] Padrão de commit respeitado (Conventional Commits).
-- [ ] Aderência à stack/padrões da ficha e do perfil (`guidelines/project/frontend/next-16.md`).
-- [ ] Code review aprovado.
+- [x] **Cor semântica (lição [Design])**: `grep -nE 'text-(red|green|blue|yellow|orange|purple|pink)-[0-9]' mnemonicos-frontend/src/components/mnemonic-strip-board.tsx` → esperado vazio; `grep -c 'text-danger' mnemonicos-frontend/src/components/mnemonic-strip-board.tsx` → esperado `>= 1` (usado nos estados de falha).
+- [x] **Guard de navegação (n/a confirmado)**: `npm --prefix mnemonicos-frontend test -- proxy.test` → verde, sem alteração no arquivo (confirma que `/content/[id]/tira` já cai sob o prefixo coberto).
+- [x] Sem warnings/lints novos sobre `git diff --name-only main...HEAD` (produção e teste).
+- [x] Padrão de commit respeitado (Conventional Commits).
+- [x] Aderência à stack/padrões da ficha e do perfil (`guidelines/project/frontend/next-16.md`).
+- [x] Code review aprovado.
+- [x] Design/UX (gate 11) aprovado — superfície de interface tocada (tela+componente novos).
 
 ## Roteiro do gate 9 (fixado ANTES do código)
 
@@ -147,26 +148,40 @@ DELETE FROM raw_contents WHERE id = '<rawContentId>';
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-07T10:23:13-0300
+**Data conclusão**: 2026-09-07T14:52:00-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 7ca5938 (implementação) + 2d2f2a2 (retry 1 — 8 achados code-review/design) + ae7bb78 (retry 2 — header sem prova + foco no diálogo) + 78c3ddc (retry 3 — 4ª porta editar-vs-confirmar)
 **Jira**: KAN-62
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (4 rodadas) + product-designer (4 rodadas — gate 11, superfície de interface)
+**Tentativas**: 4 (1ª REPROVADA nos 2 gates — 3 achados de falsificabilidade + 8 achados de UX; 2ª REPROVADA nos 2 gates — retry introduziu página sem prova + diálogo de confirmação sem gestão de foco; 3ª REPROVADA só no gate 11 — 4ª porta de desmonte do diálogo (editar vs. confirmar remoção), code-reviewer já APROVADO; 4ª APROVADA nos 2 gates)
+**Cobertura final**: todos os critérios de pronto + achados dos 2 gates fechados; AC-011-024 com critério corrigido na closure (contradição com invalidatesTags pré-existente)
 **Arquivos modificados**:
-  -
+  - mnemonicos-frontend/src/store/api.ts (rename openMnemonicStrip→getMnemonicStrip + nova mutation openMnemonicStrip POST)
+  - mnemonicos-frontend/src/store/api.test.ts
+  - mnemonicos-frontend/src/app/(interno)/content/[id]/tira/page.tsx
+  - mnemonicos-frontend/src/components/mnemonic-strip-board.tsx
+  - mnemonicos-frontend/src/components/mnemonic-strip-board.test.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando (210/210, 18 suites)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (convergência em 3 rodadas)
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — nenhum endpoint novo de backend, sem mudança de autorização
+- [x] Comportamento (gate 9): n/a — SPEC-011 sem FEATs (verificação consolidada na Etapa 4/DoD do PLAN; roteiro fixado neste card, seção "Roteiro do gate 9")
+- [x] Design/UX (gate 11): aprovado — convergência em 4 rodadas (página sem cabeçalho/saída; estado de falha sem retry; vazio sem próximo passo; submit silencioso; remoção sem confirmação; diálogo sem gestão de foco — 2 iterações)
 
-**Notas**:
+**Notas**: 2ª task mais disputada do PLAN-012 (empatada com a Wave 5) — 4 rodadas de convergência
+em cada um dos 2 gates. A maioria dos achados de UX veio de um padrão comum: código novo
+copiava o MARKUP de um exemplar já aprovado (`content-form.tsx`) sem copiar o CONTRATO
+COMPLETO que o sustenta (efeito de foco, régua de fechamento) — lição registrada
+(em-observação) em `lessons.md`. Achado não-bloqueante fora de escopo: mover um Quadro para a
+extremidade da lista desabilita o próprio botão clicado e o foco cai no `<body>` — propriedade
+pré-existente dos controles de mover, independente do diálogo; vira brief avulso/pendência para
+o Diretor, não retry desta TASK. Pendência de consolidação (não urgente): o diálogo de
+confirmação existe em 2 implementações inline (`content-form.tsx` e `mnemonic-strip-board.tsx`)
+— candidato a hook compartilhado `useConfirmDialogFocus`, diff próprio no futuro.

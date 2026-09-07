@@ -1123,3 +1123,109 @@ deve devolver só hooks de path público (hoje: `useGetHealthQuery`).
 por estado de sessão, neste projeto.
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Guard de destino de navegação valida por resolução — entrada E saída, com prova de ponto-fixo
+
+**Erro:** `isSafeRelativePath` (`src/proxy.ts`) validava a FORMA textual do candidato
+(prefixo `/`, ausência de `//`/`://`), mas quem consome o valor (`router.push`) resolve
+com o parser WHATWG de URL — que remove `%09`/`%0A`/`%0D` antes de interpretar e
+reinterpreta `\` como `/`. `next=%2F%0A%2Fevil.com` decodifica `/\n/evil.com`, passava no
+guard textual, e resolvia para `https://evil.com/` (Open Redirect real). Corrigido para
+validação-por-resolução (`new URL` contra base sentinela + comparação de `origin`), a
+correção introduziu uma SEGUNDA falha da mesma família: o guard passou a **devolver** um
+valor (`url.pathname` cru) em vez de só aprovar/reprovar — e `url.pathname` podia começar
+com `//` (protocolo-relativo), saindo da origem de novo no consumidor. Pego em 2 rodadas
+de gate 8 do BRIEF-014 (KAN-75).
+**Causa:** validar e devolver são dois atos distintos. Provar que o CANDIDATO não muda de
+origem não prova que o VALOR DEVOLVIDO, re-resolvido pelo consumidor, também não muda — e
+um origin-check contra uma base sentinela **constante do código-fonte** não é barreira por
+si (o atacante pode nomear a sentinela); quem fecha a classe é a allowlist do PATH.
+**Solução:** guard de redirect/navegação que **devolve valor** (não só boolean):
+(1) valida o candidato por resolução no MESMO parser que o sink usa, nunca por forma
+textual; (2) restringe por **allowlist de destino** (o primeiro segmento do path contra a
+lista canônica de rotas internas — nunca lista de formatos proibidos, que por construção
+nunca é exaustiva); (3) reconstrói o retorno a partir de **componentes já validados**
+(`'/' + segments.filter(Boolean).join('/')`), nunca repassa campo cru do parser
+(`url.pathname`); (4) a prova é **ponto-fixo + idempotência**, não uma lista de vetores:
+para todo candidato aceito, `new URL(guard(x), origemArbitrária).origin === origemArbitrária`
+(≥2 origens distintas) e `guard(guard(x)) === guard(x)`. Referência:
+`mnemonicos-frontend/src/proxy.ts` (`isSafeRelativePath`) e `src/proxy.test.ts` (bloco
+"propriedade de ponto-fixo").
+**Validade:** geral (qualquer guard que valida e devolve um destino de navegação/redirect
+a partir de entrada não confiável).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] `jsdom` sem `Request`/`Response`/`fetch` por import transitivo de `next/server` — `testEnvironment` canônico, nunca mock do módulo sob guarda
+
+**Erro:** um teste de Server Component (`page.test.tsx`) importava (transitivamente, via
+`@/proxy`) `next/server`, que estende o `Request` global — ausente em `jsdom` puro. A
+correção adotada foi `jest.mock('@/proxy', () => ({ isSafeRelativePath: jest.fn(() => true) }))`
+— stubando um **guard de segurança** (open-redirect) como sempre-permissivo dentro da
+própria suíte que renderiza a tela de login, quando a casa já tem a solução canônica
+(`testEnvironment` customizado que injeta os globais de rede do realm Node em `jsdom`,
+já usado em `content-form.test.tsx`, `content-list.test.tsx`,
+`internal-shell.integration.test.tsx`, `rule-breakdown-form.test.tsx`). Pego no gate
+1-7 do BRIEF-014 (KAN-75).
+**Causa:** a régua já existia, mas só como bullet dentro de uma lição sobre um assunto
+diferente (RTK Query — acima, "Harness:"), sem entrada própria nem menção no perfil —
+quem procurava "jsdom sem Request" não a encontrava, e mockar o módulo é o primeiro
+reflexo disponível.
+**Solução:** globais de rede do realm Node faltando em `jsdom` (`fetch`/`Response`/
+`Request`/`Headers`, inclusive por import transitivo de `next/server`) resolvem-se
+**sempre** com `@jest-environment <rootDir>/test/jsdom-fetch-env.js` — nunca mockando o
+módulo de produção sob teste, e **jamais** stubando um guard de segurança como
+sempre-permissivo (isso reprova o gate mesmo se o resto do diff estiver correto).
+Referência: `mnemonicos-frontend/test/jsdom-fetch-env.js` + os 4 arquivos citados acima.
+**Validade:** geral (qualquer suíte `jsdom` deste frontend cujo grafo de import alcance
+`next/server`).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Design] Parâmetro que carrega destino/estado entre telas exige inventário de todos os produtores e do consumidor
+
+**Erro:** `proxy.ts` escrevia `next=<path>` ao redirecionar para `/login`, mas
+`src/app/login/page.tsx` nunca lia o parâmetro — o mecanismo nasceu pela metade (um lado
+escreve, o outro nunca leu). Corrigido o consumidor (BRIEF-014/KAN-75), o gate 11 notou
+que **dois outros produtores** de redirect involuntário para `/login`
+(`internal-shell.tsx:42` ao perder sessão dentro da área interna; `store/api.ts` no
+redirect de "sessão expirada") continuam sem escrever `next` — a promessa "você volta
+para onde queria ir" só vale por um dos três caminhos.
+**Causa:** parâmetro de navegação introduzido de um lado sem inventariar os dois lados
+(quem escreve o estado, quem o lê). Cada produtor/consumidor parece correto isolado; é a
+promessa ao usuário que fica parcial, e revisão de um arquivo só não enxerga isso.
+**Solução:** ao introduzir ou corrigir um parâmetro que carrega DESTINO ou estado entre
+telas (`next`, `sessao`, `from`), o diff (ou o brief que o autoriza) inventaria, por
+`grep` dos produtores reais (todo redirect para a mesma rota-alvo), **todos** eles e o(s)
+consumidor(es) — cada um rotulado "propaga" ou "não propaga (motivo)" (saída deliberada,
+como logout, legitimamente não propaga). Referência: `src/proxy.ts` (produtor canônico) e
+`src/lib/internal-routes.ts` (símbolos de destino — nunca literal de rota).
+**Validade:** geral (qualquer parâmetro de navegação que carregue destino/estado entre
+telas, neste frontend).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Design] Diálogo in-place em ramo condicional exige grep de todos os setters do estado que decide o ramo, não só de quem o fecha
+
+**Erro:** o diálogo `role="alertdialog"` de confirmação de remoção em
+`mnemonic-strip-board.tsx` (TASK-012-012, PLAN-012) foi entregue com gestão de foco
+correta para os 3 fechamentos legítimos do próprio diálogo (sucesso, cancelar, falha) —
+mas existia uma 4ª porta: clicar "Editar" no MESMO Quadro enquanto a confirmação estava
+aberta trocava `editingFrameId`, o que muda o RAMO de JSX em que o diálogo vive,
+desmontando-o sem passar por nenhum dos 3 fechamentos tratados. Resultado: foco cai no
+`<body>`, e ao cancelar a edição a confirmação de remoção reaparece sozinha (órfã).
+**Causa:** a revisão de foco cobriu os caminhos que ESCREVEM o estado do diálogo
+(`confirmingRemoveFrameId`) e não os que escrevem o estado que decide o RAMO onde ele
+vive (`editingFrameId`) — quem desmonta um diálogo condicional não é só quem o fecha
+explicitamente, é qualquer setter que altere a condição do ramo que o envolve.
+**Solução:** ao gerenciar foco de um diálogo/bloco renderizado condicionalmente, listar
+por `grep` TODOS os setters de CADA estado que compõe a condição do ramo (não só o
+estado que "parece dono" do diálogo) e, para cada um, dar destino de foco explícito OU
+tornar a ação que o escreve indisponível (`disabled`) enquanto o diálogo está aberto —
+o gesto mais barato quando a ação concorrente não precisa coexistir com a confirmação.
+Referência do gesto: `mnemonic-strip-board.tsx:120-142,355-367` (disabled na ação
+concorrente) e `content-form.tsx:129-144` (efeito de foco em estado único).
+**Validade:** todo componente frontend com diálogo/painel in-place cuja presença depende
+de mais de um estado local.
+**Estado:** em-observacao
+**Contadores:** confirmada 0 · contestada 0

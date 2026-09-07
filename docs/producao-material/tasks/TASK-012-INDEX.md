@@ -9,9 +9,9 @@ backend, Server Components por padrão + RTK Query para estado de servidor no fr
 
 ## Status agregado
 
-- Todo: 2
+- Todo: 1
 - In Progress: 0
-- Done: 11
+- Done: 12
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -37,8 +37,8 @@ backend, Server Components por padrão + RTK Query para estado de servidor no fr
 ### Wave 5 (depende de Wave 4) — ✅ concluída
 - [x] TASK-012-008 ✅ Done — Expor `tira.routes.ts` sob a barreira EDITOR/ADMIN (fatia sensível — gate 8 obrigatório)
 
-### Wave 6 (depende de Wave 5 e Wave 2)
-- [ ] TASK-012-012 ⏸ Todo — Construir a tela da Tira mnemônica (quadro a quadro) (gate 9 — screenVerify)
+### Wave 6 (depende de Wave 5 e Wave 2) — ✅ concluída
+- [x] TASK-012-012 ✅ Done — Construir a tela da Tira mnemônica (quadro a quadro) (gate 9 — screenVerify)
 
 ### Wave 7 (depende de Wave 6)
 - [ ] TASK-012-013 ⏸ Todo — Adicionar navegação condicional da Quebra da regra para a Tira
