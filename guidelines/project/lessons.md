@@ -633,12 +633,35 @@ executar o script servido cru, usando `respondWith` como proxy observável — n
 CÓDIGO (não uma constante), "ler a outra fonte" não basta — é preciso **executar as duas e
 comparar o resultado no mesmo caso**; paridade de dados + execução isolada de cada cópia
 não substitui isso.
+**Reincidência (code-reviewer, re-review Wave 2 de PLAN-021 — extensão para a DIREÇÃO
+INVERSA do erro):** ao fechar o achado original (docblock de `resolveApiBaseUrl()` em
+`mnemonicos-frontend/src/store/api.ts` afirmava paridade não provada entre o prefixo
+`/api/v1` do próprio arquivo e o `source` de `next.config.ts`), a correção aplicou a
+"alternativa aceitável" desta lição — suavizar o comentário para descrever o que o teste
+de fato garante — mas trocou a afirmação falsa-por-EXCESSO ("o teste garante a paridade")
+por uma falsa-por-FALTA ("mudar um lado sem o outro deixaria as duas suítes verdes"), sem
+medir. Provado falso por mutante em cada lado isoladamente: trocar o `source` de
+`next.config.ts` deixa `next.config.test.ts` vermelho; trocar o prefixo em `api.ts` deixa
+3 suítes de `src/store/` vermelhas — cada lado TEM tripwire próprio, só a paridade REAL
+entre os dois nunca é provada (nenhum teste lê as duas fontes e compara).
+**Corolário:** "suavizar o comentário" não é ato de redação livre — é uma afirmação nova
+sobre o instrumento de teste, e se prova como qualquer outra: por mutante rodado em CADA
+lado da fronteira antes de escrever a frase. Descrever a rede de proteção "por baixo"
+(subestimando o que ela cobre) parece o lado seguro do erro e por isso passa sem
+verificação — mas é erro do mesmo tipo, só na direção oposta.
+**Solução:** ao suavizar (ou escrever) comentário sobre a rede de proteção de um literal
+espelhado, rodar 1 mutante por LADO da fronteira (alterar o literal de cada arquivo
+isoladamente) e escrever no comentário só o que o resultado sustenta — tipicamente "cada
+lado fixa o próprio literal na sua suíte; o que ninguém prova é a paridade entre eles".
+Exemplar desta rodada: `mnemonicos-frontend/src/store/api.ts:146-154` (redação corrigida),
+mutantes em `next.config.ts:28` e `api.ts:157-158`.
 **Validade:** enquanto houver constante, interface, valor de fixture OU lógica de decisão
 espelhada à mão entre `mnemonicos-backend` e `mnemonicos-frontend`, ou entre dois arquivos
 do mesmo repo (inclusive fronteira de runtime — script servido sem bundler × módulo
-compilado) que um comentário declara "idênticos"/"espelhados"/"mesma estrutura".
+compilado) que um comentário declara "idênticos"/"espelhados"/"mesma estrutura" — inclusive
+quando o comentário está sendo SUAVIZADO para deixar de afirmar paridade.
 **Estado:** ativa
-**Contadores:** confirmada 4 · contestada 0
+**Contadores:** confirmada 5 · contestada 0
 
 ## [Segurança] Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos
 

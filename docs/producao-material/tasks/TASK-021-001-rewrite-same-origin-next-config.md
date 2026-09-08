@@ -93,6 +93,6 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 - [x] Code review aprovado (gate 1-7, delta cc3b9f6 sobre fcfaf92)
 - [x] ACs verificados (AC-002-001 parte — topologia/rewrite; NFR-002-008 parte — trafega same-origin)
 - [x] Segurança (gate 8): aprovado (Wave 1) — security-engineer, 0 achados; 2 notas não-bloqueantes para o checklist de deploy (header em resposta de rewrite; validação de esquema/TLS de `BACKEND_API_URL`)
-- [ ] Comportamento (gate 9): pendente — FEAT-002-001 completa no fim da Wave 2
+- [x] Comportamento (gate 9): n/a — resíduo de verificação manual pós-deploy (TRISK-021-001/002), item de DoD do PLAN (Etapa 4), não roteiro de TASK: comportamento cross-site sob dois sites `*.vercel.app` reais é tecnicamente irreproduzível localmente (TASK-021-INDEX.md, nota de cobertura). Faceta local (AC-002-001 topologia/rewrite) coberta por gate 1.
 
 **Notas**: `headers()` (CSP-lite) permanece byte-a-byte inalterado, confirmado por diff+md5. Achado fora de escopo do code-reviewer (não desta TASK): `next.config.ts`/`headers()` nunca teve teste próprio no repo — sinal registrado no Histórico do INDEX. Lição nova registrada em `guidelines/project/lessons.md` (`[Testes] Valor capturado dentro de callback...`) e anti-pattern equivalente adicionado a `guidelines/project/frontend/next-16.md` §1.

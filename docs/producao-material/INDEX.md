@@ -58,7 +58,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-013 | SPEC-013 | 6/6 FRs + 8/8 NFRs (manifesto, ícones 192/512, service worker artesanal restrito a assets estáticos, kill-switch por autodesregistro, postura de exposição, não-regressão de sessão) | 6/6 ✅ | Done (sugerido) |
 | PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 2/2 ✅ | Done (sugerido) |
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
-| PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 1/2 🟡 | Draft |
+| PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Draft |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).

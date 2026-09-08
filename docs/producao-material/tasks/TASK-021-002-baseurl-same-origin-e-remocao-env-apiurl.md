@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -77,26 +77,32 @@ Passos NÃO-VINCULANTES — em tensão com os "Critérios de pronto", os critér
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-08T14:28:08-0300
+**Data conclusão**: 2026-09-08T15:13:56-0300
+**Branch**: feat/producao-material-rewrite-same-origin-cookie-sessao
+**Commit SHA**: e54f562
 **Jira**: KAN-84
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer, security-engineer
+**Tentativas**: 3 (1 retry — 2 achados bloqueantes de gate 1 confirmados por mutation testing, mutantes M1/M2 sobreviviam à suíte inteira, corrigidos com origem discriminante em `api.browser-base-url.test.ts` e teste novo de URL absoluta em `api.browser-request-url.test.ts`; 1 achado de gate 7, docblock afirmava paridade não provada; + 1 aplicação de correção não-bloqueante do gate 7 — cláusula do docblock reescrita, verificada pelo mesmo revisor)
+**Cobertura final**: n/a (sem instrumento de cobertura na ficha)
 **Arquivos modificados**:
-  -
+  - mnemonicos-frontend/src/store/api.ts
+  - mnemonicos-frontend/src/store/api.test.ts
+  - mnemonicos-frontend/src/store/api.browser-base-url.test.ts
+  - mnemonicos-frontend/src/store/api.browser-request-url.test.ts
+  - mnemonicos-frontend/src/lib/env.ts
+  - mnemonicos-frontend/.env.example
+  - mnemonicos-frontend/README.md
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (34 suites/363 testes verdes, 3 novos)
+- [x] Lint limpo (0 warnings; `tsc --noEmit` limpo)
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (gate 1-7, delta f8c41a8 sobre 35a3bde + verificação final e54f562)
+- [x] ACs verificados (AC-002-001 parte — baseUrl same-origin; NFR-002-008 parte)
+- [x] Segurança (gate 8): aprovado (Wave 2) — security-engineer, 0 achados; confirmou `isPublicAuthRequest`/`baseQueryWithReauth` intocados e nenhuma exposição de URL do backend no bundle
+- [x] Comportamento (gate 9): n/a — resíduo de verificação manual pós-deploy (TRISK-021-001/002), item de DoD do PLAN (Etapa 4), não roteiro de TASK: comportamento cross-site sob dois sites `*.vercel.app` reais é tecnicamente irreproduzível localmente (TASK-021-INDEX.md, nota de cobertura). Faceta local (AC-002-001 topologia/baseUrl) coberta por gate 1 (mutation testing).
 
-**Notas**:
+**Notas**: FEAT-002-001 completa nesta wave (TASK-021-001 + TASK-021-002 Done) — sem novo ciclo de `qa` por FEAT nesta rodada porque o contrato observável não muda (re-cobertura técnica, DEC-021-001) e o resíduo real (TRISK-021-001/002) só fecha em produção. Achados fora de escopo do code-reviewer (não desta TASK, registrados no Histórico do INDEX): paridade real do prefixo `/api/v1` entre `api.ts`/`next.config.ts` nunca provada por teste único; helper `asRequest` com 4 cópias locais (candidato a `tests/support/`). Lição existente estendida em `lessons.md` (5ª reincidência — direção inversa: comentário suavizado também precisa de mutante por lado).
