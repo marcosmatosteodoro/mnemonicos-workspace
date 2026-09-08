@@ -1329,3 +1329,28 @@ simetria. Prefira esperar o próximo chunk a resolver com o que já veio. Refer�
 processo filho ou de socket lido em chunks.
 **Estado:** em-observacao
 **Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Valor capturado dentro de callback devolvido ao chamador se estreita por guard clause, nunca por `as` que apaga o `undefined` inferido
+
+**Erro:** `next.config.test.ts` (TASK-021-001, PLAN-021) capturava o módulo carregado
+dentro do callback de `jest.isolateModules(() => { mod = require('./next.config'); })`
+e devolvia `(mod as { default: NextConfig }).default` ao chamador — o `as` apaga o
+`| undefined` que o TypeScript infere corretamente para uma variável atribuída só
+dentro de um closure (o compilador não estreita através da fronteira do callback).
+Achado no gate 1-7 (code-reviewer) da Wave 1.
+**Causa:** o TS não estreita variável de captura fora do closure onde foi atribuída, e
+nenhuma regra de lint type-aware está habilitada para acusar a assertion — o caminho de
+menor resistência é calar o compilador, e o padrão certo já existia mergeado noutro
+arquivo (`src/lib/sw-loader.ts:139-147`) sem estar escrito em nenhuma guideline que o
+developer leia antes de codar.
+**Solução:** todo valor capturado dentro de um callback (`jest.isolateModules`,
+`addEventListener`, qualquer closure) e devolvido ao chamador se estreita por **guard
+clause que lança** com mensagem diagnóstica (`if (!mod) { throw new Error('<fonte> não
+carregou dentro de <mecanismo>'); }`), nunca por `as`/`!` que apaga o `undefined`
+inferido — perfil `next-16.md` §1 já proíbe "`as` para calar o compilador"; o `as` que
+tipa um `any` de origem externa (ex.: retorno de `require`) continua legítimo, é defeito
+de natureza diferente. Referência: `src/lib/sw-loader.ts:139-147`,
+`next.config.test.ts:9-12` (corrigido).
+**Validade:** geral (qualquer captura em closure devolvida ao chamador, nos dois repos).
+**Estado:** em-observacao
+**Contadores:** confirmada 0 · contestada 0

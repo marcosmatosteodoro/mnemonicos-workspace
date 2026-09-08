@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-07T14:41:00-0300 (SPEC-019 via `/keelson:specify`)
+**Última atualização**: 2026-09-08T14:20:00-0300 (PLAN-021 Wave 1/2 via `/keelson:implement`)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -28,6 +28,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 - Página 404 personalizada (SPEC-019/**PLAN-020**, done (sugerido) 2026-09-07) — `not-found.tsx` nativo do App Router (Server Component `NotFoundPage`), `metadata.title` próprio (não herda o título da home), herda `SiteHeader`/`Providers`/footer do root layout automaticamente, tokens `@theme`/`text-link`/`text-muted`, `<Link href="/">` de volta à home pública. Precedência guard×404 delegada inteiramente ao `proxy.ts` existente (SPEC-002), sem lógica nova — rota interna sem sessão continua indo para `/login?next=<path>` (decisão do PO, E-019-01); rota interna com sessão prova a 404 personalizada ponta-a-ponta via HTTP real. 1 COMP, 4 DECs (todas reversíveis), 2 TRISKs. Demanda avulsa fora do épico MNEMORA STUDIO — brief BRIEF-019, Jira Story KAN-76 (subtasks KAN-81/KAN-82 concluídas). 2/2 TASKs Done, 1 wave — TASK-020-001: 1 retry (achado do product-designer: sem `metadata.title`, título herdava o da home). TASK-020-002: 4 rodadas de convergência (acima do teto padrão de 1 retry, todas mecânicas — asserção de corpo não-discriminante, âncora de regex de stream, bind loopback do servidor de teste, branch defasada de `origin/main` sincronizada por merge fast-forward); nenhuma decisão de arquitetura/produto pendente, degrau 1 da escada de reação aplicado pelo Tech Lead na última rodada. Gate 9 consolidado (DoD, Etapa 4) — SPEC-019 sem FEATs, todos os ACs fecham por gate 1 (teste automatizado com servidor `next start` real: HTTP 404 + `<title>` discriminante). 4 lições novas em `lessons.md` (discriminação de rota por `<title>`; bind loopback de servidor de teste; parser de token sobre buffer de stream; metadata.title em arquivo de convenção do App Router).
 
 ### Em desenvolvimento
+- Rewrite same-origin do cookie de sessão para produção cross-site (SPEC-002/**PLAN-021**, Draft, 2026-09-08) — `mnemonicos-frontend` e `mnemonicos-backend` são dois sites Vercel distintos (`*.vercel.app`, cada subdomínio é um site próprio na Public Suffix List); o cookie `sameSite: 'lax'` de DEC-003-004/PLAN-003 nunca persiste em produção sob essa topologia — confirmado por execução real com Playwright (KAN-75): `POST /auth/login` responde 200 com o `SessionUser`, sem nenhum `Set-Cookie`, `document.cookie` vazio depois. Re-cobertura técnica de FR-002-001/NFR-002-008 (já contabilizados em PLAN-003, sem FR novo): `rewrites()` em `next.config.ts` + `baseUrl` same-origin (`window.location.origin`) em `store/api.ts`, sem mudar flags do cookie nem `verifyOrigin`/`CORS_ORIGINS` do backend (DEC-021-001, reabre DEC-003-004 pela condição que ela mesma previu). 3 COMPs, 3 DECs (todas reversíveis), 3 TRISKs — os 2 primeiros só fecham em verificação manual pós-deploy (sem staging cross-site disponível). Aguardando `/keelson:tasks`.
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
@@ -57,6 +58,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-013 | SPEC-013 | 6/6 FRs + 8/8 NFRs (manifesto, ícones 192/512, service worker artesanal restrito a assets estáticos, kill-switch por autodesregistro, postura de exposição, não-regressão de sessão) | 6/6 ✅ | Done (sugerido) |
 | PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 2/2 ✅ | Done (sugerido) |
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
+| PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 1/2 🟡 | Draft |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -120,6 +122,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | ID | Risco | Mitigação | Origem |
 |----|-------|-----------|--------|
 | — | Verificação de tela pendente — HANDOFF-PLAN-013 (`docs/producao-material/handoffs/HANDOFF-PLAN-013.md`) — V1/V2 (instalação nativa, UI fora do alcance de Playwright headless) e V3/V4 (ciclo login/logout com SW ativo, bloqueado por `CORS_ORIGINS` de origem única do backend) | roteiro completo no handoff; exercitar em navegador real com backend aceitando a origem do frontend | HANDOFF-PLAN-013 |
+| TRISK-021-001/002 | Encaminhamento de `Origin`/`Referer` e preservação de múltiplos `Set-Cookie` pelo `rewrites()` do Next para URL externa não documentados em detalhe pela doc bundled — sem ambiente de staging cross-site para provar antes do deploy real | verificação manual pós-deploy (gate 9, DoD de PLAN-021): requisição forjada de outra origem contra rota mutante autenticada por cookie confirma 403; login legítimo confirma os 2 `Set-Cookie` distintos gravados sob o domínio do frontend | PLAN-021 |
 | ~~RISK-006-008~~ | **RESOLVIDO 2026-09-05 — não era vulnerabilidade ativa.** O re-review do gate 1-7 da Wave 4 de PLAN-006 achou que a asserção estrutural de CSRF filtrava por "rota não-pública" (eixo de autorização), excluindo `/auth/login` e `/auth/refresh` (POST públicas) do escopo da prova — `/auth/refresh` sem nenhum teste dedicado. A investigação do BRIEF-007 confirmou que `POST /auth/refresh` **sempre teve** `verifyOrigin` como 1º handler, desde o commit original de F1 (`d2560a9`) — o gap era só na REDE DE PROVA, nunca na proteção real. | Diretor autorizou correção imediata (AskUserQuestion). BRIEF-007 (avulso, KAN-43): asserção estrutural generalizada para toda rota mutante montada (`ROUTES`, não `NON_PUBLIC`), pública ou não — fecha a classe inteira, não só esta rota. Gates 1-7/8 aprovados. | code-reviewer + security-engineer, BRIEF-007 |
 | PIL-001 | Teste da tira aprovado sem limiar (Q-11) e cinco das seis métricas da §5.4 sem instrumento (Q-12) — não bloqueiam a SPEC, bloqueiam a conclusão do piloto | decidir antes do beta; retomar via /keelson:brief producao-material | BRIEF-001 |
 | ~~RDR-001~~ | **RESOLVIDO 2026-09-01** — SPEC-005 A-005-001: as 5 classes da TAP são o dado persistido; as 3 prioridades do mockup são derivação de apresentação, exibição adiada para F10. Não é 2ª dimensão gravada. | selado (premissa com `Reabrir se:` F7/F10/F11 precisarem priorizar natureza acima de grau) | BRIEF-001 → SPEC-005 |
@@ -176,6 +179,26 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | RISK-019-002 | A home pública (`/`) hoje não tem link de volta à área interna (`/studio`) — o CTA sensível a sessão de BRIEF-015/KAN-74 está implementado mas ainda não mergeado no `main` do frontend; até lá, EDITOR/ADMIN que sai da 404 personalizada chega a `/` sem caminho direto a `/studio` (2 cliques via `/login`, não 1) | Nenhuma ação desta SPEC; merge de KAN-74 fecha a lacuna por conta própria | SPEC-019 §9, sugestão S-01 do PO |
 
 ## Histórico recente
+
+- 2026-09-08 14:20: **Wave 1 de PLAN-021 concluída via `/keelson:implement`** (TASK-021-001,
+  KAN-83 — `rewrites()` same-origin em `next.config.ts`). Gate 1-7 (code-reviewer) REPROVOU
+  na 1ª rodada: `next.config.test.ts:9` usava `as` para apagar o `| undefined` que o
+  TypeScript infere para valor capturado dentro do callback de `jest.isolateModules` — 1
+  retry trocou por guard clause que lança, no molde do exemplar mergeado
+  `src/lib/sw-loader.ts:139-147`; delta re-aprovado. Gate 8 (security-engineer) aprovou de
+  primeira, 0 achados — 2 notas não-bloqueantes para o checklist de deploy (header em
+  resposta de rewrite; validação de esquema/TLS de `BACKEND_API_URL`, TRISK-021-003).
+  32 suites/360 testes verdes (2 novos), lint/typecheck limpos. Lição nova em
+  `guidelines/project/lessons.md` (`[Testes] Valor capturado dentro de callback...`) +
+  anti-pattern equivalente em `guidelines/project/frontend/next-16.md` §1. Fora de escopo
+  (registrado, não é dívida da TASK): `next.config.ts`/`headers()` (CSP-lite) nunca teve
+  teste próprio no repo; 4 arquivos do working tree do frontend mostravam `M` no
+  `git status` com diff de conteúdo vazio (ruído LF/CRLF, sugestão de `.gitattributes`).
+  Tracker: marco "TASK iniciada" degradou para comentário em KAN-83 (mapa de colunas do
+  board `jira.KAN.md` ainda não promovido, `transition: auto` sem status-alvo seguro).
+  Wave 2 (TASK-021-002) segue para implementação.
+
+- 2026-09-08: `/keelson:triage` classificou o relato de KAN-75 persistindo em produção pós-merge como bug **diferente e mais grave**: login autentica (200 + perfil), mas o cookie de sessão nunca é gravado pelo navegador — causa raiz é topologia (frontend e backend como dois sites Vercel distintos, `sameSite: 'lax'` de DEC-003-004 não sobrevive a isso), não o fix de `next` do KAN-75 (que segue correto e mergeado). Classificado Categoria 2 (novo PLAN da mesma SPEC-002 — contrato não muda, estratégia técnica muda, DEC real entre alternativas). Diretor escolheu proxy same-origin (rewrite) em vez de `SameSite=None`+anti-CSRF via `AskUserQuestion`. `/keelson:plan` gerou **PLAN-021** (alocado inicialmente como PLAN-020; colisão de id com `PLAN-020-pagina-404-personalizada.md` de sessão paralela detectada pelo `graph.sh` e corrigida por renumeração antes da publicação). `plan-validator` limpo — 3 ERRORs de `plan-dec-irreversivel-enum` identificados como falso positivo do `artifact-lint.sh` (bug de portabilidade do `awk` nesta plataforma: `gsub` octal não casa o byte UTF-8 de "ã" em `não`, a forma exata que `commands/plan.md` prescreve) — reproduzido e documentado, não é defeito do PLAN. Status: Draft, aguardando `/keelson:tasks`.
 
 - 2026-09-07 16:27: **PLAN-020 (página 404 personalizada) implementado — 2/2 TASKs Done,
   wave única, via `/keelson:implement`.** TASK-020-001 (`not-found.tsx`): 1 retry —

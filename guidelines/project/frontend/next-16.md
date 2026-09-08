@@ -86,7 +86,11 @@ lint acompanha a major/minor do framework. Suba os dois juntos, num commit só.
   reducer com `switch` e spread manual, `redux-thunk` importado à mão (já vem),
   imutabilidade manual (o Immer do `createSlice` cuida).
 - **`any` explícito ou implícito**, `as` para calar o compilador, `@ts-ignore` (se
-  inevitável: `@ts-expect-error` **com o motivo na linha acima**).
+  inevitável: `@ts-expect-error` **com o motivo na linha acima**). Vale também para valor
+  capturado dentro de callback/closure (`jest.isolateModules`, `addEventListener`) e
+  devolvido ao chamador: estreita por guard clause que lança
+  (`if (!x) { throw new Error('...') }`), nunca por `as`/`!` apagando o `undefined`
+  inferido — exemplar: `src/lib/sw-loader.ts:139-147` (lição em `lessons.md`).
 - **`enum` do TypeScript**: o padrão da base é `as const` + união de literais
   (`MNEMONIC_TECHNIQUES` / `MnemonicTechnique` em `src/types/domain.ts`).
 
