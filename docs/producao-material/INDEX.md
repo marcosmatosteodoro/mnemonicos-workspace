@@ -125,6 +125,8 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | — | Verificação de tela pendente — HANDOFF-PLAN-013 (`docs/producao-material/handoffs/HANDOFF-PLAN-013.md`) — V1/V2 (instalação nativa, UI fora do alcance de Playwright headless) e V3/V4 (ciclo login/logout com SW ativo, bloqueado por `CORS_ORIGINS` de origem única do backend) | roteiro completo no handoff; exercitar em navegador real com backend aceitando a origem do frontend | HANDOFF-PLAN-013 |
 | TRISK-021-001/002 | Encaminhamento de `Origin`/`Referer` e preservação de múltiplos `Set-Cookie` pelo `rewrites()` do Next para URL externa não documentados em detalhe pela doc bundled — sem ambiente de staging cross-site para provar antes do deploy real | verificação manual pós-deploy (gate 9, DoD de PLAN-021): requisição forjada de outra origem contra rota mutante autenticada por cookie confirma 403; login legítimo confirma os 2 `Set-Cookie` distintos gravados sob o domínio do frontend | PLAN-021 |
 | TRISK-021-003 (deploy) | **Pendência de deploy**: `BACKEND_API_URL` (env var nova, server-only) precisa ser configurada no painel Vercel do projeto `mnemonicos-frontend` **antes** do próximo deploy de produção — pré-requisito do código: sem ela, `rewrites()` cai no fallback de dev local (`http://localhost:3333`) e toda chamada de API em produção falha de forma visível (timeout/erro de rede), nunca silenciosamente. Valor deve ter esquema `https://` (2ª nota do gate 8, Wave 1) — `http://` faria os cookies de sessão trafegarem Vercel→backend sem TLS. | ato do Diretor: configurar `BACKEND_API_URL=https://<host-real-do-backend>` no painel Vercel do frontend antes/junto do merge | PLAN-021, gate 8 Wave 1 |
+| — | Paridade do prefixo `/api/v1` entre `next.config.ts:28` (`source`) e `store/api.ts:157-158` (literal em `resolveApiBaseUrl()`) sem tripwire — cada lado tem teste próprio, mas nenhum lê as duas fontes e compara; divergir os dois ao mesmo tempo derrubaria toda chamada de API em produção sem nenhum gate acusar. Não é gap (estado atual satisfaz o requisito), achado da passada de dedup da convergência de fecho de PLAN-021 | consolidação barata (~8 linhas, precedente no próprio repo: `sw-parity.test.ts`) — decisão do Diretor, diff novo | code-reviewer, convergência de fecho de PLAN-021 |
+| — | 2 docblocks desatualizados por PLAN-021 em arquivos que ele não tocou: `src/lib/service-worker-policy.ts:26-30` e o bloco equivalente de `public/sw.js` (`isSameOriginRequest`) ainda afirmam que a API é cross-origin — DEC-021-001 tornou-a same-origin. Comportamento intacto e provado (`sw-parity.test.ts`), mas a garantia de NFR-013-001 (SW nunca cacheia resposta de API) passou de 2 camadas (origem + pathname) para 1 (só pathname) sem nada declarar isso | atualizar os 2 comentários; avaliar se a garantia de NFR-013-001 ainda precisa de 2 camadas — dono de SPEC-013, diff novo | code-reviewer, convergência de fecho de PLAN-021 |
 | ~~RISK-006-008~~ | **RESOLVIDO 2026-09-05 — não era vulnerabilidade ativa.** O re-review do gate 1-7 da Wave 4 de PLAN-006 achou que a asserção estrutural de CSRF filtrava por "rota não-pública" (eixo de autorização), excluindo `/auth/login` e `/auth/refresh` (POST públicas) do escopo da prova — `/auth/refresh` sem nenhum teste dedicado. A investigação do BRIEF-007 confirmou que `POST /auth/refresh` **sempre teve** `verifyOrigin` como 1º handler, desde o commit original de F1 (`d2560a9`) — o gap era só na REDE DE PROVA, nunca na proteção real. | Diretor autorizou correção imediata (AskUserQuestion). BRIEF-007 (avulso, KAN-43): asserção estrutural generalizada para toda rota mutante montada (`ROUTES`, não `NON_PUBLIC`), pública ou não — fecha a classe inteira, não só esta rota. Gates 1-7/8 aprovados. | code-reviewer + security-engineer, BRIEF-007 |
 | PIL-001 | Teste da tira aprovado sem limiar (Q-11) e cinco das seis métricas da §5.4 sem instrumento (Q-12) — não bloqueiam a SPEC, bloqueiam a conclusão do piloto | decidir antes do beta; retomar via /keelson:brief producao-material | BRIEF-001 |
 | ~~RDR-001~~ | **RESOLVIDO 2026-09-01** — SPEC-005 A-005-001: as 5 classes da TAP são o dado persistido; as 3 prioridades do mockup são derivação de apresentação, exibição adiada para F10. Não é 2ª dimensão gravada. | selado (premissa com `Reabrir se:` F7/F10/F11 precisarem priorizar natureza acima de grau) | BRIEF-001 → SPEC-005 |
@@ -182,6 +184,20 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-08 16:04: **Convergência de fecho verde em `e54f562`** (dedup: aplicada) —
+  code-reviewer, modo convergência, via `/keelson:integrate`: confronto semântico
+  completo de PLAN-021 (FR-002-001/NFR-002-008 realizados sob a topologia
+  same-origin, com prova que mata o mutante do host cross-site; DEC-021-001/002/003
+  refletidas fielmente, backend confirmado intocado por leitura direta; nenhuma
+  condição `Reabrir se:` satisfeita). CONVERGIU, 0 gaps. Dedup achou 2 pendências
+  novas (tripwire de paridade `/api/v1` ausente entre `next.config.ts`/`store/api.ts`;
+  2 docblocks do service worker desatualizados por esta branch, reduzindo em silêncio
+  a margem declarada de NFR-013-001 de 2 camadas para 1) + reconfirmou 1 conhecida
+  (`asRequest`, 6ª cópia local) — nenhuma bloqueia, roteadas em Riscos ativos. Suíte
+  completa reconfirmada verde no checkpoint de integrate: backend 26/26 suites e
+  243/243 testes, frontend 34/34 suites e 363/363 testes, lint/typecheck do frontend
+  limpos (lint do backend tem 11 erros pré-existentes numa worktree alheia,
+  `kan-49-vercel-entrypoint`, sem relação com o diff desta branch).
 - 2026-09-08 15:26: **PLAN-021 implementado — 2/2 TASKs Done, 2 waves, via
   `/keelson:implement`.** Wave 2 (TASK-021-002, KAN-84 — `baseUrl` same-origin em
   `store/api.ts` + remoção de `env.apiUrl`/`NEXT_PUBLIC_API_URL`) REPROVOU na 1ª
