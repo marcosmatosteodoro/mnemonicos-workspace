@@ -110,7 +110,51 @@ Escopo>Inclui delas, citando o artefato novo em vez do molde superado. Não bloq
 (dedup registrado como pendência de consolidação, não gap) — mas é a mesma causa-raiz, 2ª vez
 no mesmo PLAN.
 
-## LRN-010: critério composto por dois oráculos (grep de presença + grep de ausência) vira estruturalmente insatisfazível quando a correção do gate remove o artefato do oráculo de presença
+## LRN-010: esqueleto de brief avulso não pede declarar oráculo quando o critério central só é verificável pós-deploy
+data: 2026-09-06
+gatilho: gate_reprovado
+origem: BRIEF-010 (slug producao-material) — mudança avulsa no `mnemonicos-backend`
+(`vercel-build` passa a rodar `prisma migrate deploy`); o `code-reviewer` (gate 1-7) achou que a
+rodada local (lint, typecheck, 217 testes) fechou verde sem exercitar a mudança, porque o
+critério central ("o build passa a aplicar as migrações") só tem oráculo no deploy real contra
+um Postgres — que o próprio brief proíbe tocar durante a execução
+causa_raiz: instrucao_ausente — o esqueleto de "Variação avulsa" (`docs/_meta/conventions/index-contract.md`)
+pede só "<observável e verificável>" no Critério de aceite, sem distinguir o caso em que o único
+oráculo é o efeito do deploy (config lida em build/runtime de produção, script de infra, env do
+painel); quem preenche o brief (Tech Lead) segue o esqueleto à risca e não é levado a declarar
+essa lacuna nem a nomear a verificação pós-deploy — gates verdes locais provam ausência de
+regressão, e essa concordância foi confundida com verificação até o gate 1-7 apontar
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`docs/_meta/conventions/index-contract.md`, esqueleto "Variação avulsa" § Critério de aceite
+patch: proposta de expansão do comentário-placeholder do bullet "## Critério de aceite" — quando
+o oráculo central só existe pós-deploy, o brief nomeia ali a verificação observável que o fecha;
+sem ela, o fecho da rodada não reporta Done, reporta PARCIAL
+reincidencia: 0
+estado: ativa
+
+## LRN-011: esqueleto de brief avulso não tem seção formal para "risco aceito", e a captura em prosa livre omite custo de recuperação
+data: 2026-09-06
+gatilho: gate_reprovado
+origem: BRIEF-010 (slug producao-material) — o `security-engineer` (gate 8) achou que o risco
+aceito declarado pelo Diretor ("migração quebrada derruba o build — fail secure, o deployment
+anterior segue servindo") registrou só a consequência otimista, omitindo que o estado FAILED em
+`_prisma_migrations` (P3009, confirmado contra o engine instalado) trava TODOS os deploys
+seguintes — inclusive hotfix de segurança — até `prisma migrate resolve --rolled-back` rodar à
+mão contra produção
+causa_raiz: instrucao_ausente — o esqueleto de "Variação avulsa" (`docs/_meta/conventions/index-contract.md`)
+não tem seção "Riscos aceitos": quem precisa registrar um risco aceito pelo Diretor improvisa
+formato livre (como o BRIEF-010 fez), e prosa livre captura o evento sem forçar o custo de
+recuperação nem quem pode executá-lo — risco "aceito" sem esses dois campos não é risco aceito,
+é risco não medido
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`docs/_meta/conventions/index-contract.md`, esqueleto "Variação avulsa" (nova seção)
+patch: proposta de seção opcional "## Riscos aceitos" no esqueleto — cada item com 3 campos:
+consequência · custo de recuperação (comando/runbook + onde está documentado) · quem pode
+executar; sem os três campos, o risco não está aceito
+reincidencia: 0
+estado: ativa
+
+## LRN-012: critério composto por dois oráculos (grep de presença + grep de ausência) vira estruturalmente insatisfazível quando a correção do gate remove o artefato do oráculo de presença
 data: 2026-09-06
 gatilho: verificacao_falhou
 origem: PLAN-012 (slug producao-material), Wave 1, TASK-012-003 — o code-reviewer (achado A1) determinou que o import citado pelo critério (item 5, "reuso de `rawContentIdParamSchema`") era re-export especulativo sem consumidor real e mandou REMOVÊ-LO; a metade do critério que checava "presença do import" ficou insatisfazível por desenho (o import não deve mais existir), enquanto a condição de domínio real ("não redeclara o parâmetro `:id`", 2º grep) seguia satisfeita — quase virou checkbox verde sobre critério de fato quebrado, só pego na convergência
@@ -120,7 +164,7 @@ patch: proposta de item novo (j) no catálogo de "resistir a contorno" de `comma
 reincidencia: 0
 estado: ativa
 
-## LRN-011: Etapa 1 de `commands/auto.md` justapõe dois enums homônimos-na-forma (`edits|reescrita` do pacote de correção × `mecânico|julgamento` da revalidação) sem marcar que pertencem a réguas diferentes
+## LRN-013: Etapa 1 de `commands/auto.md` justapõe dois enums homônimos-na-forma (`edits|reescrita` do pacote de correção × `mecânico|julgamento` da revalidação) sem marcar que pertencem a réguas diferentes
 data: 2026-09-06
 gatilho: verificacao_falhou
 origem: SPEC-013 (slug producao-material) — ao despachar o pacote de correção ao `scribe`, o Tech Lead declarou `modo: julgamento` (vocabulário de `validator-protocol.md` §4.5, revalidação) no campo que exige `modo: edits|reescrita` (vocabulário de `graph-contract.md` §4.1, pacote de correção); o `scribe` (`agents/scribe.md` passo 4) tratou o rótulo como fora do enum, re-derivou `reescrita` corretamente e declarou a divergência com motivo em `modo_aplicado` — nenhum dano, mas é a classe de ambiguidade de instrução que a Etapa 4.5 pede para rotear
@@ -130,7 +174,7 @@ patch: proposta de inserção in-line em `commands/auto.md` Etapa 1, logo após 
 reincidencia: 0
 estado: ativa
 
-## LRN-012: `parselist()` de `scripts/graph.sh` fatia a lista por vírgula ANTES de remover a anotação parentética — vírgula interna ao parêntese quebra o campo inteiro e produz falso-positivo em cascata
+## LRN-014: `parselist()` de `scripts/graph.sh` fatia a lista por vírgula ANTES de remover a anotação parentética — vírgula interna ao parêntese quebra o campo inteiro e produz falso-positivo em cascata
 data: 2026-09-06
 gatilho: verificacao_falhou
 origem: PLAN-013 (slug producao-material), validação do PLAN — o `scribe` escreveu, no campo `Realiza` de COMP-013-003, anotação legítima e tolerada por desenho (comentário nas l.106-107 da própria função) `NFR-013-008 (não participa de requisição de API/HTML autenticado, logo não pode alterar login/renovação/logout)`; a vírgula dentro do parêntese fragmentou o token no `split(val, arr, ",")` (l.103) antes de `sub(/[ \t]*\([^)]*\)$/, "", t)` (l.108) — que só casa parêntese fechando no FIM do token — ter chance de agir; nenhum fragmento bateu `^(FR|NFR)-[0-9]+-[0-9]+$`, `parselist` devolveu 0 (`TN=0`), o campo inteiro virou `nao-parseavel` e o check `realiza-vs-mapeamento`, sem nenhum ID reconhecido no campo, reportou TODOS os FR/NFR do componente como "só na §7" — divergência total falsa mascarando conteúdo correto. Diagnosticado pelo Tech Lead comparando com bug irmão já remediado (ad hoc, sem entrada neste ledger) em PLAN-010: lista "NFRs cobertos" quebrada por continuação de linha sem bullet própria — mesma função, mesma fragilidade de tokenização, dois sintomas de formatação-livre diferentes
@@ -140,17 +184,17 @@ patch: proposta de função auxiliar `splitlist(val, arr)` que tokeniza respeita
 reincidencia: 0
 estado: ativa
 
-## LRN-013: fechamento contável de predicado de CONJUNTO instanciado por "método que toca", não por eixo discriminável do próprio predicado
+## LRN-015: fechamento contável de predicado de CONJUNTO instanciado por "método que toca", não por eixo discriminável do próprio predicado
 data: 2026-09-06
 gatilho: gate_reprovado
 origem: PLAN-012 (slug producao-material), Wave 3, TASK-012-006 — o code-reviewer achou (bloqueante) que o critério de pronto de `isExactFrameSet` (`mnemonicos-backend/src/modules/tira/tira.service.ts:266-279` — conjunto: `order` tem exatamente os ids da Tira, nem falta nem sobra nem duplicidade) fechou contando "1 método nesta TASK → 1 prova" em vez dos eixos do próprio predicado; a TASK enumerava 2 casos concretos (id de outra Tira; duplicata) e o developer entregou exatamente esses 2 — o 3º eixo (cardinalidade: id faltando, subconjunto estrito sem duplicata) ficou sem prova. Confirmado por mutação real (manual — `quality.mutation` é `null` nesta ficha, sem ferramenta instalada): remover `order.length === existingIds.size` do código deixa a suíte inteira verde, embora o serviço passe a aceitar reordenação parcial silenciosamente
 causa_raiz: instrucao_ausente — o item (c) do catálogo "resistir a contorno" (`commands/tasks.md`, Etapa 3, decisões 4.139/4.232) já nomeia fechamento contável, mas só para predicado de **escopo** (tenant/dono/agregado pai), com denominador "quem toca a tabela escopada"; nenhum item do catálogo nomeia a classe irmã — predicado de **conjunto** (`&&` de condições de cardinalidade/multiplicidade/pertencimento, sempre três por construção), cujo fechamento certo é por EIXO do predicado, não por método/chamada que o toca. Como a TASK já trazia 2 casos nomeados e concretos, a lista parecia exaustiva — o developer a cumpriu à risca e nada no gerador acusou o eixo ausente. Lição-irmã de projeto já registrada em `guidelines/project/lessons.md` ("[Testes] Predicado de conjunto composto por && exige um caso por EIXO discriminável") cobre o developer; esta entrada cobre o gerador da TASK (`/keelson:tasks`), que é quem deveria ter fixado o 3º caso antes do código
 artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, catálogo "resistir a contorno" (Etapa 3, mesmo parágrafo dos itens a–i, linha ~273 da v0.156.0)
-patch: proposta de item novo no catálogo (letra a atribuir pelo mantenedor — item (j) já está em disputa com a proposta pendente de LRN-010; esta pode ficar (j) ou (k) conforme a ordem de aplicação): AC cujo predicado de aceite é um predicado de CONJUNTO (a coleção é exatamente um conjunto-alvo) fecha por fechamento contável sobre os EIXOS do próprio predicado — cardinalidade (falta elemento), multiplicidade (duplicidade), pertencimento (elemento estranho), sempre três por construção — nunca por "N métodos que tocam → N provas" (isso mede superfície de chamada, não exaustão do predicado); lista de casos concretos no Escopo nunca substitui a checagem dos três eixos, ainda que pareça exaustiva
+patch: proposta de item novo no catálogo (letra a atribuir pelo mantenedor — item (j) já está em disputa com a proposta pendente de LRN-012; esta pode ficar (j) ou (k) conforme a ordem de aplicação): AC cujo predicado de aceite é um predicado de CONJUNTO (a coleção é exatamente um conjunto-alvo) fecha por fechamento contável sobre os EIXOS do próprio predicado — cardinalidade (falta elemento), multiplicidade (duplicidade), pertencimento (elemento estranho), sempre três por construção — nunca por "N métodos que tocam → N provas" (isso mede superfície de chamada, não exaustão do predicado); lista de casos concretos no Escopo nunca substitui a checagem dos três eixos, ainda que pareça exaustiva
 reincidencia: 0
 estado: ativa
 
-## LRN-014: `probe-env.sh` mascara falha de leitura/encoding de `keelson.local.json` como `credencial_ausente`
+## LRN-016: `probe-env.sh` mascara falha de leitura/encoding de `keelson.local.json` como `credencial_ausente`
 data: 2026-09-07
 gatilho: verificacao_falhou
 origem: PLAN-013 (slug producao-material), TASK-013-005, gate 9 — o `qa` (modo screen-verify) achou que `scripts/probe-env.sh` abre `keelson.local.json` com `open(path)` sem `encoding='utf-8'` explícito; no Windows isso cai no encoding padrão do console (cp1252), que não decodifica o conteúdo pt-BR acentuado do arquivo — o `UnicodeDecodeError` cai no `except Exception` genérico e o script devolve `causa=credencial_ausente`, indistinguível de "arquivo realmente ausente/vazio"
