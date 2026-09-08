@@ -184,6 +184,15 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-08 16:10: **`/keelson:integrate` de PLAN-021** — branch
+  `feat/producao-material-rewrite-same-origin-cookie-sessao` pushada
+  (`mnemonicos-frontend`, `e54f562`). **PR não aberto automaticamente** —
+  mesma limitação já registrada na Entrega de PLAN-020: token do `gh` sem
+  acesso ao repo `mnemonicos-frontend`; link manual:
+  https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/new/feat/producao-material-rewrite-same-origin-cookie-sessao .
+  Título e descrição completos preparados e entregues ao Diretor no output
+  desta execução. Jira: sync de link do PR não aplicado (nenhum PR real
+  existe ainda para linkar) — pendente até o Diretor abrir manualmente.
 - 2026-09-08 16:04: **Convergência de fecho verde em `e54f562`** (dedup: aplicada) —
   code-reviewer, modo convergência, via `/keelson:integrate`: confronto semântico
   completo de PLAN-021 (FR-002-001/NFR-002-008 realizados sob a topologia
