@@ -53,6 +53,7 @@
     }
   },
   "docsRoot": "docs",
+  "models": {},
   "commit": {
     "convention": "conventional",
     "releaseAutomation": null

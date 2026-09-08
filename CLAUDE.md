@@ -100,7 +100,9 @@ Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-ke
 ### Fonte da verdade
 
 - **Ficha do projeto:** `keelson.config.json` na raiz — paths de código, comandos de
-  qualidade, perfil de linguagem e gates ativos. **Antes de qualquer tarefa, leia a
+  qualidade, perfil de linguagem e gates ativos — e, opcional, o tier de modelo por papel: a cada
+  despacho de agent, `ficha.sh --get models.<agent>` vai em `model:` do spawn, vazio →
+  frontmatter do agent (régua em `sdd-conventions.md`). **Antes de qualquer tarefa, leia a
   ficha** e use os valores dela; nunca assuma caminhos ou comandos fixos.
 - **Constituição de qualidade:** o `QUALITY-CHARTER` do plugin — artigos agnósticos
   de linguagem.
@@ -119,17 +121,26 @@ Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-ke
 ### Como trabalhar
 
 - **Modo padrão = autônomo** (`/keelson:auto` — não precisa digitar o comando): pedido
-  não-trivial em linguagem natural entra no ciclo `specify → plan → tasks → implement`
+  não-trivial em linguagem natural **sem declaração de intenção pontual** (bullet
+  seguinte) entra no ciclo `specify → plan → tasks → implement`
   conduzido pelo **time** keelson (po, developer, code-reviewer, qa, security-engineer,
   performance-engineer, product-designer),
   sob o contrato Diretor–PO: o brief é emitido na largada (janela de veto — o fluxo
   segue sem esperar), o PO valida SPEC e entrega **contra o brief**, e a entrega fecha
-  com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, PR, merge e
-  deploy são seus — a autonomia termina no push da branch. Aprovação etapa a etapa é
+  com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, PR, merge para a
+  branch principal e deploy são seus — a autonomia termina no push da branch. Aprovação etapa a etapa é
   opt-in (`/keelson:guided`). Rigor **proporcional a complexidade × risco** (ver Charter).
 - **Mudança pontual = modo sob demanda** (decisão 4.75): ajuste localizado de código,
-  sem decisão de produto, não precisa do ciclo — mas **a main session (Tech Lead) não
-  escreve o código**: destila um briefing curto (o quê, onde, critério de aceite) —
+  sem decisão de produto, não precisa do ciclo. **Declaração de intenção pontual do
+  Diretor** ("ajuste pontual", "sem ciclo", "mudança direta") **escolhe este modo como
+  default de porta, sem re-julgar** (decisão 4.246; vale **fora de comando em
+  execução** — inclusive logo após a entrega de um ciclo na mesma sessão, quando a
+  sessão volta a ser livre; comando `/keelson:*` invocado segue o contrato do
+  comando, 4.129): a promoção ao ciclo
+  continua existindo só pela régua falsificável deste bullet (mudança de promessa ·
+  decisão entre alternativas · o teste 4.205 abaixo) e é **declarada com motivo antes
+  de seguir, nunca arbitrada em silêncio** (família 4.85). Neste modo, **a main
+  session (Tech Lead) não escreve o código**: destila um briefing curto (o quê, onde, critério de aceite) —
   que **nasce em arquivo**, como **brief avulso** em
   `{docsRoot}/<slug>/briefs/BRIEF-MMM-<descricao>-avulso.md` (esqueleto no
   `index-contract.md` do plugin; decisão 4.86; mudança que cruza slugs → **um brief só**,
@@ -141,7 +152,9 @@ Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-ke
   `performance-engineer` quando o diff toca superfície de custo (lista canônica na
   description do agent — gate 10), `product-designer` quando o diff toca superfície
   de interface (lista canônica na description do agent — gate 11) e `qa`
-  quando há comportamento observável — mesmos gatilhos do ciclo. A orquestração da
+  quando há comportamento observável — mesmos gatilhos do ciclo, e o despacho nasce
+  do **inventário derivado do diff, nunca de memória** (decisão 4.335 — a régua vive
+  na seção *Orquestração da rodada*, abaixo). A orquestração da
   rodada — gates em paralelo sobre pacote de contexto único factual (4.89), correção
   que converge com teto de 1 retry e escalação ao Diretor (4.88) — tem **dono único**
   na seção *Orquestração da rodada* de
@@ -172,6 +185,15 @@ Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-ke
   execução) → **escale ao Diretor com proposta + default** antes de codar, **nunca
   arbitre em silêncio**: os dois contratos foram configurados por ele, e só ele decide
   qual prevalece (decisão 4.85).
+- **Warroom = velocidade acima de rigor, com a conta registrada** (decisão 4.372): só o
+  Diretor abre, por `/keelson:warroom on <motivo>` (humano-only) — urgência aparente
+  **sem** o comando é rota normal, nunca inferida. Na janela: sem `code-reviewer`/`qa`/
+  validators nem promoção ao ciclo; **gate 8 sobrevive** em superfície sensível; commit
+  por mudança com trailer `Warroom: <motivo>`; **cada commit vira linha aberta em
+  `{docsRoot}/DEBT.md`**, escrita pelo hook a cada turno — gate pulado é registrado,
+  nunca omitido. `/keelson:warroom close` roda os gates sobre o diff acumulado e cobra a
+  dívida; linha aberta é pendência do Diretor, cutucada no encerramento. Régua:
+  `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/warroom-contract.md`.
 - **Toda mudança fecha com relatório** (decisão 4.76): terminado o ajuste — sob demanda ou
   ciclo — o Tech Lead **exibe o fecho sem que você peça**, em 6–10 linhas: o que mudou
   (produção · teste · doc · migration/config) · **cada gate aplicável com estado
@@ -180,17 +202,20 @@ Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-ke
   `/keelson:report`; fecho com gate pendente se declara **parcial** e não convida ao
   commit — decisão 4.85) · decisões tomadas em seu nome · o que ficou fora de
   escopo ou pendente · **toda `licao_candidata` devolvida por qualquer gate da rodada
-  — inclusive retry — com destino registrado** (`alvo: projeto` →
-  `guidelines/project/lessons.md` · `alvo: processo` → `agile-coach`): aplicar a
+  — inclusive retry — com destino registrado e verificado** (`alvo: projeto` →
+  `guidelines/project/lessons.md` · `alvo: processo` → `agile-coach`; a linha só se
+  escreve com a lição conferida **presente** no destino — declarar "roteada" sem
+  escrever no destino é a forma que reincidiu, decisão 4.333): aplicar a
   correção de código que o achado pede **não é** rotear a lição que ele carrega — são
   dois atos, e lição sem destino também declara o fecho **parcial** (decisão 4.204) ·
   estado do tracker (com `jira.enabled`) · e o que depende de você
   — **por modo** (decisão 4.91): no sob demanda, o commit é seu; no ciclo, a branch já
   chega commitada TASK a TASK (e pushada pelo `/keelson:auto`) — seus atos são revisão,
   PR e merge (decisão 4.41). O relatório é montado a partir do **ledger de sessão**
-  (`thoughts/local/session-ledger/`), onde cada evento é escrito **quando acontece** — não
-  se relê a sessão para produzi-lo, e o que o contexto comprimiu não se perde. Relatório
-  perdido ou sessão retomada → `/keelson:report` reconstrói.
+  (no `ledger/` da casa da sessão — `thoughts/local/sessions/<ts>-<sid8>/`; instalações
+  antigas usam `thoughts/local/session-ledger/`), onde cada evento é escrito **quando
+  acontece** — não se relê a sessão para produzi-lo, e o que o contexto comprimiu não se
+  perde. Relatório perdido ou sessão retomada → `/keelson:report` reconstrói.
 - **Varredura ampla → `code-scout`**: pergunta que exige varrer a codebase (entender
   um fluxo, mapear consumidores, "de onde vem este dado?") é delegada ao `code-scout`,
   que devolve conclusão ancorada em `arquivo:linha` — os arquivos lidos não entram no
@@ -215,6 +240,10 @@ Humanos-only (não aparecem na listagem): `/keelson:guided` (ciclo com checkpoin
 `/keelson:brief` (forjar documento de produto em BRIEF, pré-ciclo) ·
 `/keelson:refine` (lapidar ideia) · `/keelson:audit` (auditoria de dependências) ·
 `/keelson:review` (code review de um diff avulso, sem artefato SDD) ·
+`/keelson:merge` (mesclar uma ou mais branches na branch de trabalho corrente, uma de
+cada vez, com commit de merge próprio por branch — push, merge remoto, PR e deploy
+continuam humanos) ·
+`/keelson:warroom` (abrir/fechar janela sem gate bloqueante, dívida em `DEBT.md`) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
 `/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida
 ou próxima fatia, derivado dos artefatos commitados) ·

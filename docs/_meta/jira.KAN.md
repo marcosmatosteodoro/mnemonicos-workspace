@@ -56,8 +56,15 @@ tela própria encontrado):
 | `31` | In Review | Em análise (`10006`) | Em andamento (`indeterminate`) |
 | `41` | Itens concluídos | Concluído (`10007`) | Itens concluídos (`done`) |
 
-Não medido ainda para o tipo **Epic** nem **Tarefa** (`standalone`) — meça antes de mover
-um card desses tipos; não assuma os mesmos ids só porque bateram em Subtask/História.
+**Tarefa (`standalone`) medido em 2026-09-06** via `getTransitionsForJiraIssue` em
+`KAN-43` — idêntico aos dois tipos acima (mesmo workflow global, ids `11`/`21`/`31`/`41`).
+`KAN-43` e `KAN-44` transicionados para `41` (Concluído) nesta medição — os dois briefs
+avulsos (BRIEF-007, BRIEF-008) já estavam com Status: Concluído localmente desde
+2026-09-05, mas ficaram parados em "Tarefas pendentes" no board até este ponto por falta
+do id de transição para o tipo.
+
+Não medido ainda para o tipo **Epic** — meça antes de mover um card desse tipo; não
+assuma os mesmos ids só porque bateram em Subtask/História/Tarefa.
 
 ## Campos
 
@@ -68,6 +75,23 @@ estratégia de escrita.*
 
 *A preencher: colunas do board 2, status-alvo de cada etapa do ciclo, coluna de nascimento
 por tipo de issue.*
+
+<!-- Sugestão gerada por /keelson:init (2026-09-06) a partir do `getTransitionsForJiraIssue`
+     já medido acima (seção "Transições medidas") — pré-preenchida por statusCategory, não
+     aplicada: o Diretor confirma/ajusta a coluna `Coluna` (rótulo do board) e promove a
+     tabela removendo este comentário. Story/Subtask medidos; Epic e Tarefa (standalone)
+     ainda não têm transição observada — linhas correspondentes ficam de fora até medir.
+
+| Etapa | Nível | Coluna | Status-alvo (ID) | Gatilho |
+| --- | --- | --- | --- | --- |
+| TASK iniciada | subtask | ? | Em andamento (10005) | despacho da TASK ao developer |
+| TASK concluída | subtask | ? | Concluído (10007) | closure da TASK (Done) |
+| Trabalho iniciado (Story) | story | ? | Em andamento (10005) | primeira TASK da Story despachada |
+| Funcionalidade pronta p/ QA | story | ? | Em análise (10006) | todas as TASKs da FEAT Done — decisão do Diretor (ver "Trilho do board" abaixo): a História fecha só após revisão própria, não vai direto a Concluído |
+| ? | epic | ? | — não medido — | --phase start-dev (linha nasce comentada — mover Epic é opt-in explícito do Diretor) |
+| ? | epic | ? | — não medido — | --phase finish-dev (idem) |
+
+-->
 
 ## Trilho do board
 
