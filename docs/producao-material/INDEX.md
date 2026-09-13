@@ -40,7 +40,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 
 _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 em ciclo (BRIEF-022/SPEC-022 Approved 2026-09-13; PLAN-023 Approved 2026-09-13, 100%
-cobertura) — aguardando `/keelson:tasks`._
+cobertura; 17 TASKs em 6 waves geradas 2026-09-13) — aguardando `/keelson:implement`._
 
 ## SPECs
 
@@ -67,7 +67,7 @@ cobertura) — aguardando `/keelson:tasks`._
 | PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 2/2 ✅ | Done (sugerido) |
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
-| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 0/? ⏸ | Approved |
+| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 0/17 ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -206,6 +206,25 @@ cobertura) — aguardando `/keelson:tasks`._
 
 ## Histórico recente
 
+- 2026-09-13: **TASK-023-001 a 017 geradas via `/keelson:auto` (rota fan-out, decisão
+  4.310 — 1 decompositor + 3 redatores em paralelo).** 6 waves: setup (migração +
+  assinatura de bytes + schemas + tipos, Wave 1), storage/RTK Query (Wave 2), CRUD de
+  escrita + picker (Wave 3), remoção/vínculo/telas (Wave 4), listagem + página (Wave 5),
+  binário + paridade cross-repo (Wave 6). 4 TASKs marcadas fatia sensível (princípio 8):
+  assinatura de bytes, upload+CRUD write, remoção+alcance, vínculo+reuso de guarda de F4.
+  Achados corrigidos pelo Tech Lead na consolidação: nome de branch errado em todas as 17
+  (apontava branch nova em vez da branch do épico `feat/producao-material-mnemora-studio`
+  — decisão 4.126); URL da miniatura sem prefixo `/api/v1` + `<img>` cru em vez de
+  `next/image` (3 arquivos, teria dado 404 e warning de lint); `/visual-library` não
+  coberto por `INTERNAL_ROUTE_PREFIXES`/`config.matcher` (achado real do redator,
+  premissa do PLAN estava errada — TASK-023-015 corrigida para incluir o ajuste,
+  puramente aditivo); `FEAT-022-003` faltando em TASK-023-014 (FR-022-019 mal atribuído
+  no manifesto); 2 TASKs de UI (012/013) só tinham gate 9 para ACs testáveis em unidade —
+  acrescentado critério de gate 1 (3 estados observáveis testados no componente montado)
+  em ambas, sem remover o gate 9. Validação mecânica (`artifact-lint.sh`/`graph.sh`): 0
+  ERROR real (3 ERRORs mecânicos de `task-criterio-sem-ac` aceitos via override
+  documentado + precedente real do slug — TASK-006-004/007, TASK-012-003/010). Cobertura:
+  25/25 FRs, 25/25 ACs, 3/3 FEATs. Próximo: `/keelson:implement`.
 - 2026-09-13: **PLAN-023 criado e aprovado via `/keelson:auto` (F5, cobertura 100% de
   SPEC-022 — 25/25 FRs, 7/7 NFRs).** 17 COMPs, 12 DECs (todas reversíveis), 7 TRISKs.
   Reconhecimento técnico do `code-scout` confirmou greenfield total (nenhuma dependência de

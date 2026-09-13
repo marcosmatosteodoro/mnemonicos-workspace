@@ -479,10 +479,12 @@ acrescentadas a `TAG_TYPES`. Upload/edição usam `FormData` no `query` (RTK Que
 client component, `<h1>` + nenhum link de volta específico (a navegação principal já cobre
 a rota).
 **Realiza**: FR-022-010
-**Interface pública**: rota `/visual-library`. Sem registro novo em `config.matcher` do
-`proxy.ts` — o segmento `(interno)` já guarda todo prefixo interno por símbolo compartilhado
-(mesmo mecanismo de PLAN-003); confirmar na TASK que `/visual-library` cai dentro do prefixo
-já enumerado, sem exigir edição do matcher.
+**Interface pública**: rota `/visual-library`. **Correção da TASK (achado do redator,
+confirmado por leitura direta do código real — a premissa abaixo estava errada)**:
+`/visual-library` NÃO cai no prefixo hoje; `INTERNAL_ROUTE_PREFIXES`
+(`internal-routes.ts:14`) e as 2 entradas de `config.matcher` (`proxy.ts:97`) precisam do
+segmento novo, no mesmo diff desta TASK — extensão puramente aditiva do allowlist
+deny-by-default, mesmo padrão de `'studio'`/`'content'`.
 **Dependências**: COMP-023-014
 
 ### COMP-023-014: Client component — `visual-library-board.tsx`
@@ -500,8 +502,12 @@ service recusa por vínculo ativo — exibe os Quadros/Tiras alcançáveis devol
 ### COMP-023-015: Client component reusável — `visual-association-picker.tsx`
 **Responsabilidade**: `'use client'`; seletor embutido (usado por COMP-023-014 e
 COMP-023-016) — busca/filtra por categoria a partir de `useListVisualAssociationsQuery`,
-mostra miniatura (`<img src="/visual-associations/{id}/image">`, mesma URL relativa que o
-`rewrites()` de `next.config.ts` já encaminha same-origin ao backend, DEC-021-001) e
+mostra miniatura via `next/image` (`unoptimized`, endpoint devolve o binário puro) com URL
+`/api/v1/visual-associations/{id}/image` — o prefixo `/api/v1` é obrigatório (o
+componente de imagem não passa pelo `baseUrl` do RTK Query, que já prefixa
+internamente, `store/api.ts:155-158`) para o `rewrites()` de `next.config.ts`
+encaminhar same-origin ao backend (DEC-021-001); `next/image` em vez de `<img>` cru
+evita o warning `@next/next/no-img-element` (`eslint-config-next/core-web-vitals`) e
 devolve o id escolhido via callback — não faz a chamada de vínculo em si (isso é
 responsabilidade de quem o usa).
 **Realiza**: FR-022-013
