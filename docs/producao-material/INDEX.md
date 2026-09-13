@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-13T20:35:00+0000 (PLAN-023 Wave 2/6 concluída — F5)
+**Última atualização**: 2026-09-13T22:52:57+0000 (PLAN-023 Wave 3/6 concluída — F5)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -67,7 +67,7 @@ cobertura; 17 TASKs em 6 waves geradas 2026-09-13) — aguardando `/keelson:impl
 | PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 2/2 ✅ | Done (sugerido) |
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
-| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 7/17 🟡 | Approved |
+| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 9/17 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -206,6 +206,36 @@ cobertura; 17 TASKs em 6 waves geradas 2026-09-13) — aguardando `/keelson:impl
 
 ## Histórico recente
 
+- 2026-09-13: **Wave 3/6 de PLAN-023 concluída (2 TASKs Done — fatia sensível)** —
+  `createVisualAssociation`/`updateVisualAssociation` (upload validado por assinatura de
+  bytes, guarda `assertVisualAssociationWritable` DEC-023-006) e
+  `visual-association-picker.tsx` (seletor reusável). História de convergência mais longa
+  do slug até aqui — 3 rodadas de gate no backend: **rodada 1 REPROVADA**
+  (code-reviewer/security-engineer/product-designer) — teto de campo multipart cobria só o
+  arquivo (bypass via JSON), prova HTTP de spoof de `authorId` (DEC-023-012) insuficiente,
+  3 fixtures duplicadas, ARIA incorreta no picker (`role="listbox"`/`"option"` sem
+  interação de teclado, nome acessível não-único, sem feedback de `isFetching`, copy do
+  vazio enganosa) — corrigida em retry (`ad13a0d` backend/`aa526d4` frontend). **Rodada 2
+  REPROVADA** (code-reviewer): 2 achados mecânicos — mutante M1 (reintroduzir `authorId`
+  no `data` do update) sobrevivia porque só a via HTTP tinha prova (o Zod descarta o campo
+  antes do service; faltava o par no nível de service) e reincidência da lição DRY em
+  `env.test.ts` (`loadEnvModule()` re-derivado inline). O code-reviewer propôs escalar
+  (teto de convergência); **Tech Lead aplicou degrau 1 da escada** (decidir e registrar,
+  não pausar) — achados mecânicos, reversíveis, sem ambiguidade de produto (ledger
+  `20260913-222341-decisao-tech-lead.md`) — corrigidos em retry (`ddc56cb`). **Verificação
+  final APROVADA** (ledger `20260913-225257-gate-tech-lead.md`): M1 confirmado morto por
+  execução própria do revisor em worktree isolada (não por relato) — achado colateral: a
+  prova HTTP sozinha de fato NÃO mata M1, validando a reprovação da rodada 2;
+  `env.test.ts` sem re-derivação solta; varredura de comentários residuais achou 1 sobra
+  real (`visual-associations.routes.ts:18`), corrigida no commit de fechamento
+  (`c57c5f7`) junto de um estado `MM` de formatação (renormalizado antes de commitar).
+  Unit 272/272, integration 312/312, 0 vulnerabilidade, 0 warning de lint. 2 lições
+  roteadas: reincidência da lição DRY (`guidelines/project/lessons.md:783`, contador
+  "confirmada 2" — a 2ª ocorrência de re-derivação de `loadEnvModule` no MESMO arquivo só
+  fechou nas edições do Tech Lead, não no retry que a citou) e lição de processo nova
+  sobre despacho de retry (`docs/_meta/learning-log.md` LRN-022, PROPOSTA_PLUGIN —
+  achado de classe deve levar o COMANDO de varredura como critério de pronto, não como
+  ilustração). Próximo: Wave 4 (TASK-023-010/011/012/013 — 2 fatias sensíveis).
 - 2026-09-13: **Wave 2/6 de PLAN-023 concluída (2 TASKs Done)** — `visual-association-storage.ts`
   (leitura/escrita de `imageData Bytes` sobre a MESMA transação do chamador, nunca
   filesystem) e extensão de `store/api.ts` com os 6 endpoints RTK Query do acervo. Gate 1-7

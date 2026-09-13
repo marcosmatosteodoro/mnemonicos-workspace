@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -124,26 +124,27 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-13T20:47:34+0000
+**Data conclusão**: 2026-09-13T21:44:43+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 2084d63, aa526d4
 **Jira**: KAN-97
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gate 1-7) · product-designer (gate 11) — REPROVADO rodada 1 (ARIA: `role="listbox"`/`"option"` sem interação de teclado, nome acessível não-único, sem feedback de `isFetching`, copy do vazio enganosa) → retry (aa526d4: `ul`/`li`/`button` semânticos, `aria-label` único via `Intl.DateTimeFormat`, `role="status" aria-live="polite"` + `aria-busy`, copy bifurcada) → APROVADO. Sem achados na rodada 2 (restrita ao backend); Wave 3 fechou completa após a verificação final (ledger `20260913-225257-gate-tech-lead.md`).
+**Tentativas**: 2
+**Cobertura final**: componente montado com `makeStore()` real + `fetch` mockado — onSelect, filtro por categoria, miniatura com prefixo `/api/v1`, estados de loading/vazio
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/components/visual-association-picker.tsx
+  - mnemonicos-frontend/src/components/visual-association-picker.test.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — sem superfície sensível (seletor puro, sem I/O próprio)
+- [x] Comportamento (gate 9): consolidado FEAT-022-003 (AC-022-011 fecha combinado com TASK-023-012/013, gate 9 daquelas TASKs)
 
 **Notas**: 

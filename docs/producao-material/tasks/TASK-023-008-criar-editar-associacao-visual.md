@@ -9,7 +9,7 @@
 **Fatia sensível (princípio 8)**: security-engineer focado (upload + assinatura de bytes + guarda de autoria)
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -223,26 +223,43 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-13T20:47:34+0000
+**Data conclusão**: 2026-09-13T22:52:57+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: a6a0407, ad13a0d, ddc56cb, c57c5f7
 **Jira**: KAN-96
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gate 1-7) · security-engineer (gate 8) · product-designer (gate 11, achados no picker do par frontend) — 3 rodadas: REPROVADO (rodada 1: teto de campo bypass via JSON, prova HTTP de spoof insuficiente, DRY de fixtures, ARIA do picker) → retry (ad13a0d/aa526d4) → REPROVADO (rodada 2: mutante M1 do update sem prova espelhada, reincidência DRY em env.test.ts) → Tech Lead aplicou degrau 1 da escada (achados mecânicos, sem ambiguidade de produto — ledger `20260913-222341-decisao-tech-lead.md`) → retry (ddc56cb) + fix residual do Tech Lead (c57c5f7) → APROVADO (verificação final, ledger `20260913-225257-gate-tech-lead.md`)
+**Tentativas**: 3
+**Cobertura final**: unit 272/272 · integration 312/312 (19 suites) — AC-022-001/002/003/004/006(parte)/014(parte)/020(parte) provados; DEC-023-012 provada nas duas escritas (create e update) no nível de service
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/.env.example
+  - mnemonicos-backend/package.json / package-lock.json
+  - mnemonicos-backend/src/config/env.ts
+  - mnemonicos-backend/src/http/middlewares/error-handler.ts
+  - mnemonicos-backend/src/http/routes.ts
+  - mnemonicos-backend/src/modules/visual-associations/visual-association-storage.ts
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.routes.ts
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.schema.ts
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.service.ts
+  - mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts
+  - mnemonicos-backend/tests/integration/visual-association-storage.integration.test.ts
+  - mnemonicos-backend/tests/integration/visual-associations.model.integration.test.ts
+  - mnemonicos-backend/tests/integration/visual-associations.routes.integration.test.ts
+  - mnemonicos-backend/tests/integration/visual-associations.service.integration.test.ts
+  - mnemonicos-backend/tests/support/visual-association-fixtures.ts
+  - mnemonicos-backend/tests/setup-env.ts
+  - mnemonicos-backend/tests/unit/env.test.ts
+  - mnemonicos-backend/tests/unit/visual-associations.service.guard-order.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado
+- [x] Comportamento (gate 9): consolidado FEAT-022-001 (write path provado ponta-a-ponta via HTTP; faceta de UI de "exibir ao reabrir" fecha em TASK-023-012)
 
-**Notas**: 
+**Notas**: Achado de DRY reincidente (2ª ocorrência de re-derivação de `loadEnvModule` no mesmo arquivo, sobrevivendo ao 1º retry) e achado de processo (comando de varredura não transcrito como critério do despacho) roteados: `guidelines/project/lessons.md:783` (contador atualizado para "confirmada 2") e `docs/_meta/learning-log.md` LRN-022 (PROPOSTA_PLUGIN).

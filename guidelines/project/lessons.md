@@ -780,7 +780,19 @@ mesma condição antes de despachar/commitar. Exemplar: `src/lib/prisma.ts` impo
 `{ env, isProduction }` de `../config/env` em vez de recalcular.
 **Validade:** geral (qualquer predicado derivado de configuração/env).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 2 · contestada 0
+**Reincidência (2026-09-13, PLAN-023/TASK-023-008, Wave 3)**: o retry que consolidou 3
+fixtures duplicadas de `VisualAssociation` em `tests/support/visual-association-fixtures.ts`
+(achado de gate 7) re-derivou, no MESMO diff, **duas** ocorrências de bloco
+`jest.isolateModules`+`require` em `tests/unit/env.test.ts` — uma para o default de
+`VISUAL_ASSOCIATIONS_MAX_FILE_SIZE_BYTES` (~linha 157) e outra para o `.env.example`
+contra o `envSchema` (~linha 221) — enquanto o helper `loadEnvModule()` já existia no
+topo do MESMO arquivo (linha ~23) fazendo exatamente isso. O despacho do retry fechou só
+a 1ª (endereço citado no achado original), e a 2ª sobreviveu ao próprio retry — só caiu
+no re-review seguinte do `code-reviewer`. Achado pelo `code-reviewer`, 2 rodadas: a lição
+previu a classe, mas o despacho transcreveu o exemplo citado como se fosse a lista
+inteira, não a condição ("nenhum re-derivação de `loadEnvModule` em lugar nenhum do
+arquivo").
 
 ## [Design] Cor semântica de texto (erro/sucesso/link) vem de token do tema, nunca de literal da paleta
 

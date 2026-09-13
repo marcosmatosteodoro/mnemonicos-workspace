@@ -11,9 +11,9 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 
 ## Status agregado
 
-- Todo: 10
+- Todo: 8
 - In Progress: 0
-- Done: 7
+- Done: 9
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -29,9 +29,9 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 - [x] TASK-023-006 ✅ Done — `visual-association-storage.ts`: camada de acesso ao binário (bytea)
 - [x] TASK-023-007 ✅ Done — Extensão `store/api.ts` (RTK Query)
 
-### Wave 3 (depende de Wave 2)
-- [ ] TASK-023-008 ⏸ Todo — Criar e editar associação visual (upload, CRUD write, guarda de escrita) (fatia sensível — upload + assinatura de bytes + autoria)
-- [ ] TASK-023-009 ⏸ Todo — `visual-association-picker.tsx` (seletor reusável)
+### Wave 3 (depende de Wave 2) — ✅ concluída
+- [x] TASK-023-008 ✅ Done — Criar e editar associação visual (upload, CRUD write, guarda de escrita) (fatia sensível — upload + assinatura de bytes + autoria; 3 rodadas de gate — 2 retries, gate 8 aprovado)
+- [x] TASK-023-009 ✅ Done — `visual-association-picker.tsx` (seletor reusável) — 1 retry (achados de acessibilidade, gate 11)
 
 ### Wave 4 (depende de Wave 3)
 - [ ] TASK-023-010 ⏸ Todo — Remover associação visual com trava de vínculo (fatia sensível — guarda reusada + alcance)
@@ -118,9 +118,9 @@ AC-022-025 (TASK-023-014).
 
 | FEAT | TASKs (P = primária) | Done |
 |------|----------------------|------|
-| FEAT-022-001 (Gestão do acervo) | TASK-023-002 (P), TASK-023-003 (P), TASK-023-008 (P), TASK-023-010, TASK-023-012 (P) | 0/5 |
+| FEAT-022-001 (Gestão do acervo) | TASK-023-002 (P), TASK-023-003 (P), TASK-023-008 (P), TASK-023-010, TASK-023-012 (P) | 3/5 |
 | FEAT-022-002 (Navegação e busca) | TASK-023-012, TASK-023-014 (P), TASK-023-015 (P) | 0/3 |
-| FEAT-022-003 (Vínculo a Quadros) | TASK-023-001 (P), TASK-023-005 (P), TASK-023-008, TASK-023-009 (P), TASK-023-010 (P), TASK-023-011 (P), TASK-023-012, TASK-023-013 (P), TASK-023-014 (FR-022-019, transversal) | 0/9 |
+| FEAT-022-003 (Vínculo a Quadros) | TASK-023-001 (P), TASK-023-005 (P), TASK-023-008, TASK-023-009 (P), TASK-023-010 (P), TASK-023-011 (P), TASK-023-012, TASK-023-013 (P), TASK-023-014 (FR-022-019, transversal) | 4/9 |
 
 Cobertura total: 25/25 ACs, 25/25 FRs, 7/7 NFRs de SPEC-022 — 3/3 FEATs cobertas, sem
 decomposição parcial (`--only` não usado).
