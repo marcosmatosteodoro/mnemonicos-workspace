@@ -33,8 +33,9 @@ _(nenhuma no momento)_
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
+- Biblioteca visual reutilizável — acervo de associações visuais (imagem raster + categoria + função cognitiva) pesquisável por categoria e vinculável (N:N) a Quadros de Tiras diferentes, com alcance por autoria herdado de F4, métrica de uploads evitados e instrumentação de etapa (SPEC-022, F5 do épico MNEMORA STUDIO, 2026-09-13). Aguardando `/keelson:plan`.
 
-_Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 implementada 2026-09-07 (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done) — aguardando Etapa 4 (DoD)/Entrega, PR e merge (ato do Diretor)._
+_Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 em ciclo (BRIEF-022/SPEC-022 Approved 2026-09-13) — aguardando `/keelson:plan`._
 
 ## SPECs
 
@@ -47,6 +48,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | SPEC-013 | Suporte a PWA no mnemonicos-frontend | Approved | 2026-09-06 |
 | SPEC-016 | Toggle de mostrar/ocultar senha nos campos de senha | Approved | 2026-09-07 |
 | SPEC-019 | Página 404 personalizada com volta à home | Approved | 2026-09-07 |
+| SPEC-022 | Biblioteca visual reutilizável | Approved | 2026-09-13 |
 
 ## PLANs
 
@@ -113,6 +115,10 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | Página 404 (personalizada) | Tela exibida quando o usuário acessa uma rota inexistente, com a identidade visual da aplicação (paleta, tipografia, componentes de marca) e um link/botão de volta — em contraste com a página de erro genérica do framework | SPEC-019 |
 | Rota inexistente | Qualquer URL solicitada na aplicação que não corresponde a nenhuma rota definida — cai na 404 personalizada na área pública sempre, e na área interna só com sessão ativa (sem sessão, o guard de SPEC-002 prevalece) | SPEC-019 |
 | Home pública | A página inicial da aplicação em `/`, destino fixo do link/botão de volta da 404 personalizada, independente de sessão ou área de origem | SPEC-019 |
+| Biblioteca visual | Acervo pesquisável e navegável de associações visuais, organizado por categoria, reutilizável entre Quadros de Tiras diferentes | SPEC-022 |
+| Categoria (da associação visual) | Rótulo textual atribuído pelo EDITOR para agrupar e filtrar associações visuais na biblioteca; texto livre com sugestão das categorias existentes e normalização (trim/case-fold) no filtro | SPEC-022 |
+| Função cognitiva (da associação visual) | Justificativa textual, escrita pelo EDITOR, de por que a imagem apoia a recuperação da regra — não decoração; critério herdado da TAP | SPEC-022 |
+| Vínculo (associação visual ↔ Quadro) | Relação entre uma associação visual e um Quadro (no máximo 1 associação por Quadro nesta fatia) — o que torna a associação visual reutilizável entre Tiras diferentes | SPEC-022 |
 
 ## Decisões irreversíveis
 
@@ -181,9 +187,31 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | E-01 (SPEC-016) | PO escalou (não-bloqueante, vai à Entrega): KAN-72 fecha entregando só o toggle no `LoginForm`, ou nasce card de follow-up para as telas de troca de senha/gestão de contas — a capacidade já existe na API (`POST /auth/change-password`, `POST /users/:id/reset-password`) e nos hooks RTK Query (`api.ts:406,430`), só falta a tela | Default do PO: fechar KAN-72 com o `LoginForm` e não criar card novo — expectativa registrada em Q-016-001 | PO, aprovação de SPEC-016 |
 | E-019-01 (SPEC-019) | PO escalou (não-bloqueante, vai à Entrega): aceita que a 404 personalizada NÃO apareça para quem não tem sessão e erra a URL sob `/studio/**` ou `/content/**` (continua indo para `/login?next=<path>`, como hoje) — servir 404 antes do guard exigiria tirar os prefixos internos do matcher de `proxy.ts:56`, regredindo SPEC-002/FEAT-002-002 e revelando rotas internas a anônimo (A01) | Default do PO: manter SPEC-002 prevalecendo, AC-019-001 partido em 2 cenários (público sempre; interno com sessão) — não bloqueia o `/keelson:plan` | PO, aprovação de SPEC-019 |
 | RISK-019-002 | A home pública (`/`) hoje não tem link de volta à área interna (`/studio`) — o CTA sensível a sessão de BRIEF-015/KAN-74 está implementado mas ainda não mergeado no `main` do frontend; até lá, EDITOR/ADMIN que sai da 404 personalizada chega a `/` sem caminho direto a `/studio` (2 cliques via `/login`, não 1) | Nenhuma ação desta SPEC; merge de KAN-74 fecha a lacuna por conta própria | SPEC-019 §9, sugestão S-01 do PO |
+| RISK-022-001 | Categoria como texto livre sem normalização pode fragmentar a navegação por categoria se o acervo crescer sem curadoria | mitigado por FR-022-025 (sugestão de categorias existentes) e NFR-022-007 (normalização trim/case-fold no filtro); decisão técnica de implementação fica com o PLAN | SPEC-022 §9 |
+| RISK-022-002 | Métrica primária "uploads evitados" depende da disciplina de busca do EDITOR antes de subir imagem nova — se ele não busca antes, sempre cria nova mesmo havendo equivalente | mitigado em parte por FR-022-025; aceito nesta fatia, revisitar se o piloto mostrar baixo reuso | SPEC-022 §9 |
+| RISK-022-003 | Teto de tamanho de arquivo (5 MB, A-022-005) é estimativa sem dado real; se o motor de PDF (F6) exigir resolução maior, pode precisar subir | reabrir a validação de tamanho (e possivelmente a decisão de armazenamento, A-022-003) se/quando F6 exigir | SPEC-022 §9 |
+| RISK-022-004 | Reuso da mesma associação visual em Quadros/Tiras diferentes reduz a rastreabilidade de "quem introduziu a imagem originalmente" por vínculo | sem requisito de proveniência de autoria por vínculo nesta fatia; pode importar para F8/F9 | SPEC-022 §9 |
+| RISK-022-005 | Listagem de associações visuais com miniatura (sem processamento/thumbnail derivado) tem custo de banda real em acervo grande com arquivos de até 5 MB | atenção obrigatória do gate 10 (performance) e do PLAN, junto com Q-022-001 (paginação) | SPEC-022 §9 |
+| Q-022-001 | Volume do acervo pode exigir paginação/ordenação na listagem/filtro da biblioteca — não decidido na SPEC | fica para o PLAN avaliar o volume esperado | SPEC-022 §9 |
+| E-01 (SPEC-022) | PO escalou (não-bloqueante, vai à Entrega de F5): o acervo de associações visuais é de leitura/busca/vínculo comum a todo EDITOR/ADMIN, mas a escrita (editar/substituir/remover) é restrita ao autor — alternativa seria escrita também comum, ou acervo totalmente privado por autor | Default do PO: acervo comum na leitura, escrita restrita ao autor (ADMIN alcança tudo) — já implementado na SPEC (FR-022-023, A-022-011); resposta ao Diretor na Entrega de F5 | PO, aprovação de SPEC-022 |
+| E-02 (SPEC-022) | PO escalou (não-bloqueante, vai à Entrega de F5): a instrumentação de etapa desta fatia (evento na 1ª mutação de vínculo) entra já nesta fatia, ou fica declaradamente fora do escopo — instrumentar depois não recupera o passado | Default do PO: instrumentação mínima entra nesta fatia — já implementado na SPEC (FR-022-024, A-022-012); resposta ao Diretor na Entrega de F5 | PO, aprovação de SPEC-022 |
 
 ## Histórico recente
 
+- 2026-09-13: **SPEC-022 criada e aprovada via `/keelson:auto` (F5 do épico, BRIEF-022).**
+  0 ERROR de forma (achado de ambiente: `tolower()` do awk local corrompe "ã" em UTF-8,
+  disparando falso positivo de `spec-ac-fora-gwt` em todos os ACs — leitura manual
+  confirma Dado/Quando/Então corretos; candidato a lição de processo/plugin). Crítica de
+  mérito do `product-analyst` (11 pontos) resolvida pelo `po`: 9 aplicadas diretamente
+  (alcance por autoria do vínculo herdado de F4/SPEC-011; vínculo com Quadro soft-deleted
+  não conta na trava/contagem/métrica; remover Quadro preserva a associação; métrica
+  primária virou "uploads evitados"; categoria texto livre + sugestão + normalização;
+  binário exige sessão/alcance; 1 associação por Quadro, vínculo idempotente; trava de
+  remoção identifica Quadros alcançáveis; NFR de não-regressão da tela da Tira), 2
+  escaladas ao Diretor com default já aplicado (acervo comum na leitura × escrita
+  restrita ao autor; instrumentação mínima de etapa) — perguntas vão ao lote da Entrega
+  de F5. SPEC final: 25 FRs, 7 NFRs, 25 ACs, 12 premissas, 5 riscos, 1 questão aberta.
+  Próximo: `/keelson:plan`.
 - 2026-09-08 16:33: **PLAN-021 mergeado e verificado em produção real.** Diretor
   mergeou o PR e configurou `BACKEND_API_URL` no painel Vercel do
   `mnemonicos-frontend`. 1ª tentativa de login em produção falhou:

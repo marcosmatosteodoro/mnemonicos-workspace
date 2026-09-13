@@ -46,8 +46,8 @@ fora do MVP).
 | 1 | Acesso interno e papéis de produção | producao-material | entregue (BRIEF-002 · SPEC-002 · PLAN-003 Done 16/16; mergeado PR #1; HANDOFF-PLAN-003 fechado 2026-09-01) |
 | 2 | Conteúdo bruto, quebra da regra e fonte normativa | producao-material | entregue (BRIEF-005 · SPEC-005 · PLAN-006 Done 14/14; mergeado PR #2 backend/#3 frontend 2026-09-06) |
 | 3 | Instrumentação de etapas da fábrica | producao-material | entregue e mergeada (BRIEF-009 · SPEC-009 · PLAN-010 Done 3/3; PR #3 backend `6541d49`, 2026-09-06) |
-| 4 | Tira mnemônica como sequência de quadros | producao-material | em ciclo (docs/producao-material/briefs/BRIEF-011.md) |
-| 5 | Biblioteca visual reutilizável | producao-material | pendente |
+| 4 | Tira mnemônica como sequência de quadros | producao-material | entregue (BRIEF-011 · SPEC-011 · PLAN-012 Done 13/13; PR #5 backend `9063f9e`/PR #9 frontend `179e7f5` mergeados em `main`; DoD (Etapa 4) + Entrega ACEITA_COM_RESSALVAS 2026-09-07, ressalva R-1 do PO aplicada) |
+| 5 | Biblioteca visual reutilizável | producao-material | em ciclo (docs/producao-material/briefs/BRIEF-022.md) |
 | 6 | Pipeline de publicação — PDF (rascunho) | producao-material | pendente |
 | 7 | Contrastes, pegadinhas, flashcards e protocolos impressos | producao-material | pendente |
 | 8 | Versionamento editorial e fechamento legislativo | producao-material | pendente |
@@ -155,3 +155,15 @@ fora do MVP).
 - 2026-09-06: **F4 largada** via `/keelson:continue` → `/keelson:auto` (BRIEF-011.md) —
   sync de largada dos dois repos de código com `main` (backend fast-forward `6541d49`;
   frontend já atualizado).
+- 2026-09-13: `/keelson:continue` — correção declarada da fila (princípio 2): F4 estava
+  como `em ciclo (BRIEF-011.md)` mas os artefatos filhos mostram **entregue** — PLAN-012
+  Done 13/13, DoD (Etapa 4) fechada e Entrega ACEITA_COM_RESSALVAS 2026-09-07 (ressalva
+  R-1 do PO aplicada: DEC-012-009 supersedida por DEC-012-011), PR #5 backend (`9063f9e`)
+  e PR #9 frontend (`179e7f5`) mergeados em `main` nos dois repos. Pendência aberta pela
+  Entrega (RISK-011-008, R-3 do PO): brief avulso para investigar `mnemonic-strip-board.tsx`
+  (mesma forma "data em cache + 404" corrigida em `rule-breakdown-form.tsx`) — ainda não
+  aberto, não bloqueia a fila. Próxima elegível: F5 (depende só de F4).
+- 2026-09-13: **F5 largada** via `/keelson:continue` → `/keelson:auto` (BRIEF-022.md) —
+  sync de largada dos dois repos de código com `main` (backend fast-forward `9063f9e`
+  via PR #5; frontend fast-forward `8d661a5` via PR #11, branch trocada de
+  `feat/producao-material-rewrite-same-origin-cookie-sessao`, que já estava mergeada).

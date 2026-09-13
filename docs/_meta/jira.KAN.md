@@ -105,3 +105,13 @@ pedido).
 
 *A preencher conforme a execução revelar: validator invisível, id que mudou, post-function
 que não dispara. A medição justifica a régua; ela não é a régua.*
+
+- **`issueType.spec` (Epic, id `10006`, hierarchyLevel 1) não tem campo `parent`** —
+  confirmado via `getJiraIssueTypeMetaWithFields` (KAN, issueTypeId `10006`) em
+  2026-09-13: a lista de campos do createmeta não inclui `parent` (projeto team-managed
+  sem nível acima de Epic/Advanced Roadmaps). Consequência: uma SPEC nova que é fatia de
+  um épico-raiz já existente (ex.: KAN-6, "MNEMORA STUDIO") **não pode** ser criada com
+  `parent: KAN-6` — mesmo nível hierárquico (1), não adjacente (§7.0 do protocolo). O
+  stub-raiz da largada (§16) nasce **sem parent** e é ligado ao épico-raiz por
+  `createIssueLink` tipo `Relates` (id `10003`). Primeiro caso: KAN-85 (stub SPEC-022,
+  fatia F5) ↔ KAN-6, 2026-09-13.
