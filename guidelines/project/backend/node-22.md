@@ -824,6 +824,13 @@ qualquer otimização não óbvia **cita a medição** que a justifica (no comen
   `23502`/`23503`/`23505`); cai no genérico `P2039` com a mensagem crua do servidor.
   Oráculo estável para RESTRICT: o par rejeição + linha protegida sobrevive — nunca o
   código de erro como asserção primária (lição em `lessons.md`, "[Dados/Persistência]").
+- **Coluna `Bytes` tipa como `Uint8Array<ArrayBuffer>`, não `Buffer`** — `Buffer` do Node é
+  `Uint8Array<ArrayBufferLike>` (superset). Ponte correta: `Buffer.from(row.campoBytes)`
+  (copia respeitando `byteOffset`/`length`); **nunca** `Buffer.from(row.campoBytes.buffer)`
+  — ignora offset/length, mesma classe de defeito que `timingSafeEqual` com buffers de
+  tamanho diferente (§5). Na escrita, `meuBuffer as unknown as Uint8Array<ArrayBuffer>` é
+  cast só-de-tipo, seguro (apagado na emissão) — a asserção real é o round-trip provado
+  contra Postgres real.
 
 **Zod 4**
 

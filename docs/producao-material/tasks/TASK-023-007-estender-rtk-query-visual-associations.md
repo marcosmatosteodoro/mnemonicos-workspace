@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -161,26 +161,30 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-13T20:23:58+0000
+**Data conclusão**: 2026-09-13T20:31:25+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: a2164c2
 **Jira**: KAN-95
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gate 1-7, wave 2)
+**Tentativas**: 1
+**Cobertura final**: n/a (60/60 verde, suíte completa 380/380)
 **Arquivos modificados**:
-  -
+  - mnemonicos-frontend/src/store/api.ts
+  - mnemonicos-frontend/src/store/api.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [ ] Segurança (gate 8): n/a — wiring de cliente HTTP, sem decisão de autorização
+- [ ] Comportamento (gate 9): n/a — sem tela própria (consumido por TASK-023-009/012/013)
+
+**Notas**: tag `'VisualAssociation'` (singular) em `TAG_TYPES` fica sem consumidor até
+COMP-023-013/016 (carry-over declarado pelo code-reviewer, não cruft).
 
 **Notas**:

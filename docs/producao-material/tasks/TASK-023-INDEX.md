@@ -11,9 +11,9 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 
 ## Status agregado
 
-- Todo: 12
+- Todo: 10
 - In Progress: 0
-- Done: 5
+- Done: 7
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -25,9 +25,9 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 - [x] TASK-023-004 ✅ Done — Extensão `tira.schema.ts`: schema do vínculo
 - [x] TASK-023-005 ✅ Done — Extensão `types/domain.ts` (frontend) — 1 retry (paridade cross-repo, achado do gate 1-7; campo trazido ao backend nesta wave, antecipando parte de TASK-023-011/017)
 
-### Wave 2 (depende de Wave 1)
-- [ ] TASK-023-006 ⏸ Todo — `visual-association-storage.ts`: camada de acesso ao binário (bytea)
-- [ ] TASK-023-007 ⏸ Todo — Extensão `store/api.ts` (RTK Query)
+### Wave 2 (depende de Wave 1) — ✅ concluída
+- [x] TASK-023-006 ✅ Done — `visual-association-storage.ts`: camada de acesso ao binário (bytea)
+- [x] TASK-023-007 ✅ Done — Extensão `store/api.ts` (RTK Query)
 
 ### Wave 3 (depende de Wave 2)
 - [ ] TASK-023-008 ⏸ Todo — Criar e editar associação visual (upload, CRUD write, guarda de escrita) (fatia sensível — upload + assinatura de bytes + autoria)
