@@ -29,13 +29,18 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 - Página 404 personalizada (SPEC-019/**PLAN-020**, done (sugerido) 2026-09-07) — `not-found.tsx` nativo do App Router (Server Component `NotFoundPage`), `metadata.title` próprio (não herda o título da home), herda `SiteHeader`/`Providers`/footer do root layout automaticamente, tokens `@theme`/`text-link`/`text-muted`, `<Link href="/">` de volta à home pública. Precedência guard×404 delegada inteiramente ao `proxy.ts` existente (SPEC-002), sem lógica nova — rota interna sem sessão continua indo para `/login?next=<path>` (decisão do PO, E-019-01); rota interna com sessão prova a 404 personalizada ponta-a-ponta via HTTP real. 1 COMP, 4 DECs (todas reversíveis), 2 TRISKs. Demanda avulsa fora do épico MNEMORA STUDIO — brief BRIEF-019, Jira Story KAN-76 (subtasks KAN-81/KAN-82 concluídas). 2/2 TASKs Done, 1 wave — TASK-020-001: 1 retry (achado do product-designer: sem `metadata.title`, título herdava o da home). TASK-020-002: 4 rodadas de convergência (acima do teto padrão de 1 retry, todas mecânicas — asserção de corpo não-discriminante, âncora de regex de stream, bind loopback do servidor de teste, branch defasada de `origin/main` sincronizada por merge fast-forward); nenhuma decisão de arquitetura/produto pendente, degrau 1 da escada de reação aplicado pelo Tech Lead na última rodada. Gate 9 consolidado (DoD, Etapa 4) — SPEC-019 sem FEATs, todos os ACs fecham por gate 1 (teste automatizado com servidor `next start` real: HTTP 404 + `<title>` discriminante). 4 lições novas em `lessons.md` (discriminação de rota por `<title>`; bind loopback de servidor de teste; parser de token sobre buffer de stream; metadata.title em arquivo de convenção do App Router).
 
 ### Em desenvolvimento
-_(nenhuma no momento)_
+- Biblioteca visual reutilizável (SPEC-022/**PLAN-023**, F5 do épico MNEMORA STUDIO) — acervo
+  de associações visuais (upload raster validado por assinatura de bytes, categoria, função
+  cognitiva) vinculável (N:1, no máximo 1 por Quadro) a Quadros da Tira mnemônica (F4);
+  binário como coluna `Bytes` no Postgres (não filesystem — incompatível com a topologia
+  serverless do backend, corrigido ainda no PLAN); alcance por autoria herdado de F4; métrica
+  de "uploads evitados" instrumentada. Aguardando `/keelson:tasks`.
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
-- Biblioteca visual reutilizável — acervo de associações visuais (imagem raster + categoria + função cognitiva) pesquisável por categoria e vinculável (N:N) a Quadros de Tiras diferentes, com alcance por autoria herdado de F4, métrica de uploads evitados e instrumentação de etapa (SPEC-022, F5 do épico MNEMORA STUDIO, 2026-09-13). Aguardando `/keelson:plan`.
 
-_Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 em ciclo (BRIEF-022/SPEC-022 Approved 2026-09-13) — aguardando `/keelson:plan`._
+_Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 em ciclo (BRIEF-022/SPEC-022 Approved 2026-09-13; PLAN-023 Approved 2026-09-13, 100%
+cobertura) — aguardando `/keelson:tasks`._
 
 ## SPECs
 
@@ -62,6 +67,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 2/2 ✅ | Done (sugerido) |
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
+| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 0/? ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -195,9 +201,32 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | Q-022-001 | Volume do acervo pode exigir paginação/ordenação na listagem/filtro da biblioteca — não decidido na SPEC | fica para o PLAN avaliar o volume esperado | SPEC-022 §9 |
 | E-01 (SPEC-022) | PO escalou (não-bloqueante, vai à Entrega de F5): o acervo de associações visuais é de leitura/busca/vínculo comum a todo EDITOR/ADMIN, mas a escrita (editar/substituir/remover) é restrita ao autor — alternativa seria escrita também comum, ou acervo totalmente privado por autor | Default do PO: acervo comum na leitura, escrita restrita ao autor (ADMIN alcança tudo) — já implementado na SPEC (FR-022-023, A-022-011); resposta ao Diretor na Entrega de F5 | PO, aprovação de SPEC-022 |
 | E-02 (SPEC-022) | PO escalou (não-bloqueante, vai à Entrega de F5): a instrumentação de etapa desta fatia (evento na 1ª mutação de vínculo) entra já nesta fatia, ou fica declaradamente fora do escopo — instrumentar depois não recupera o passado | Default do PO: instrumentação mínima entra nesta fatia — já implementado na SPEC (FR-022-024, A-022-012); resposta ao Diretor na Entrega de F5 | PO, aprovação de SPEC-022 |
+| TRISK-023-002 | `multer` (parser multipart) é dependência nova no backend — supply chain de primeira classe (A03) | `/keelson:audit` no gate 8 antes do merge; `memoryStorage()` nunca `diskStorage()` | PLAN-023 §8 |
+| TRISK-023-006 | `route-authz-matrix.integration.test.ts` (tripwire, hoje 25 pares) precisa crescer para as 8 chaves novas de F5 (6 de `visual-associations.routes.ts` + 2 de `tira.routes.ts`) | TASK de rotas atualiza o tripwire junto; suíte acusa se alguma ficar de fora | PLAN-023 §8 |
 
 ## Histórico recente
 
+- 2026-09-13: **PLAN-023 criado e aprovado via `/keelson:auto` (F5, cobertura 100% de
+  SPEC-022 — 25/25 FRs, 7/7 NFRs).** 17 COMPs, 12 DECs (todas reversíveis), 7 TRISKs.
+  Reconhecimento técnico do `code-scout` confirmou greenfield total (nenhuma dependência de
+  upload/multipart, rota de binário autenticado ou env var de storage nos dois repos).
+  **Correção do Tech Lead em voo** (degrau 1 da escada — decisão registrada, não
+  ambiguidade nova): a 1ª redação do PLAN escolhia armazenamento em disco local para o
+  binário; o próprio PLAN identificou (`TRISK-023-003`) que isso é incompatível com a
+  função serverless do backend na Vercel (mesma topologia de PLAN-021) — filesystem efêmero
+  por instância, upload não sobreviveria de forma confiável. Corrigido para armazenar o
+  binário como coluna `Bytes` (bytea) no próprio Postgres — elimina o risco por completo,
+  sem infraestrutura nova, mantém a reversibilidade (interface isolada para trocar por blob
+  externo depois). Cardinalidade do vínculo modelada como FK N:1 (`MnemonicFrame.
+  visualAssociationId`), não tabela de junção N:N — SPEC já fixa no máximo 1 associação por
+  Quadro. Validação de forma (`artifact-lint.sh`/`graph.sh`): corrigido erro real (lista de
+  FRs/NFRs cobertos em formato wrapped multi-linha, não reconhecido pelo parser — 1 ID por
+  linha é o formato canônico) e reconciliado `Realiza` × §7 em 6 componentes. Falso positivo
+  confirmado do ambiente (mesmo bug de `tolower()`/UTF-8 do Windows local da SPEC-022):
+  `plan-dec-irreversivel-enum` acusa ERROR nas 12 DECs (`Irreversível: não`, com acento) —
+  candidato a lição de processo/plugin, ainda não roteado. Migração 100% aditiva; execução
+  exige autorização do Diretor antes de `prisma migrate dev` (DEC-023-007, regra do
+  CLAUDE.md do workspace). Próximo: `/keelson:tasks`.
 - 2026-09-13: **SPEC-022 criada e aprovada via `/keelson:auto` (F5 do épico, BRIEF-022).**
   0 ERROR de forma (achado de ambiente: `tolower()` do awk local corrompe "ã" em UTF-8,
   disparando falso positivo de `spec-ac-fora-gwt` em todos os ACs — leitura manual
