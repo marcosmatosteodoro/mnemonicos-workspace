@@ -493,9 +493,11 @@ pequeno, mas não nulo:
   interno, então o controle precisa ser no host resolvido/`redirect: 'manual'`. ⚠️ não confirmado
 - **Body limitado:** `express.json({ limit: '100kb' })` — limite explícito é defesa contra
   DoS por payload. Endpoint novo que precise de mais **declara** o seu.
-- **Upload:** não existe hoje. Se entrar: allowlist de extensão **e** verificação do
-  conteúdo real (magic bytes), nome gerado pelo servidor, armazenamento fora do webroot,
-  limite de tamanho. Nunca confie em `originalname`/`mimetype` do cliente.
+- **Upload:** a primitiva de verificação de conteúdo real (magic bytes) já existe —
+  `src/modules/visual-associations/image-signature.ts` (PLAN-023/F5, `detectImageSignature`)
+  detecta PNG/JPEG/WebP por assinatura de bytes, função pura sem I/O. Reuse-a em vez de
+  reimplementar; allowlist de extensão, nome gerado pelo servidor e limite de tamanho
+  seguem como antes. Nunca confie em `originalname`/`mimetype` do cliente.
 - **ReDoS:** regex sobre entrada de usuário com quantificador aninhado (`(a+)+`) trava o
   event loop **do processo inteiro** — Node é single-threaded. Regex de validação vem do
   Zod ou é simples e ancorada, com tamanho da entrada limitado antes.
@@ -645,6 +647,7 @@ das testadas e produz o bug "só em produção".
 | Tipo de linha do banco | tipos gerados em `src/generated/prisma/**` — não redeclare o shape à mão |
 | Prefixo da API | `API_PREFIX` em `src/app.ts` |
 | Env de teste | `tests/setup-env.ts` |
+| Detecção de formato de imagem por magic bytes | `src/modules/visual-associations/image-signature.ts` (`detectImageSignature`, PLAN-023/F5) |
 
 **Prefira stdlib e biblioteca instalada a helper caseiro:** `node:crypto`, `structuredClone`,
 `Object.groupBy`, `Intl.DateTimeFormat`, `AbortSignal.timeout`, `node:util.parseArgs`; do

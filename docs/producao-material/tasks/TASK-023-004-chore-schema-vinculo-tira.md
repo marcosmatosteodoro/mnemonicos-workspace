@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -109,26 +109,27 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-13T19:29:23+0000
+**Data conclusão**: 2026-09-13T19:31:24+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: afd5002
 **Jira**: KAN-92
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gate 1-7, wave 1)
+**Tentativas**: 1
+**Cobertura final**: n/a (12/12 verde)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/tira/tira.schema.ts
+  - mnemonicos-backend/tests/unit/tira.schema.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [ ] Segurança (gate 8): n/a — schema de validação isolado, sem rota consumidora ainda (TASK-023-011)
+- [ ] Comportamento (gate 9): n/a — schema sem efeito observável de tela
 
 **Notas**:

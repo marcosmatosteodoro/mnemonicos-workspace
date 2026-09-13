@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-08T16:33:00-0300 (PLAN-021 mergeado e verificado em produção)
+**Última atualização**: 2026-09-13T19:56:00+0000 (PLAN-023 Wave 1/6 concluída — F5)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -67,7 +67,7 @@ cobertura; 17 TASKs em 6 waves geradas 2026-09-13) — aguardando `/keelson:impl
 | PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 2/2 ✅ | Done (sugerido) |
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
-| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 0/17 ⏸ | Approved |
+| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 5/17 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -206,6 +206,31 @@ cobertura; 17 TASKs em 6 waves geradas 2026-09-13) — aguardando `/keelson:impl
 
 ## Histórico recente
 
+- 2026-09-13: **Wave 1/6 de PLAN-023 concluída (5 TASKs Done)** — migração de schema
+  (`VisualAssociation`, FK `SetNull`, `ASSOCIACAO_VISUAL` aditivo, `VisualAssociationLinkEvent`),
+  `image-signature.ts` (detecção de assinatura de bytes), `visual-associations.schema.ts`
+  (Zod), extensão de `tira.schema.ts` (vínculo) e de `types/domain.ts` (frontend). Gate 8
+  (security-engineer): APROVADO, com 4 achados roteados como critérios herdados em
+  TASK-023-008/010/014/016 (TOCTOU na remoção — trava agora atômica via `deleteMany`
+  condicional; Content-Type nunca ecoa a coluna livre; `multer` precisa de
+  `fieldSize`/`files`/`fields`; `select` explícito em toda leitura sem precisar do binário).
+  Gate 1-7 (code-reviewer): REPROVADO na 1ª rodada — achado bloqueante real: a rede de
+  paridade cross-repo já existente (`tira-frontend-contract.test.ts`, ativa desde
+  TASK-012-011) ficou vermelha porque o campo `visualAssociationId` entrou no frontend
+  (TASK-023-005) sem o par no backend, que estava alocado para a Wave 4 (TASK-023-011).
+  Corrigido via retry (commit `84b1f08`, mesma wave) — campo trazido ao backend agora,
+  antecipando parte do escopo de TASK-023-011/017 (registrado nos dois arquivos). 2 lições
+  de processo registradas e propostas ao mantenedor do plugin: (1) decomposição de TASKs
+  deve varrer redes de paridade cross-repo EXISTENTES antes de declarar uma como "trabalho
+  de wave futura"; (2) `tolower()` do awk em `artifact-lint.sh` corrompe UTF-8 sob este
+  ambiente (Windows/gawk), causando falsos ERROR/WARNING em SPEC/PLAN com "não"/"então" —
+  diff de correção proposto para os 2 checks afetados. **Incidente de migração**: a
+  suíte de integração aplicou a migração ao banco de TESTE como efeito colateral do
+  `globalSetup` (sem autorização prévia explícita) — banco de DEV/produção não foram
+  tocados; Diretor autorizado e confirmou a aplicação ao DEV após disclosure completa.
+  Achados fora de escopo registrados (não bloqueiam): paginação copiada em 3 módulos
+  (candidato a consolidação futura), inconsistência de mensagem pt-BR entre schemas de
+  corpo e de query. Próximo: Wave 2 (TASK-023-006/007).
 - 2026-09-13: **TASK-023-001 a 017 geradas via `/keelson:auto` (rota fan-out, decisão
   4.310 — 1 decompositor + 3 redatores em paralelo).** 6 waves: setup (migração +
   assinatura de bytes + schemas + tipos, Wave 1), storage/RTK Query (Wave 2), CRUD de

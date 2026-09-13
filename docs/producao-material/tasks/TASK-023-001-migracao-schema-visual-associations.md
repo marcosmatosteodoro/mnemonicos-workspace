@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -221,26 +221,35 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-13T17:35:25+0000
+**Data conclusão**: 2026-09-13T14:53:49-03:00
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: dcdf0bc
 **Jira**: KAN-89
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gate 1-7, wave 1) · security-engineer (gate 8, wave 1)
+**Tentativas**: 1
+**Cobertura final**: n/a (integração 287/287 verde, unit 255/255 verde)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/prisma/schema.prisma
+  - mnemonicos-backend/prisma/migrations/20260913174134_add_visual_association/migration.sql
+  - mnemonicos-backend/src/domain/types.ts
+  - mnemonicos-backend/tests/unit/domain-types-parity.test.ts
+  - mnemonicos-backend/tests/integration/production-events.model.integration.test.ts
+  - mnemonicos-backend/tests/integration/visual-associations.model.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1)
+- [ ] Comportamento (gate 9): n/a — chore de schema, sem efeito observável de tela; AC-022-017 provado em gate 1 (teste de integração)
 
-**Notas**:
+**Notas**: Migração gerada via `prisma migrate dev --create-only`, aplicada ao banco de TESTE
+como efeito colateral do globalSetup da suíte de integração (incidente registrado no ledger
+da sessão) e ao banco de DEV com autorização explícita do Diretor (AskUserQuestion,
+2026-09-13) após disclosure do incidente — nenhuma aplicação silenciosa em produção; o
+`vercel-build` já existente aplica no próximo deploy.

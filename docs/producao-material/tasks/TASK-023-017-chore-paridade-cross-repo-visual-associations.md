@@ -53,12 +53,11 @@ campos e (2) criar o arquivo NOVO que compara as interfaces do acervo.
 
 ### Inclui
 
-- `mnemonicos-backend/tests/unit/tira-frontend-contract.test.ts` (EMENDA — arquivo
-  existente): o array esperado de `extractInterfaceFields(backendSource,
-  'MnemonicFrameDetail')`/`extractInterfaceFields(frontendSource, 'MnemonicFrame')` cresce de
-  `['id', 'text', 'position', 'originBlock']` (4) para `[..., 'visualAssociationId']` (5) —
-  mesmo padrão de asserção já usado (`.sort()` dos dois lados, `toEqual` cruzado, mutante:
-  renomear `visualAssociationId` só de um lado reprova).
+- ~~`mnemonicos-backend/tests/unit/tira-frontend-contract.test.ts` (EMENDA — array 4→5
+  campos)~~ — **JÁ ENTREGUE na Wave 1** (retry sobre achado bloqueante do `code-reviewer`,
+  commit `84b1f08` de TASK-023-005 — a rede de paridade já compara os 5 campos, incluindo
+  `visualAssociationId`, mutante de renomear já provado morto na rodada 2 do gate 1-7).
+  Nada a fazer aqui além de confirmar que segue verde.
 - `mnemonicos-backend/tests/unit/visual-associations-frontend-contract.test.ts` (novo) —
   MOLDE LITERAL de `tira-frontend-contract.test.ts` (mesmas funções `readSourceFile`/
   `extractInterfaceFields`, reaproveitadas por import ou reimplementadas idênticas se o

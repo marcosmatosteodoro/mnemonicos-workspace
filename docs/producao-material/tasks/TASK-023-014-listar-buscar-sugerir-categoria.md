@@ -115,6 +115,11 @@ nunca siga um passo que enfraqueça um critério.
 
 ## Critérios de pronto
 
+- [ ] **`select` explícito na listagem (achado do `security-engineer`, gate 8 da Wave 1)**:
+      `listVisualAssociations` usa `select` excluindo `imageData` — cada linha da listagem
+      pode ter até 5 MB no binário; arrastar isso por padrão em uma consulta paginada é o
+      tipo de custo que este `select` explícito evita por construção. Teste: resposta de
+      `GET /visual-associations` não contém a chave `imageData` em nenhum item.
 - [ ] Testes cobrem AC-022-009 (parte — correção do backend: miniatura/categoria/contagem
       corretos na resposta; a renderização em si é TASK-023-012/gate 9): `GET
       /visual-associations` com um acervo de 2+ associações, cada uma com N vínculos

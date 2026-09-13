@@ -57,9 +57,15 @@ sem stack.
 - `mnemonicos-backend/src/modules/visual-associations/visual-associations.routes.ts`
   (estende a base de TASK-023-006): `const upload = multer({ storage:
   multer.memoryStorage(), limits: { fileSize:
-  env.VISUAL_ASSOCIATIONS_MAX_FILE_SIZE_BYTES } })` — instanciado UMA ÚNICA VEZ no topo do
-  módulo (nunca por requisição) — usado como middleware em `POST /visual-associations`
-  (arquivo obrigatório) e `PATCH /visual-associations/:id` (arquivo opcional). `verifyOrigin`
+  env.VISUAL_ASSOCIATIONS_MAX_FILE_SIZE_BYTES, files: 1, fields: 2, fieldSize: 4096 } })`
+  — **`files`/`fields`/`fieldSize` acrescentados por achado do `security-engineer` (gate 8
+  da Wave 1, decisão 4.140)**: `NFR-022-004`/`env.VISUAL_ASSOCIATIONS_MAX_FILE_SIZE_BYTES`
+  só cobrem o ARQUIVO — `category`/`cognitiveDescription` (schemas Zod sem `.max()`, mesma
+  convenção do projeto) ficariam ilimitados no corpo multipart sem `fieldSize` explícito;
+  4096 bytes por campo de texto é folga generosa sobre qualquer categoria/descrição real. —
+  instanciado UMA ÚNICA VEZ no topo do módulo (nunca por requisição) — usado como
+  middleware em `POST /visual-associations` (arquivo obrigatório) e `PATCH
+  /visual-associations/:id` (arquivo opcional). `verifyOrigin`
   como 1º handler nas duas; `requireRole('POST'|'PATCH', '<caminho completo>', 'EDITOR',
   'ADMIN')` declarado na montagem (nunca dentro do handler).
 - `VISUAL_ASSOCIATIONS_MAX_FILE_SIZE_BYTES` em `mnemonicos-backend/src/config/env.ts`
@@ -117,6 +123,19 @@ nunca siga um passo que enfraqueça um critério.
 
 ## Critérios de pronto
 
+- [ ] **Limites de multipart além do arquivo (achado do `security-engineer`, gate 8 da Wave
+      1)**: `grep -n "fieldSize\|files:\|fields:" mnemonicos-backend/src/modules/
+      visual-associations/visual-associations.routes.ts` confirma os 3 limites configurados
+      no `multer(...)` (estrutural, ancorado na chamada real — mutante: remover `fieldSize`
+      faz este grep falhar). Teste comportamental: campo `category` com payload muito maior
+      que 4096 bytes → multipart recusado (413/400 via a EMENDA do `error-handler.ts`),
+      nunca aceito silenciosamente.
+- [ ] **`select` explícito em toda leitura que devolve `VisualAssociationDetail` (achado do
+      `security-engineer`, gate 8 da Wave 1)**: `createVisualAssociation`/
+      `updateVisualAssociation` usam `select` (nunca deixam o Prisma devolver a linha
+      inteira por default) excluindo `imageData` do payload de resposta — o binário nunca
+      trafega na resposta JSON de criação/edição, só via `GET .../:id/image`
+      (TASK-023-016). Teste: resposta de `POST`/`PATCH` não contém a chave `imageData`.
 - [ ] Testes cobrem AC-022-001 (cobre FR-022-001, NFR-022-001): upload com assinatura de
       bytes PNG, JPEG e WebP válidas (3 fixtures REAIS, capturadas — nunca geradas a partir
       de prosa) → `201` com o `VisualAssociationDetail` criado, linha persistida com

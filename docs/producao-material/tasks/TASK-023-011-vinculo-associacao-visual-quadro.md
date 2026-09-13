@@ -61,10 +61,17 @@ vínculo caso contrário — cada caminho de escrita real emite `VisualAssociati
   sobre remoção).
 - Extensão de `MnemonicStripClient` (tipo existente, `tira.service.ts`) com as chaves
   `visualAssociation` e `visualAssociationLinkEvent`.
-- Extensão de `MnemonicFrameDetail` (campo escalar `visualAssociationId: string | null`) e
-  de `MNEMONIC_STRIP_DETAIL_SELECT`/mapeamento equivalente em `getMnemonicStrip` e em toda
-  leitura que devolve `MnemonicStripDetail` — a imagem em si nunca é embutida no payload
-  (o cliente resolve via `GET /visual-associations/:id/image`, TASK-023-016).
+- ~~Extensão de `MnemonicFrameDetail` (campo escalar `visualAssociationId: string | null`) e
+  de `MNEMONIC_STRIP_DETAIL_SELECT`~~ — **JÁ ENTREGUE na Wave 1** (retry sobre achado
+  bloqueante do `code-reviewer`, commit `84b1f08` de TASK-023-005: campo + select já
+  expostos em `tira.service.ts`, sempre `null` hoje — nenhuma escrita ainda). Esta TASK só
+  precisa GRAVAR o valor real (link/unlink); a imagem em si nunca é embutida no payload (o
+  cliente resolve via `GET /visual-associations/:id/image`, TASK-023-016). **Pendência
+  herdada** (achado da rodada 2 do gate 1-7, fora_de_escopo): nenhum teste ainda prova o
+  VALOR do campo no payload HTTP real (`getMnemonicStrip` devolvendo `visualAssociationId:
+  null` sem vínculo / com o id quando vinculado) — a rede de paridade de tipos só compara
+  declaração×declaração (RISK-006-006). Esta TASK fecha os DOIS ramos como parte de
+  AC-022-013 (já no Critério de pronto abaixo).
 - `POST /contents/:id/strip/frames/:frameId/visual-association` e `DELETE
   .../visual-association` em `tira.routes.ts` (COMP-023-009) — cada uma com `verifyOrigin` +
   `requireRole` PRÓPRIO na montagem (nenhuma herda de vizinha, mesma árvore plana das 6 rotas

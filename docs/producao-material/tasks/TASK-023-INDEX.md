@@ -11,19 +11,19 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 
 ## Status agregado
 
-- Todo: 17
+- Todo: 12
 - In Progress: 0
-- Done: 0
+- Done: 5
 - Blocked: 0
 
 ## Ordem de execução (waves)
 
-### Wave 1 (paralelizável, setup-first)
-- [ ] TASK-023-001 ⏸ Todo — Migração de schema Prisma (`VisualAssociation`, FK, enum, LinkEvent) (fatia sensível — migração; para antes de aplicar, autorização do Diretor)
-- [ ] TASK-023-002 ⏸ Todo — `image-signature.ts`: detecção de assinatura de bytes (fatia sensível — segurança)
-- [ ] TASK-023-003 ⏸ Todo — `visual-associations.schema.ts`: validação Zod
-- [ ] TASK-023-004 ⏸ Todo — Extensão `tira.schema.ts`: schema do vínculo
-- [ ] TASK-023-005 ⏸ Todo — Extensão `types/domain.ts` (frontend)
+### Wave 1 (paralelizável, setup-first) — ✅ concluída
+- [x] TASK-023-001 ✅ Done — Migração de schema Prisma (`VisualAssociation`, FK, enum, LinkEvent) (fatia sensível — migração; aplicada ao DEV com autorização do Diretor)
+- [x] TASK-023-002 ✅ Done — `image-signature.ts`: detecção de assinatura de bytes (fatia sensível — segurança; gate 8 aprovado)
+- [x] TASK-023-003 ✅ Done — `visual-associations.schema.ts`: validação Zod
+- [x] TASK-023-004 ✅ Done — Extensão `tira.schema.ts`: schema do vínculo
+- [x] TASK-023-005 ✅ Done — Extensão `types/domain.ts` (frontend) — 1 retry (paridade cross-repo, achado do gate 1-7; campo trazido ao backend nesta wave, antecipando parte de TASK-023-011/017)
 
 ### Wave 2 (depende de Wave 1)
 - [ ] TASK-023-006 ⏸ Todo — `visual-association-storage.ts`: camada de acesso ao binário (bytea)

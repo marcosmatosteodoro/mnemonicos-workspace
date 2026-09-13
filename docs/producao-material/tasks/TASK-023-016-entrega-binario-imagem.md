@@ -47,8 +47,15 @@ automaticamente).
   '/visual-associations/:id/image', 'EDITOR', 'ADMIN')` — SEM `verifyOrigin` (leitura pura,
   mesmo raciocínio de `GET /contents/:id/strip` em `tira.routes.ts`, NFR-022-005) — parseia
   `visualAssociationIdParamSchema` (já existente, TASK-023-003), chama
-  `getVisualAssociationBinary`; `null` → 404; encontrado → `res.type(mimeType)
-  .send(imageData)` (sem stream de arquivo, é um `Buffer` já em memória).
+  `getVisualAssociationBinary`; `null` → 404; encontrado → **achado do `security-engineer`
+  no gate 8 da Wave 1, incorporado como critério (decisão 4.140)**: `mimeType` é coluna
+  `String` livre no schema (não um enum de banco) — o `Content-Type` da resposta NUNCA
+  ecoa a coluna diretamente; valida contra o allowlist fechado (`image/png`, `image/jpeg`,
+  `image/webp` — os únicos valores que `mimeTypeForFormat()`, COMP-023-002, jamais grava),
+  e um valor fora do allowlist (não deveria acontecer, mas é defesa em profundidade) cai
+  em 500 genérico, nunca é refletido na resposta. `res.type(<mimeType validado>)
+  .set('Content-Disposition', 'inline').send(imageData)` (sem stream de arquivo, é um
+  `Buffer` já em memória).
 - `mnemonicos-backend/tests/integration/visual-associations.routes.integration.test.ts`
   (ESTENDE): ver Critérios de pronto.
 - `route-authz-matrix.integration.test.ts`: nenhuma alteração de asserção fixa — a chave
@@ -81,6 +88,12 @@ nunca siga um passo que enfraqueça um critério.
 
 ## Critérios de pronto
 
+- [ ] **`Content-Type` nunca ecoa a coluna livre do banco (achado do `security-engineer`,
+      gate 8 da Wave 1)**: teste que grava, diretamente via Prisma (bypassando a rota de
+      criação), uma linha com `mimeType: 'text/html'` (valor fora do allowlist, simulando
+      corrupção/bug futuro) e confirma que `GET .../:id/image` responde 500 genérico —
+      NUNCA `Content-Type: text/html` refletido. Caso normal (mimeType válido) responde
+      200 com o `Content-Type` correspondente.
 - [ ] Testes cobrem AC-022-023 (cobre NFR-022-005): (a) requisição SEM sessão (`401`); (b)
       sessão STUDENT (`403`); (c) sessão EDITOR ou ADMIN válida, mas SEM alcance por FR-022-018
       sobre o Quadro que usa a imagem (ex.: associação vinculada só a Quadros de OUTRO

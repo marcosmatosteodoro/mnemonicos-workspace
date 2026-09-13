@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -134,26 +134,31 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-13T19:22:01+0000
+**Data conclusão**: 2026-09-13T19:28:53+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: d19c238
 **Jira**: KAN-91
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gate 1-7, wave 1)
+**Tentativas**: 1
+**Cobertura final**: n/a (268/268 verde)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.schema.ts
+  - mnemonicos-backend/tests/unit/visual-associations.schema.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [ ] Segurança (gate 8): n/a — validação de forma (Zod), não superfície sensível isolada (a superfície de upload real é TASK-023-008)
+- [ ] Comportamento (gate 9): n/a — schema sem efeito observável de tela
+
+**Notas**: `z.string({ error: msg })` + `.min(1, msg)` (dois mecanismos, não redundantes —
+confirmado por execução contra Zod 4.4.3 pelo code-reviewer) cobre ausência E vazio com
+mensagem pt-BR; a "Interface pública" do PLAN era contrato mínimo, não transcrição.
 
 **Notas**:

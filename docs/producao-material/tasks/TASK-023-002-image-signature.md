@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 **FATIA SENSÍVEL (princípio 8)**: `security-engineer` focado nesta TASK, mesmo sendo função
 pura sem I/O — é o controle central de NFR-022-001/NFR-022-002 (mitigação de XSS/XXE por
@@ -121,26 +121,29 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-13T19:17:29+0000
+**Data conclusão**: 2026-09-13T19:21:13+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: d13a5a3
 **Jira**: KAN-90
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gate 1-7, wave 1) · security-engineer (gate 8, wave 1)
+**Tentativas**: 1
+**Cobertura final**: n/a (255/255 verde)
 **Arquivos modificados**:
-  -
+  - mnemonicos-backend/src/modules/visual-associations/image-signature.ts
+  - mnemonicos-backend/tests/unit/image-signature.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1)
+- [ ] Comportamento (gate 9): n/a — função pura sem I/O, sem efeito observável de tela
 
-**Notas**:
+**Notas**: security-engineer confirmou as duas âncoras WebP (RIFF+WEBP), guarda de
+comprimento antes de qualquer acesso a byte, e as 3 assinaturas mutuamente exclusivas no
+byte 0.

@@ -37,13 +37,22 @@ exige prova comportamental PRÓPRIA aqui, não herdada da prova de `update`.
 
 ### Inclui
 
-- `removeVisualAssociation(id, actor, db?)` — dentro de `db.$transaction`: (1)
+- `removeVisualAssociation(id, actor, db?)` — **achado do `security-engineer` no gate 8 da
+  Wave 1, incorporado como critério desta TASK (decisão 4.140 — TOCTOU em READ COMMITTED)**:
+  contar vínculos e DEPOIS deletar em passos separados não trava a leitura — um vínculo
+  criado entre a contagem e o `delete` seria anulado silenciosamente pelo `SetNull`,
+  furando FR-022-008. A trava fecha na ESCRITA, atômica, dentro de `db.$transaction`: (1)
   `assertVisualAssociationWritable` primeiro (autor ou ADMIN, senão `ForbiddenError` — 2ª
-  chamadora da guarda); (2) conta vínculos ATIVOS da associação (`MnemonicFrame` cujo
-  `visualAssociationId` é este `id`, excluindo os cuja cadeia
-  Frame→Strip→RuleBreakdown→RawContent tem `RawContent.deletedAt` preenchido, FR-022-019);
-  (3) contagem `0` → `delete` da linha (o binário some junto, é a mesma linha); contagem
-  `>= 1` → `ConflictError` 409 com `details: { reachableLinks: Array<{ rawContentId: string;
+  chamadora da guarda); (2) `db.visualAssociation.deleteMany({ where: { id, frames: {
+  none: { strip: { ruleBreakdown: { rawContent: { deletedAt: null } } } } } } })` — a
+  condição `frames: none` só casa (permite o delete) quando NENHUM `MnemonicFrame`
+  vinculado tem cadeia até um `RawContent` ainda ativo (não soft-deleted, FR-022-019); a
+  decisão de bloquear ou não é feita pelo PRÓPRIO banco, na mesma operação que apagaria a
+  linha — sem janela entre ler e escrever. (3) `result.count === 1` → sucesso (o binário
+  some junto, é a mesma linha); `result.count === 0` → a linha existe mas tem vínculo
+  ativo (já confirmado que existe e é escrita pelo `actor`, passos anteriores) — SÓ ENTÃO
+  uma leitura separada (fora da decisão de segurança, só para montar a mensagem) monta
+  `ConflictError` 409 com `details: { reachableLinks: Array<{ rawContentId: string;
   frameId: string }>; outOfReachCount: number }` — `reachableLinks` só os vínculos cujo
   `RawContent` o `actor` alcança por autoria (ADMIN vê todos), `outOfReachCount` o resto,
   SEM identificar.
@@ -82,6 +91,16 @@ nunca siga um passo que enfraqueça um critério.
 
 ## Critérios de pronto
 
+- [ ] **Fechamento da corrida TOCTOU (achado do `security-engineer`, gate 8 da Wave 1)**:
+      prova ESTRUTURAL de que a decisão de bloquear é feita por `deleteMany` com `where`
+      condicional (nunca por um `count`/leitura separada seguida de `delete` incondicional)
+      — `grep -n "deleteMany" mnemonicos-backend/src/modules/visual-associations/
+      visual-associations.service.ts` confirma a chamada, e o mesmo trecho contém
+      `frames:\s*{\s*none` no `where` (mutante: substituir a condição por um `count` prévio
+      + `delete` faz este grep estrutural falhar — nunca por comparação de string solta,
+      ancorado na chamada real do Prisma). Teste comportamental complementar: mock/spy que
+      confirma 1 única operação de escrita no banco para a decisão (não 2 chamadas
+      count-então-delete).
 - [ ] Testes cobrem AC-022-007 (cobre FR-022-007): associação SEM nenhum vínculo → `DELETE`
       exclui a linha (confirmado por `findUnique` subsequente devolvendo `null`).
 - [ ] Testes cobrem AC-022-008 (cobre FR-022-008): associação com 1 ou mais vínculos ATIVOS

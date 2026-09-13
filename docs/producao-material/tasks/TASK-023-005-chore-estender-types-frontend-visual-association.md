@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -155,26 +155,34 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Branch**:
-**Commit SHA**:
+**Data início**: 2026-09-13T19:31:43+0000
+**Data conclusão**: 2026-09-13T19:55:53+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: c638c29 (frontend); 84b1f08 (retry no backend, tira.service.ts)
 **Jira**: KAN-93
-**Implementado por**:
-**Revisado por**:
-**Tentativas**:
-**Cobertura final**:
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gate 1-7, wave 1 — REPROVADO na rodada 1, achado
+bloqueante de paridade cross-repo; APROVADO na rodada 2 sobre o delta do retry)
+**Tentativas**: 2 (1 retry — campo `visualAssociationId` faltando no backend
+`MnemonicFrameDetail`, achado no gate 1-7 da wave, corrigido em `84b1f08`)
+**Cobertura final**: n/a (367/367 frontend verde; 270/270 backend verde após o retry)
 **Arquivos modificados**:
-  -
+  - mnemonicos-frontend/src/types/domain.ts
+  - mnemonicos-frontend/tests/types/mnemonic-strip.test.ts
+  - mnemonicos-frontend/tests/types/visual-association.test.ts
+  - mnemonicos-backend/src/modules/tira/tira.service.ts (retry)
+  - mnemonicos-backend/tests/unit/tira-frontend-contract.test.ts (retry)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [ ] Segurança (gate 8): n/a — extensão de tipo, sem superfície sensível isolada
+- [ ] Comportamento (gate 9): n/a — tipos sem efeito observável de tela
 
-**Notas**:
+**Notas**: retry trouxe ao backend, nesta mesma wave (antecipação declarada, sancionada),
+parte do escopo que TASK-023-011 e TASK-023-017 previam para wave 4/6 — ver os "Não
+inclui" desses arquivos, já atualizados.
