@@ -48,7 +48,7 @@ fora do MVP).
 | 3 | Instrumentação de etapas da fábrica | producao-material | entregue e mergeada (BRIEF-009 · SPEC-009 · PLAN-010 Done 3/3; PR #3 backend `6541d49`, 2026-09-06) |
 | 4 | Tira mnemônica como sequência de quadros | producao-material | entregue (BRIEF-011 · SPEC-011 · PLAN-012 Done 13/13; PR #5 backend `9063f9e`/PR #9 frontend `179e7f5` mergeados em `main`; DoD (Etapa 4) + Entrega ACEITA_COM_RESSALVAS 2026-09-07, ressalva R-1 do PO aplicada) |
 | 5 | Biblioteca visual reutilizável | producao-material | entregue e mergeada (BRIEF-022 · SPEC-022 · PLAN-023 Done 17/17; PR #6 backend `e316ab6`/PR #12 frontend `677b836` mergeados em `main` 2026-09-14) |
-| 6 | Pipeline de publicação — PDF (rascunho) | producao-material | pendente |
+| 6 | Pipeline de publicação — PDF (rascunho) | producao-material | em ciclo (BRIEF-024.md) |
 | 7 | Contrastes, pegadinhas, flashcards e protocolos impressos | producao-material | pendente |
 | 8 | Versionamento editorial e fechamento legislativo | producao-material | pendente |
 | 9 | Controle de qualidade e gate de versão aprovada | producao-material | pendente |

@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-14T14:20:00-0300 (PLAN-023 Wave 6/6 concluída — F5 COMPLETA, 17/17 TASKs)
+**Última atualização**: 2026-09-14T16:34:27-0300 (SPEC-024 criada e aprovada — F6, pipeline de publicação PDF)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -31,11 +31,12 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
+- Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14. Precisa de PLAN para decidir o motor concreto (DEC com alternativas).
 
 _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 entregue e mergeada 2026-09-14
 (BRIEF-022/SPEC-022/PLAN-023, 17/17 TASKs Done, 6 waves, DoD satisfeito, PR #6 backend
-`e316ab6`/PR #12 frontend `677b836`). Próxima elegível: F6 (Pipeline de publicação — PDF,
-rascunho)._
+`e316ab6`/PR #12 frontend `677b836`). F6 em ciclo (BRIEF-024/SPEC-024, `Approved`
+2026-09-14) — próximo passo é o PLAN._
 
 ## SPECs
 
@@ -49,6 +50,7 @@ rascunho)._
 | SPEC-016 | Toggle de mostrar/ocultar senha nos campos de senha | Approved | 2026-09-07 |
 | SPEC-019 | Página 404 personalizada com volta à home | Approved | 2026-09-07 |
 | SPEC-022 | Biblioteca visual reutilizável | Approved | 2026-09-13 |
+| SPEC-024 | Pipeline de publicação — PDF (rascunho) | Approved | 2026-09-14 |
 
 ## PLANs
 
@@ -120,6 +122,10 @@ rascunho)._
 | Categoria (da associação visual) | Rótulo textual atribuído pelo EDITOR para agrupar e filtrar associações visuais na biblioteca; texto livre com sugestão das categorias existentes e normalização (trim/case-fold) no filtro | SPEC-022 |
 | Função cognitiva (da associação visual) | Justificativa textual, escrita pelo EDITOR, de por que a imagem apoia a recuperação da regra — não decoração; critério herdado da TAP | SPEC-022 |
 | Vínculo (associação visual ↔ Quadro) | Relação entre uma associação visual e um Quadro (no máximo 1 associação por Quadro nesta fatia) — o que torna a associação visual reutilizável entre Tiras diferentes | SPEC-022 |
+| Publicação | Ato de gerar um documento PDF a partir de um Conteúdo bruto, numa das duas Variantes de F6, sempre marcado como rascunho | SPEC-024 |
+| Variante do PDF | "tira" (Quadros em ordem, com Associação visual vinculada quando existir) ou "resumo" (texto corrido da Quebra da regra, sem diagramação de Quadros — braço de controle do A/B de retenção, A-012) | SPEC-024 |
+| Rascunho (PDF) | Rótulo textual visível estampado em toda página de todo PDF emitido por F6, indicando que o documento não passou pelo carimbo de Versão aprovada (F8+F9) | SPEC-024 |
+| Exportação | Ação disparada pelo EDITOR ou ADMIN, na tela do Conteúdo bruto ou da Tira mnemônica, que aciona a Publicação e resulta no download do PDF gerado | SPEC-024 |
 
 ## Decisões irreversíveis
 
@@ -198,9 +204,26 @@ rascunho)._
 | E-02 (SPEC-022) | PO escalou (não-bloqueante, vai à Entrega de F5): a instrumentação de etapa desta fatia (evento na 1ª mutação de vínculo) entra já nesta fatia, ou fica declaradamente fora do escopo — instrumentar depois não recupera o passado | Default do PO: instrumentação mínima entra nesta fatia — já implementado na SPEC (FR-022-024, A-022-012); resposta ao Diretor na Entrega de F5 | PO, aprovação de SPEC-022 |
 | TRISK-023-002 | `multer` (parser multipart) é dependência nova no backend — supply chain de primeira classe (A03) | `/keelson:audit` no gate 8 antes do merge; `memoryStorage()` nunca `diskStorage()` | PLAN-023 §8 |
 | TRISK-023-006 | `route-authz-matrix.integration.test.ts` (tripwire, hoje 25 pares) precisa crescer para as 8 chaves novas de F5 (6 de `visual-associations.routes.ts` + 2 de `tira.routes.ts`) | TASK de rotas atualiza o tripwire junto; suíte acusa se alguma ficar de fora | PLAN-023 §8 |
+| RISK-024-001 | Variantes "tira" e "resumo" podem ficar informacionalmente quase idênticas quando a Tira nunca foi editada por humano, ameaçando o isolamento da variável do A/B (A-012) — mesma classe de E-01/SPEC-011 | A-024-006 declara a composição pretendida; decisão final sobre o que o A/B compara cabe ao Diretor, junto de E-01/SPEC-011 | SPEC-024 §9 |
+| RISK-024-002 | O motor de PDF concreto (DEC do PLAN) pode não sustentar por padrão a postura "sem rede/sem template executável" (NFR-024-001/002) — a escolha da biblioteca não elimina a necessidade de prova no gate 8 | PLAN prova a postura por biblioteca escolhida; gate 8 confirma | SPEC-024 §9 |
+| RISK-024-003 | Geração automática da Tira na exportação (FR-024-006) pode surpreender um EDITOR que só queria "resumo" — mitigado parcialmente por FR-024-013 (não distorce a métrica de tempo-por-etapa de F3/F10) | Aceito nesta fatia; sem tela de confirmação prévia | SPEC-024 §9 |
+| RISK-024-004 | Sem teto de tamanho de texto por Quadro (RISK-011-007 parcialmente resolvido por FR-024-016 — 1 Quadro = 1 página), Quadro com texto muito longo pode gerar leiaute pobre | Revisitável quando o PLAN escolher o motor | SPEC-024 §9 |
+| RISK-024-005 | Falha segura (FR-024-009 — nunca entregar PDF parcial) depende do motor escolhido suportar geração atômica da resposta | PLAN prova; SPEC só declara o comportamento observável exigido | SPEC-024 §9 |
+| RISK-024-006 | Escolha do motor de PDF no PLAN fixa, na prática, o padrão visual das 10 camadas do método (nomeado "irreversível na prática" pelo épico) | DEC do PLAN que escolhe o motor deve apresentar essa consequência entre as alternativas avaliadas | BRIEF-2026-08-27-epico (Riscos por fatia, F6) → SPEC-024 §9 |
+| RISK-024-007 | Herdado de RISK-022-003: teto de 5 MB / resolução da imagem de F5 pode não bastar para impressão de qualidade a partir do PDF de F6 (NFR-024-004 proíbe reprocessamento nesta fatia) | `Reabrir se:` verificação real de impressão mostrar resolução insuficiente — reabre A-022-003/A-022-005, não SPEC-024 | SPEC-022 §9 → SPEC-024 §9 |
+| Q-024-001 | Teto de tamanho de texto por Quadro (paginação já fixada em 1 Quadro/página por FR-024-016) fica para o PLAN — não fecha o denominador de "página" da régua de tempo-por-página de F10 | PLAN avalia junto da escolha do motor | SPEC-024 §9 |
+| E-024-01 | `po` escalou (degrau 2, default aplicado — vai à Entrega de F6): a auto-geração da Tira mnemônica pela exportação (FR-024-006) deve, ou não, emitir o evento de abertura da etapa de produção "Tira mnemônica" (afeta a série de tempo-por-etapa de F3/F10)? | Default aplicado: **não** emite abertura na auto-geração via exportação (FR-024-013, correção aditiva sobre FR-011-008/SPEC-011) — confirmação ou reversão do Diretor na Entrega de F6 | po, aprovação de SPEC-024 |
 
 ## Histórico recente
 
+- 2026-09-14: **SPEC-024 criada e aprovada via `/keelson:specify`** (F6 do épico MNEMORA
+  STUDIO, BRIEF-024) — pipeline de publicação, geração sob demanda de PDF rascunho em 2
+  Variantes (tira/resumo). 16 FRs, 4 NFRs, 20 ACs após pacote de correção consolidado do
+  `po` (métrica com fonte mista, imagem irrenderizável degrada sem derrubar tudo, teto de
+  duração como falha informada, 1 Quadro/página, autorização herdada com prova própria,
+  rótulo de rascunho em toda página + data de geração). 1 escalação pendente para a
+  Entrega (E-024-01, default aplicado). Jira `KAN-106` (Epic-raiz) + `KAN-107` (Story).
+  Próximo passo: `/keelson:plan`.
 - 2026-09-14: **Wave 6/6 de PLAN-023 concluída — PLAN-023 IMPLEMENTADO (17/17 TASKs)** —
   `getVisualAssociationBinary`/`GET /visual-associations/:id/image` (entrega autenticada
   do binário) e a rede de paridade cross-repo do acervo visual (`visual-associations-
