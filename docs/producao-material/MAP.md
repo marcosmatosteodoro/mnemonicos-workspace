@@ -126,6 +126,64 @@
   textual do fonte) é complemento de ORDEM, nunca substituto de alcance; fechamento contável
   reconferido a cada TASK que adiciona um método, nunca herdado do denominador da TASK anterior.
 
+## Biblioteca visual reutilizável (F5 · PLAN-023)
+
+- [2026-09-14 · PLAN-023] **Corrige a entrada da linha 10 acima**: `VisualAssociation`
+  (imagem `Bytes`, categoria, descrição da função cognitiva, `authorId`) +
+  `VisualAssociationLinkEvent` (log append-only de reuso, sem FK — sobrevive à remoção da
+  associação, DEC-023-011) agora existem; `MnemonicFrame.visualAssociationId` (N:1,
+  `onDelete: SetNull`) é o vínculo. `ASSOCIACAO_VISUAL` estende `ProductionStageType`
+  (aditivo) — mnemonicos-backend/prisma/schema.prisma (models `VisualAssociation`/
+  `VisualAssociationLinkEvent`).
+- [2026-09-14 · PLAN-023] `visual-associations.service.ts` — módulo único cobrindo TODO o
+  CRUD + leitura em massa do acervo (schema Zod → este service → routes): `create`/
+  `updateVisualAssociation` (guarda `assertVisualAssociationWritable`, autor ou ADMIN),
+  `removeVisualAssociation` (trava de vínculo ativo — ver corrida abaixo),
+  `listVisualAssociations`/`listVisualAssociationCategories`/`normalizeCategoryKey`/
+  `suggestCategories` (leitura comum a EDITOR/ADMIN, sem guarda de autoria — FR-022-023),
+  `getVisualAssociationBinary` (leitura pura do binário) — todas com `select` explícito
+  excluindo `imageData` exceto a última — mnemonicos-backend/src/modules/visual-associations/visual-associations.service.ts:1-180.
+- [2026-09-14 · PLAN-023] **Corrida TOCTOU real sob READ COMMITTED**: `deleteMany` com
+  `where` condicional sobre tabela FILHA (`frames: { none: ... } }`) NÃO é atômico contra
+  escrita concorrente na tabela filha quando há FK `ON DELETE SET NULL` — o predicado é
+  avaliado no snapshot do statement, não reavaliado após espera de lock. Fechado travando
+  a linha PAI (`tx.$queryRaw` `SELECT ... FOR UPDATE`, parametrizado) como 1º statement da
+  `$transaction`, antes de qualquer decisão — padrão a repetir em qualquer corrida futura
+  da mesma forma (predicado sobre relação, nunca sobre a própria linha escrita) —
+  mnemonicos-backend/src/modules/visual-associations/visual-associations.service.ts
+  (`removeVisualAssociation`).
+- [2026-09-14 · PLAN-023] **`Content-Type` de resposta binária nunca ecoa coluna livre**:
+  `GET /visual-associations/:id/image` valida `mimeType` (coluna `String`, não enum de
+  banco) contra `IMAGE_MIME_TYPE_ALLOWLIST` fechado antes do header — 1ª rota não-JSON do
+  backend inteiro (`res.type(...).send(Buffer)`, nunca `express.static`/`sendFile`) —
+  mnemonicos-backend/src/modules/visual-associations/visual-associations.routes.ts:70-160.
+- [2026-09-14 · PLAN-023] **Filtro Prisma `mode: 'insensitive'` compila para `ILIKE`**: o
+  valor do CLIENTE em `equals`/`contains` com `mode: 'insensitive'` é interpretado como
+  PADRÃO LIKE (`%`/`_`/`\` viram curinga), não igualdade — `escapeLikeMetacharacters`
+  escapa antes de montar o filtro; a mesma classe (não corrigida, fora do escopo deste
+  PLAN) existe em `disciplines.service.ts`/`users.service.ts` —
+  mnemonicos-backend/src/modules/visual-associations/visual-associations.service.ts
+  (`listVisualAssociations`).
+- [2026-09-14 · PLAN-023] Frontend: `visual-association-list-states.tsx` (módulo canônico
+  compartilhado — casca de estados loading/erro+retry/vazio + `visualAssociationImageUrl`)
+  consumido por `visual-association-picker.tsx` (seletor embutido), `visual-library-board.tsx`
+  (CRUD completo da tela `/visual-library`, confirmação de remoção, validação de
+  obrigatórios, `aria-label` único por item) e o enxerto em `mnemonic-strip-board.tsx`
+  (vínculo/desvínculo/substituição por Quadro, reusa o `role="alertdialog"` de remoção
+  para um 2º propósito — trava cruzada `isAnyDialogOpen` impede 2 diálogos simultâneos
+  entre Quadros diferentes, mirando só os GATILHOS, nunca o bloco que hospeda feedback
+  assíncrono de outro Quadro) — mnemonicos-frontend/src/components/visual-association-list-states.tsx:1-60.
+- [2026-09-14 · PLAN-023] `/visual-library` — Server Component casca (`content/page.tsx` é
+  o molde) + `INTERNAL_ROUTE_PREFIXES`/`config.matcher` (guard de navegação); ainda sem
+  entrada de menu (mesma condição de `/content`, sem navegação principal no produto) —
+  mnemonicos-frontend/src/app/(interno)/visual-library/page.tsx:1-20.
+- [2026-09-14 · PLAN-023] Mutations `linkVisualAssociationToFrame`/
+  `unlinkVisualAssociationFromFrame` invalidam AS DUAS tags RTK Query (`MnemonicStrip` E
+  `VisualAssociationList`) — o mesmo `linkCount` é lido por 2 consumidores com tags
+  distintas (picker embutido × board do acervo); mutation que altera campo lido por 2+
+  queries precisa invalidar todas — mnemonicos-frontend/src/store/api.ts (linhas das 2
+  mutações de vínculo).
+
 ## Publicação (ausente)
 
 - [2026-08-27 · epico] Nenhuma geração ou exportação de PDF existe nos dois repos — nem dependência, nem rota, nem script; F6 é greenfield total nesta área — busca em ambos os repos não retornou nada
