@@ -7,7 +7,7 @@
 **Wave**: 5
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -113,19 +113,19 @@ base da mutation (os 3 estados observáveis nascem de graça de `isLoading`/`isS
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-14T20:25:37-0300
+**Data conclusão**: 2026-09-14T20:40:55-0300
+**Commit SHA**: 09b9fbf (implementação) · 554e929 (retry — gate 1: remoção do ramo morto de parsing sem emissor real)
 **Jira**: KAN-117
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (Wave 5 — 1 retry, achado fechado, re-review APROVADO)
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — sem superfície sensível (parsing de resposta do próprio backend, sem autenticação/injeção nova)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-024 sem FEATs
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

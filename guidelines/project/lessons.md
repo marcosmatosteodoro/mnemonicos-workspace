@@ -390,6 +390,21 @@ independente do estado do dado do dono real. O caso do par coincidente se escrev
 **PAPEL** (não-dono vs. dono/ADMIN), asserindo a **mensagem por igualdade literal** entre
 as duas recusas de não-alcance — nunca só `instanceof AppError`. Referência:
 `guidelines/core/SECURITY.md` "Padrões de autorização" + `node-22.md` §6.3.
+**Corolário de ramo sem emissor real (gate 1 da Wave 5 de PLAN-025, TASK-025-010,
+`extractContentDispositionFilename`):** função de parsing/extração com CADEIA de
+fallback (`if (a) return …; if (b) return …; return default`) — não uma árvore de
+precedência com dois predicados que coincidem, mas uma sequência de ramos alternativos —
+tem o mesmo ponto cego: "um caso por ramo" no critério de pronto não força prova do ramo
+cujo formato nenhum emissor real produz. Aqui, o ramo de `Content-Disposition` SEM aspas
+nunca foi exercitado porque o único emissor (`publication.routes.ts`, nome vindo de
+`publication.service.ts`: uuid + enum + literal) sempre emite COM aspas — apagar o ramo
+morto deixava a suíte inteira verde. Fechado por REMOÇÃO do ramo (não por prova
+artificial): quando um ramo de fallback não corresponde a nenhum emissor real do projeto,
+a decisão declarada é removê-lo, nunca deixá-lo sem teste "por via das dúvidas" (Art. 4 —
+sem dor demonstrável). Se o ramo tiver que ficar (ex.: consumidor externo fora de
+controle do projeto), cada ramo ganha 1 caso com fixture no formato daquele ramo
+especificamente — "apagar o ramo, um por vez, derruba pelo menos 1 teste" é o fechamento
+falsificável, nos dois casos.
 
 ## [Testes] Prova de corrida/exclusão nasce na fronteira da invariante, e o mutante roda pelo comando do critério
 

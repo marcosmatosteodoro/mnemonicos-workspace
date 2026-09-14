@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-14T20:23:54-0300 (PLAN-025 Wave 4/7 concluída, 9/13 TASKs — F6, pipeline de publicação PDF)
+**Última atualização**: 2026-09-14T20:40:55-0300 (PLAN-025 Wave 5/7 concluída, 10/13 TASKs — F6, pipeline de publicação PDF)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -65,7 +65,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
-| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 9/13 🟡 | Approved |
+| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 10/13 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -219,6 +219,15 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-14: **Wave 5/7 de PLAN-025 concluída (10/13 TASKs Done)** — mutation
+  `exportPublication` (RTK Query, primeiro `responseHandler` binário do frontend). 1
+  retry (gate 1: ramo de fallback de parsing de `Content-Disposition` sem aspas nunca
+  exercitado por teste — removido, já que o único emissor real sempre emite com aspas;
+  lição estendida em `guidelines/project/lessons.md`). 2 pendências não-bloqueantes para
+  TASK-025-011: (a) armazenar o `Blob` no cache RTK dispara `console.error` do
+  `serializableStateInvariantMiddleware` (ruído de dev, não afeta build/runtime); (b) o
+  guard `filename === ''` (header ausente) segue sem consumidor e sem teste — vira
+  exigência real quando o componente de download existir.
 - 2026-09-14: **Wave 4/7 de PLAN-025 concluída (9/13 TASKs Done)** — `POST
   /contents/:id/publication`, a barreira de autorização REAL do pipeline
   (NFR-024-003, `requireRole('EDITOR','ADMIN')` + `verifyOrigin`; o service de baixo
