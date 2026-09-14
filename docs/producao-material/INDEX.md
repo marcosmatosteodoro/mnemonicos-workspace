@@ -219,6 +219,9 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-14: sync Jira pulado (conector Atlassian caído — `getJiraIssue` sem resposta em
+  300s, 2 tentativas) — KAN-115 (TASK-025-008) não transicionada para Concluído. Retomar:
+  `/keelson:jira-sync producao-material --phase finish-dev`.
 - 2026-09-14: **Wave 3/7 de PLAN-025 concluída (8/13 TASKs Done)** — `exportPublication`,
   função central de orquestração (guarda de alcance + leitura + composição + evento).
   Confirma em código a resolução do achado do PLAN sobre AC-024-018/DEC-025-007: LEITURA
