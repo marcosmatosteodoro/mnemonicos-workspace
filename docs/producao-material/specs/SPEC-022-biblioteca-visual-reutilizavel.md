@@ -204,6 +204,33 @@ reprova 4/4). Gate 8 reaprovado na 2ª rodada da Wave 4; FEAT-022-001 completou 
 > miniatura, categoria e quantos Quadros cada associação já ilustra, e filtra por
 > categoria para achar a que precisa.
 
+**Verificação (gate 9)**: 2026-09-14 — APROVADO (comportamento funcional). Exercitado com
+execução real (backend `createApp()` via `npm run dev` :3333 + Postgres real de dev;
+frontend `next dev` :3000; identidade confirmada: processos iniciados nesta sessão a
+partir do próprio worktree, backend HEAD `3fc9b9a`, frontend HEAD `51f4a50`, branch
+`feat/producao-material-mnemora-studio`, `git status` idêntico antes/depois do exercício
+em ambos os repos — sem mudança concorrente): AC-022-009 (`GET /visual-associations` real
++ tela `/visual-library` real, logado como EDITOR: listagem mostra categoria e `linkCount`
+corretos, refletindo dados reais do backend em tempo real), AC-022-010 (filtro por
+categoria — via UI e via HTTP direto — devolve só a associação daquela categoria; filtro é
+por categoria específica/normalizada, não substring — comportamento correto por design do
+`equals` normalizado do service, confirmado não ser regressão), AC-022-022 (sugestão de
+categoria ao digitar "Categ" no formulário de criação exibe, via HTTP real, as 2
+categorias existentes que combinam), AC-022-025 (normalização trim/case-fold: filtro por
+"categoria qa gate9" minúsculo casa com "Categoria QA Gate9" armazenada, texto original
+preservado, confirmado por leitura direta). Suíte automatizada (rodada pelo `qa`, filtro
+mais amplo que o gate 2 por cobrir a FEAT inteira): `visual-associations.routes.integration.test.ts`
+47/47, `visual-associations.service.test.ts` (`normalizeCategoryKey`/`suggestCategories`)
+11/11, `route-authz-matrix.integration.test.ts` 36/36, frontend `visual-library-board.test.tsx`
+18/18, `proxy.test.ts` (guard de `/visual-library`) 55/55. Dados de teste (2 associações
+visuais, 2 Conteúdos brutos/Tiras) criados via API real e removidos ao final (`db:psql`),
+acervo restaurado a vazio (`GET /visual-associations` → `total:0` confirmado).
+**Achado fora de escopo** (não bloqueia, sinal ao Tech Lead): `GET
+/visual-associations/:id/image` (TASK-023-016, ainda não implementada) devolve 403
+(deny-by-default de rota não montada) — miniaturas não carregam na tela ainda; esperado,
+fora do escopo desta wave.
+
+
 - **FR-022-010** [MUST] O sistema deve prover uma tela de navegação da biblioteca visual
   que lista as associações visuais existentes no acervo.
 - **FR-022-011** [MUST] Quando o usuário filtra a biblioteca por uma categoria, o sistema
@@ -222,6 +249,45 @@ reprova 4/4). Gate 8 reaprovado na 2ª rodada da Wave 4; FEAT-022-001 completou 
 > EDITOR seleciona uma associação visual da biblioteca (nova ou já usada em outro Quadro)
 > e a vincula; pode desvincular depois sem apagar a associação do acervo; e a imagem
 > vinculada reaparece ao recarregar a tela.
+
+**Verificação (gate 9)**: 2026-09-14 — APROVADO (comportamento funcional). Mesma execução
+real e mesma prova de identidade/estabilidade do bloco de FEAT-022-002 acima (mesmos HEADs,
+mesma janela, sem mudança concorrente nos dois repos). Exercitado ponta-a-ponta via HTTP
+real e via UI (Playwright, logado como EDITOR, tela `/content/<id>/tira`): AC-022-011
+(vincular associação nova a um Quadro sem vínculo — via API e via UI/picker; e vincular a
+MESMA associação a um Quadro de OUTRA Tira — `linkCount` sobe para 2, `total` do acervo
+permanece 1, sem duplicar a imagem), AC-022-012 (desvincular — via UI: miniatura/estado
+somem do Quadro desvinculado, associação permanece vinculada ao outro Quadro, `linkCount`
+decrementa corretamente 2→1, confirmado por leitura direta do backend), AC-022-013 (reload
+real da tela da Tira após login exibe o vínculo persistido — confirmado pela renderização
+de "Desvincular"/"Trocar associação visual" no Quadro certo ao reabrir a rota), AC-022-008/
+AC-022-019 (`DELETE` da associação vinculada → 409 com `reachableLinks` identificando os 2
+vínculos do próprio EDITOR e `outOfReachCount:0`; listagem confirma o item intacto com
+`linkCount` correto durante a recusa), AC-022-017 (remoção de Quadro vinculado pela UI —
+diálogo `alertdialog`, confirmar — conclui sem bloqueio; associação preservada no acervo,
+`linkCount` decrementa), AC-022-018 (troca de associação vinculada — diálogo de confirmação
+de substituição abre ANTES da mutação, foco no botão "Confirmar substituição", controles
+dos OUTROS Quadros ficam desabilitados enquanto o diálogo está aberto; ao confirmar, A
+desvinculada e B única vinculada, confirmado via leitura direta do backend; repetir
+vinculando a MESMA associação já vinculada não reabre diálogo — idempotente, sem erro).
+Suíte automatizada: `mnemonic-strip-board.test.tsx` 46/46 (inclui os `describe` novos de
+vincular/desvincular/substituir + regressão de PLAN-012 — NFR-022-006), demais suítes
+compartilhadas com FEAT-022-002 acima. Dados de teste (2 Tiras, 2 associações, vínculos
+cruzados) criados via API real e removidos ao final, acervo restaurado a vazio.
+**Achado fora de escopo** (não viola nenhum AC citado acima, sinal ao Tech Lead):
+`linkVisualAssociationToFrame`/`unlinkVisualAssociationFromFrame` (`store/api.ts`) só têm
+`invalidatesTags: ['MnemonicStrip']` — não invalidam `'VisualAssociationList'`. Confirmado
+ao vivo: após vincular "Categoria QA Gate9" a um Quadro (`linkCount` real = 1, confirmado
+por `GET /visual-associations` direto), o picker embutido reaberto na MESMA sessão
+(componente canônico compartilhado com a tela `/visual-library`,
+`visual-association-list-states.tsx`) ainda mostrava "0 vínculos" para essa associação —
+contagem desatualizada até um refetch por outro caminho (ex.: navegar para
+`/visual-library`). Não viola nenhum AC-022-011/012/013/.../018 citado (nenhum exige
+contagem ao vivo no picker embutido, só na tela da biblioteca — AC-022-009 — onde a
+contagem sempre bateu no teste acima), mas é uma lacuna real de cache que pode subestimar
+o reuso visível ao EDITOR durante a mesma sessão de vínculo. Correção sugerida: somar
+`'VisualAssociationList'` a `invalidatesTags` das 2 mutações de vínculo/desvínculo.
+
 
 - **FR-022-013** [MUST] Quando um EDITOR ou ADMIN está na tela da Tira mnemônica de um
   Quadro específico, o sistema deve permitir selecionar uma associação visual da
@@ -449,9 +515,16 @@ reprova 4/4). Gate 8 reaprovado na 2ª rodada da Wave 4; FEAT-022-001 completou 
 
 - **AC-022-025** (cobre NFR-022-007)
   Dado o acervo com associações visuais cujas categorias variam por capitalização ou
-  espaçamento (ex.: "Tributário" e " tributario "), quando o usuário agrupa ou filtra a
+  espaçamento (ex.: "Tributário" e " TRIBUTÁRIO "), quando o usuário agrupa ou filtra a
   biblioteca por categoria, então o sistema trata essas variações como a mesma categoria
   na exibição e no filtro, sem alterar o texto livre armazenado na entrada original.
+  Variação por ACENTO (ex.: "Tributário" vs. "Tributario") fica FORA desta normalização
+  — NFR-022-007 é trim + case-fold, nunca accent-fold; texto anterior deste AC citava um
+  exemplo com variação de acento simultânea à de capitalização, inconsistente com o
+  mecanismo prescrito (corrigido nesta revisão — achado do code-reviewer, Wave 5 de
+  PLAN-023). `Reabrir se:` reincidência real de queixa de fragmentação por acento
+  demandar accent-folding — aí DEC-023-008 (PLAN-023) reabre para prever `unaccent`/
+  coluna normalizada, decisão do Diretor por envolver migração.
 
 ## 8. Premissas e decisões prévias
 

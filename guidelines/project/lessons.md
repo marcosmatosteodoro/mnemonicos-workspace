@@ -1520,3 +1520,31 @@ POSITIVA TERMINAL (`findByText` do item esperado no resultado final), nunca na n
 debounce, neste frontend).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Código] Filtro Prisma com `mode: 'insensitive'` interpreta o valor do cliente como PADRÃO LIKE, não como igualdade
+
+**Erro:** `{ campo: { equals: <valor do cliente>, mode: 'insensitive' } }` foi escrito como
+igualdade e entregue como casamento por PADRÃO — `?category=%` devolvia o acervo inteiro
+(Wave 5 de PLAN-023, `visual-associations.service.ts`).
+**Causa:** `mode: 'insensitive'` compila para `ILIKE` no Postgres. O valor vai
+parametrizado (não há injeção), e é exatamente por isso que revisão de segurança e
+typecheck passam por cima: o defeito não é injeção, é semântica — `%`, `_` e `\` no valor
+viram curinga. O perfil ativo (`guidelines/project/backend/node-22.md` §6.1) reforçava a
+leitura tranquilizadora ("sem interpolação da entrada") e marcava o item como
+"⚠️ não confirmado", sem mencionar a interpretação de padrão.
+**Solução:** todo valor de origem externa que entra em filtro Prisma com
+`mode: 'insensitive'` (`equals`, `contains`, `startsWith`, `endsWith`) passa antes por
+escape dos metacaracteres LIKE — `value.replace(/[\\%_]/g, '\\$&')`. A prova é um teste
+por metacaractere (`%`, `_`, `\`) com fixture discriminante e asserção de CONTAGEM exata,
+nunca "contém". Exemplar: `mnemonicos-backend/src/modules/visual-associations/visual-associations.service.ts`
+(`escapeLikeMetacharacters`). §6.1 do perfil já foi corrigido (marca "⚠️ não confirmado"
+removida, KAN-102/PLAN-023).
+**Nota (achado relacionado, fora de escopo de PLAN-023 — não corrigido, só rastreado):** a
+mesma classe existe, pré-existente, em `mnemonicos-backend/src/modules/disciplines/disciplines.service.ts:28`
+e `mnemonicos-backend/src/modules/users/users.service.ts:69-70`
+(`{ contains: search, mode: 'insensitive' }` com `search` do cliente, sem escape). Quem
+mexer nesses módulos aplica a mesma solução.
+**Validade:** geral (qualquer filtro Prisma com `mode: 'insensitive'` sobre valor de
+origem externa).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

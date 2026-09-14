@@ -329,9 +329,13 @@ await prisma.$queryRawUnsafe(`SELECT id FROM disciplines WHERE slug = '${slug}'`
 - `$queryRaw`/`$executeRaw` com **template tag** interpolam os valores como parâmetros do
   driver `pg` (`$1`, `$2`), não como texto — inclusive sob o driver adapter do Prisma 7.
   ⚠️ não confirmado
-- `mode: 'insensitive'` é traduzido pelo Prisma para comparação case-insensitive
-  parametrizada no Postgres (`ILIKE`), sem interpolação da entrada — vale reconfirmar sob o
-  compilador TS/WASM do Prisma 7, que substituiu o engine Rust. ⚠️ não confirmado
+- `mode: 'insensitive'` compila para `ILIKE` com o valor PARAMETRIZADO (confirmado sob o
+  compilador TS/WASM do Prisma 7, KAN-102/PLAN-023) — não há injeção, MAS o valor do
+  cliente é interpretado como PADRÃO LIKE, não como igualdade literal: `%`, `_` e `\`
+  digitados pelo usuário viram curinga (`?category=%` casa qualquer linha). Todo valor de
+  origem externa que entra em filtro `equals`/`contains`/`startsWith`/`endsWith` com
+  `mode: 'insensitive'` escapa `\`, `%` e `_` antes (`value.replace(/[\\%_]/g, '\\$&')`) —
+  exemplar: `visual-associations.service.ts` (`escapeLikeMetacharacters`).
 - **`$queryRawUnsafe` / `$executeRawUnsafe` são proibidos com dado de usuário.** Se
   precisarem existir, o argumento é literal do código.
 - **Identificador não se parametriza.** Nome de coluna em `orderBy`, direção `asc`/`desc`,
