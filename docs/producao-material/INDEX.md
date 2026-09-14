@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-14T18:24:06-0300 (PLAN-025 Wave 2/7 concluída, 7/13 TASKs — F6, pipeline de publicação PDF)
+**Última atualização**: 2026-09-14T19:39:44-0300 (PLAN-025 Wave 3/7 concluída, 8/13 TASKs — F6, pipeline de publicação PDF)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -65,7 +65,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
-| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 7/13 🟡 | Approved |
+| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 8/13 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -219,6 +219,16 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-14: **Wave 3/7 de PLAN-025 concluída (8/13 TASKs Done)** — `exportPublication`,
+  função central de orquestração (guarda de alcance + leitura + composição + evento).
+  Confirma em código a resolução do achado do PLAN sobre AC-024-018/DEC-025-007: LEITURA
+  de material já existente (Quebra, Tira já aberta) usa a guarda nova sem autoria; só a
+  AUTO-GERAÇÃO da Tira continua restrita ao autor original (herdado de F4) — comportamento
+  real medido é 404/`NotFoundError`, não 409/`ConflictError` como o texto original do
+  PLAN presumia (corrigido). 1 retry (gate 1: faltava prova do cabeamento de
+  `suppressOpeningEvent`; gate 6: `relationLoadStrategy` não medido/fixado para relação
+  de lista; gate 7: 2 achados de DRY — `actorOf` e fixture WEBP duplicados). Gates 1-7 e
+  8 aprovados após o retry.
 - 2026-09-14: **Wave 2/7 de PLAN-025 concluída (7/13 TASKs Done)** — schema Zod de
   exportação (dedup com `rawContentIdParamSchema` de F2) e motor de composição de PDF
   (`pdf-lib`, `buildSummaryPdf`/`buildStripPdf`). Convergência mais longa e mais séria do

@@ -7,7 +7,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: In Progress
+**Status**: Done
 
 ## Dependências
 
@@ -211,17 +211,17 @@ PLAN-025 §3 (COMP-025-005) e §6 (DEC-025-002/DEC-025-005/DEC-025-007).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-09-14T18:35:10-0300
+**Data conclusão**: 2026-09-14T19:39:44-0300
+**Commit SHA**: 2bfb0e9 (implementação) · b440c0b (retry — gate 1/6/7: cabeamento suppressOpeningEvent, relationLoadStrategy medido, DRY actorOf/WEBP) · 20bfdca (carona Art. 7)
 **Jira**: KAN-115
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (Wave 3 — 1 retry, 4 achados fechados, re-review APROVADO)
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 3)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-024 sem FEATs
