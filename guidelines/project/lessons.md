@@ -796,7 +796,7 @@ mesma condição antes de despachar/commitar. Exemplar: `src/lib/prisma.ts` impo
 `{ env, isProduction }` de `../config/env` em vez de recalcular.
 **Validade:** geral (qualquer predicado derivado de configuração/env).
 **Estado:** ativa
-**Contadores:** confirmada 4 · contestada 0
+**Contadores:** confirmada 5 · contestada 0
 **Reincidência (2026-09-13, PLAN-023/TASK-023-008, Wave 3)**: o retry que consolidou 3
 fixtures duplicadas de `VisualAssociation` em `tests/support/visual-association-fixtures.ts`
 (achado de gate 7) re-derivou, no MESMO diff, **duas** ocorrências de bloco
@@ -826,6 +826,16 @@ pelo mesmo módulo (`production-events.service.ts`) que o arquivo já importava 
 a implementação reinventou o predicado — nomear o canônico na decisão não substitui
 importá-lo no código. Achado pelo `code-reviewer` (gate 5, não-conformidade com a DEC),
 fechado em 1 retry.
+**Reincidência (2026-09-14, PLAN-025/TASK-025-007, Wave 2 — mesma wave, diff subsequente)**:
+o retry que fechou 2 achados de gate 8 em `image-signature.ts` (bypass de estrutura PNG)
+criou `crc32`/`pngChunk`/builder de decoy em `tests/unit/image-signature.test.ts`
+byte-idênticos aos que o MESMO diff da wave já tinha criado 4 commits antes em
+`tests/unit/pdf-composer.test.ts` (commit `b52d131`). 5ª ocorrência da mesma causa —
+extensão da validade: antes de commitar fixture/helper de teste novo, `git diff
+--name-status --diff-filter=A <base>...HEAD` + grep do nome nos arquivos de teste JÁ
+criados na branch corrente — canônico a reusar não precisa ser antigo, pode ter nascido
+poucos commits atrás na mesma wave. Home correto para o reuso: `tests/support/<domínio>-fixtures.ts`
+(exemplares: `production-events-fixtures.ts`, `visual-association-fixtures.ts`).
 
 ## [Design] Cor semântica de texto (erro/sucesso/link) vem de token do tema, nunca de literal da paleta
 

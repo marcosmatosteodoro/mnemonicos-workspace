@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-14T16:15:04-0300 (PLAN-025 Wave 1/7 concluída, 5/13 TASKs — F6, pipeline de publicação PDF)
+**Última atualização**: 2026-09-14T18:24:06-0300 (PLAN-025 Wave 2/7 concluída, 7/13 TASKs — F6, pipeline de publicação PDF)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -65,7 +65,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
-| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 5/13 🟡 | Approved |
+| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 7/13 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -162,6 +162,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | ~~Q-005-004 (E-01)~~ | **RESPONDIDA 2026-09-06 (Entrega de PLAN-006)** — Diretor confirmou que o EDITOR PODE criar tema/assunto novo em disciplina existente. Reabre A-005-007 (SPEC-005) — mas **não** reabre PLAN-006 (já implementado e entregue sob o comportamento anterior, só seleção do acervo semeado, AC-005-027 provado). | Capacidade nova registrada em "Especificadas, ainda não planejadas" — entra num PLAN/brief futuro para decidir a forma (endpoint de criação de tema, validação/dedup, UI inline em `content/new`) | Diretor, Entrega de PLAN-006 |
 | ~~TRISK-006-001~~ | **RESOLVIDO 2026-09-01** — Diretor confirmou "Gerar e executar" (ledger `intervencao` 2026-09-01T13:27:23Z, anterior à aplicação). Migração aditiva aplicada em dev + `mnemonicos_test`; auditada linha a linha pelo gate 8 (0 `DROP`/`ALTER` destrutivo). | — nenhuma | PLAN-006 §8 / Wave 1 |
 | RISK-006-005 | `npm audit` do backend (pós-`npm ci` de recuperação, Wave 2) = 3 vulnerabilidades nas deps transitivas via `prisma` (1 high — mysql2 auth plugin downgrade; 2 moderate — mysql2 decompression bomb, `qs`). Não introduzidas por este diff (lockfile intocado) | `/keelson:audit` na Entrega; `fixAvailable` do npm exige downgrade maior de Prisma (7→6, inaceitável); superfície `mysql2` provavelmente inalcançável em projeto PostgreSQL — hipótese a confirmar, não medição | security-engineer, re-review Wave 2 |
+| RISK-025-002 | Confirmado por `security-engineer` (gate 8, Wave 2 de PLAN-025, com `provider = "postgresql"` em `schema.prisma:20` visto): `mysql2` (via `@prisma/client`) inalcançável nesta configuração — confirma a hipótese de RISK-006-005, rebaixa `high` catalogado para risco residual não-explorável. `qs` (via `express@5.2.1`) segue moderate e ALCANÇÁVEL (Express parseia query string com `qs`), com fix disponível sem downgrade major (`npm audit fix`) — não aplicado neste PLAN (fora do diff da wave, mudança de lockfile é ajuste pontual próprio) | rodar `npm audit fix` no backend como ajuste pontual antes do próximo PR, ou via `/keelson:audit` | security-engineer, gate 8 Wave 2 de PLAN-025 |
 | ~~TRISK-006-003~~ | **RESOLVIDO 2026-09-05** — filtro `deletedAt = null` centralizado em `contents.service.ts` (helper reusado por T006/T008/T009, nunca recriado) e confirmado end-to-end na superfície HTTP por T011 (AC-005-031/037: conteúdo removido → 404 no acesso direto E na Quebra; linha órfã confirmada presente no banco mas inalcançável). Verificado ao vivo pelo `qa` (gate 9, execução real com Postgres). | selado — nenhum caminho de leitura ficou sem o filtro | PLAN-006 §8 / Wave 4-5 |
 | ~~TRISK-006-004~~ | **RESOLVIDO 2026-09-05** — `domain-types-parity.test.ts` estendido a `PROOF_RADAR_CLASSES`/`NORMATIVE_SOURCE_TYPES` (TASK-006-007); rede equivalente criada para as INTERFACES de F2 (`contents-frontend-contract.test.ts`, Wave 3 retry) — gap que DEC-006-005 tinha deixado aberto (interfaces fora do escopo original da DEC) e que causou a reprovação inicial da Wave 3. | selado — nenhuma condição de reabertura pendente | PLAN-006 §8 / Wave 3 |
 | RISK-006-006 | Contrato cross-repo por leitura de texto (`domain-types-parity.test.ts`, `contents-frontend-contract.test.ts`) prova DECLARAÇÃO×DECLARAÇÃO, não `select`×declaração — uma chave nova no `select` do Prisma sem a mesma chave na interface do frontend passa pelo typecheck (extra property em valor não-literal) e pelos dois testes. Achado do code-reviewer (re-review Wave 3), declarado como "próximo degrau da rede, não gap desta rodada" | disciplina de mesmo-diff continua sendo a defesa; revisitar se doer (campo novo no backend some silenciosamente do frontend) | code-reviewer, re-review Wave 3 |
@@ -198,6 +199,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | RISK-022-001 | Categoria como texto livre sem normalização pode fragmentar a navegação por categoria se o acervo crescer sem curadoria | mitigado por FR-022-025 (sugestão de categorias existentes) e NFR-022-007 (normalização trim/case-fold no filtro); decisão técnica de implementação fica com o PLAN | SPEC-022 §9 |
 | RISK-022-002 | Métrica primária "uploads evitados" depende da disciplina de busca do EDITOR antes de subir imagem nova — se ele não busca antes, sempre cria nova mesmo havendo equivalente | mitigado em parte por FR-022-025; aceito nesta fatia, revisitar se o piloto mostrar baixo reuso | SPEC-022 §9 |
 | RISK-022-003 | Teto de tamanho de arquivo (5 MB, A-022-005) é estimativa sem dado real; se o motor de PDF (F6) exigir resolução maior, pode precisar subir | reabrir a validação de tamanho (e possivelmente a decisão de armazenamento, A-022-003) se/quando F6 exigir | SPEC-022 §9 |
+| RISK-025-001 | `security-engineer` (gate 8, Wave 2 de PLAN-025) achou que o teto de 5 MB de F5/`visual-associations` limita bytes COMPRIMIDOS do upload, não DIMENSÃO decodificada — decompression bomb via PNG (poucos KB comprimidos, cabeçalho declarando dimensão gigante) passa pela admissão de F5 intacto; F6 (`pdf-composer.ts`) ganhou teto de pixels antes do decode (achado ALTA, corrigido no retry de TASK-025-007), mas a ADMISSÃO do upload em F5 continua sem esse teto | fora de escopo de PLAN-025 (não mexer em F5 já mergeado); considerar teto de dimensão na admissão do upload (`visual-associations.routes.ts`) numa fatia/brief futuro | security-engineer, gate 8 Wave 2 de PLAN-025 |
 | RISK-022-004 | Reuso da mesma associação visual em Quadros/Tiras diferentes reduz a rastreabilidade de "quem introduziu a imagem originalmente" por vínculo | sem requisito de proveniência de autoria por vínculo nesta fatia; pode importar para F8/F9 | SPEC-022 §9 |
 | RISK-022-005 | Listagem de associações visuais com miniatura (sem processamento/thumbnail derivado) tem custo de banda real em acervo grande com arquivos de até 5 MB | atenção obrigatória do gate 10 (performance) e do PLAN, junto com Q-022-001 (paginação) | SPEC-022 §9 |
 | Q-022-001 | Volume do acervo pode exigir paginação/ordenação na listagem/filtro da biblioteca — não decidido na SPEC | fica para o PLAN avaliar o volume esperado | SPEC-022 §9 |
@@ -217,6 +219,21 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-14: **Wave 2/7 de PLAN-025 concluída (7/13 TASKs Done)** — schema Zod de
+  exportação (dedup com `rawContentIdParamSchema` de F2) e motor de composição de PDF
+  (`pdf-lib`, `buildSummaryPdf`/`buildStripPdf`). Convergência mais longa e mais séria do
+  slug até aqui: **3 vulnerabilidades reais de decompression bomb** encontradas e
+  fechadas em sequência pelo gate 8 (falta de teto de pixels/APNG antes do decode →
+  bypass por chunk decoy antes do IHDR → bypass por IHDR duplicado com semântica
+  last-wins no decoder real) — fechado com refatoração estrutural (`walkPngChunks`,
+  varredura única de chunk reusada pelos dois predicados de leitura de PNG), não mais
+  patches pontuais. Mais 5 achados do gate 1-7 (rótulo de Variante ausente no cabeçalho,
+  prova de ausência de rede cega ao especificador `node:`, buffer JPEG com ArrayBuffer
+  não-exato quebrando silenciosamente em produção, schema duplicado, fixtures de teste
+  duplicadas — 5ª reincidência da lição DRY). 7 commits de retry ao todo. 2 achados de
+  supply chain (RISK-025-002): `mysql2` rebaixado de high para risco não-explorável
+  (projeto é PostgreSQL) e `qs` moderate alcançável, com fix disponível — registrado como
+  ajuste pontual pendente, fora do diff desta wave.
 - 2026-09-14: **Wave 1/7 de PLAN-025 concluída (5/13 TASKs Done)** — migração aditiva
   gerada (não aplicada em dev/prod), tipos `PublicationVariant` cross-repo,
   `GenerationTimeoutError`, `wrapTextToLines` (função pura), EMENDA de `tira.service.ts`

@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -196,17 +196,17 @@ NFR-024-001/002 pedem para mitigar. Ver PLAN-025 §3 (COMP-025-003) e §6 (DEC-0
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-09-14T16:25:23-0300
+**Data conclusão**: 2026-09-14T18:24:06-0300
+**Commit SHA**: b52d131 (implementação) · 4d06303 (gate 8 ALTA: teto de pixels/APNG) · f7d2511 (gate 1/7: F1-F4) · df7a706 (gate 8: bypass IHDR offset) · d39c674 (gate 7: F5 APNG substring) · 0f3ab64 (gate 8: unificação walkPngChunks, fecha 3º bypass IHDR duplicado) · 45d02aa (gate 7: dedup de fixtures de teste)
 **Jira**: KAN-114
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (Wave 2 — 3 rodadas de retry: F1-F4 gate 1/7, F5 gate 7, dedup de fixtures gate 7; convergiu e APROVADO)
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 2 — 3 rodadas de retry: teto de pixels/APNG ausente, bypass por decoy antes do IHDR, bypass por IHDR duplicado/last-wins; fechado com refatoração estrutural de leitura de chunk PNG unificada)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-024 sem FEATs
