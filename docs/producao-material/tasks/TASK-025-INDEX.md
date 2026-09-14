@@ -20,7 +20,7 @@
 - [x] TASK-025-008 ✅ Done
 
 ### Wave 4 (depende de Wave 3)
-- [ ] TASK-025-009 ⏸ Todo
+- [x] TASK-025-009 ✅ Done
 
 ### Wave 5 (depende de Wave 4)
 - [ ] TASK-025-010 ⏸ Todo

@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-14T19:39:44-0300 (PLAN-025 Wave 3/7 concluída, 8/13 TASKs — F6, pipeline de publicação PDF)
+**Última atualização**: 2026-09-14T20:23:54-0300 (PLAN-025 Wave 4/7 concluída, 9/13 TASKs — F6, pipeline de publicação PDF)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -65,7 +65,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
-| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 8/13 🟡 | Approved |
+| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 9/13 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -219,6 +219,18 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-14: **Wave 4/7 de PLAN-025 concluída (9/13 TASKs Done)** — `POST
+  /contents/:id/publication`, a barreira de autorização REAL do pipeline
+  (NFR-024-003, `requireRole('EDITOR','ADMIN')` + `verifyOrigin`; o service de baixo
+  nível não checa papel por desenho). 1 retry (gate 1: a rota tinha sido excluída do
+  bloco de topologia de `route-authz-matrix` em vez de enumerada — deixava o conjunto
+  `{EDITOR, ADMIN}` sem prova completa, mutante que remove `'ADMIN'` sobrevivia;
+  corrigido enumerando a rota, mutante agora morre). Tripwire 34→35 pares. Gates 1-7 e
+  8 aprovados. Achados fora de escopo registrados (não corrigidos): `eslint.config.mjs`
+  não ignora `.claude/worktrees/**` (deixa `npm run lint` completo estruturalmente
+  vermelho); falta `.gitattributes` (ruído CRLF em `format:check`); texto de
+  TASK-025-006 cita símbolo (`exportPublicationParamsSchema`) que não existe (o código,
+  correto, reusa `rawContentIdParamSchema`).
 - 2026-09-14: sync Jira pulado (conector Atlassian caído — `getJiraIssue` sem resposta em
   300s, 2 tentativas) — KAN-115 (TASK-025-008) não transicionada para Concluído. Retomar:
   `/keelson:jira-sync producao-material --phase finish-dev`.
