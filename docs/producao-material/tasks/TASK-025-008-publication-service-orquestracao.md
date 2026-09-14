@@ -57,7 +57,17 @@ PLAN-025 §3 (COMP-025-005) e §6 (DEC-025-002/DEC-025-005/DEC-025-007).
   detectado) ou `getVisualAssociationBinary` devolvendo `null` →
   `StripFrameForPdf.image = null` (é AQUI, neste arquivo, que o mapeamento
   `WEBP`/indetectável → `null` acontece — `pdf-composer.ts`, TASK-025-007, só recebe
-  `'PNG'|'JPEG'` ou `null`); chama `buildStripPdf(frames, meta)` (`pdf-composer.ts`).
+  `'PNG'|'JPEG'` ou `null`); chama `buildStripPdf(frames, meta, onImageSkipped)`
+  (`pdf-composer.ts`) passando um callback `onImageSkipped: (info: ImageSkippedInfo) =>
+  void` que faz `logger.warn({ rawContentId, frameIndex: info.frameIndex, format:
+  info.format, reason: info.reason }, 'Imagem de Quadro descartada da exportação')`
+  (`src/lib/logger.ts`, já existente) — **[furo no plano corrigido em voo, achado do
+  security-engineer no gate 8 de TASK-025-007]**: `buildStripPdf` ganhou esse 3º
+  parâmetro opcional na Wave 2 (teto de pixels/APNG/decode-failed) especificamente para
+  ter um consumidor que logue o motivo — sem isso, uma imagem recusada por segurança
+  (bomb de pixels, APNG, PNG malformado) some do PDF em silêncio total, mesmo com o
+  mecanismo de observabilidade já existindo. NUNCA logar `buffer`/bytes da imagem nem
+  texto do usuário — só metadado (índice, formato, motivo enum).
 - Passo 5: `withDeadline(promise, env.PUBLICATION_PDF_TIMEOUT_MS)` (função nova,
   `Promise.race` entre a composição — passos 3/4 — e um temporizador) — o temporizador
   vencendo lança `new GenerationTimeoutError()` (`http/errors.ts`, TASK-025-003,
@@ -101,6 +111,14 @@ PLAN-025 §3 (COMP-025-005) e §6 (DEC-025-002/DEC-025-005/DEC-025-007).
       `openMnemonicStrip(..., { suppressOpeningEvent: true })`) e compõe o PDF a partir
       dela — NÃO recusa, NÃO exige passo manual anterior; `Buffer` não-vazio devolvido.
       Mesmo comando.
+- [ ] Quadro vinculado a uma Associação visual que `buildStripPdf` recusa (via
+      `onImageSkipped` — teto de pixels/APNG/PNG malformado, achado de segurança de
+      TASK-025-007) — item do Inclui sem AC formal (a garantia de "nunca derruba a
+      exportação" já é AC-024-004/FR-024-014, provada em TASK-025-007; este critério
+      prova só o CONSUMO do callback): `logger.warn` é chamado exatamente 1 vez por
+      Quadro recusado, com `rawContentId`/`frameIndex`/`format`/`reason` e SEM o buffer da
+      imagem nem texto do Quadro no payload de log (grep no corpo do log estruturado
+      confirma ausência de `Buffer`/texto do Quadro). Mesmo comando.
 - [ ] **AC-024-008** (FR-024-009, gate 1) — falha do motor de composição como um todo
       (`buildStripPdf`/`buildSummaryPdf` mockado para rejeitar) em qualquer passo:
       `exportPublication` propaga a exceção, NENHUM `Buffer` é devolvido, NENHUM evento
