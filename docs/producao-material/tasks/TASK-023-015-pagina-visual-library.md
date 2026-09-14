@@ -8,7 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -131,26 +131,29 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-14T00:33:41+0000
+**Data conclusão**: 2026-09-14T09:17:45-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 51f4a50 (implementação — página + correção do guard de navegação), 1345144/f4ba4b6 (fix de achado do qa em `linkVisualAssociationToFrame`/`unlinkVisualAssociationFromFrame`, cache-tag `VisualAssociationList` ausente — descoberto durante o gate 9 desta wave, TASK-023-011)
 **Jira**: KAN-103
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · product-designer (gate 11) — 0 achados nas 2 rodadas (única TASK da wave sem retry). Achado real do `qa` no gate 9 (não desta TASK, de TASK-023-011: mutações de vínculo não invalidavam a listagem do acervo) corrigido à parte e verificado.
+**Tentativas**: 1
+**Cobertura final**: guard de navegação provado por `proxy.test.ts` (55/55, incl. caso novo + falso-positivo `/visual-libraryteca`), `next build` confirma rota estática + middleware compilado
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/app/(interno)/visual-library/page.tsx
+  - mnemonicos-frontend/src/lib/internal-routes.ts
+  - mnemonicos-frontend/src/proxy.ts
+  - mnemonicos-frontend/src/proxy.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — página estática sem I/O próprio, guard de navegação é allowlist puramente aditiva (gate 1-7)
+- [x] Comportamento (gate 9): consolidado FEAT-022-002 (VERIFICADO, ver SPEC-022)
 
-**Notas**: 
+**Notas**: Achado do redator sobre premissa errada do PLAN §3/COMP-023-013 (`/visual-library` não estava no guard de navegação) corrigido dentro desta TASK, conforme já autorizado na sua própria redação. Único achado do gate 11 (não-bloqueante, nota): rota ainda sem entrada de menu — mesma condição de `/content`, aguarda fatia de navegação do épico (BRIEF-001).

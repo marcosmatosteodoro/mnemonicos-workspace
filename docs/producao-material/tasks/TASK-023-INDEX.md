@@ -11,9 +11,9 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 
 ## Status agregado
 
-- Todo: 4
+- Todo: 2
 - In Progress: 0
-- Done: 13
+- Done: 15
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -39,9 +39,9 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 - [x] TASK-023-012 ✅ Done — `visual-library-board.tsx` (client component — CRUD UI do acervo) (gate 9 VERIFICADO via FEAT-022-001; 4 rodadas — DRY, acessibilidade, teste flaky)
 - [x] TASK-023-013 ✅ Done — Enxerto em `mnemonic-strip-board.tsx` (vínculo/desvínculo por Quadro) (4 rodadas — diálogo cruzado entre Quadros, regressão de feedback, chamada morta)
 
-### Wave 5 (depende de Wave 4)
-- [ ] TASK-023-014 ⏸ Todo — Listar/buscar/sugerir categoria da biblioteca (backend)
-- [ ] TASK-023-015 ⏸ Todo — `(interno)/visual-library/page.tsx` (casca + correção do guard de navegação)
+### Wave 5 (depende de Wave 4) — ✅ concluída
+- [x] TASK-023-014 ✅ Done — Listar/buscar/sugerir categoria da biblioteca (backend) (2 rodadas — filtro de categoria interpretava metacaractere LIKE, gate 8 aprovado)
+- [x] TASK-023-015 ✅ Done — `(interno)/visual-library/page.tsx` (casca + correção do guard de navegação) — 0 achados, única TASK sem retry no PLAN
 
 ### Wave 6 (depende de Wave 5)
 - [ ] TASK-023-016 ⏸ Todo — Entrega do binário da imagem (`GET /visual-associations/:id/image`)
@@ -119,8 +119,8 @@ AC-022-025 (TASK-023-014).
 | FEAT | TASKs (P = primária) | Done |
 |------|----------------------|------|
 | FEAT-022-001 (Gestão do acervo) | TASK-023-002 (P), TASK-023-003 (P), TASK-023-008 (P), TASK-023-010, TASK-023-012 (P) | 5/5 |
-| FEAT-022-002 (Navegação e busca) | TASK-023-012, TASK-023-014 (P), TASK-023-015 (P) | 0/3 |
-| FEAT-022-003 (Vínculo a Quadros) | TASK-023-001 (P), TASK-023-005 (P), TASK-023-008, TASK-023-009 (P), TASK-023-010 (P), TASK-023-011 (P), TASK-023-012, TASK-023-013 (P), TASK-023-014 (FR-022-019, transversal) | 8/9 |
+| FEAT-022-002 (Navegação e busca) | TASK-023-012, TASK-023-014 (P), TASK-023-015 (P) | 3/3 |
+| FEAT-022-003 (Vínculo a Quadros) | TASK-023-001 (P), TASK-023-005 (P), TASK-023-008, TASK-023-009 (P), TASK-023-010 (P), TASK-023-011 (P), TASK-023-012, TASK-023-013 (P), TASK-023-014 (FR-022-019, transversal) | 9/9 |
 
 Cobertura total: 25/25 ACs, 25/25 FRs, 7/7 NFRs de SPEC-022 — 3/3 FEATs cobertas, sem
 decomposição parcial (`--only` não usado).

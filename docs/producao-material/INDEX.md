@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-14T12:00:43+0000 (PLAN-023 Wave 4/6 concluída — F5)
+**Última atualização**: 2026-09-14T13:22:05-0300 (PLAN-023 Wave 5/6 concluída — F5)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -34,8 +34,10 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   cognitiva) vinculável (N:1, no máximo 1 por Quadro) a Quadros da Tira mnemônica (F4);
   binário como coluna `Bytes` no Postgres (não filesystem — incompatível com a topologia
   serverless do backend, corrigido ainda no PLAN); alcance por autoria herdado de F4; métrica
-  de "uploads evitados" instrumentada. Em implementação (13/17 TASKs Done, 4/6 waves —
-  FEAT-022-001 "Gestão do acervo" já completa e verificada).
+  de "uploads evitados" instrumentada. Em implementação (15/17 TASKs Done, 5/6 waves —
+  as 3 FEATs completas e verificadas: FEAT-022-001 "Gestão do acervo", FEAT-022-002
+  "Navegação e busca" e FEAT-022-003 "Vínculo a Quadros"). Falta só Wave 6 (entrega do
+  binário + rede de paridade cross-repo).
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
@@ -68,7 +70,7 @@ cobertura; 17 TASKs em 6 waves geradas 2026-09-13) — aguardando `/keelson:impl
 | PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 2/2 ✅ | Done (sugerido) |
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
-| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 13/17 🟡 | Approved |
+| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 15/17 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -207,6 +209,33 @@ cobertura; 17 TASKs em 6 waves geradas 2026-09-13) — aguardando `/keelson:impl
 
 ## Histórico recente
 
+- 2026-09-14: **Wave 5/6 de PLAN-023 concluída (2 TASKs Done)** — `listVisualAssociations`/
+  `listVisualAssociationCategories`/`normalizeCategoryKey`/`suggestCategories` (backend) e
+  a página `(interno)/visual-library/page.tsx` + correção do guard de navegação (achado do
+  redator: `INTERNAL_ROUTE_PREFIXES` não incluía `'visual-library'`, corrigido no mesmo
+  diff). **As 3 FEATs de SPEC-022 completaram e foram VERIFICADAS** (gate 9, execução real
+  browser+HTTP): FEAT-022-001, FEAT-022-002 e FEAT-022-003 — ver as linhas
+  "**Verificação (gate 9)**:" na própria SPEC-022. Achado real de segurança-adjacente no
+  backend: o filtro de categoria (`equals`+`mode:'insensitive'` do Prisma) compilava para
+  `ILIKE`, então o valor do CLIENTE era interpretado como PADRÃO LIKE — `?category=%`
+  devolvia o acervo inteiro, sem SQL injection (parametrizado) mas violando o "SOMENTE"
+  de AC-022-010; achado pelo code-reviewer, fechado com escape de metacaracteres +
+  4 provas por mutação (1 por metacaractere), e roteado como lição nova em
+  `guidelines/project/lessons.md` (mesma classe pré-existente identificada, não corrigida
+  por estar fora do escopo do PLAN, em `disciplines.service.ts`/`users.service.ts`).
+  Medição obrigatória de performance (lição ativa) rodada de verdade: `EXPLAIN ANALYZE`
+  contra 12k linhas semeadas confirma `Seq Scan` (sem índice em `category`), custo
+  aceitável no volume atual (≤16ms) — candidato a índice/migração registrado para
+  gate 10/Diretor, NENHUMA migração feita nesta wave. Achado de honestidade do developer:
+  AC-022-025 da SPEC prometia accent-folding que `DEC-023-008`/NFR-022-007 nunca
+  implementaram (mecanismo real é só trim+case-fold) — inconsistência SPEC↔SPEC, não erro
+  do developer; Tech Lead aplicou degrau 1 e corrigiu a prosa do AC para o exemplo que o
+  mecanismo realiza, com `Reabrir se:` explícito. Achado do `qa` durante o gate 9 (fora
+  desta wave, em TASK-023-011): mutações de vínculo/desvínculo não invalidavam a tag de
+  listagem do acervo, deixando `linkCount` do picker desatualizado na mesma sessão —
+  corrigido à parte. TASK-023-015 foi a ÚNICA TASK do PLAN-023 aprovada sem nenhum achado
+  em nenhuma rodada. Próximo: Wave 6 (TASK-023-016 entrega do binário, TASK-023-017 rede
+  de paridade cross-repo) — última wave do PLAN-023.
 - 2026-09-14: **Wave 4/6 de PLAN-023 concluída (4 TASKs Done — 2 fatias sensíveis + 2 UI)**
   — `removeVisualAssociation` (trava de vínculo), `linkVisualAssociationToFrame`/
   `unlinkVisualAssociationFromFrame` (backend), `visual-library-board.tsx` (CRUD do

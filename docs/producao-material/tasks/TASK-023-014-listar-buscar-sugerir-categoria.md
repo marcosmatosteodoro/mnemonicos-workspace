@@ -8,7 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -213,26 +213,33 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-13T23:10:17-0300
+**Data conclusão**: 2026-09-14T10:29:57-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 2939b2a, 273e7f6, 3fc9b9a (implementação), 976457e (retry — escapa metacaracteres LIKE, extrai withQueryProbe, mede EXPLAIN ANALYZE), f8e4a14 (nit Art.7)
 **Jira**: KAN-102
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8, aprovado sem achados) — 2 rodadas: rodada 1 REPROVADA nos gates 1-7 (A2: filtro de categoria `equals`+`mode:'insensitive'` compila para `ILIKE` — valor do cliente interpretado como padrão LIKE, `?category=%` devolvia o acervo inteiro; A4: `withQueryProbe` duplicado, 4ª cópia) + 2 itens escalados e resolvidos pelo Tech Lead (A1: inconsistência SPEC↔SPEC em AC-022-025, corrigida na prosa; A3: medição EXPLAIN ANALYZE obrigatória, Seq Scan confirmado aceitável no volume atual, sem migração) → retry (`976457e`) → rodada 2 APROVADA, mutante do escape confirmado morto por execução própria do revisor
+**Tentativas**: 2
+**Cobertura final**: unit 286/286 · integration 364/364 (650 total) — listagem paginada, filtro por categoria (com prova de metacaractere LIKE), sugestão de categoria, `linkCount` medido em 2 round-trips fixos (não N+1)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.service.ts
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.routes.ts
+  - mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts
+  - mnemonicos-backend/tests/integration/visual-associations.routes.integration.test.ts
+  - mnemonicos-backend/tests/integration/visual-associations.service.integration.test.ts
+  - mnemonicos-backend/tests/support/visual-association-fixtures.ts
+  - mnemonicos-backend/tests/support/query-probe.ts (novo)
+  - mnemonicos-backend/tests/unit/visual-associations.service.test.ts (novo)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado
+- [x] Comportamento (gate 9): consolidado FEAT-022-002 e FEAT-022-003 (VERIFICADO, ver SPEC-022)
 
-**Notas**: 
+**Notas**: Achado real (LIKE injection funcional, não SQL injection — parametrizado mas interpretado como padrão) fechado com escape de metacaracteres + prova por mutação. Mesma classe de bug pré-existente identificada em `disciplines.service.ts`/`users.service.ts` (fora do escopo deste PLAN, roteado como nota em `guidelines/project/lessons.md`). Perfil `node-22.md` §6.1 atualizado (removida marca "não confirmado"). `Seq Scan` em `visual_associations` sem índice — aceitável no volume atual (≤16ms/12k linhas), escalado como candidato a índice/migração futura (gate 10/Diretor).
