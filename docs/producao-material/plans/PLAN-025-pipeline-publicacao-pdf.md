@@ -95,9 +95,13 @@ guarda nova, comum a todo EDITOR/ADMIN (sem checagem de autoria) — satisfaz AC
 exportar "resumo" e "tira" já aberta de Conteúdo bruto de qualquer autor; a AUTO-GERAÇÃO da
 Tira (FR-024-006, quando ainda não existe) continua delegada a `openMnemonicStrip`
 **sem nenhuma mudança na guarda dele** — logo, exportar "tira" ainda não aberta de um
-Conteúdo bruto de OUTRO autor recusa (409, mesma mensagem de "abra a tira antes"), até que o
-autor ou um ADMIN a abram. Este caso específico (auto-geração + não-autor) não é testado
-literalmente por nenhum AC da SPEC — sinalizado em `duvidas` deste sumário.
+Conteúdo bruto de OUTRO autor recusa com o MESMO comportamento herdado de
+`assertStripPrerequisites`/`assertRawContentReachable`: **404, `NotFoundError`,
+"Conteúdo bruto não encontrado."** (não 409/`ConflictError` — corrigido após medição real
+na implementação de TASK-025-008, Wave 3; o texto anterior desta seção presumia um
+código de status que a guarda de F4 nunca usou), até que o autor ou um ADMIN a abram.
+Este caso específico (auto-geração + não-autor) não é testado literalmente por nenhum AC
+da SPEC — sinalizado em `duvidas` deste sumário.
 
 ## 2. Stack e dependências
 
@@ -712,8 +716,11 @@ LEITURA de material já existente na exportação (Quebra salva, Tira já aberta
 Associação visual vinculada), satisfazendo AC-024-018 para "resumo" e "tira" já aberta de
 Conteúdo bruto de qualquer autor. A AUTO-GERAÇÃO da Tira (FR-024-006, quando ainda não
 existe) continua delegada a `openMnemonicStrip` **sem nenhuma mudança na guarda dele** —
-um Conteúdo bruto de outro autor sem Tira ainda aberta recusa a exportação em "tira" (409,
-mesma mensagem de "abra a tira antes") até que o autor ou um ADMIN a abram.
+um Conteúdo bruto de outro autor sem Tira ainda aberta recusa a exportação em "tira" com o
+mesmo comportamento herdado de `assertStripPrerequisites`/`assertRawContentReachable`:
+**404, `NotFoundError`, "Conteúdo bruto não encontrado."** (medido na implementação de
+TASK-025-008 — não 409/`ConflictError`, como uma versão anterior desta DEC presumia) até
+que o autor ou um ADMIN a abram.
 **Alternativas consideradas**:
 - Afrouxar `assertRawContentReachable`/a guarda de escrita de `openMnemonicStrip` para todo
   EDITOR (não só o autor), descartada — mudaria a superfície de segurança de autorização de

@@ -7,7 +7,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: In Progress
 
 ## Dependências
 
@@ -47,9 +47,17 @@ PLAN-025 §3 (COMP-025-005) e §6 (DEC-025-002/DEC-025-005/DEC-025-007).
   dele (DEC-025-007 explica o motivo: o passo 1 já resolveu o alcance sem autoria).
 - Passo 3 (Variante `RESUMO`): `buildSummaryPdf(breakdown, meta)` (`pdf-composer.ts`,
   TASK-025-007) direto sobre a Quebra lida no passo 2.
-- Passo 4 (Variante `TIRA`): `openMnemonicStrip(rawContentId, actor, db, {
-  suppressOpeningEvent: true })` (`tira.service.ts`, TASK-025-005) — get-or-generate
-  reusado sem duplicar lógica; para cada `MnemonicFrameDetail` do resultado com
+- Passo 4 (Variante `TIRA`): resolve os Quadros por 2 caminhos reais, distintos por
+  necessidade de DEC-025-007 (não é 1 chamada incondicional a `openMnemonicStrip`,
+  correção pós-retry do gate 1/code-reviewer da Wave 3) — (a) Tira JÁ aberta: leitura de
+  BAIXO NÍVEL própria deste arquivo (`mnemonicStrip.findUnique` a partir do
+  `ruleBreakdownId` já confirmado no passo 2), SEM a guarda de autoria de
+  `openMnemonicStrip` — satisfaz AC-024-018 (EDITOR B lê "tira" já aberta de EDITOR A);
+  (b) Tira AINDA não existe (`null`): delega a `openMnemonicStrip(rawContentId, actor,
+  db, { suppressOpeningEvent: true })` (`tira.service.ts`, TASK-025-005) —
+  get-or-generate idempotente reusado sem duplicar lógica, aí sim sujeito à guarda de
+  autoria ORIGINAL dele (intencional, DEC-025-007: auto-geração por não-autor recusa).
+  Para cada `MnemonicFrameDetail` resultante (de qualquer um dos 2 caminhos) com
   `visualAssociationId !== null`: `getVisualAssociationBinary(visualAssociationId, db)`
   (`visual-associations.service.ts`, já existente) + `detectImageSignature(imageData)`
   (`image-signature.ts`, já existente) — formato `'PNG'`/`'JPEG'` →
