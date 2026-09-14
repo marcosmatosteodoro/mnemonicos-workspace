@@ -578,17 +578,15 @@ o reuso visível ao EDITOR durante a mesma sessão de vínculo. Correção suger
   reuso em 60 dias é uma estimativa inicial sem medição prévia (a biblioteca ainda não
   existe) — vira veredito de métrica no ciclo seguinte, mesma régua das demais SPECs do
   slug (decisão 4.99).
-- **A-022-011** [confirmar] [evidência: crença] O acervo de associações visuais é de
+- **A-022-011** [assumido] [evidência: medido] O acervo de associações visuais é de
   leitura/busca/vínculo comum a todo EDITOR/ADMIN, mas a escrita (editar/substituir/
   remover) é restrita ao autor (ADMIN alcança tudo, FR-022-023) — default do `po` sobre
-  uma ambiguidade escalada ao Diretor (a alternativa seria acervo também de escrita
-  comum, ou acervo totalmente privado por autor); resposta do Diretor pendente, este é o
-  comportamento implementado enquanto isso.
-- **A-022-012** [assumido] [evidência: crença] A instrumentação de etapa desta fatia
-  (FR-022-024) é mínima por decisão do `po` sobre uma ambiguidade escalada ao Diretor (a
-  alternativa seria não instrumentar esta etapa nesta fatia, declarando o vão
-  conscientemente) — resposta do Diretor pendente, este é o comportamento implementado
-  enquanto isso.
+  uma ambiguidade escalada ao Diretor, **confirmado pelo Diretor na Entrega de PLAN-023
+  (2026-09-14)**: decisão definitiva, não mais pendente.
+- **A-022-012** [assumido] [evidência: medido] A instrumentação de etapa desta fatia
+  (FR-022-024) é mínima por decisão do `po` sobre uma ambiguidade escalada ao Diretor —
+  **confirmado pelo Diretor na Entrega de PLAN-023 (2026-09-14)**: decisão definitiva,
+  não mais pendente.
 
 ## 9. Riscos e questões abertas
 
