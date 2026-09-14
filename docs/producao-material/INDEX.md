@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-14T16:34:27-0300 (PLAN-025 aprovado — F6, pipeline de publicação PDF)
+**Última atualização**: 2026-09-14T16:34:27-0300 (PLAN-025 decomposto em 13 TASKs — F6, pipeline de publicação PDF)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -65,7 +65,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
-| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | a decompor | Approved |
+| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 0/13 ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -217,6 +217,16 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-14: **PLAN-025 decomposto em 13 TASKs via `/keelson:tasks`** (rota fan-out,
+  decisão 4.310 — 1 decompositor + 3 redatores em paralelo), 7 waves. `graph.sh --check`
+  limpo. `task-validator`: 2 seções ausentes + 1 override incompleto corrigidos; 3
+  `task-criterio-sem-ac` mantidos `OVERRIDDEN` (calibrados por exemplares Done). `qa`
+  (pré-código, Etapa 3.5): achou e fechou 1 gap real (leitura de binário real de
+  Associação visual + mapeamento WEBP→null sem prova em nenhuma TASK — corrigido em
+  TASK-025-008). Índice: `tasks/TASK-025-INDEX.md`.
+- 2026-09-14: **sync Jira das TASKs de PLAN-025** — 13 sub-tasks criadas sob KAN-107
+  (KAN-108..KAN-120, uma por `TASK-025-{001..013}`), keys gravadas em `**Jira**:` de cada
+  TASK.
 - 2026-09-14: **PLAN-025 aprovado via `/keelson:plan`** (F6, SPEC-024) — cobertura total
   (16/16 FRs, 4/4 NFRs), 13 COMPs, 7 DECs, 8 TRISKs. Motor de PDF: `pdf-lib` (DEC-025-001,
   Irreversível: sim — vai à Entrega em lote, junto de DEC-025-007, achado do PLAN sobre

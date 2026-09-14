@@ -142,3 +142,15 @@ Diretor.
   auto-geração restrita à autoria de F4 — EDITOR não-autor exportando "tira" de Conteúdo
   cuja Tira nunca foi aberta por ninguém fica recusado (409) até a abertura por quem
   alcança; não testado literalmente por nenhum AC da SPEC. PLAN-025 promovido a `Approved`.
+- 2026-09-14: TASKs decompostas via rota fan-out (decisão 4.310 — 13 TASKs previstas,
+  1 `scribe` decompositor + 3 `scribe`s redatores em paralelo). `graph.sh --check` limpo
+  após 2 correções mecânicas do Tech Lead (campos de aresta `Realiza (FRs)` com
+  parênteses/NFR misturado em TASK-025-007/008, quebrando o parser — IDs limpos
+  restauram a cobertura). `task-validator`: 2 seções "Riscos específicos" ausentes
+  (TASK-025-010/012) e 1 override sem `override-aprovador` (TASK-025-010) corrigidos;
+  3 ERRORs `task-criterio-sem-ac` mantidos como `OVERRIDDEN` (calibrados por exemplares
+  Done do slug). Rodada consolidada da Etapa 3.5: `qa` (pré-código) achou 1 gap real —
+  nenhuma TASK exercitava a leitura de binário real de Associação visual + mapeamento
+  WEBP→null (Passo 4 de TASK-025-008, Inclui explícito sem critério correspondente) —
+  corrigido com 1 critério novo (AC-024-003, parte publication.service) antes do
+  despacho. Jira: 13 sub-tasks criadas sob KAN-107 (KAN-108..120, gancho tasks).
