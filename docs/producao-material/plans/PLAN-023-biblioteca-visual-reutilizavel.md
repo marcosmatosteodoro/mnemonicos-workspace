@@ -973,30 +973,39 @@ cliente)
 
 ## 9. Definition of Done deste PLAN
 
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs
-- [ ] Todos os NFRs cobertos têm verificação
-- [ ] Decisões DEC refletidas no código
-- [ ] Aderência à ficha/perfil validada
-- [ ] Todos os ACs cobertos por teste (gate 1 dos quality gates)
-- [ ] Métrica da SPEC operacional (§1.3, Fonte de medição: instrumentação) —
+- [x] Todos os FRs cobertos têm implementação satisfazendo os ACs — 25/25 FRs, 25/25 ACs
+- [x] Todos os NFRs cobertos têm verificação — 7/7 NFRs
+- [x] Decisões DEC refletidas no código — 12 DECs, confirmadas por múltiplos code-reviewer
+- [x] Aderência à ficha/perfil validada — gate 6 aprovado em todas as 6 waves
+- [x] Todos os ACs cobertos por teste (gate 1 dos quality gates)
+- [x] Métrica da SPEC operacional (§1.3, Fonte de medição: instrumentação) —
   `VisualAssociationLinkEvent` grava `wasReuse` em toda criação real de vínculo (nunca em
   idempotente/CRUD isolado do acervo, FR-022-024), e uma consulta/teste demonstra a razão
-  reuso/total sobre um período (gate 9 exibe o número existindo, sem UI nova exigida)
-- [ ] Migração revisada e **autorizada pelo Diretor antes de `prisma migrate dev`**
+  reuso/total sobre um período (gate 9 exibe o número existindo, sem UI nova exigida) —
+  entregue em TASK-023-011
+- [x] Migração revisada e **autorizada pelo Diretor antes de `prisma migrate dev`**
   (DEC-023-007) — 100% aditiva: `CREATE TABLE visual_associations`, `ALTER TABLE
   mnemonic_frames ADD COLUMN "visualAssociationId"` + FK `SetNull`, `ALTER TYPE
   "ProductionStageType" ADD VALUE 'ASSOCIACAO_VISUAL'`, `CREATE TABLE
-  visual_association_link_events`; nenhuma execução presumida pelo TASK/implement sem essa
-  autorização.
-- [ ] `route-authz-matrix.integration.test.ts` estendido com as 8 chaves novas (25 → 33
-  pares, TRISK-023-006)
-- [ ] `visual-associations-frontend-contract.test.ts` (novo) e `tira-frontend-contract.test.ts`
-  (estendido) provam paridade cross-repo das interfaces novas/alteradas (COMP-023-011)
-- [ ] `domain-types-parity.test.ts` estendido para `ASSOCIACAO_VISUAL` em
+  visual_association_link_events`; autorizada via AskUserQuestion na Wave 1, aplicada ao DEV
+- [x] `route-authz-matrix.integration.test.ts` estendido com as 8 chaves novas (25 → 33
+  pares, TRISK-023-006) — crescimento real confirmado: +2 (TASK-023-008) +1 (TASK-023-010)
+  +2 (TASK-023-011) +2 (TASK-023-014) +1 (TASK-023-016) = 8
+- [x] `visual-associations-frontend-contract.test.ts` (novo) e `tira-frontend-contract.test.ts`
+  (estendido) provam paridade cross-repo das interfaces novas/alteradas (COMP-023-011) —
+  TASK-023-017, 3 mutantes de rename/campo-extra confirmados mortos
+- [x] `domain-types-parity.test.ts` estendido para `ASSOCIACAO_VISUAL` em
   `PRODUCTION_STAGE_TYPES` sem regressão
-- [ ] `npm audit`/gate 8 sobre a dependência nova (`multer`) sem vulnerabilidade não mitigada
-- [ ] Leitura/escrita de `imageData` confirmada com o adapter real (`@prisma/adapter-pg`) em
+- [x] `npm audit`/gate 8 sobre a dependência nova (`multer`) sem vulnerabilidade não mitigada
+  — reconfirmado na closure (0 vuln atribuível a `multer`; as 3 vulnerabilidades
+  pré-existentes do `npm audit` são transitivas de `prisma`/`qs`, já rastreadas em
+  RISK-006-005, alheias a este PLAN)
+- [x] Leitura/escrita de `imageData` confirmada com o adapter real (`@prisma/adapter-pg`) em
   teste de integração com Postgres real (mesmo padrão dos demais módulos)
+
+**Suíte completa na closure (2026-09-14)**: backend unit 288/288 (31 suites) · backend
+integration 373/373 (19 suites) · frontend 426/426 (37 suites) — 1087 testes, 0 regressão,
+0 vermelho.
 
 ## 10. Não coberto por este PLAN
 
