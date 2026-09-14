@@ -11,9 +11,9 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 
 ## Status agregado
 
-- Todo: 2
+- Todo: 0
 - In Progress: 0
-- Done: 15
+- Done: 17
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -43,9 +43,9 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 - [x] TASK-023-014 ✅ Done — Listar/buscar/sugerir categoria da biblioteca (backend) (2 rodadas — filtro de categoria interpretava metacaractere LIKE, gate 8 aprovado)
 - [x] TASK-023-015 ✅ Done — `(interno)/visual-library/page.tsx` (casca + correção do guard de navegação) — 0 achados, única TASK sem retry no PLAN
 
-### Wave 6 (depende de Wave 5)
-- [ ] TASK-023-016 ⏸ Todo — Entrega do binário da imagem (`GET /visual-associations/:id/image`)
-- [ ] TASK-023-017 ⏸ Todo — Rede de paridade cross-repo (chore)
+### Wave 6 (depende de Wave 5) — ✅ concluída (ÚLTIMA WAVE DO PLAN-023)
+- [x] TASK-023-016 ✅ Done — Entrega do binário da imagem (`GET /visual-associations/:id/image`) (2 rodadas — achado de staleness de perfil `node-22.md` §6.2, 0 retry de código: 7 mutantes mortos na 1ª rodada)
+- [x] TASK-023-017 ✅ Done — Rede de paridade cross-repo (chore) — 0 achados
 
 ## Cobertura de FRs
 

@@ -7,7 +7,7 @@
 **Wave**: 6
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -145,26 +145,29 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-14T10:41:42-0300
+**Data conclusão**: 2026-09-14T14:20:00-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: a36e163 (implementação), 645e0e2 (nit Art.7), a7f445a (nit cosmético)
 **Jira**: KAN-104
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8, aprovado sem achados) — 2 rodadas: rodada 1 REPROVADA no gate 6 (achado de staleness de perfil: `node-22.md` §6.2 afirmava "Esta API só emite JSON", premissa que esta TASK falsificou — o `GET /visual-associations/:id/image` é o 1º emissor não-JSON de todo o backend) → correção do perfil pelo Tech Lead (converteu a premissa em condição, não exceção pontual) + nit Art.7 → rodada 2 APROVADA
+**Tentativas**: 1 (0 retry de código — o único achado bloqueante foi de documentação/perfil, não do diff de produção, confirmado por 7 mutantes mortos na 1ª rodada)
+**Cobertura final**: unit 288/288 · integration 373/373 — última capacidade do PLAN-023 (17/17)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.service.ts
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.routes.ts
+  - mnemonicos-backend/tests/integration/visual-associations.routes.integration.test.ts
+  - mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado
+- [x] Comportamento (gate 9): verificado (AC-022-023, ver SPEC-022 — suíte + HTTP real com comparação md5 + browser real via Playwright confirmando a miniatura carregando no frontend)
 
-**Notas**: 
+**Notas**: Achado real confirmado por mutação (Content-Type allowlist — sem a guarda, a rota refletiria a coluna `mimeType` corrompida verbatim). AC-022-023 da SPEC prometia restrição por alcance de FR-022-018 que o próprio PLAN (A-023-001) já havia decidido não existir — mesma classe de inconsistência SPEC↔PLAN da Wave 5 (AC-022-025), corrigida na prosa. `node-22.md` §6.2 atualizado para refletir a 1ª resposta binária do backend.

@@ -7,7 +7,7 @@
 **Wave**: 6
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -151,26 +151,26 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-14T10:40:27-0300
+**Data conclusão**: 2026-09-14T14:20:00-0300
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 2fc72a1
 **Jira**: KAN-105
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) — 0 achados nas 2 rodadas (achados da Wave 6 foram todos de TASK-023-016)
+**Tentativas**: 1
+**Cobertura final**: rede de paridade cross-repo do acervo visual fechada — 7 campos de `VisualAssociationDetail`/`VisualAssociation` e 4 de `VisualAssociationSummary`, com 3 mutantes de rename/campo-extra confirmados mortos pelo revisor
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/tests/unit/visual-associations-frontend-contract.test.ts (novo)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados (n/a — chore de teste puro, override registrado no cabeçalho da TASK)
+- [x] Segurança (gate 8): n/a — sem produção tocada
+- [x] Comportamento (gate 9): n/a — chore sem comportamento observável de produto
 
-**Notas**: 
+**Notas**: `tira-frontend-contract.test.ts` (extensão 4→5 campos) já estava entregue desde a Wave 1 (commit `84b1f08`) — apenas confirmado verde. Consolidação das 3 cópias locais de `readSourceFile`/`extractInterfaceFields` (contents/tira/visual-associations) fica para diff futuro (fora de escopo desta TASK, decisão registrada pelo code-reviewer).
