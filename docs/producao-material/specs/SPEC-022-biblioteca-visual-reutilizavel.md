@@ -500,10 +500,23 @@ o reuso visível ao EDITOR durante a mesma sessão de vínculo. Correção suger
   essas categorias para seleção.
 
 - **AC-022-023** (cobre NFR-022-005)
-  Dada uma requisição anônima, ou de um usuário sem o alcance por autoria de FR-022-018,
-  pedindo diretamente o binário de uma imagem de associação visual (download ou exibição),
-  quando a requisição chega ao servidor, então o sistema recusa a entrega do binário,
-  mesmo sem passar pela rota ou tela de gestão.
+  Dada uma requisição anônima ou de sessão STUDENT, pedindo diretamente o binário de uma
+  imagem de associação visual (download ou exibição), quando a requisição chega ao
+  servidor, então o sistema recusa a entrega do binário, mesmo sem passar pela rota ou
+  tela de gestão. Sessão EDITOR/ADMIN válida basta — a barreira é a MESMA deny-by-default
+  comum a toda a fatia (NFR-022-003), nunca uma restrição adicional por alcance de
+  FR-022-018: o acervo é comum a todo EDITOR/ADMIN (FR-022-023), então mesmo um EDITOR
+  sem nenhum vínculo com o Quadro que usa a imagem lê o binário normalmente (A-023-001,
+  PLAN-023 §1 — corrigido nesta revisão, achado do gate 9/TASK-023-016: o texto anterior
+  prometia uma restrição por autoria que o próprio PLAN já havia decidido não existir).
+
+  **Verificação (gate 9)**: 2026-09-14 — VERIFICADO. Exercitado via suíte de integração
+  (60/60 + 36/36 `route-authz-matrix`) + HTTP real (`curl`, upload multipart PNG real +
+  comparação md5 byte-a-byte) + browser real (Playwright, login EDITOR, `/visual-library`
+  carregando a miniatura pela URL do endpoint): 401 sem sessão, 403 STUDENT, 200 para
+  EDITOR sem alcance por FR-022-018 sobre o Quadro (comportamento intencional, A-023-001),
+  200 para ADMIN, 404 id inexistente, `Content-Type` nunca ecoa a coluna `mimeType`
+  corrompida (500 genérico). Detalhe completo no ledger de sessão.
 
 - **AC-022-024** (cobre NFR-022-006)
   Dada a suíte de testes automatizados já existente de PLAN-012 (F4) para a tela

@@ -367,8 +367,16 @@ campo a partir do resultado do parse.
 
 ### 6.2 Saída / escaping → escapar no destino
 
-Esta API **só emite JSON** — não há template HTML, então o vetor de XSS refletido é
-pequeno, mas não nulo:
+Esta API emite JSON em toda rota de dados — não há template HTML, então o vetor de XSS
+refletido é pequeno, mas não nulo. Desde PLAN-023/F5 há também resposta BINÁRIA (`GET
+/visual-associations/:id/image`, `res.type(...).send(Buffer)`) — condição que se aplica
+a ela, não instância: **toda rota que emita `Content-Type` derivado de valor ARMAZENADO**
+(coluna livre, metadado de upload, não literal do código) **valida contra um allowlist
+fechado antes do header**, e um valor fora do allowlist falha genérico (nunca reflete o
+valor). Exemplar: `IMAGE_MIME_TYPE_ALLOWLIST` em
+`src/modules/visual-associations/visual-associations.routes.ts` — sem a guarda, a rota
+refletiria a coluna verbatim (`Content-Type: text/html`, medido por mutante no gate 6 de
+PLAN-023/Wave 6).
 
 - `res.json()` serializa com `JSON.stringify` e envia
   `Content-Type: application/json; charset=utf-8`. **Nunca** troque para `res.send()` com
