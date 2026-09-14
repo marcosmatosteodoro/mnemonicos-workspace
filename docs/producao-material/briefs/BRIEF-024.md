@@ -125,3 +125,20 @@ Diretor.
   etapa de F3/F10)? Default aplicado: **não** emite abertura na auto-geração via
   exportação (correção aditiva sobre FR-011-008/SPEC-011) — pergunta ao Diretor vai para
   a Entrega desta fatia. SPEC-024 promovida a `Approved` após a correção consolidada.
+- 2026-09-14: PLAN-025 redigido pelo `scribe` (cobertura total: 16/16 FRs, 4/4 NFRs, Caso
+  D). 13 COMPs, 7 DECs, 8 TRISKs. `plan-validator`: `graph.sh --check` sem `fr-sem-comp`
+  real (3 achados `[parse]` são o mesmo padrão tolerado de PLAN-023, componentes de apoio
+  com `Realiza` em prosa); `artifact-lint.sh` acusou ERROR `plan-dec-irreversivel-enum` em
+  todas as 7 DECs — falso positivo confirmado: o mesmo script produz erro idêntico sobre
+  PLAN-023, já `Approved`/entregue (bug de comparação de acentuação "nao" neste ambiente
+  Windows) — não bloqueante, candidato a lição de processo na Etapa 4.5. 2 itens vão para
+  a Entrega em lote (degrau 2 da escada): (1) DEC-025-001 (Irreversível: sim) — motor de
+  PDF escolhido é `pdf-lib` (puro JS/TS, sem template/HTML, sem processo externo — postura
+  de segurança por construção; compatível com o teto de 15s/1024MB de `vercel.json`); (2)
+  DEC-025-007 — achado do PLAN (não do product-analyst): o mecanismo real herdado de F4
+  (`assertRawContentReachable`) restringe a auto-geração da Tira à autoria original,
+  tensionando com AC-024-018 (leitura "sem restrição adicional por autoria"); resolvido
+  com guarda nova para leitura de material já existente (comum a EDITOR/ADMIN) mantendo a
+  auto-geração restrita à autoria de F4 — EDITOR não-autor exportando "tira" de Conteúdo
+  cuja Tira nunca foi aberta por ninguém fica recusado (409) até a abertura por quem
+  alcança; não testado literalmente por nenhum AC da SPEC. PLAN-025 promovido a `Approved`.
