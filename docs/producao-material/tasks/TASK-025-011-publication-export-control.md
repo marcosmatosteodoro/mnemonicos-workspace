@@ -75,6 +75,15 @@ consumo do `filename` já extraído por TASK-025-010 no nome do arquivo baixado.
       src/components/publication-export-control.tsx
       src/components/publication-export-control.test.tsx` (cwd `mnemonicos-frontend`) → 0
       problemas.
+- [ ] **[Pendência herdada de TASK-025-010, gate 1]** `filename === ''` (o backend nunca
+      emite `Content-Disposition` sem filename, mas o parser de TASK-025-010 devolve `''`
+      se o header vier ausente por algum motivo) — este componente é o PRIMEIRO consumidor
+      real do campo `filename`. Decida e teste explicitamente: `<a download={filename}>`
+      com `filename=''` faz o browser escolher o nome do arquivo (comportamento nativo,
+      não um bug) — se isso for aceitável, um teste próprio confirma que o componente não
+      quebra/trava nesse caso (mesmo spy de `createObjectURL`, `filename` vazio passado ao
+      `download`); se não for aceitável, trate como caso de falha (mesmo `role="alert"` do
+      critério acima) antes de disparar o download.
 
 ## Riscos específicos
 
@@ -83,6 +92,17 @@ consumo do `filename` já extraído por TASK-025-010 no nome do arquivo baixado.
   classe de ajuste que `test/jsdom-fetch-env.js` já faz para `fetch`/`Request`/`Response`,
   mas por spy local ao arquivo de teste desta TASK, não pelo ambiente compartilhado — os
   demais componentes que usam `jsdom-fetch-env.js` não precisam de `createObjectURL`).
+- **[Pendência herdada de TASK-025-010]** guardar o `Blob` no cache da mutation RTK Query
+  dispara `console.error` do `serializableStateInvariantMiddleware` ("non-serializable
+  value") a cada exportação — ruído de dev conhecido (DEC-025-006: mutation com blob como
+  `data`), não falha teste nem build. NÃO tente silenciar mexendo em
+  `src/store/index.ts`/`getDefaultMiddleware` (fora do escopo desta TASK, afeta a store
+  inteira) — se o ruído incomodar nos seus próprios testes, use `unwrap()` no trigger da
+  mutation (`const { blob, filename } = await exportPublication(args).unwrap()`) para
+  consumir o resultado diretamente sem depender de ler `data` do cache/seletor — isso não
+  elimina o warning (o RTK ainda grava no cache internamente), só evita que o SEU código
+  dependa da leitura via seletor. Aceitar o console.error como conhecido é a decisão
+  padrão; não é bloqueante.
 
 ---
 
