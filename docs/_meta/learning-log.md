@@ -263,3 +263,60 @@ artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensa
 patch: proposta de extensão in-line, logo após a frase da decisão 4.302 ("...deixa a regressão do lado benigno nascer exatamente no conserto."): achado que nomeia uma CLASSE (grep/padrão a variar) leva o COMANDO de varredura para o despacho como critério de pronto, não como ilustração; o developer devolve, no campo `verificacao` do report, a linha `varredura: <comando> → <saída>` (vazia, ou cada hit remanescente justificado) ao lado do diff, e o revisor re-executa o mesmo comando no re-review antes de aprovar — saldo líquido ~+6 linhas (dentro do orçamento ≤10)
 reincidencia: 0
 estado: ativa
+
+## LRN-023: "Achado só-texto não reabre o ciclo" dispensa gates 1/2/9 pela ORIGEM do achado (rotulado mecânico/degrau 1), não por conferência mecânica do delta entregue
+data: 2026-09-14
+gatilho: gate_reprovado
+origem: PLAN-023 (slug producao-material), Wave 4 — um retry foi tratado como "mecânico"
+(degrau 1) pela origem do achado que o motivou e dispensou os gates 1/2 (cobertura + prova),
+mas o delta efetivamente entregue introduzia função/predicado/branch novo, não só texto; o
+revisor propôs regra de bolso (`git diff <sha>..<sha> | grep -c '^+.*function '` > 0 implica
+delta não-mecânico) para a rodada seguinte
+causa_raiz: instrucao_ausente — o bullet "Achado só-texto não reabre o ciclo"
+(`guidelines/core/CODE-REVIEW.md`, Gate 7/Convergência do re-gate, ~l.489-492 da v0.156.0)
+dispensa gates 1/2/9 quando o delta da correção é "inerte" (comentário/docblock/doc), mas
+nada no texto exige CONFERIR MECANICAMENTE o delta entregue antes de dispensar — a
+classificação observada nasceu da origem do achado (rotulado mecânico), não de uma conferência
+sobre o que o retry de fato mudou; é a mesma classe de risco já nomeada alhures no arquivo
+("quem está no meio dos retries tem exatamente o incentivo de classificar o restante como
+'mecânico' para não escalar", ~l.448), mas aplicada aqui à dispensa de gates, não à escalação
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`guidelines/core/CODE-REVIEW.md`, bullet "Achado só-texto não reabre o ciclo" (~l.489-492 da v0.156.0)
+patch: proposta de inserção in-line — dispensa de gates 1/2/9 por "achado só-texto" exige
+conferência mecânica do delta ANTES de aplicar (nunca da origem/rótulo do achado): diff do
+delta entregue, restrito aos arquivos do achado, sem linha `^+` que declare função/predicado/
+branch novo (proxy: `grep -c '^+.*\(function\|=>\|if \|switch\)'`); delta que falha a
+conferência não é só-texto — gates 1/2 (cobertura + prova) se aplicam como em qualquer TASK
+normal, mesmo quando o achado que motivou a correção foi classificado mecânico — saldo
+líquido ~+4 linhas
+reincidencia: 0
+estado: ativa
+
+## LRN-024: inventário Art. 7 (narrativa de processo/proveniência) fecha por ocorrências pontuais vistas na rodada, não pela CLASSE inteira no delta acumulado da wave
+data: 2026-09-14
+gatilho: gate_reprovado
+origem: PLAN-023 (slug producao-material), Wave 4 — o inventário de comentários com narrativa
+de processo/proveniência (Art. 7) fechou com uma lista pontual de ocorrências vistas na
+rodada; parte da mesma classe (grep amplo por `code-reviewer|re-review|Wave [0-9]|achado|
+gate [0-9]`) não fazia parte do delta desta wave (pré-existente) e parte fazia — sem separar
+os dois por `git blame`, o resíduo real da wave ficou fora da lista e migrou para a rodada de
+fecho seguinte
+causa_raiz: instrucao_ausente — o bullet "Comentários (Art. 7)" (`guidelines/core/CODE-REVIEW.md`,
+Gate 7, l.188-196 da v0.156.0) já exige inventário CONTÁVEL dos comentários que o diff
+introduz/altera (decisão 4.250, escada 4.149), mas não instrui a varredura pela CLASSE
+inteira sobre o delta ACUMULADO da wave, nem a separar por `git blame` o que a wave introduziu
+do que é pré-existente — sem essa varredura ampla, o revisor lista só as ocorrências que viu
+na rodada, e o resíduo da mesma classe migra para o fecho seguinte; a mesma falha geral já
+está nomeada em "Achado de classe fecha com a varredura como entregável" (decisão 4.173,
+~l.453-460), mas nunca aplicada nomeadamente a este bullet
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`guidelines/core/CODE-REVIEW.md`, bullet "Comentários (Art. 7)" (Gate 7, l.188-196 da v0.156.0)
+patch: proposta de extensão in-line, logo após "decisão 4.250, escada 4.149": inventário de
+narrativa de processo/proveniência varre a CLASSE inteira sobre o delta ACUMULADO da wave
+(não só o diff da rodada), por grep amplo (`code-reviewer|re-review|Wave [0-9]|achado|
+gate [0-9]`, ou equivalente do domínio do artefato) separando por `git blame` o que a wave
+introduziu do que é pré-existente (fora de escopo do achado); lista de ocorrências pontuais
+sem essa varredura não fecha o achado — mesma régua da decisão 4.173, aplicada nomeadamente
+a este bullet — saldo líquido ~+5 linhas
+reincidencia: 0
+estado: ativa

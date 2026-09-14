@@ -8,7 +8,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -227,26 +227,27 @@ TASK-023-012).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-14T00:48:37+0000
+**Data conclusão**: 2026-09-14T12:00:43+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: 28c2894 (implementação), b4f8871 (retry — trava `isAnyDialogOpen` contra 2 alertdialog simultâneos), eea5703 (fix — regressão do próprio retry, feedback de outros Quadros escondido), bff601d (fix — chamada morta `closeOtherFramePicker` + prova do call site vivo), 43cdb73 (nit Art.7)
 **Jira**: KAN-101
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · product-designer (gate 11) — 4 rodadas: rodada 1 REPROVADA (gate 11: dois `alertdialog` simultâneos possíveis entre Quadros diferentes, achado novo desta EMENDA) → retry (`b4f8871`) → rodada 2 REPROVADA (gate 11: a própria correção introduziu regressão — `isRemovalActive` escondia o BLOCO inteiro de vínculo, inclusive feedback `role="status"`/`role="alert"` de ações em voo de OUTROS Quadros) → retry (`eea5703`, predicado restrito aos gatilhos) → rodada 3 (verificação) achou 1 call site de `closeOtherFramePicker` morto + 1 call site vivo sem prova → retry (`bff601d`) → APROVADO
+**Tentativas**: 4
+**Cobertura final**: componente montado — 3 estados de vínculo/desvínculo, diálogo de substituição, trava cruzada entre Quadros (nunca 2 `alertdialog` simultâneos, com teste de regressão do picker órfão), regressão zero da suíte pré-existente de PLAN-012 (43→46 casos)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/components/mnemonic-strip-board.tsx
+  - mnemonicos-frontend/src/components/mnemonic-strip-board.test.tsx
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — sem superfície sensível própria
+- [x] Comportamento (gate 9): consolidado FEAT-022-003 combinado com TASK-023-009/012 (AC-022-011/012/018 fecham combinados); FEAT-022-003 completa só na Wave 5 (falta TASK-023-014)
 
-**Notas**: 
+**Notas**: Duas rodadas de correção em cadeia sobre o mesmo mecanismo de diálogo reusado — a lição ativa "diálogo in-place exige grep de TODOS os setters" precisou ser estendida para além da fronteira do `<li>` (setters alcançáveis a partir de OUTRO Quadro), e depois a própria correção de escopo (esconder bloco vs. esconder só gatilho) teve de ser recalibrada para não apagar feedback assíncrono de ações não-relacionadas. Lição candidata roteada: correção rotulada "mecânica" deve ser classificada pelo DELTA (função/predicado/branch novo → gates normais), não pela origem do achado.

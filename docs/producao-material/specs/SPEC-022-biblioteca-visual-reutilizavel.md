@@ -139,6 +139,35 @@ interna de produção, mesma postura de todo o slug.
 > descrição, edita ou substitui esses dados depois, e remove uma associação visual —
 > exceto quando ela ainda está vinculada a algum Quadro, caso em que a remoção é recusada.
 
+**Verificação (gate 9)**: 2026-09-13 — APROVADO (comportamento funcional). Exercitado com
+execução real (backend `createApp()` via `npm run dev` :3333 + Postgres real de dev;
+frontend `next dev` :3000; identidade confirmada pelos processos já de pé apontando para
+este worktree; branch `feat/producao-material-mnemora-studio`, backend HEAD `cfbded7`,
+frontend HEAD `28c2894`, `git status` limpo antes/depois, sem mudança concorrente):
+AC-022-001 (PNG real por assinatura de bytes → 201), AC-022-002 (SVG renomeado `.png` →
+400, sem criar), AC-022-003 (PNG válido de 6 MB → 413 antes de processar), AC-022-004
+(campos obrigatórios ausentes → 422/400), AC-022-006 (PATCH edita in-place, mesmo id, sem
+duplicar), AC-022-007 (DELETE sem vínculo → 204, some), AC-022-008 (DELETE com vínculo
+ativo real, criado via link de verdade a um Quadro → 409, linha íntegra), AC-022-019
+(cenário com 2 autores: EDITOR só vê o próprio vínculo em `reachableLinks` e
+`outOfReachCount` sem identificar; ADMIN vê os 2 identificados), AC-022-020 (2º EDITOR
+recebe 403 com a MESMA mensagem em PATCH e DELETE da associação de outro autor; ADMIN
+escreve com sucesso), NFR-022-003 cross-cutting (STUDENT 403, anônimo 401 nas 3 rotas).
+Suíte automatizada (por arquivo): rotas 31/31, service 2/2, model 3/3, storage 2/2,
+route-authz-matrix 36/36, guard-order 2/2; frontend `visual-library-board.test.tsx` 9/9
+(3 estados AC-022-005, filtro AC-022-010, sugestão AC-022-022). Dados de teste criados e
+removidos ao final, banco restaurado. **Pendente de tela** (causa: artefato ausente —
+`GET /visual-associations` e a rota `/visual-library` só chegam em TASK-023-014/015, Wave
+5 — não é credencial/runtime): a caminhada em browser real do Roteiro do gate 9 já fixado
+em TASK-023-012 (upload via `<input type=file>` real, miniatura `next/image`, F5 reload,
+sugestão viva). Seed de verificação registrada no report do `qa` (handoff a consolidar
+quando TASK-023-014/015 fecharem). **Nota de sequência — resolvida**: gate 8 da mesma wave achou uma corrida TOCTOU real em
+`removeVisualAssociation` (AC-022-008 sob concorrência) — fechada com `SELECT ... FOR
+UPDATE` na linha pai antes do `deleteMany`, provada por execução real de concorrência
+(`Promise.all` disputando link×remove contra Postgres de teste, mutante que remove o lock
+reprova 4/4). Gate 8 reaprovado na 2ª rodada da Wave 4; FEAT-022-001 completou nesta wave
+(5/5 TASKs Done).
+
 - **FR-022-001** [MUST] Quando um EDITOR ou ADMIN envia um arquivo para criar uma nova
   associação visual, o sistema deve validar a assinatura de bytes (magic number) do
   arquivo e aceitar somente arquivos cuja assinatura corresponda a um formato raster

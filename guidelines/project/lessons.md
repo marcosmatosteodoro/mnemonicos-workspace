@@ -359,7 +359,16 @@ da decisão (`{ kind: 'expired'; reused: boolean }`). Reincidiu em `auth.service
 `expired ∧ reuse`): apagar o bloco de revogação+auditoria deixava as duas suítes verdes.
 **Validade:** geral (padrão de teste).
 **Estado:** ativa
-**Contadores:** confirmada 3 · contestada 0
+**Contadores:** confirmada 4 · contestada 0
+**Corolário de idempotência (gate 1 da Wave 4 de PLAN-023, TASK-023-011, `tira.service.ts`):**
+quando o ramo que deve VENCER no par de precedência é um NO-OP (idempotência: reaplicar a
+mesma associação/vínculo não muda o estado persistido), a asserção por EFEITO (linhas
+gravadas, evento auditado) não discrimina a ordem — o efeito é idêntico nas duas ordens,
+porque o vencedor não grava nada. A prova precisa medir o TRABALHO que a ordem correta
+EVITA: contagem de round-trips ao banco (`withQueryProbe` ou equivalente do driver) — a
+ordem errada faz a consulta/gravação extra que a ordem correta pula. Corolário: "efeito
+persistido" e "trabalho evitado" são oráculos diferentes; quando o vencedor do par é um
+no-op, só o segundo discrimina.
 **Reincidência (gate 1 da Wave 5, `disableUser`):** `disableUser` foi reescrita no retry
 com 3 guards em ordem declarada (`id == null → 404` · `disabledAt != null → no-op` ·
 `role == 'ADMIN' && activeAdmins <= 1 → 409`); o par `disabledAt != null` × `último ADMIN
@@ -760,10 +769,17 @@ vermelho — verificar isolamento: `pg_stat_activity WHERE datname='mnemonicos_t
 estar em 0 conexões e não deve haver processo `node`/`jest` órfão na linha de comando.
 Fixação sugerida (ainda não implementada): `--forceExit` no script `test:integration` ou
 banco por worker.
+**Reincidência (Wave 4 de PLAN-023, mencionada 2× por revisores distintos na mesma
+rodada):** `resetDb()` produziu deadlock transitório do Postgres (`40P01`) quando
+múltiplos arquivos de integração da wave rodaram concorrentemente na mesma máquina —
+worktrees de gates paralelos da mesma rodada (decisão 4.89) contra o MESMO banco de nome
+fixo (`mnemonicos_test`). 4ª manifestação da mesma causa-raiz (nome fixo + TRUNCATE
+compartilhado); a fixação (banco por execução/worktree ou `pg_advisory_lock`) segue sem
+estar implementada.
 **Validade:** enquanto `tests/integration/db.ts`/`jest.integration.config.ts` usarem
 `TRUNCATE` num banco compartilhado por nome fixo.
 **Estado:** ativa
-**Contadores:** confirmada 2 · contestada 0
+**Contadores:** confirmada 3 · contestada 0
 
 ## [Código] Correção de duplicação (DRY) introduz nova re-derivação do canônico no mesmo diff
 **Erro:** o retry que eliminou a redeclaração de dois enums de domínio (`contents.schema.ts`
@@ -780,7 +796,7 @@ mesma condição antes de despachar/commitar. Exemplar: `src/lib/prisma.ts` impo
 `{ env, isProduction }` de `../config/env` em vez de recalcular.
 **Validade:** geral (qualquer predicado derivado de configuração/env).
 **Estado:** ativa
-**Contadores:** confirmada 2 · contestada 0
+**Contadores:** confirmada 3 · contestada 0
 **Reincidência (2026-09-13, PLAN-023/TASK-023-008, Wave 3)**: o retry que consolidou 3
 fixtures duplicadas de `VisualAssociation` em `tests/support/visual-association-fixtures.ts`
 (achado de gate 7) re-derivou, no MESMO diff, **duas** ocorrências de bloco
@@ -793,6 +809,13 @@ no re-review seguinte do `code-reviewer`. Achado pelo `code-reviewer`, 2 rodadas
 previu a classe, mas o despacho transcreveu o exemplo citado como se fosse a lista
 inteira, não a condição ("nenhum re-derivação de `loadEnvModule` em lugar nenhum do
 arquivo").
+**Reincidência (2026-09-14, PLAN-023/TASK-023-010..013, Wave 4)**: o retry que criou o
+módulo canônico `visual-association-list-states.tsx` (consolidando os estados de lista
+repetidos entre `visual-association-picker.tsx` e `visual-library-board.tsx`) ainda
+redigitou, no MESMO diff, `dateFormatter`/`linkCountLabel` idênticos aos que o módulo
+canônico deveria centralizar — em vez de importá-los de lá. 3ª ocorrência da mesma causa
+dentro do MESMO PLAN-023 (após a de TASK-023-008/Wave 3, acima): criar o canônico não
+basta — o próprio diff que o cria precisa importar dele, não redigitar ao lado.
 
 ## [Design] Cor semântica de texto (erro/sucesso/link) vem de token do tema, nunca de literal da paleta
 
@@ -1412,5 +1435,88 @@ Sensitive no painel e com rotação registrada. Referência: `core/SECURITY.md` 
 vêm de configuração/secret store") + `guidelines/project/backend/node-22.md` §6.4.
 **Validade:** geral (qualquer mudança em script de build/CI que passe a exigir segredo de
 ambiente). Ver [[BRIEF-010]].
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Segurança] Corrida (TOCTOU) só se fecha com prova de CONCORRÊNCIA real contando linhas no fim; prova estrutural ou caso sequencial nunca fecha
+
+**Erro:** `deleteMany` com `where` condicional sobre a tabela FILHA
+(`visual-associations.service.ts`, TASK-023-010) parecia atômico, mas sob READ COMMITTED,
+com FK `ON DELETE SET NULL` na tabela PAI, o predicado do `where` é avaliado no snapshot do
+início do statement e nunca reavaliado após esperar um lock liberado por outra transação —
+duas exclusões concorrentes podem ambas "ver" a condição satisfeita e a corrida sobrevive à
+suíte. Pego pelo security-engineer na Wave 4 de PLAN-023.
+**Causa:** prova estrutural (grep confirmando `where`/transação presentes) ou caso
+sequencial (uma exclusão de cada vez) nunca exercitam o instante em que duas transações
+leem o mesmo snapshot — corrida é comportamento de CONCORRÊNCIA REAL, não de estrutura do
+código.
+**Solução:** quando a FK é `SET NULL`/`SET DEFAULT` (o filho sobrevive à exclusão do pai,
+mudando de estado em vez de sumir), travar a linha PAI (`SELECT ... FOR UPDATE`) antes do
+`deleteMany` condicional, ou rodar a operação com `isolationLevel: Serializable` — e a
+prova é 2+ transações disparadas de fato em paralelo (`Promise.all`), contando linhas no
+fim (nunca `instanceof`/mensagem de erro): resultado esperado é exatamente 1 sobrevivente,
+nunca os dois.
+**Validade:** geral (qualquer exclusão condicional sobre tabela referenciada por FK
+`SET NULL`/`SET DEFAULT`, Prisma + Postgres).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Design] Item de lista que renderiza a MESMA entidade em 2 componentes nascidos na MESMA wave herda a correção de acessibilidade já aplicada no irmão canônico, não só a estrutura
+
+**Erro:** `visual-library-board.tsx` (TASK-023-012, Wave 4 de PLAN-023) reincidiu o defeito
+de nome-acessível-não-único (dois itens de lista com o mesmo nome computado quando o
+visual se repete) que `visual-association-picker.tsx` já tinha corrigido na Wave 3 — um
+commit antes, na mesma Wave 4.
+**Causa:** os dois componentes renderizam a MESMA entidade (`VisualAsset`) em listas
+irmãs nascidas na mesma wave; a correção de acessibilidade do primeiro foi tratada como
+propriedade do ARQUIVO corrigido, não como propriedade do PADRÃO de item de lista daquela
+entidade — o segundo componente copiou a estrutura JSX, mas não a correção.
+**Solução:** ao criar (ou revisar) um 2º componente que renderiza item de lista da MESMA
+entidade que um irmão já corrigido na mesma wave/PLAN, conferir explicitamente se as
+correções de acessibilidade do irmão (nome acessível único, roles, ordem de foco) foram
+herdadas — não só a estrutura de render. Sinal de alerta: dois arquivos com JSX quase
+idêntico para o mesmo tipo de dado, nascidos na mesma janela de tempo.
+**Validade:** geral (qualquer par de componentes de lista que renderizam a mesma entidade
+de domínio, neste frontend).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Design] Predicado que impede 2º diálogo/confirmação simultâneo mira só o gatilho que o abriria — nunca o contêiner que hospeda feedback de ação assíncrona não-relacionada
+
+**Erro:** ao ampliar o predicado "nunca 2 `alertdialog` simultâneos" em
+`mnemonic-strip-board.tsx` (TASK-023-013, Wave 4 de PLAN-023), a correção escondeu o
+bloco inteiro que hospeda `role="status"`/`role="alert"` — e esse bloco também renderizava
+o feedback de vínculo/desvínculo de associação visual de OUTROS Quadros, sem relação com o
+diálogo que o predicado deveria impedir.
+**Causa:** o predicado foi ampliado mirando o CONTÊINER (esconder o bloco que hospeda
+tanto o diálogo quanto o feedback) em vez do GATILHO específico que abriria um 2º
+diálogo — contêiner compartilhado por responsabilidades diferentes escondido de uma vez
+apaga a que não é o alvo.
+**Solução:** ao ampliar um predicado que impede um 2º diálogo/confirmação simultâneo,
+mirar APENAS o gatilho (botão/ação) que o abriria — nunca o contêiner que hospeda
+`role="status"`/`role="alert"` de ações assíncronas não-relacionadas. Antes de esconder um
+bloco inteiro por um predicado novo, `grep` o que ele renderiza: se hospeda mais de uma
+responsabilidade, o predicado se aplica só à que o achado nomeia.
+**Validade:** geral (qualquer predicado de exclusão de diálogo/confirmação sobre um
+contêiner que também hospeda feedback de outra ação, neste frontend).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Teste de filtro/busca assíncrona sem debounce ancora `waitFor` na condição POSITIVA terminal, nunca na negativa
+
+**Erro:** `visual-library-board.test.tsx` (TASK-023-012, Wave 4 de PLAN-023) testava busca
+sem debounce (1 query por keystroke) ancorando `waitFor` no DESAPARECIMENTO do item
+anterior — flake real de ~5%, porque a condição negativa ("o item anterior sumiu") já é
+verdadeira durante QUALQUER resposta intermediária de uma query em voo, antes da resposta
+final chegar.
+**Causa:** input que dispara 1 query por keystroke produz uma sequência de respostas
+intermediárias; a ausência do item antigo é satisfeita cedo demais (no meio da sequência),
+enquanto o item novo esperado só aparece na última resposta — ancorar na negativa mede o
+estado errado do meio do caminho.
+**Solução:** teste de filtro/busca assíncrona sem debounce ancora `waitFor` na condição
+POSITIVA TERMINAL (`findByText` do item esperado no resultado final), nunca na negativa
+(desaparecimento do anterior) — a positiva só é satisfeita quando a resposta certa chega.
+**Validade:** geral (qualquer teste de input que dispara query por keystroke sem
+debounce, neste frontend).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0

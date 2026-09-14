@@ -9,7 +9,7 @@
 **Fatia sensível (princípio 8)**: security-engineer focado (guarda de autoria reusada + identificação de alcance)
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -175,26 +175,31 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-13T22:56:03+0000
+**Data conclusão**: 2026-09-14T11:05:00+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: b0e05ee (implementação), b547887 (retry — fecha corrida TOCTOU real com `SELECT ... FOR UPDATE`)
 **Jira**: KAN-98
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8) — 2 rodadas: rodada 1 REPROVADA (gate 1-7: prova comportamental do TOCTOU nunca escrita, só grep estrutural; gate 8: vulnerabilidade REAL — `deleteMany` condicional não fecha a corrida sob READ COMMITTED, confirmado por execução de concorrência real contra Postgres) → retry (`b547887`: `SELECT ... FOR UPDATE` como 1º statement, parametrizado, + teste de concorrência real) → rodada 2 APROVADA nos dois gates, com prova de mutação executada pelos próprios revisores (mutante que remove o `FOR UPDATE` reprova 4/4; SQL confirmado parametrizado contra payload hostil)
+**Tentativas**: 2
+**Cobertura final**: integration 342/342 (backend) — corrida real provada com `Promise.all` concorrente contra Postgres de teste, invariante "vínculo ativo nunca anulado em silêncio" confirmada
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.service.ts
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.routes.ts
+  - mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts
+  - mnemonicos-backend/tests/integration/visual-associations.routes.integration.test.ts
+  - mnemonicos-backend/tests/unit/visual-associations.service.guard-order.test.ts
+  - mnemonicos-backend/tests/integration/tira.service.integration.test.ts (teste de concorrência real)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (2ª rodada, após fechar corrida TOCTOU real)
+- [x] Comportamento (gate 9): consolidado FEAT-022-001 (verificado via HTTP real, ver SPEC-022 §FEAT-022-001)
 
-**Notas**: 
+**Notas**: A trava de vínculo por `deleteMany` condicional (achado da Wave 1) não fechava a corrida de verdade sob READ COMMITTED — o predicado é avaliado no snapshot do statement e não reavaliado após espera de lock; um vinculador concorrente que commitasse durante a espera do DELETE tinha o vínculo anulado em silêncio pelo `ON DELETE SET NULL`. Fechado travando a linha pai (`SELECT ... FOR UPDATE`) antes de qualquer decisão. Lição candidata roteada (`guidelines/project/lessons.md`/`docs/_meta/learning-log.md`): corrida só se fecha com prova de concorrência real contando linhas no fim — prova estrutural/sequencial nunca fecha corrida.

@@ -8,7 +8,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -279,26 +279,30 @@ FROM visual_associations WHERE id = '<associationId>';` (via `npm run db:psql` e
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-14T00:33:41+0000
+**Data conclusão**: 2026-09-14T12:00:43+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: dc3a624 (implementação), b4f8871 (retry — confirmação de remoção, nome acessível único, validação, extração DRY), eea5703 (retry — DRY residual `dateFormatter`/`linkCountLabel`), 9b5876f (fix teste flaky do filtro), 43cdb73 (nit Art.7)
 **Jira**: KAN-100
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · product-designer (gate 11) — 4 rodadas: rodada 1 REPROVADA (gate 11: remoção destrutiva sem confirmação, nome acessível não-único reincidente da Wave 3, formulário sem validação de obrigatórios; gate 7: DRY — duplicava quase verbatim `visual-association-picker.tsx`) → retry (`b4f8871`) → rodada 2 REPROVADA (gate 7: 2 símbolos ainda duplicados — `dateFormatter`/`linkCountLabel`) → retry (`eea5703`) → rodada 3 (verificação, escopo backend+achado design de `mnemonic-strip-board.tsx`, sem achado novo em `visual-library-board.tsx`) → rodada 4 achou 1 teste flaky real (`AC-022-010`, ~5% de falha, causa: `waitFor` ancorado em condição negativa) → retry (`9b5876f`, 40/40 execuções sem falha) → APROVADO
+**Tentativas**: 4
+**Cobertura final**: componente montado (`makeStore()` + `fetch` mockado) — 0/1/N itens, 3 estados por ação, filtro, sugestão de categoria, confirmação de remoção, validação de obrigatórios, mensagem 409 com `reachableLinks`/`outOfReachCount` como links de navegação
 **Arquivos modificados**:
-  - 
+  - mnemonicos-frontend/src/components/visual-library-board.tsx
+  - mnemonicos-frontend/src/components/visual-library-board.test.tsx
+  - mnemonicos-frontend/src/components/visual-association-list-states.tsx (novo, módulo canônico compartilhado com o picker)
+  - mnemonicos-frontend/src/components/visual-association-picker.tsx (passou a consumir o módulo canônico)
+  - mnemonicos-frontend/test/jsdom-fetch-env.js (extensão: `FormData` do realm Node)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — sem superfície sensível própria (consome endpoints já auditados)
+- [x] Comportamento (gate 9): consolidado FEAT-022-001 (verificado via componente montado + HTTP real do backend, ver SPEC-022 §FEAT-022-001); AC-022-011 combinado fecha em TASK-023-013
 
-**Notas**: 
+**Notas**: Achado de DRY reincidente dentro do próprio PLAN-023 (3ª manifestação da lição ativa) — retry que cria o módulo canônico ainda redigitou 2 símbolos idênticos aos do arquivo-irmão no MESMO diff. Teste flaky real encontrado e corrigido (âncora `waitFor` trocada de condição negativa para `findByText` positivo/assíncrono) — mecanismo de causa-raiz confirmado no código, não só suprimido por repetição de execução.

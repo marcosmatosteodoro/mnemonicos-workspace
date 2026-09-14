@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-13T22:52:57+0000 (PLAN-023 Wave 3/6 concluída — F5)
+**Última atualização**: 2026-09-14T12:00:43+0000 (PLAN-023 Wave 4/6 concluída — F5)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -34,7 +34,8 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   cognitiva) vinculável (N:1, no máximo 1 por Quadro) a Quadros da Tira mnemônica (F4);
   binário como coluna `Bytes` no Postgres (não filesystem — incompatível com a topologia
   serverless do backend, corrigido ainda no PLAN); alcance por autoria herdado de F4; métrica
-  de "uploads evitados" instrumentada. Aguardando `/keelson:tasks`.
+  de "uploads evitados" instrumentada. Em implementação (13/17 TASKs Done, 4/6 waves —
+  FEAT-022-001 "Gestão do acervo" já completa e verificada).
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
@@ -67,7 +68,7 @@ cobertura; 17 TASKs em 6 waves geradas 2026-09-13) — aguardando `/keelson:impl
 | PLAN-018 | SPEC-016 | 7/7 FRs + 4/4 NFRs (componente PasswordField com toggle de visibilidade, SVG inline, atributos anti-canal, aplicado ao LoginForm) | 2/2 ✅ | Done (sugerido) |
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
-| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 9/17 🟡 | Approved |
+| PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 13/17 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -206,6 +207,36 @@ cobertura; 17 TASKs em 6 waves geradas 2026-09-13) — aguardando `/keelson:impl
 
 ## Histórico recente
 
+- 2026-09-14: **Wave 4/6 de PLAN-023 concluída (4 TASKs Done — 2 fatias sensíveis + 2 UI)**
+  — `removeVisualAssociation` (trava de vínculo), `linkVisualAssociationToFrame`/
+  `unlinkVisualAssociationFromFrame` (backend), `visual-library-board.tsx` (CRUD do
+  acervo) e enxerto de vínculo em `mnemonic-strip-board.tsx` (frontend). **FEAT-022-001
+  ("Gestão do acervo") completou e foi VERIFICADA** (gate 9) por execução real (HTTP +
+  Postgres de dev): AC-022-001/002/003/004/006/007/008/019/020 + NFR-022-003.
+  Convergência mais longa e mais séria do slug até aqui — **1 vulnerabilidade REAL
+  encontrada e corrigida**: a trava de vínculo ativo por `deleteMany` condicional (achado
+  da Wave 1) NÃO fechava a corrida TOCTOU sob READ COMMITTED — um vinculador concorrente
+  que commitasse durante a espera de lock do `DELETE` tinha o vínculo ativo anulado em
+  SILÊNCIO pelo `ON DELETE SET NULL` (o predicado do `where` é avaliado no snapshot do
+  statement, não reavaliado após a espera). Provado por execução real de concorrência
+  contra Postgres pelo `security-engineer`; fechado travando a linha pai (`SELECT ... FOR
+  UPDATE`, parametrizado) antes de qualquer decisão — mutante que remove o lock reprova
+  4/4, fix passa 22/22. Backend: 2 rodadas de gate (rodada 1 REPROVADA nos gates 1-7 E 8;
+  retry único corrigindo os dois; rodada 2 APROVADA nos dois, com prova de mutação
+  executada pelos próprios revisores). Frontend: 4 rodadas — reincidência da lição DRY
+  (3ª vez dentro do próprio PLAN-023), reincidência de nome-acessível-não-único (corrigido
+  na Wave 3 no picker, reintroduzido no board novo), 2 achados ALTA de design (remoção
+  destrutiva sem confirmação, formulário sem validação), 1 regressão introduzida pela
+  própria correção de "nunca 2 diálogos simultâneos" (escondia feedback assíncrono de
+  Quadros não-relacionados) e 1 teste flaky real (~5%, filtro por categoria sem debounce
+  com `waitFor` mal ancorado). Todas as rodadas excederam o teto padrão de 1 retry —
+  **Tech Lead aplicou degrau 1 da escada de reação repetidamente** (decidir e registrar,
+  sem escalar) para cada achado mecânico com correção já prescrita pelo próprio revisor,
+  sem ambiguidade de produto pendente. 6+ lições novas/estendidas roteadas (DRY 3ª
+  manifestação, corrida real, precedência com ramo no-op, design de diálogo cruzado,
+  nome acessível herdado entre componentes-irmãos, teste assíncrono mal ancorado) — ver
+  `guidelines/project/lessons.md` e `docs/_meta/learning-log.md` (LRN-022+). Próximo:
+  Wave 5 (TASK-023-014/015 — completa FEAT-022-003 e FEAT-022-002).
 - 2026-09-13: **Wave 3/6 de PLAN-023 concluída (2 TASKs Done — fatia sensível)** —
   `createVisualAssociation`/`updateVisualAssociation` (upload validado por assinatura de
   bytes, guarda `assertVisualAssociationWritable` DEC-023-006) e

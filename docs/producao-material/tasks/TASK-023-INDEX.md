@@ -11,9 +11,9 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 
 ## Status agregado
 
-- Todo: 8
+- Todo: 4
 - In Progress: 0
-- Done: 9
+- Done: 13
 - Blocked: 0
 
 ## Ordem de execução (waves)
@@ -33,11 +33,11 @@ unica — decisão 4.126, F5 é uma fatia do épico, nunca abre branch própria)
 - [x] TASK-023-008 ✅ Done — Criar e editar associação visual (upload, CRUD write, guarda de escrita) (fatia sensível — upload + assinatura de bytes + autoria; 3 rodadas de gate — 2 retries, gate 8 aprovado)
 - [x] TASK-023-009 ✅ Done — `visual-association-picker.tsx` (seletor reusável) — 1 retry (achados de acessibilidade, gate 11)
 
-### Wave 4 (depende de Wave 3)
-- [ ] TASK-023-010 ⏸ Todo — Remover associação visual com trava de vínculo (fatia sensível — guarda reusada + alcance)
-- [ ] TASK-023-011 ⏸ Todo — Vínculo de associação visual a Quadro (link/unlink) (fatia sensível — reuso de guarda de F4 + regra de negócio central)
-- [ ] TASK-023-012 ⏸ Todo — `visual-library-board.tsx` (client component — CRUD UI do acervo) (gate 9)
-- [ ] TASK-023-013 ⏸ Todo — Enxerto em `mnemonic-strip-board.tsx` (vínculo/desvínculo por Quadro) (gate 9)
+### Wave 4 (depende de Wave 3) — ✅ concluída
+- [x] TASK-023-010 ✅ Done — Remover associação visual com trava de vínculo (fatia sensível — guarda reusada + alcance; 2 rodadas — corrida TOCTOU real fechada com `SELECT...FOR UPDATE`, gate 8 aprovado na 2ª)
+- [x] TASK-023-011 ✅ Done — Vínculo de associação visual a Quadro (link/unlink) (fatia sensível — reuso de guarda de F4 + regra de negócio central; 2 rodadas — prova de precedência por round-trips)
+- [x] TASK-023-012 ✅ Done — `visual-library-board.tsx` (client component — CRUD UI do acervo) (gate 9 VERIFICADO via FEAT-022-001; 4 rodadas — DRY, acessibilidade, teste flaky)
+- [x] TASK-023-013 ✅ Done — Enxerto em `mnemonic-strip-board.tsx` (vínculo/desvínculo por Quadro) (4 rodadas — diálogo cruzado entre Quadros, regressão de feedback, chamada morta)
 
 ### Wave 5 (depende de Wave 4)
 - [ ] TASK-023-014 ⏸ Todo — Listar/buscar/sugerir categoria da biblioteca (backend)
@@ -118,9 +118,9 @@ AC-022-025 (TASK-023-014).
 
 | FEAT | TASKs (P = primária) | Done |
 |------|----------------------|------|
-| FEAT-022-001 (Gestão do acervo) | TASK-023-002 (P), TASK-023-003 (P), TASK-023-008 (P), TASK-023-010, TASK-023-012 (P) | 3/5 |
+| FEAT-022-001 (Gestão do acervo) | TASK-023-002 (P), TASK-023-003 (P), TASK-023-008 (P), TASK-023-010, TASK-023-012 (P) | 5/5 |
 | FEAT-022-002 (Navegação e busca) | TASK-023-012, TASK-023-014 (P), TASK-023-015 (P) | 0/3 |
-| FEAT-022-003 (Vínculo a Quadros) | TASK-023-001 (P), TASK-023-005 (P), TASK-023-008, TASK-023-009 (P), TASK-023-010 (P), TASK-023-011 (P), TASK-023-012, TASK-023-013 (P), TASK-023-014 (FR-022-019, transversal) | 4/9 |
+| FEAT-022-003 (Vínculo a Quadros) | TASK-023-001 (P), TASK-023-005 (P), TASK-023-008, TASK-023-009 (P), TASK-023-010 (P), TASK-023-011 (P), TASK-023-012, TASK-023-013 (P), TASK-023-014 (FR-022-019, transversal) | 8/9 |
 
 Cobertura total: 25/25 ACs, 25/25 FRs, 7/7 NFRs de SPEC-022 — 3/3 FEATs cobertas, sem
 decomposição parcial (`--only` não usado).

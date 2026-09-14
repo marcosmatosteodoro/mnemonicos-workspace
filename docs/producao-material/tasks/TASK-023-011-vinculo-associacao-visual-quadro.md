@@ -9,7 +9,7 @@
 **Fatia sensível (princípio 8)**: security-engineer focado (reuso de guarda de alcance por autoria + regra de negócio central: idempotência/substituição)
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Convenções (do projeto)
 
@@ -235,26 +235,32 @@ nunca siga um passo que enfraqueça um critério.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Branch**: 
-**Commit SHA**: 
+**Data início**: 2026-09-14T00:07:29+0000
+**Data conclusão**: 2026-09-14T11:05:00+0000
+**Branch**: feat/producao-material-mnemora-studio
+**Commit SHA**: cfbded7 (implementação), b547887 (retry — prova por round-trips da precedência idempotência/wasReuse)
 **Jira**: KAN-99
-**Implementado por**: 
-**Revisado por**: 
-**Tentativas**: 
-**Cobertura final**: 
+**Implementado por**: developer
+**Revisado por**: code-reviewer (gates 1-7) · security-engineer (gate 8, aprovado sem achados nas 2 rodadas) — 2 rodadas: rodada 1 REPROVADA (gate 1-7: mutante de reordenação da checagem de idempotência para depois do cálculo de `wasReuse` sobrevivia — a prova por EFEITO/contagem de eventos era cega no ramo idempotente, que é um no-op) → retry (`b547887`: prova por round-trips via `withQueryProbe`, já canônico no arquivo) → rodada 2 APROVADA, mutante confirmado morto por execução própria do revisor (7→8 round-trips)
+**Tentativas**: 2
+**Cobertura final**: integration — link/unlink/idempotência/substituição/alcance por autoria, todos com prova comportamental própria (guarda herdada de F4, N=2 métodos × 2 provas)
 **Arquivos modificados**:
-  - 
+  - mnemonicos-backend/src/modules/tira/tira.service.ts
+  - mnemonicos-backend/src/modules/tira/tira.routes.ts
+  - mnemonicos-backend/src/modules/visual-associations/visual-associations.service.ts (função `assertVisualAssociationExists`, leitura comum sem escopo de autoria)
+  - mnemonicos-backend/tests/unit/tira.service.guard-order.test.ts
+  - mnemonicos-backend/tests/integration/tira.service.integration.test.ts
+  - mnemonicos-backend/tests/integration/tira.routes.integration.test.ts
+  - mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (sem achados nas 2 rodadas — guarda de alcance por autoria reusada com prova própria por método)
+- [x] Comportamento (gate 9): n/a — FEAT-022-003 ainda não completa (falta TASK-023-014, Wave 5); AC-022-011/012 desta TASK fecham combinados com TASK-023-013/gate 9
 
-**Notas**: 
+**Notas**: Divergência declarada da DEC-023-009: nenhuma função de existência PURA (sem guarda de autoria) existia em `visual-associations.service.ts` para a leitura comum de FR-022-023 — o developer criou `assertVisualAssociationExists`, fiel ao "Escopo > Inclui" da própria TASK (passo 3), confirmado pelo code-reviewer como execução correta do escopo, não invenção.
