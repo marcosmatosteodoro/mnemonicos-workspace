@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-14T16:34:27-0300 (PLAN-025 decomposto em 13 TASKs — F6, pipeline de publicação PDF)
+**Última atualização**: 2026-09-14T16:15:04-0300 (PLAN-025 Wave 1/7 concluída, 5/13 TASKs — F6, pipeline de publicação PDF)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -65,7 +65,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
-| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 0/13 ⏸ | Approved |
+| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 5/13 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -217,6 +217,45 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-14: **Wave 1/7 de PLAN-025 concluída (5/13 TASKs Done)** — migração aditiva
+  gerada (não aplicada em dev/prod), tipos `PublicationVariant` cross-repo,
+  `GenerationTimeoutError`, `wrapTextToLines` (função pura), EMENDA de `tira.service.ts`
+  (supressão do evento de abertura na auto-geração, FR-024-013/AC-024-015). Gate 8
+  (security-engineer): APROVADO, 0 achados. Gate 1-7 (code-reviewer): 1 retry em
+  TASK-025-005 — 2 achados bloqueantes fechados (prova estrutural de ordem de guarda
+  quebrada pelo novo parâmetro, extrator corrigido; DEC-025-003 não seguida à risca,
+  `decideStageTransition` canônica agora importada — 4ª reincidência da lição DRY,
+  atualizada em `guidelines/project/lessons.md`). Nova lição registrada: "[Testes]
+  Extrator textual de código para prova estrutural precisa de controle positivo
+  OBRIGATÓRIO". 2 notas prospectivas do security-engineer para a Wave 3 (TASK-025-008):
+  corrida check-then-act na decisão de reabertura sob concorrência, e
+  `GenerationTimeoutError` não deve receber mensagem crua do motor de PDF.
+- 2026-09-14: furo no plano em TASK-025-001 — Escopo não incluía a extensão de
+  `domain/types.ts`/`PRODUCTION_STAGE_TYPES` (necessária de verdade: sem ela,
+  `npm run typecheck` quebra em `production-events.service.ts:96`), diferente do
+  precedente `TASK-023-001` que incluía o passo equivalente — destino: ajuste localizado
+  no próprio arquivo da TASK (Inclui), aplicado pelo developer como auxiliar necessário,
+  mesmo padrão mínimo do precedente.
+- 2026-09-14: decisão em autonomia (Tech Lead, degrau 1) — `npm run test:integration`
+  rodado pelo developer de TASK-025-001 (verificação extra, além do exigido pela TASK)
+  disparou `globalSetup` do harness de integração, que aplica `prisma migrate deploy`
+  incondicionalmente contra `mnemonicos_test` (banco local descartável, não
+  dev/produção) — aplicou a migração aditiva `20260914175940_...` nesse banco sem
+  pergunta prévia. Avaliado como comportamento padrão e pré-existente do harness (todo
+  `test:integration` já sincroniza esse banco descartável; mesmo mecanismo que
+  permitiu F3/F4/F5 testarem migrações próprias antes do merge) — não é a leitura que a
+  regra do CLAUDE.md do workspace ("toda migração exige perguntar antes") mirava (banco
+  de dev/produção). Nenhuma ação de reversão tomada (reverter empilharia mais DDL não
+  perguntado). Registrado para a Entrega — Diretor pode pedir `docker compose down -v`
+  se preferir o banco de teste limpo antes do próximo `test:integration`.
+- 2026-09-14: achado fora de escopo (developer, TASK-025-001) — `mnemonicos-backend/
+  .claude/worktrees/kan-49-vercel-entrypoint/` é um worktree git de outra branch
+  (`fix/kan-49-vercel-entrypoint-500`), untracked, aninhado dentro do repo; o comando
+  literal `quality.lint` da ficha (`npm run lint`) sai estruturalmente vermelho por
+  causa dele (11 erros, todos lá dentro) para qualquer TASK futura rodada a partir desta
+  working copy. Pré-existente, não introduzido por esta fatia. Estacionado — sugestão:
+  mover o worktree para fora do diretório do repo, ou excluir `.claude/worktrees/**` do
+  `eslint.config.mjs`; candidato a `/keelson:triage`.
 - 2026-09-14: **PLAN-025 decomposto em 13 TASKs via `/keelson:tasks`** (rota fan-out,
   decisão 4.310 — 1 decompositor + 3 redatores em paralelo), 7 waves. `graph.sh --check`
   limpo. `task-validator`: 2 seções ausentes + 1 override incompleto corrigidos; 3

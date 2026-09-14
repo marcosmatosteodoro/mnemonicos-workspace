@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -108,17 +108,17 @@ frontend — mesma disciplina textual (sem AST) dos extratores já existentes no
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-14T15:12:51-0300
+**Data conclusão**: 2026-09-14T15:18:41-0300
+**Commit SHA**: backend 71d3f9c · frontend 2f3ad27
 **Jira**: KAN-109
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-024 sem FEATs

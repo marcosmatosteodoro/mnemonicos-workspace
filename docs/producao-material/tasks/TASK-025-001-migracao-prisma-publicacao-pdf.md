@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -55,6 +55,15 @@ migração 100% aditiva).
   no Contexto, nunca simulado.
 - rodar `npx prisma generate` após o schema editado — não altera banco, só o client TS
   (necessário para TASK-025-008 referenciar `tx.publicationEvent`).
+- **[Furo no plano corrigido em voo, 2026-09-14]** `mnemonicos-backend/src/domain/types.ts`:
+  `ProductionStageType`/`PRODUCTION_STAGE_TYPES` ganham o mesmo 5º valor aditivo
+  `PUBLICACAO_PDF` (mesmo padrão de `TASK-023-001`, que fez o equivalente para
+  `ASSOCIACAO_VISUAL` no mesmo arquivo) + ajuste mínimo correspondente em
+  `tests/unit/domain-types-parity.test.ts` — sem isso, `npm run typecheck` quebra de
+  verdade (`production-events.service.ts:96`, tipo Prisma de 5 valores vs. domínio de 4).
+  A decomposição de PLAN-025 não havia repetido este passo do precedente de F5; achado
+  empírico do developer, resolvido como "auxiliar necessário" (mesmo escopo mínimo do
+  precedente), registrado no INDEX.
 
 ### Não inclui
 
@@ -108,17 +117,17 @@ migração 100% aditiva).
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-14T14:53:59-0300
+**Data conclusão**: 2026-09-14T15:12:51-0300
+**Commit SHA**: 696d6c3
 **Jira**: KAN-108
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-024 sem FEATs

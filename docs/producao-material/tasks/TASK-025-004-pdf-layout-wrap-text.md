@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ```yaml
 override-erros: task-criterio-sem-ac
@@ -95,17 +95,17 @@ desta lista), que injeta a medição real via `font.widthOfTextAtSize` do `pdf-l
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-14T15:24:35-0300
+**Data conclusão**: 2026-09-14T15:29:13-0300
+**Commit SHA**: abba640
 **Jira**: KAN-111
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-024 sem FEATs

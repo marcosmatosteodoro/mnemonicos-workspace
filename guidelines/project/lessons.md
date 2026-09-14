@@ -796,7 +796,7 @@ mesma condição antes de despachar/commitar. Exemplar: `src/lib/prisma.ts` impo
 `{ env, isProduction }` de `../config/env` em vez de recalcular.
 **Validade:** geral (qualquer predicado derivado de configuração/env).
 **Estado:** ativa
-**Contadores:** confirmada 3 · contestada 0
+**Contadores:** confirmada 4 · contestada 0
 **Reincidência (2026-09-13, PLAN-023/TASK-023-008, Wave 3)**: o retry que consolidou 3
 fixtures duplicadas de `VisualAssociation` em `tests/support/visual-association-fixtures.ts`
 (achado de gate 7) re-derivou, no MESMO diff, **duas** ocorrências de bloco
@@ -816,6 +816,16 @@ redigitou, no MESMO diff, `dateFormatter`/`linkCountLabel` idênticos aos que o 
 canônico deveria centralizar — em vez de importá-los de lá. 3ª ocorrência da mesma causa
 dentro do MESMO PLAN-023 (após a de TASK-023-008/Wave 3, acima): criar o canônico não
 basta — o próprio diff que o cria precisa importar dele, não redigitar ao lado.
+**Reincidência (2026-09-14, PLAN-025/TASK-025-005, Wave 1)**: a EMENDA que ensinou
+`openMnemonicStrip` a suprimir o evento de abertura (DEC-025-003, que nomeia literalmente
+`decideStageTransition` como o mecanismo a reusar) inlinou, no ramo de reabertura,
+`priorTransitions.length === 0` em vez de IMPORTAR `decideStageTransition` — já exportada
+pelo mesmo módulo (`production-events.service.ts`) que o arquivo já importava para
+`recordProductionStageEvent`. 4ª ocorrência da mesma causa, agora atravessando PLANs
+(PLAN-023 → PLAN-025): mesmo com a DEC do PLAN nomeando o símbolo canônico pelo nome,
+a implementação reinventou o predicado — nomear o canônico na decisão não substitui
+importá-lo no código. Achado pelo `code-reviewer` (gate 5, não-conformidade com a DEC),
+fechado em 1 retry.
 
 ## [Design] Cor semântica de texto (erro/sucesso/link) vem de token do tema, nunca de literal da paleta
 
@@ -1546,5 +1556,36 @@ e `mnemonicos-backend/src/modules/users/users.service.ts:69-70`
 mexer nesses módulos aplica a mesma solução.
 **Validade:** geral (qualquer filtro Prisma com `mode: 'insensitive'` sobre valor de
 origem externa).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Extrator textual de código para prova estrutural precisa de controle positivo OBRIGATÓRIO, e o conserto precisa varrer a CLASSE (AST), não só a instância que quebrou
+
+**Erro:** `tira.service.guard-order.test.ts` prova, por extração TEXTUAL (sem AST), que
+guardas de autorização são a 1ª chamada dentro de uma `$transaction`. O extrator ancorava
+na 1ª `{` após o nome da função — assumindo, sem declarar, que a assinatura não contém
+chave nenhuma. `openMnemonicStrip` ganhou um parâmetro com tipo inline
+(`options?: { suppressOpeningEvent?: boolean }`, TASK-025-005/PLAN-025) e o extrator
+passou a devolver o CORPO DO TIPO, não o corpo da função — 2 testes lançaram (sorte: se o
+trecho errado contivesse os textos-âncora buscados, a asserção passaria VERDE E VAZIA,
+sem provar nada). O retry corrigiu (parênteses balanceados antes da 1ª `{`) e acrescentou
+controle positivo — mas como parâmetro OPCIONAL (`requiredAnchor?: string`); o re-review
+(via checagem independente contra o AST real, `ts.createSourceFile`) achou que 1 das 14
+funções do arquivo (`buildInitialFrames`, cujo TIPO DE RETORNO também tem `{`) ainda
+extraía o trecho errado — só não quebrava nada porque nenhum teste a usa como âncora hoje.
+**Causa:** duas falhas empilhadas. (1) extrator textual consertado pelo SINTOMA (a `{` do
+parâmetro) em vez da CLASSE do defeito ("qualquer `{` que a ASSINATURA contém e não é o
+corpo" — parâmetro OU tipo de retorno). (2) a rede de proteção criada no mesmo retry
+(controle positivo) nasceu opcional — protege só quem lembrar de usá-la, e por construção
+não pode fechar a classe: o próximo call site que esquecer volta a cair na armadilha que
+o retry acabou de corrigir.
+**Solução:** (1) em qualquer extrator textual de corpo de função, `requiredAnchor`
+(ou equivalente) é parâmetro OBRIGATÓRIO no tipo, nunca opcional — "a rede que depende da
+disciplina de quem chama não é rede". (2) ao consertar um extrator textual, a prova de
+fechamento cruza o resultado contra o AST real (`ts.createSourceFile` + `node.body`) para
+**todas** as declarações do arquivo-alvo, não só as que o teste usa hoje como âncora —
+é essa varredura completa, não a instância que quebrou, que decide se a classe fechou.
+**Validade:** geral (qualquer teste que prove estrutura de código por extração textual
+sem parser — grep/indexOf de código-fonte).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
