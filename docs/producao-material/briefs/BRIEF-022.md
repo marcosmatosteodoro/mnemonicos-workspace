@@ -74,3 +74,4 @@ inventário original do PM e sem pedido do Diretor.
   basta, ou precisa full-text.
 
 ## Cronologia
+- retomada: 2026-09-14T16:32:49+0000 · sessão 0f43399a@DESKTOP-DO75G16 · parado desde 2026-09-14T13:16:50-0300 (piso: último commit 8dadcdb) · 0h15min
