@@ -507,8 +507,7 @@ o reuso visível ao EDITOR durante a mesma sessão de vínculo. Correção suger
   comum a toda a fatia (NFR-022-003), nunca uma restrição adicional por alcance de
   FR-022-018: o acervo é comum a todo EDITOR/ADMIN (FR-022-023), então mesmo um EDITOR
   sem nenhum vínculo com o Quadro que usa a imagem lê o binário normalmente (A-023-001,
-  PLAN-023 §1 — corrigido nesta revisão, achado do gate 9/TASK-023-016: o texto anterior
-  prometia uma restrição por autoria que o próprio PLAN já havia decidido não existir).
+  PLAN-023 §1).
 
   **Verificação (gate 9)**: 2026-09-14 — VERIFICADO. Exercitado via suíte de integração
   (60/60 + 36/36 `route-authz-matrix`) + HTTP real (`curl`, upload multipart PNG real +
