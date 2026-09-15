@@ -1,7 +1,7 @@
 # Índice de tarefas do PLAN-025
 
-**Total de tasks**: 13
-**Tamanho dominante**: medium (6 medium, 7 small)
+**Total de tasks**: 14 (13 previstas na decomposição + 1 retroativa, achado da aceitação do PO)
+**Tamanho dominante**: medium (6 medium, 8 small)
 
 ## Ordem de execução (waves)
 
@@ -31,3 +31,6 @@
 ### Wave 7 (depende de Wave 6, paralelizável)
 - [x] TASK-025-012 ✅ Done
 - [x] TASK-025-013 ✅ Done
+
+### Entrega (retroativa — achado da aceitação do PO, não prevista na decomposição original)
+- [ ] TASK-025-014 🟡 Em retry (backend Done, frontend em retry)
