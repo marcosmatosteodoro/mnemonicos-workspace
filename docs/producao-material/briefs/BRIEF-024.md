@@ -1,7 +1,7 @@
 # BRIEF-024: Pipeline de publicação — PDF (rascunho)
 
 **Slug**: producao-material
-**Status**: Aceito com ressalvas — aguardando push/merge/deploy (ato do Diretor)
+**Status**: Aceito, gate 9 VERIFICADO — aguardando decisão de RISK-025-007 + push/merge/deploy (atos do Diretor)
 **Data**: 2026-09-14
 **Largada**: 2026-09-14T13:34:27-0300
 **SPEC**: SPEC-024
@@ -203,3 +203,25 @@ Diretor.
   migração de dev, reinício do servidor Turbopack, E-2 (A/B), E-4 (audit), 2
   mensagens ao mantenedor (LRN-027/028), staleness de `CLAUDE.md` (`jira.enabled:
   false` desatualizado, ficha real já `true`).
+- 2026-09-15: **Gate 10 (performance) rodado** (gap identificado pelo Tech Lead —
+  nunca tinha sido despachado, apesar do DoD do PLAN pedir) — REPROVOU com 2
+  achados reais medidos: (1) teto de duração inoperante sob composição
+  CPU-bound síncrona (timer atrasava 8318ms), **corrigido** (event-loop-yield,
+  commits `16bb218`/`6a5af2b`, gate 1-7 aprovado com 2 mutantes reais) —
+  resíduo de `doc.save()` sozinho ~3,1s, não eliminado; (2) **RISK-025-007,
+  risco real de produção NÃO corrigido**: sem teto cumulativo de custo, Tira
+  grande com imagens pode estourar tempo/memória, e o corpo de resposta já
+  excede hoje o limite de function serverless da Vercel para Tiras acima de
+  ~1 Quadro com imagem de 5MB — escalado ao Diretor, decisão de produto.
+  TRISK-025-001 fechado por medição (migração aditiva confirmada sem
+  lock/reescrita). Lição de código registrada (`lessons.md` + `node-22.md`
+  §10).
+- 2026-09-15: **Diretor autorizou e aplicou a migração + reiniciou o
+  servidor de dev do frontend.** `qa` exercitou o roteiro completo
+  (V1-V3) de `HANDOFF-PLAN-025.md` com ambiente real: **gate 9 VERIFICADO**
+  — download real das 2 Variantes nas 2 telas (Conteúdo bruto e Tira),
+  gating de Tira vazia confirmado, exatamente 1 evento `ABERTURA` mesmo com
+  auto-geração fora do fluxo da UI, falha controlada sem Quebra da regra
+  (404 estruturado, nunca 500 cru). `HANDOFF-PLAN-025.md` fechado
+  (`status: Concluído`). RISK-025-005 selado. Pendente: RISK-025-007
+  (decisão de produto) + E-2/E-4 antes do merge/deploy.

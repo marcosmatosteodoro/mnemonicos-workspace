@@ -80,6 +80,6 @@ tela da Tira mnemônica é da TASK-025-013.
 - [x] Code review aprovado (Wave 7)
 - [x] ACs verificados
 - [x] Segurança (gate 8): n/a — sem superfície sensível (composição client pura, nenhum auth/injeção nova)
-- [x] Comportamento (gate 9): pendente_handoff — **consolidado na Etapa 4 (DoD)**: migração ainda pendente + achado NOVO (pool de compilação do Turbopack do frontend quebrado, RISK-025-005, fix commitado `3115fec`, processo precisa reiniciar). Roteiro de re-verificação em `docs/producao-material/handoffs/HANDOFF-PLAN-025.md`.
+- [x] Comportamento (gate 9): **verificado** — V1 de `HANDOFF-PLAN-025.md` exercitado com ambiente real (migração aplicada, servidor reiniciado): as 2 Variantes exportadas com sucesso na tela do Conteúdo bruto, download real, sem regressão entre estados.
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

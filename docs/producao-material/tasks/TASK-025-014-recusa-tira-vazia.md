@@ -109,6 +109,6 @@ mensagem.
 - [x] Code review aprovado (rodada 2 — 1ª REPROVADA por 3 eixos: escopo/decisões/qualitativo, todos fechados via emenda de SPEC-024/PLAN-025 + discriminação de mensagem no frontend; 1 retry textual não-bloqueante depois)
 - [x] ACs verificados (AC-024-020 ressalva N≥1, AC-024-021 nova)
 - [x] Segurança (gate 8): n/a — validação de negócio, sem superfície sensível nova (auth/injeção/upload inalterados)
-- [x] Comportamento (gate 9): pendente_handoff — mesmo bloqueio de ambiente do HANDOFF-PLAN-025.md (migração de dev + reinício do servidor Turbopack), não bloqueio de código
+- [x] Comportamento (gate 9): **verificado** — V3 de `HANDOFF-PLAN-025.md` exercitado com ambiente real: falha sem Quebra da regra devolve 404 estruturado (`NOT_FOUND`) nas 2 Variantes, nunca 500 cru, `role="alert"` correto, sem regressão entre os 2 alertas
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

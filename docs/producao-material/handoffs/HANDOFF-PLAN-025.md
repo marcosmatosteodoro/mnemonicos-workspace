@@ -2,7 +2,7 @@
 id: HANDOFF-PLAN-025
 slug: producao-material
 branch: feat/producao-material-mnemora-studio
-status: Pendente
+status: Concluído
 criado: 2026-09-15T02:15:00+0000
 origem: PLAN-025
 commits: [09b9fbf, 554e929, db1a3e4, a66e7da, 87b4f70, 453d84f, 9a70284, 242899e, a55a2c9, e4c47c8, e2745c4, 913cc49, 3115fec]
@@ -109,7 +109,20 @@ fatia.
   coerente (`Content-Disposition`), sem regressão de estado (a Variante que
   falhar, se falhar, continua identificável).
 - **Risco se falhar**: FR-024-007/008/012 é o comportamento central da fatia.
-- **Evidência**: _(preencher ao exercitar)_
+- **Evidência**: ✅ Exercitado em `01a0a271-2f18-7499-b4ef-5cdb699de1e8`
+  (RawContent COM Quebra) logado como `editor@mnemonicos.local` via
+  `keelson.local.json`. Os 2 controles apareceram depois do link "Ir para a
+  Quebra da regra", como esperado. "Exportar Tira mnemônica":
+  `POST /contents/:id/publication {"variant":"TIRA"}` → `200`,
+  `content-type: application/pdf`,
+  `content-disposition: attachment; filename="01a0a271-...-tira-rascunho.pdf"`,
+  `content-length: 2702`; download real confirmado (`%PDF-1.7`, 2702 bytes) e
+  `role="status"`: "Tira mnemônica exportada." "Exportar Resumo":
+  `POST .../publication {"variant":"RESUMO"}` → `200`,
+  `content-disposition: ...-resumo-rascunho.pdf`, `content-length: 1360`,
+  download real (`%PDF-1.7`, 1360 bytes), `role="status"`: "Resumo exportado."
+  Os 2 status ficaram visíveis simultaneamente, cada um sob seu próprio
+  controle — sem regressão de estado entre as Variantes. **V1: VERIFICADO.**
 
 ### V2 — Gating por Tira vazia/não-vazia + exportação na tela da Tira (AC-024-014 parte mnemonic-strip-board, FR-024-013)
 - **Tela/rota**: `http://localhost:3000/content/01a0a271-2f18-7499-b4ef-5cdb699de1e8/tira`
@@ -130,7 +143,36 @@ fatia.
   download real, 1 único POST de confirmação de abertura.
 - **Risco se falhar**: FR-024-013/AC-011-024 e o achado de PDF vazio
   (já corrigido em `242899e`) reabririam se regredirem.
-- **Evidência**: _(preencher ao exercitar)_
+- **Evidência**: ✅ Os fixtures documentados já não cobriam mais o estado
+  "Tira vazia" (a Tira de `01a0a271-...` já tinha 5 Quadros de rodadas
+  anteriores da sessão) — criados 2 RawContents novos com Quebra da regra
+  para cobrir os 2 sub-casos do roteiro:
+  - `01a0a71b-bccf-71ce-baa9-3ebf17862546`: a auto-geração da Tira (1ª
+    abertura) já populou 3 Quadros a partir de Conceito/Ação/Objeto da
+    Quebra — os 3 foram removidos manualmente (com confirmação) até 0
+    Quadros. Com 0 Quadros: nenhum controle de exportação presente
+    (mensagem de estado vazio "Adicione o primeiro quadro..."). Adicionado 1
+    Quadro: os 2 controles reapareceram no fim da tela, depois do formulário
+    de novo Quadro — gating confirmado nos 2 sentidos. "Exportar Tira
+    mnemônica" com 1 Quadro: download real, não-vazio (`%PDF-1.7`,
+    1069 bytes) — não é PDF de 0 páginas.
+  - `01a0a71d-d73e-74fa-acfc-729fba4b7a36`: Quebra da regra registrada e a
+    Tira **nunca aberta no browser**; a Tira foi auto-gerada por uma chamada
+    direta a `POST /contents/:id/publication` (curl autenticado como
+    `editor`, fora do fluxo do frontend) — confirmado via
+    `GET .../strip` (404 antes, 200 com 3 frames depois). Só então a tela
+    `/tira` foi aberta pela 1ª vez no browser (network:
+    `GET .../strip → 200`, `POST .../strip → 200`, `GET .../strip → 200`) e
+    recarregada uma 2ª vez (hard reload, `location.reload()` — mesmo padrão
+    de 3 chamadas, incluindo um novo `POST .../strip → 200`). Consulta
+    read-only em `production_stage_events` (via Prisma Client do próprio
+    backend, `stageType='TIRA_MNEMONICA'`) confirma **exatamente 1** evento
+    `ABERTURA` para este `rawContentId` apesar da auto-geração fora do fluxo
+    da UI e das 2 aberturas subsequentes no browser — o `POST /strip` da UI
+    é idempotente (get-or-generate) e a emissão do evento é guardada pelo
+    histórico, não pela contagem de chamadas HTTP. **V2: VERIFICADO**
+    (gating vazio/não-vazio, download real e exatamente 1 evento de
+    abertura confirmados).
 
 ### V3 — Falha controlada sem Quebra da regra (DEC-025-007)
 - **Tela/rota**: `http://localhost:3000/content/01a0a2ce-8ec0-77a9-9221-f09a5c38bf5f`
@@ -142,7 +184,17 @@ fatia.
   500 cru nem sucesso parcial.
 - **Risco se falhar**: FR-024-009 (nunca entregar PDF parcial) e a barreira
   de pré-requisito (achado do product-designer, TASK-025-012).
-- **Evidência**: _(preencher ao exercitar)_
+- **Evidência**: ✅ Exercitado em `01a0a2ce-8ec0-77a9-9221-f09a5c38bf5f`
+  (RawContent SEM Quebra da regra, confirmado na tela — só "Registrar Quebra
+  da regra", sem "Tem Quebra da regra"). "Exportar Resumo":
+  `POST .../publication` → `404`, corpo
+  `{"error":{"code":"NOT_FOUND","message":"Quebra da regra não
+  encontrada."}}` — nunca 500 cru, sem download, `role="alert"`: 'Não foi
+  possível exportar a variante "Resumo" agora. Tente novamente.' Repetido
+  com "Exportar Tira mnemônica" na mesma tela: mesmo 404/NOT_FOUND, mesmo
+  padrão de alerta próprio ("Não foi possível exportar a variante "Tira
+  mnemônica" agora."), sem regressão do alerta da Variante anterior (os 2
+  ficaram visíveis, cada um sob seu controle). **V3: VERIFICADO.**
 
 ## 5. Riscos e pontos de atenção
 
@@ -163,6 +215,33 @@ fatia.
 - **RISK-025-004** (já em INDEX): feedback de exportação em voo se perde se o
   componente desmontar (3 gatilhos) — débito aceito, fora de escopo, não
   bloqueia este handoff.
+- **Achado não-bloqueante (sugestão, gate 11)**: cada exportação bem-sucedida
+  dispara no console de dev (RTK Query) o aviso "A non-serializable value was
+  detected... payload.blob" / "...api.mutations.<id>.data.blob" — o
+  `responseHandler` binário guarda o `Blob` no cache RTK Query, e o
+  middleware de serializability do Redux (dev-only, não afeta produção nem o
+  comportamento observado) sinaliza isso. Não bloqueou nenhum download nem
+  gerou erro visível ao usuário nos 4 exercícios (V1 x2, V2 x1); registrado
+  aqui como sinal ao `product-designer`/`developer` para uma futura
+  configuração de `serializableCheck.ignoredPaths` no store, se incomodar.
+- **3 fixtures novos criados nesta rodada** (os documentados na Seção 3 não
+  cobriam mais "Tira vazia" — ver Evidência de V2): RawContents
+  `01a0a71b-bccf-71ce-baa9-3ebf17862546` (Quebra da regra salva, Tira com 1
+  Quadro ao final do exercício), `01a0a71d-d73e-74fa-acfc-729fba4b7a36`
+  (Quebra da regra salva, Tira com 3 Quadros auto-gerados, 1 evento ABERTURA
+  confirmado). Dados de teste reais no Postgres de dev, não precisam de
+  limpeza para este handoff, mas ficam disponíveis para reuso/descarte por
+  sessões futuras.
+- **Identidade/estabilidade reconfirmadas no fecho do exercício**: backend
+  HEAD `6a5af2b43509414a1f5f4f33df2d27bdbc1463e7`, frontend HEAD
+  `5c406abd15fc0c92e4760cf55ed3a26afe65d334` (ambos avançaram da sondagem
+  original — `2f45711c622f`/`a55a2c99ae94` — com commits adicionais da mesma
+  fatia, incluindo o próprio `3115fec` do fix de `turbopack.root`); `git
+  status --porcelain` idêntico na abertura e no fecho nos dois repos (só
+  ruído de normalização de fim de linha CRLF/LF pré-existente em 5 arquivos
+  do backend e 1 do frontend, sem diff de conteúdo — `git diff --stat`
+  vazio; fora do escopo tocado por esta fatia) — nenhuma mudança concorrente
+  durante o exercício.
 
 ## 6. Protocolo de conclusão
 
