@@ -1188,6 +1188,38 @@ com backend fixo por `CORS_ORIGINS`, neste projeto.
 **Estado:** em-observacao
 **Contadores:** confirmada 0 · contestada 0
 
+## [Config] `turbopack.root` ausente deixa o Next resolver a raiz errada quando o workspace-mãe symlinkado tem seu próprio lockfile, quebrando o pool de compilação de QUALQUER rota nova até reiniciar
+
+**Erro:** durante o gate 9 de consolidação de PLAN-025 (Etapa 4/DoD), `qa` encontrou 500
+("Jest worker encountered 2 child process exceptions, exceeding retry limit") em
+`/content/:id` e `/content/:id/tira` — e, ao descartar defeito do diff, também em
+`/content/:id/breakdown` (rota NÃO tocada por nenhuma TASK desta fatia). Log do servidor
+mostrou a causa real, ANTES de qualquer navegação: "Could not find the Next.js package
+(next/package.json) ... The workspace root is incorrect". O Turbopack tentou resolver a
+raiz a partir de `mnemonicos-workspace` (a pasta-mãe symlinkada, que tem seu PRÓPRIO
+`package-lock.json` de 99 bytes) em vez de `mnemonicos-frontend` — sem `turbopack.root`
+declarado, o Next só emite um AVISO no boot ("ignored package-lock.json ... set
+turbopack.root"), mas nesta ocorrência o pool de workers de compilação nunca se
+recuperou pelo resto da vida do processo, e o servidor continuou reportando "Ready"
+normalmente — nenhum sinal de erro na etapa de `npm run dev`.
+**Causa:** `next.config.ts` não fixava `turbopack.root`; a topologia deste workspace
+(2 repos symlinkados dentro de uma pasta-mãe com git/lockfile próprios) é exatamente o
+caso que o próprio Next sinaliza como ambíguo, e a ambiguidade silenciosa se manifestou
+como falha permanente de UM boot específico, não como erro determinístico e repetível —
+por isso passou despercebida até um gate 9 real bater em rota ainda não compilada nesta
+sessão.
+**Solução:** declarar `turbopack: { root: __dirname }` em `next.config.ts` (commit
+`3115fec`) elimina a ambiguidade na raiz. Efeito colateral a lembrar: o fix só vale para
+um PROCESSO NOVO — um processo já quebrado por este motivo precisa ser reiniciado, não só
+ter a config corrigida. Antes de declarar um ambiente de gate 9 "saudável", checar UMA
+rota NÃO cacheada/ainda não visitada nesta sessão (não só a home ou uma rota já
+compilada) — um probe que bate só na `baseUrl` pode "mentir" ok quando só as rotas já
+compiladas respondem.
+**Validade:** qualquer workspace com 2+ repos Next.js symlinkados dentro de uma pasta-mãe
+que tenha seu próprio `package.json`/lockfile, neste projeto.
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
 ## [Arquitetura] Rota pública não monta consumidor de endpoint autenticado — o 401 esperado vira "sessão expirada"
 
 **Erro:** o CTA da rota pública `/` (KAN-74, BRIEF-015) nasceu como componente cliente
