@@ -50,6 +50,7 @@ declarado), SPEC-024 sem PLAN anterior.
 - FR-024-014
 - FR-024-015
 - FR-024-016
+- FR-024-017
 
 **NFRs cobertos**:
 - NFR-024-001
@@ -58,9 +59,9 @@ declarado), SPEC-024 sem PLAN anterior.
 - NFR-024-004
 
 **Cobertura agregada do slug**:
-- Total na SPEC: 16 FRs + 4 NFRs
+- Total na SPEC: 17 FRs + 4 NFRs (FR-024-017 emendada na Entrega, achado do `po`, ressalva R-1)
 - Cobertos por planos anteriores: 0 FRs + 0 NFRs (SPEC-024 não tem PLAN anterior)
-- Cobertos por este: 16 FRs + 4 NFRs
+- Cobertos por este: 17 FRs + 4 NFRs
 - Gap restante: 0
 - Funcionalidades cobertas: SPEC-024 não declara FEATs (mesmo padrão de SPEC-009/SPEC-019)
 
@@ -243,6 +244,12 @@ coluna/tabela/valor existente é removida ou alterada destrutivamente.
    (COMP-025-007) — get-or-generate idempotente reusado sem duplicar lógica; para cada
    `MnemonicFrameDetail` com `visualAssociationId`, `getVisualAssociationBinary` (F5, reusado)
    + `detectImageSignature` (F5, reusado) monta `StripFrameForPdf`; chama `buildStripPdf`.
+   **EMENDA (achado da aceitação do PO na Entrega, ressalva R-1, FR-024-017/AC-024-021)**:
+   se os Quadros resolvidos vierem vazios (`[]`), lança `NothingToExportError` ANTES de
+   chamar `buildStripPdf` — sem essa guarda, o motor aceita `frames: []` e devolve um PDF
+   de 1 página sem conteúdo real. Guarda exclusiva da Variante `TIRA`; `RESUMO` nunca fica
+   vazia (`concept`/`action`/`object`/`essence` são `NOT NULL` no schema + `.trim().min(1)`
+   no Zod), então não precisa da mesma guarda.
 5. Composição roda sob `withDeadline(promise, env.PUBLICATION_PDF_TIMEOUT_MS)`
    (DEC-025-002) — estoura o teto → `GenerationTimeoutError` (COMP-025-008), mesmo canal de
    falha de FR-024-009 (FR-024-015/AC-024-017).
@@ -258,7 +265,7 @@ coluna/tabela/valor existente é removida ou alterada destrutivamente.
 Fail-secure: qualquer exceção em qualquer passo (1-5) propaga sem gravar nada — os passos 6
 (evento) só rodam depois de (5) resolver com sucesso.
 **Realiza**: FR-024-002, FR-024-003, FR-024-004, FR-024-006, FR-024-008, FR-024-009,
-FR-024-010, FR-024-011, FR-024-015, NFR-024-003
+FR-024-010, FR-024-011, FR-024-015, FR-024-017, NFR-024-003
 **Interface pública**:
 ```ts
 export interface ExportPublicationInput {
@@ -344,16 +351,25 @@ export const CANONICAL_RULE_BREAKDOWN_ORDER: readonly Array<{
 ```
 **Dependências**: nenhuma nova (arquivo já existente, F4/F5)
 
-### COMP-025-008: EMENDA em `http/errors.ts` — `GenerationTimeoutError`
-**Responsabilidade**: nova subclasse de `AppError` (503, `GENERATION_TIMEOUT`), mensagem
-genérica pt-BR — usada quando `withDeadline` (COMP-025-005) estoura
-`PUBLICATION_PDF_TIMEOUT_MS`. Nenhuma outra classe existente é tocada.
-**Realiza**: FR-024-015
+### COMP-025-008: EMENDA em `http/errors.ts` — `GenerationTimeoutError` + `NothingToExportError`
+**Responsabilidade**: `GenerationTimeoutError`, nova subclasse de `AppError` (503,
+`GENERATION_TIMEOUT`), mensagem genérica pt-BR — usada quando `withDeadline`
+(COMP-025-005) estoura `PUBLICATION_PDF_TIMEOUT_MS`. **EMENDA (achado da aceitação do
+PO, ressalva R-1)**: `NothingToExportError`, subclasse irmã (409, `NOTHING_TO_EXPORT`),
+usada por COMP-025-005 quando a Variante `TIRA` resolve 0 Quadros (FR-024-017). Nenhuma
+outra classe existente é tocada.
+**Realiza**: FR-024-015, FR-024-017
 **Interface pública**:
 ```ts
 export class GenerationTimeoutError extends AppError {
   constructor(message = 'A geração do documento demorou demais. Tente novamente.') {
     super(message, 503, 'GENERATION_TIMEOUT');
+  }
+}
+
+export class NothingToExportError extends AppError {
+  constructor(message = 'Não há Quadros para exportar nesta Tira mnemônica.') {
+    super(message, 409, 'NOTHING_TO_EXPORT');
   }
 }
 ```
@@ -807,7 +823,7 @@ brief próprio revisando F4).
 
 ## 9. Definition of Done deste PLAN
 
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs — 16/16 FRs
+- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs — 17/17 FRs
 - [ ] Todos os NFRs cobertos têm verificação — 4/4 NFRs
 - [ ] Decisões DEC refletidas no código — 7 DECs
 - [ ] Aderência à ficha/perfil validada
@@ -835,7 +851,7 @@ brief próprio revisando F4).
 
 ## 10. Não coberto por este PLAN
 
-Nenhum — cobertura total da SPEC-024 (16/16 FRs, 4/4 NFRs) por este PLAN (Caso D, único
+Nenhum — cobertura total da SPEC-024 (17/17 FRs, 4/4 NFRs) por este PLAN (Caso D, único
 PLAN da SPEC). Os itens explicitamente fora de escopo pertencem à SPEC-024 §4.2 (papel de
 publicador dedicado, telas/fluxos separados por Variante, carimbo de Versão aprovada/QC
 jurídico de F9, versionamento editorial de F8, contrastes/pegadinhas/flashcards impressos de

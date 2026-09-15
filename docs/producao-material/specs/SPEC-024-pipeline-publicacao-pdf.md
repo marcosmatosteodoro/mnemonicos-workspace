@@ -162,10 +162,11 @@ atendida a partir de F8+F9.
   documento e a data/hora de geração exibida em ao menos uma página.
 - **FR-024-002** [MUST] Se o Conteúdo bruto não tem Quebra da regra salva, então o
   sistema deve recusar a exportação, em qualquer Variante, e informar que não há o que
-  exportar. A recusa é exclusivamente pela ausência de Quebra da regra salva — Conteúdo
-  bruto com Quebra salva mas Blocos majoritariamente vazios (ex.: só a Síntese preenchida)
-  gera o PDF normalmente; julgamento de suficiência editorial do conteúdo fica fora desta
-  fatia (F9).
+  exportar. Essa é a única recusa pela AUSÊNCIA de Quebra da regra — Conteúdo bruto com
+  Quebra salva mas Blocos majoritariamente vazios (ex.: só a Síntese preenchida) gera o
+  PDF normalmente; julgamento de suficiência editorial do conteúdo fica fora desta fatia
+  (F9). A Variante "tira" tem uma 2ª recusa, distinta e exclusiva dela, definida em
+  FR-024-017.
 - **FR-024-003** [MUST] Quando a Variante solicitada é "resumo", o sistema deve compor o
   PDF com o texto corrido derivado da Quebra da regra, sem diagramação de Quadros.
 - **FR-024-004** [MUST] Quando a Variante solicitada é "tira", o sistema deve compor o
@@ -210,6 +211,13 @@ atendida a partir de F8+F9.
   FR-024-009/AC-024-008, nunca deixar a requisição sem resposta.
 - **FR-024-016** [MUST] Quando a Variante "tira" é gerada, o sistema deve compor o PDF
   com 1 Quadro por página (RISK-011-007 — unidade destinada a uma página do PDF).
+- **FR-024-017** [MUST] Se a Tira mnemônica resolvida para a Variante "tira" (existente
+  ou recém-gerada por FR-024-006) tem 0 Quadros, então o sistema deve recusar a
+  exportação dessa Variante e informar que não há o que exportar, em vez de compor um
+  documento sem conteúdo real de Quadro. Esta recusa é exclusiva da Variante "tira" — a
+  Variante "resumo" no mesmo Conteúdo bruto continua disponível normalmente (achado da
+  aceitação do PO na Entrega de PLAN-025, ressalva R-1; corrige a lacuna que FR-024-002
+  não cobria).
 
 ## 6. Requisitos não-funcionais
 
@@ -342,8 +350,16 @@ atendida a partir de F8+F9.
   (SPEC-005).
 
 - **AC-024-020** (cobre FR-024-016)
-  Dada uma Tira mnemônica com N Quadros, quando o PDF da Variante "tira" é gerado, então
-  o documento tem N páginas de conteúdo de Quadro, uma por Quadro, na ordem da Tira.
+  Dada uma Tira mnemônica com N Quadros (N ≥ 1), quando o PDF da Variante "tira" é
+  gerado, então o documento tem N páginas de conteúdo de Quadro, uma por Quadro, na
+  ordem da Tira. O caso N = 0 não gera documento — é a recusa de AC-024-021.
+
+- **AC-024-021** (cobre FR-024-017)
+  Dada uma Tira mnemônica resolvida com 0 Quadros (existente e esvaziada, ou recém-gerada
+  sem Quadros), quando um EDITOR aciona a exportação da Variante "tira", então o sistema
+  recusa essa exportação e informa que não há o que exportar — e a exportação da
+  Variante "resumo" do MESMO Conteúdo bruto, no mesmo instante, continua funcionando
+  normalmente (a recusa é exclusiva da Variante "tira").
 
 ## 8. Premissas e decisões prévias
 
