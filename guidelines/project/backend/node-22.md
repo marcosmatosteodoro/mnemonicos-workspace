@@ -510,6 +510,17 @@ PLAN-023/Wave 6).
   detecta PNG/JPEG/WebP por assinatura de bytes, função pura sem I/O. Reuse-a em vez de
   reimplementar; allowlist de extensão, nome gerado pelo servidor e limite de tamanho
   seguem como antes. Nunca confie em `originalname`/`mimetype` do cliente.
+  **Decompression bomb (decisão registrada em PLAN-025/gate 8, Wave 2):** teto de tamanho
+  do upload (`limits.fileSize`) limita bytes COMPRIMIDOS, nunca a DIMENSÃO decodificada —
+  um PNG de poucos KB pode declarar cabeçalho de milhões de pixels e estourar heap no
+  decode (o decoder embutido de qualquer lib que processa a imagem — `pdf-lib`/UPNG neste
+  caso — aloca ~8 bytes/pixel antes de qualquer validação de conteúdo). Qualquer código
+  que DECODIFICA (não só valida assinatura de) um binário de origem externa — embutir em
+  PDF, gerar thumbnail, redimensionar — lê width×height do cabeçalho (IHDR do PNG,
+  marcador SOFn do JPEG) e recusa acima de um teto explícito **antes** do decode pesado;
+  recusa também formato multi-frame (APNG via chunk `acTL`) se o consumidor não suporta.
+  Qualquer DEC que adota biblioteca para processar entrada externa declara não só as
+  superfícies que ela REMOVE mas as que ela ADICIONA (parser/decoder embutido).
 - **ReDoS:** regex sobre entrada de usuário com quantificador aninhado (`(a+)+`) trava o
   event loop **do processo inteiro** — Node é single-threaded. Regex de validação vem do
   Zod ou é simples e ancorada, com tamanho da entrada limitado antes.
