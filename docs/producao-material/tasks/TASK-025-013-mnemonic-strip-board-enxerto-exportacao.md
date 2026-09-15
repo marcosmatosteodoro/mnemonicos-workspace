@@ -7,7 +7,7 @@
 **Wave**: 7
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -113,19 +113,19 @@ Tira mnemônica; a faceta da tela do Conteúdo bruto é da TASK-025-012.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-14T21:15:00-0300
+**Data conclusão**: 2026-09-14T23:10:00-0300
+**Commit SHA**: 9a70284 (implementação) · 242899e (retry — gates 1-7/11: posição, PDF vazio anunciado como sucesso, mutualidade hasData/isNotFound, teste falsificável) · a55a2c9 (retry — gate 1-7: narrativa de rodada removida dos testes)
 **Jira**: KAN-120
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (Wave 7 — 2 retries: 1 comportamental/design, 1 textual; ambos convergidos)
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — sem superfície sensível (composição client + derivação de estado de query, nenhum auth/injeção nova)
+- [x] Comportamento (gate 9): pendente_handoff — consolidação na Etapa 4 (DoD), junto de TASK-025-011/012 (mesmo bloqueio: migração `20260914175940_add_publicacao_pdf_publication_event` não aplicada no Postgres de dev). RISK-011-008 deixou de ser hipótese (confirmado por probe real, corrigido nesta TASK). 1 achado não-bloqueante de follow-up: feedback de exportação em voo se perde se o bloco desmontar (3 gatilhos: remoção do último Quadro, refetch 404, erro de leitura) — estado vive local em `PublicationExportControl` (COMP-025-010), fora de escopo desta TASK.
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

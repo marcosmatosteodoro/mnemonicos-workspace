@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-14T21:12:55-0300 (PLAN-025 Wave 6/7 concluída, 11/13 TASKs — F6, pipeline de publicação PDF)
+**Última atualização**: 2026-09-14T23:10:00-0300 (PLAN-025 Wave 7/7 concluída, 13/13 TASKs — F6, pipeline de publicação PDF)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -65,7 +65,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | PLAN-020 | SPEC-019 | 4/4 FRs + 4/4 NFRs (página 404 nativa do App Router `not-found.tsx`, precedência guard×404 delegada ao `proxy.ts` existente, link de volta via `next/link`) | 2/2 ✅ | Done (sugerido) |
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
-| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 11/13 🟡 | Approved |
+| PLAN-025 | SPEC-024 | 16/16 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`) | 13/13 🟢 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -163,6 +163,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | ~~TRISK-006-001~~ | **RESOLVIDO 2026-09-01** — Diretor confirmou "Gerar e executar" (ledger `intervencao` 2026-09-01T13:27:23Z, anterior à aplicação). Migração aditiva aplicada em dev + `mnemonicos_test`; auditada linha a linha pelo gate 8 (0 `DROP`/`ALTER` destrutivo). | — nenhuma | PLAN-006 §8 / Wave 1 |
 | RISK-006-005 | `npm audit` do backend (pós-`npm ci` de recuperação, Wave 2) = 3 vulnerabilidades nas deps transitivas via `prisma` (1 high — mysql2 auth plugin downgrade; 2 moderate — mysql2 decompression bomb, `qs`). Não introduzidas por este diff (lockfile intocado) | `/keelson:audit` na Entrega; `fixAvailable` do npm exige downgrade maior de Prisma (7→6, inaceitável); superfície `mysql2` provavelmente inalcançável em projeto PostgreSQL — hipótese a confirmar, não medição | security-engineer, re-review Wave 2 |
 | RISK-025-003 | `code-reviewer` (gate 1-7, Wave 6 de PLAN-025) achou 3 sinais de *staleness*/débito no frontend: (a) `guidelines/project/frontend/next-16.md` §7 prescreve `tests/components/<x>.test.tsx`, mas a casa real tem 12 arquivos co-localizados em `src/components` contra 2 em `tests/components`; (b) o mesmo §7 prescreve `user-event`, mas 4 arquivos (incl. o exemplar canônico da família, `visual-association-picker.test.tsx`) usam `fireEvent`, sem decisão declarada; (c) `renderWithProviders` (helper de `mount()`+`Provider`+`makeStore()`) foi previsto no perfil "a criar quando houver a 2ª cópia" — já são 9 cópias locais | atualizar o perfil (a/b) ou migrar os 4 arquivos; extrair `renderWithProviders` (c) — nenhum bloqueia esta wave, consolidação em diff próprio | code-reviewer, gate 1-7 Wave 6 de PLAN-025 |
+| RISK-025-004 | `product-designer` (gate 11, Wave 7 de PLAN-025, re-revisão do retry de TASK-025-013) achou que o feedback de uma exportação em voo (`isLoading`/`successMessage`/`errorMessage`, estado LOCAL de `PublicationExportControl`, COMP-025-010) se perde se o componente desmontar antes de resolver — 3 gatilhos mapeados em `mnemonic-strip-board.tsx`: remoção do último Quadro (`frames.length` 1→0), refetch que devolve 404, e erro real de leitura. Mesma classe já aceita no componente canônico (`content-form.tsx`: "Confirmar remoção" navega para `/content` e destrói o mesmo feedback) — não é regressão desta TASK, é debito pré-existente do componente compartilhado | follow-up sobre `publication-export-control.tsx` (COMP-025-010): elevar o resultado da exportação para um ponto que sobreviva ao desmonte, ou desabilitar o gatilho de remoção/navegação enquanto há exportação em voo — fora de escopo de PLAN-025, brief/ajuste pontual futuro | product-designer, gate 11 Wave 7 de PLAN-025 (re-revisão) |
 | — | `product-designer`/`code-reviewer` (Wave 6): o estado de SUCESSO de `PublicationExportControl` (download real) só é confirmável em browser real — jsdom não distingue "revogou depois do clique" de "revogou cedo demais", nem se o download efetivamente inicia. `gates.screenVerify.enabled: true` — recomendado que o gate 9 confirme o download real das 2 Variantes antes da Entrega desta fatia | gate 9 (consolidado, Etapa 4) confirma em ambiente com tela; sem tela disponível, vira handoff | code-reviewer, gate 1-7 Wave 6 de PLAN-025 |
 | RISK-025-002 | Confirmado por `security-engineer` (gate 8, Wave 2 de PLAN-025, com `provider = "postgresql"` em `schema.prisma:20` visto): `mysql2` (via `@prisma/client`) inalcançável nesta configuração — confirma a hipótese de RISK-006-005, rebaixa `high` catalogado para risco residual não-explorável. `qs` (via `express@5.2.1`) segue moderate e ALCANÇÁVEL (Express parseia query string com `qs`), com fix disponível sem downgrade major (`npm audit fix`) — não aplicado neste PLAN (fora do diff da wave, mudança de lockfile é ajuste pontual próprio) | rodar `npm audit fix` no backend como ajuste pontual antes do próximo PR, ou via `/keelson:audit` | security-engineer, gate 8 Wave 2 de PLAN-025 |
 | ~~TRISK-006-003~~ | **RESOLVIDO 2026-09-05** — filtro `deletedAt = null` centralizado em `contents.service.ts` (helper reusado por T006/T008/T009, nunca recriado) e confirmado end-to-end na superfície HTTP por T011 (AC-005-031/037: conteúdo removido → 404 no acesso direto E na Quebra; linha órfã confirmada presente no banco mas inalcançável). Verificado ao vivo pelo `qa` (gate 9, execução real com Postgres). | selado — nenhum caminho de leitura ficou sem o filtro | PLAN-006 §8 / Wave 4-5 |
@@ -221,6 +222,28 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-14: **Wave 7/7 de PLAN-025 concluída (13/13 TASKs Done — todas as TASKs do
+  PLAN entregues)** — os 2 enxertos finais que expõem `PublicationExportControl`
+  (TASK-025-011) nas telas reais: `content-form.tsx` (TASK-025-012, Conteúdo bruto) e
+  `mnemonic-strip-board.tsx` (TASK-025-013, Tira mnemônica). TASK-025-012 fechou com 1
+  retry (gate 11 — reordenar o controle para depois do link da Quebra da regra, já que
+  exportar sem Quebra falha no backend). TASK-025-013 foi a mais convergente da wave: 1º
+  retry corrigiu 3 achados reais simultâneos — (a) mesmo problema de posicionamento; (b)
+  achado mais sério: exportar a Tira com `frames.length === 0` produzia PDF de 1 página
+  em branco mas a UI anunciava sucesso — corrigido condicionando todo o controle a
+  `frames.length > 0`; (c) RISK-011-008 deixou de ser hipótese — `hasData`/`isNotFound`
+  não eram mutuamente exclusivos por construção (confirmado por probe real: refetch que
+  vira 404 retinha `hasData=true` por o RTK Query preservar `data` do último sucesso),
+  corrigido derivando `hasData` de `isSuccess` em vez de `data !== undefined`; 2º retry
+  (só-texto, 4.88, não reabriu o ciclo comportamental) removeu narrativa de rodada de
+  revisão que tinha vazado para dentro de comentários/nomes de teste. RISK-025-004
+  registrado (achado não-bloqueante: feedback de exportação em voo se perde se o
+  componente desmontar — débito pré-existente do componente compartilhado
+  `PublicationExportControl`, fora de escopo de PLAN-025). Gate 9 (`qa`) de ambas
+  segue `pendente_handoff`, mesmo bloqueio já registrado na Wave 6 (migração
+  `20260914175940_add_publicacao_pdf_publication_event` não aplicada no Postgres de
+  dev) — agora com as 3 TASKs de frontend prontas, a Etapa 4 (DoD) é o próximo passo, e
+  a autorização do Diretor para aplicar a migração é urgente.
 - 2026-09-14: **Wave 6/7 de PLAN-025 concluída (11/13 TASKs Done)** —
   `PublicationExportControl`, componente client que reage aos 3 estados observáveis por
   Variante (AC-024-006: em andamento/sucesso/falha), `role="status"`/`role="alert"`

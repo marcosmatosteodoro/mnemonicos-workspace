@@ -7,7 +7,7 @@
 **Wave**: 7
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -67,19 +67,19 @@ tela da Tira mnemônica é da TASK-025-013.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-14T21:15:00-0300
+**Data conclusão**: 2026-09-14T22:05:00-0300
+**Commit SHA**: 87b4f70 (implementação) · 453d84f (retry — gate 11: reordena controle após link da Quebra da regra)
 **Jira**: KAN-119
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (Wave 7)
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — sem superfície sensível (composição client pura, nenhum auth/injeção nova)
+- [x] Comportamento (gate 9): pendente_handoff — consolidação na Etapa 4 (DoD), junto de TASK-025-011/013 (mesmo bloqueio: migração `20260914175940_add_publicacao_pdf_publication_event` não aplicada no Postgres de dev)
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
