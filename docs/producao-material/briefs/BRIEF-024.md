@@ -1,7 +1,7 @@
 # BRIEF-024: Pipeline de publicação — PDF (rascunho)
 
 **Slug**: producao-material
-**Status**: Implementado — aguardando aceitação do PO (Entrega)
+**Status**: Aceito com ressalvas — aguardando push/merge/deploy (ato do Diretor)
 **Data**: 2026-09-14
 **Largada**: 2026-09-14T13:34:27-0300
 **SPEC**: SPEC-024
@@ -185,3 +185,21 @@ Diretor.
   `agile-coach` (LRN-027 `PROPOSTA_DOUTRINA` — handoff-protocol.md 5ª causa nomeada;
   LRN-028 `PROPOSTA_PLUGIN` — autocheck de narrativa-no-código não cobria nome de
   teste) + 2 lições de projeto estendidas (`lessons.md`).
+- 2026-09-15: **Etapa 5 (Entrega) — aceitação do `po` contra este BRIEF:
+  ACEITA_COM_RESSALVAS.** Todos os itens de premissa decidida e escopo negativo
+  correspondidos. 1 ressalva de correspondência real (**R-1**): tela do Conteúdo bruto
+  sem a mesma guarda de "Tira vazia" da tela da Tira (Wave 7) — nem UI nem backend
+  recusavam. Corrigido via **TASK-025-014** (Wave 8 retroativa): `NothingToExportError`
+  (409) no backend + mensagem discriminada no frontend. Gate 1-7 reprovou a 1ª rodada
+  por 3 eixos (escopo sem artefato-pai, SPEC contradizendo o código, mensagem falsa ao
+  usuário); todos fechados — SPEC-024 emendada (FR-024-017/AC-024-021, **17/17 FRs, 21
+  ACs**), TASK-025-014 documentada, mensagem do frontend corrigida. Rodada 2: APROVADO.
+  RISK-024-001 elevado (E-2 — decisão do A/B fica para o Diretor) e RISK-025-006
+  registrado (E-3 — WEBP/imagem acima do teto nunca aparece no PDF, degradação
+  silenciosa, já catalogado em TRISK-025-006). LRN-028 reincidiu (reincidência 1,
+  mesma classe, TASK diferente) — mensagem ao mantenedor reforçada, diff inalterado.
+  E-4 (audit `pdf-lib` + `npm audit fix` `qs`) fica para o Diretor (comando
+  humano-only). Jira: comentário em KAN-107. Escalações em lote para a Entrega:
+  migração de dev, reinício do servidor Turbopack, E-2 (A/B), E-4 (audit), 2
+  mensagens ao mantenedor (LRN-027/028), staleness de `CLAUDE.md` (`jira.enabled:
+  false` desatualizado, ficha real já `true`).
