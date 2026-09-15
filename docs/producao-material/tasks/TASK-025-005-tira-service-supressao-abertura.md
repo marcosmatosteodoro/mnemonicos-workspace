@@ -12,7 +12,7 @@
 ## Dependências
 
 - **Depende de**: nenhuma
-- **Bloqueia**: TASK-025-008, TASK-025-013
+- **Bloqueia**: TASK-025-008, TASK-025-013, TASK-025-014
 
 ## Contexto
 

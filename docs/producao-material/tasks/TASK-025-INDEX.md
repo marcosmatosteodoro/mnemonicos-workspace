@@ -32,5 +32,5 @@
 - [x] TASK-025-012 ✅ Done
 - [x] TASK-025-013 ✅ Done
 
-### Entrega (retroativa — achado da aceitação do PO, não prevista na decomposição original)
-- [ ] TASK-025-014 🟡 Em retry (backend Done, frontend em retry)
+### Wave 8 (retroativa — achado da aceitação do PO, não prevista na decomposição original)
+- [x] TASK-025-014 ✅ Done
