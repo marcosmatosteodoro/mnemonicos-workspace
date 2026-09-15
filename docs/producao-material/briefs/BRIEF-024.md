@@ -1,7 +1,7 @@
 # BRIEF-024: Pipeline de publicação — PDF (rascunho)
 
 **Slug**: producao-material
-**Status**: Emitido
+**Status**: Implementado — aguardando aceitação do PO (Entrega)
 **Data**: 2026-09-14
 **Largada**: 2026-09-14T13:34:27-0300
 **SPEC**: SPEC-024
@@ -140,8 +140,10 @@ Diretor.
   tensionando com AC-024-018 (leitura "sem restrição adicional por autoria"); resolvido
   com guarda nova para leitura de material já existente (comum a EDITOR/ADMIN) mantendo a
   auto-geração restrita à autoria de F4 — EDITOR não-autor exportando "tira" de Conteúdo
-  cuja Tira nunca foi aberta por ninguém fica recusado (409) até a abertura por quem
-  alcança; não testado literalmente por nenhum AC da SPEC. PLAN-025 promovido a `Approved`.
+  cuja Tira nunca foi aberta por ninguém fica recusado (**404, `NotFoundError`** — texto
+  original do PLAN dizia 409/ConflictError, corrigido na Wave 3 de TASK-025-008/PLAN-025
+  para bater com o comportamento real) até a abertura por quem alcança; não testado
+  literalmente por nenhum AC da SPEC. PLAN-025 promovido a `Approved`.
 - 2026-09-14: TASKs decompostas via rota fan-out (decisão 4.310 — 13 TASKs previstas,
   1 `scribe` decompositor + 3 `scribe`s redatores em paralelo). `graph.sh --check` limpo
   após 2 correções mecânicas do Tech Lead (campos de aresta `Realiza (FRs)` com
@@ -154,3 +156,32 @@ Diretor.
   WEBP→null (Passo 4 de TASK-025-008, Inclui explícito sem critério correspondente) —
   corrigido com 1 critério novo (AC-024-003, parte publication.service) antes do
   despacho. Jira: 13 sub-tasks criadas sob KAN-107 (KAN-108..120, gancho tasks).
+- 2026-09-14: **Waves 1-5 implementadas e fechadas** (10/13 TASKs Done). Wave 1: migração
+  aditiva + módulo `publication` (schema/service/routes) + `domain/types.ts`. Wave 2:
+  `pdf-composer.ts`/imagem — 3 rodadas reais de gate 8 (decompression bomb PNG →
+  bypass por chunk decoy → bypass por IHDR duplicado → convergência num parser
+  estrutural único, `walkPngChunks`); RISK-025-001/002 registrados. Wave 3: rota HTTP +
+  `assertRawContentExportable` (DEC-025-007); achado de texto PLAN/TASK 409→404
+  corrigido (`ec123d6`). Wave 4: barreira de autorização real
+  (`requireRole('EDITOR','ADMIN')`+`verifyOrigin`), achado de `route-authz-matrix`
+  (exclusão em vez de enumeração, corrigido). Wave 5: mutation `exportPublication`
+  (RTK Query, 1º `responseHandler` binário do frontend), 1 retry (ramo morto de parsing
+  sem emissor real, removido).
+- 2026-09-14: **Wave 6 fechada** — `PublicationExportControl` (3 estados observáveis,
+  AC-024-006), 1 retry (gate 11 — estado de sucesso in-page faltando). `qa` (gate 9,
+  isolado) achou 2 bloqueios de ambiente: migração de dev não aplicada + componente
+  ainda não enxertado em tela nenhuma.
+- 2026-09-14/15: **Wave 7 fechada — PLAN-025 completo (13/13 TASKs Done)**: os 2
+  enxertos (`content-form.tsx`/TASK-025-012, `mnemonic-strip-board.tsx`/TASK-025-013).
+  TASK-025-012: 1 retry (gate 11, posicionamento). TASK-025-013: 2 retries (gate 1-7/11
+  — posicionamento, PDF de Tira vazia anunciado como sucesso, RISK-011-008 confirmado e
+  corrigido; depois retry textual, narrativa de rodada nos testes). **Etapa 4 (DoD)**:
+  suítes completas 1x (backend 353+395, frontend 444, todas verdes); `qa` consolidou
+  gate 9 com os 2 enxertos no ar — **PARCIAL**, 2 bloqueios de AMBIENTE (nenhum de
+  código): migração de dev ainda pendente + achado NOVO (pool de compilação do
+  Turbopack do frontend quebrado, RISK-025-005, fix já commitado `3115fec`, processo em
+  execução precisa reiniciar). `HANDOFF-PLAN-025.md` criado com roteiro de
+  re-verificação. MAP.md recebeu o delta de F6. 2 lições de processo roteadas ao
+  `agile-coach` (LRN-027 `PROPOSTA_DOUTRINA` — handoff-protocol.md 5ª causa nomeada;
+  LRN-028 `PROPOSTA_PLUGIN` — autocheck de narrativa-no-código não cobria nome de
+  teste) + 2 lições de projeto estendidas (`lessons.md`).
