@@ -48,7 +48,7 @@ fora do MVP).
 | 3 | Instrumentação de etapas da fábrica | producao-material | entregue e mergeada (BRIEF-009 · SPEC-009 · PLAN-010 Done 3/3; PR #3 backend `6541d49`, 2026-09-06) |
 | 4 | Tira mnemônica como sequência de quadros | producao-material | entregue (BRIEF-011 · SPEC-011 · PLAN-012 Done 13/13; PR #5 backend `9063f9e`/PR #9 frontend `179e7f5` mergeados em `main`; DoD (Etapa 4) + Entrega ACEITA_COM_RESSALVAS 2026-09-07, ressalva R-1 do PO aplicada) |
 | 5 | Biblioteca visual reutilizável | producao-material | entregue e mergeada (BRIEF-022 · SPEC-022 · PLAN-023 Done 17/17; PR #6 backend `e316ab6`/PR #12 frontend `677b836` mergeados em `main` 2026-09-14) |
-| 6 | Pipeline de publicação — PDF (rascunho) | producao-material | pronta para PR **com decisão de produto pendente** (BRIEF-024 · SPEC-024 · PLAN-025 Done 17/17; branch `feat/producao-material-mnemora-studio` pushada `83152fd`/`6a5af2b`/`7609c99`; Entrega ACEITA_COM_RESSALVAS 2026-09-15; **gate 9 VERIFICADO de verdade** — Diretor aplicou a migração e reiniciou o servidor, `qa` exercitou V1-V3 do `HANDOFF-PLAN-025.md` com ambiente real, `status: Concluído`; gate 10 achou risco real de produção — Tira grande com imagens pode exceder o limite de corpo de resposta da Vercel (~4,5 MB) já hoje, RISK-025-007 — recomendado resolver ANTES do merge/deploy; PR/merge/deploy pendentes — ato do Diretor) |
+| 6 | Pipeline de publicação — PDF (rascunho) | producao-material | **entregue e mergeada** (BRIEF-024 · SPEC-024 · PLAN-025 Done 17/17; PR #7 backend (`5d6b4df`) e PR #13 frontend (`b54b6ef`) mergeados em `main` 2026-09-15; gate 9 VERIFICADO de verdade em ambiente real; **RISK-025-007 ainda aberto** — risco real de produção não resolvido: Tira grande com imagens pode exceder o limite de corpo de resposta de function serverless da Vercel; recomendado resolver antes do deploy em produção, decisão do Diretor) |
 | 7 | Contrastes, pegadinhas, flashcards e protocolos impressos | producao-material | pendente |
 | 8 | Versionamento editorial e fechamento legislativo | producao-material | pendente |
 | 9 | Controle de qualidade e gate de versão aprovada | producao-material | pendente |
@@ -213,3 +213,9 @@ fora do MVP).
   mantenedor (LRN-027 `PROPOSTA_DOUTRINA`, LRN-028 `PROPOSTA_PLUGIN` — reincidiu
   1×, mesma sessão), staleness de `CLAUDE.md` (`jira.enabled: false` desatualizado
   — ficha real já `true`, achado do `tracker-sync`).
+- 2026-09-15: **F6 mergeada em `main`** — PR #7 backend (`5d6b4df`) e PR #13
+  frontend (`b54b6ef`), Diretor. Próxima elegível: F7 (depende de F2, F6, ambas
+  entregues) ou F8 (depende de F2, F6) — sem dependência mútua entre F7/F8, a
+  fila decide pela ordem declarada no épico. RISK-025-007 (Tira grande com
+  imagens pode exceder o limite de corpo de resposta da Vercel) segue aberto,
+  não bloqueia a fila mas é recomendado resolver antes do deploy em produção.

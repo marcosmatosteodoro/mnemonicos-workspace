@@ -1,7 +1,7 @@
 # BRIEF-024: Pipeline de publicação — PDF (rascunho)
 
 **Slug**: producao-material
-**Status**: Aceito, gate 9 VERIFICADO — aguardando decisão de RISK-025-007 + push/merge/deploy (atos do Diretor)
+**Status**: Entregue e mergeada — RISK-025-007 aberto, recomendado resolver antes do deploy em produção
 **Data**: 2026-09-14
 **Largada**: 2026-09-14T13:34:27-0300
 **SPEC**: SPEC-024
