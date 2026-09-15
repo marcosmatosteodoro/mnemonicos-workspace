@@ -751,6 +751,19 @@ síncrona pesada trava **todos** os requests, não só o seu.
   ou fila.
 - Trabalho longo (import de acervo, geração em lote, e-mail) **não** roda no request —
   ainda mais em serverless, onde a função morre no fim da resposta.
+- **Teto de duração via `Promise.race`+`setTimeout` só corta trabalho que CEDE o event
+  loop** (I/O, rede, banco) — decisão registrada em PLAN-025/gate 10 (Entrega): uma
+  cascata de `await` sobre trabalho síncrono pesado (ex.: decode/encode de imagem numa
+  lib como `pdf-lib`) nunca alcança a fila de timers até terminar; medido: um
+  `setTimeout(200ms)` atrasou 8318ms atrás de uma composição de PDF de 20 Quadros com
+  imagem. Para trabalho CPU-bound em laço, cada iteração precisa de um ponto de cessão
+  explícito (`await new Promise((r) => setImmediate(r))`) — e mesmo assim um bloco
+  síncrono MONOLÍTICO de biblioteca de terceiro (ex.: `doc.save()` do `pdf-lib`) não tem
+  ponto de cessão possível; a folga do teto sob o limite duro externo (ex.: 15s da
+  Vercel) precisa contar esse resíduo, ou `worker_threads`/fila é a única eliminação
+  completa. **Teste de teto de duração se prova com carga CPU-bound REAL, nunca com
+  dublê baseado em `setTimeout`** — o dublê deixa o event loop livre e passa verde
+  mesmo com o teto quebrado.
 
 **Serverless muda a régua:** cold start, pool por instância (`max: 3` em produção, e
 `DATABASE_URL` apontando para o pooler), nenhum cache em memória confiável, nenhum trabalho

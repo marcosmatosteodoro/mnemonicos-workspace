@@ -787,26 +787,44 @@ brief próprio revisando F4).
 
 ## 8. Riscos técnicos
 
-- **TRISK-025-001** `ALTER TYPE "ProductionStageType" ADD VALUE 'PUBLICACAO_PDF'` dentro de
-  migração transacional pode exigir commit intermediário antes de uso na mesma sessão,
-  dependendo da versão real do Postgres (mesma classe de TRISK-012-001/TRISK-023-001)
-  (mitigação: a TASK de migração aplica e testa a gravação com o valor novo logo em
-  seguida; se recusado, dividir em 2 migrações sequenciais).
+- ~~TRISK-025-001~~ **FECHADO por medição (gate 10, Entrega)**: `ALTER TYPE ... ADD VALUE`
+  aceito dentro de bloco transacional no PostgreSQL 18.6 (0,38ms sobre tabela de 500k
+  linhas, sem reescrita — `relfilenode` inalterado), e a gravação com o valor novo
+  funcionou em seguida na mesma transação. Não exigiu 2 migrações sequenciais.
 - **TRISK-025-002** `pdf-lib` é dependência nova — supply chain de primeira classe em npm
   (A03) (mitigação: `/keelson:audit` no gate 8 antes do merge).
-- **TRISK-025-003** Sem teto de Quadros por Tira nem de tamanho de texto por Quadro
-  (RISK-011-007/RISK-024-004 herdado, Q-024-001 explicitamente não resolvido por SPEC-024) —
-  uma Tira grande com muitas imagens de até 5 MB cada (F5) pode se aproximar do teto
-  combinado de 15 s/1024 MB (mitigação: aceito nesta fatia; medir tempo real de geração no
-  gate 10; revisitar Q-024-001 se a medição mostrar risco real).
+- **TRISK-025-003** **CONCRETIZADO por medição (gate 10, Entrega — REPROVOU)**: sem teto
+  cumulativo (bytes + pixels), N=20 Quadros com imagem de 4,76 MB cada → 12080ms (bate o
+  teto interno de 12000ms) e rss 872 MB (perto do teto de 1024 MB da function); 7 Quadros
+  com arquivo de só 66 KB cada (20 MP, no limite do teto de pixels) já estouram os 12s —
+  o custo acompanha PIXELS decodificados, não bytes de arquivo. Corpo de resposta chega a
+  95,3 MB (`publication.routes.ts:67`, `res.send(buffer)`) — muito acima do limite de
+  corpo de resposta de function serverless da Vercel (~4,5 MB): qualquer Tira acima de
+  ~1 Quadro com imagem de 5 MB já provavelmente falha em produção, mesmo sem estourar
+  tempo/memória. **Q-024-001 deixa de ser questão aberta e vira requisito** — teto de
+  custo cumulativo (bytes+pixels) antes de compor, e/ou repensar a entrega síncrona via
+  resposta HTTP (job assíncrono). Escalado ao Diretor na Entrega — decisão de produto,
+  não corrigido nesta fatia.
 - **TRISK-025-004** `PublicationEvent` sem FK para `RawContent` (mesma decisão deliberada de
   DEC-023-011/TRISK-023-007) — sobrevive à remoção reversível do Conteúdo bruto (mitigação:
   aceitável, é indicador operacional, não trilha de auditoria formal).
-- **TRISK-025-005** O teto de duração interno (`Promise.race`, DEC-025-002) garante a
-  RESPOSTA HTTP dentro do prazo, mas não interrompe o trabalho síncrono de `pdf-lib` já em
-  andamento (Node não preempta código síncrono) — a function pode seguir consumindo CPU nos
-  bastidores até o corte duro da Vercel, mesmo depois da resposta de timeout já enviada
-  (mitigação: aceito nesta fatia; medir tempo real de composição no gate 10).
+- **TRISK-025-005 (REESCRITO — o risco original estava invertido, medição do gate 10)**:
+  a CPU residual depois da resposta de timeout (o que este risco nomeava originalmente) é
+  desprezível na medição (43-70ms) — fechado nesse eixo. O risco REAL, não registrado
+  antes: `Promise.race`/`setTimeout` (DEC-025-002) NÃO corta no prazo quando o trabalho é
+  CPU-bound síncrono (decode/encode de imagem em `pdf-lib`) — a cascata de microtasks
+  nunca cede para a fila de timers; medido: timer de 200ms disparou 8318ms atrasado numa
+  composição de 20 Quadros. **MITIGADO, não eliminado** (achado do gate 10, Entrega,
+  commit `16bb218`/`6a5af2b`): laço de Quadros em `pdf-composer.ts` agora cede o event
+  loop 1x por Quadro (`await new Promise(setImmediate)`), devolvendo a vez ao
+  `Promise.race` externo entre Quadros — teste de AC-024-017 trocado de dublê `setTimeout`
+  (não provava nada) para cenário CPU-bound real, code-reviewer aprovou com 2 mutantes
+  matando o teste. **Resíduo medido pelo code-reviewer na revisão do fix**: `doc.save()`
+  em si é um bloco síncrono ÚNICO sem ponto de cessão possível — 3134ms para N=20 Quadros
+  (o mesmo cenário que media 8318ms de atraso antes do fix) — acima da folga de 3s que
+  DEC-025-002 reserva sob o teto duro de 15s da Vercel. O overshoot caiu de ~8,3s para
+  ~3,2s; não foi eliminado. A eliminação completa exige a mesma decisão de TRISK-025-003
+  (worker_threads/job assíncrono/teto cumulativo) — não é retrabalho desta correção.
 - **TRISK-025-006** `pdf-lib` só embute `PNG`/`JPEG` nativamente — não tem `embedWebp`; uma
   Associação visual armazenada como `WEBP` (formato válido desde F5) nunca é embutida na
   Variante "tira", sempre cai no caminho de "só texto" (mitigação: comportamento correto sob

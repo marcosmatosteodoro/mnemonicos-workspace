@@ -1673,3 +1673,36 @@ fechamento cruza o resultado contra o AST real (`ts.createSourceFile` + `node.bo
 sem parser — grep/indexOf de código-fonte).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Performance] Teto de duração via `Promise.race`+`setTimeout` não corta trabalho CPU-bound síncrono — e teste que prova o teto com dublê `setTimeout` não falsifica nada
+
+**Erro:** `withDeadline` (`Promise.race`+`setTimeout`, DEC-025-002/PLAN-025) foi desenhado
+para garantir resposta HTTP dentro do prazo, mas não cortava a composição de PDF
+(`buildStripPdf`, decode/encode síncrono de imagem via `pdf-lib`) — medido pelo gate 10:
+um `setTimeout(200ms)` atrasou 8318ms atrás de uma composição de 20 Quadros com imagem. O
+teste que deveria provar a garantia (AC-024-017) usava um dublê `setTimeout` para simular
+"composição lenta" — que DEIXA o event loop livre, então o timer do `Promise.race`
+disparava certo no teste mesmo com o defeito real presente; o teste ficava verde sem
+falsificar nada.
+**Causa:** em Node, `await` de uma cadeia de promises já resolvidas só cede para a fila
+de MICROtasks — a fila de TIMERS (onde `setTimeout` vive) só é alcançada quando a cascata
+termina de drenar. Trabalho CPU-bound síncrono encadeado por `await` é, do ponto de vista
+do timer, um bloco síncrono só — e um dublê baseado em timer nunca reproduz essa
+propriedade, porque timer sempre cede o loop.
+**Solução:** (1) teto de duração sobre trabalho que pode ser CPU-bound exige ponto de
+cessão explícito por unidade de trabalho dentro do próprio laço (`await new
+Promise((r) => setImmediate(r))` por item), devolvendo a vez ao `Promise.race` externo —
+ou o trabalho vai para `worker_threads`/fila; um bloco síncrono MONOLÍTICO de biblioteca
+de terceiro (ex.: `doc.save()` do `pdf-lib`) não tem ponto de cessão possível, e a folga
+do teto sob qualquer limite duro externo (ex.: 15s da Vercel) precisa contar esse resíduo
+como custo fixo, não zero. (2) teste de teto de duração se prova com carga CPU-bound
+REAL (fixture que decodifica/processa de verdade), nunca com dublê baseado em timer — o
+mutante que valida a prova é remover o ponto de cessão do código de produção, não alargar
+o teto do teste. Referência: `mnemonicos-backend/src/modules/publication/pdf-composer.ts`
+(laço de `buildStripPdf`) e `guidelines/project/backend/node-22.md` §10 ("custo
+patológico nº 2").
+**Validade:** geral (qualquer teto de duração implementado por `Promise.race`+`setTimeout`
+sobre trabalho que pode envolver decode/encode/processamento síncrono de terceiro, neste
+backend).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
