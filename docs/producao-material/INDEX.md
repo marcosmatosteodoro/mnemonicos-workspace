@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-15T02:20:00-0300 (PLAN-025 — Etapa 4/DoD: gate 9 consolidado PARCIAL, `HANDOFF-PLAN-025.md` criado)
+**Última atualização**: 2026-09-15T03:20:00-0300 (PLAN-025 — Etapa 5/Entrega: aceitação do PO ACEITA_COM_RESSALVAS, achado R-1 corrigido via TASK-025-014, 17/17 FRs)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -224,6 +224,27 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-15: **Etapa 5 (Entrega) de PLAN-025 — aceitação do PO contra BRIEF-024:
+  ACEITA_COM_RESSALVAS.** Correspondência pedido×entregue confirmada em todos os itens
+  do BRIEF (2 Variantes, rótulo rascunho, postura de segurança, imagem-nunca-bloqueia,
+  sem reprocessamento, escopo negativo respeitado, DEC-025-001/007 e E-024-01
+  implementados como descrito). 1 ressalva de correspondência real (**R-1**): a tela do
+  Conteúdo bruto não tinha a mesma guarda de "Tira vazia" aplicada à tela da Tira na
+  Wave 7 — nem no frontend nem no backend, então um PDF em branco seria baixado como
+  sucesso por esse caminho. **Corrigido via TASK-025-014** (Wave 8 retroativa): nova
+  classe `NothingToExportError` (409) recusa a Variante "tira" com 0 Quadros no backend
+  (fecha as duas telas de uma vez); `PublicationExportControl` discrimina o código e
+  mostra mensagem orientada em vez de "tente novamente". 1ª rodada de gate 1-7
+  REPROVOU por 3 eixos (escopo — sem artefato-pai; decisões — SPEC contradizia o
+  código; qualitativo — mensagem falsa ao usuário); todos fechados: SPEC-024 emendada
+  (FR-024-017/AC-024-021, 17/17 FRs, 21 ACs), TASK-025-014 criada retroativamente,
+  mensagem do frontend corrigida. Rodada 2: APROVADO. RISK-024-001 elevado (E-2 da PO —
+  agora sustenta código entregue, decisão do A/B fica para o Diretor) e RISK-025-006
+  registrado (E-3 — imagem WEBP/acima do teto de pixels nunca aparece no PDF,
+  degradação silenciosa, já catalogado tecnicamente em TRISK-025-006). E-4 (audit de
+  `pdf-lib` + `npm audit fix` do `qs`) fica para o Diretor (`/keelson:audit` é
+  humano-only). Gate 9 de TASK-025-014 segue `pendente_handoff`, mesmo bloqueio de
+  ambiente do `HANDOFF-PLAN-025.md`.
 - 2026-09-15: **Etapa 4 (DoD) de PLAN-025 — gate 9 consolidado PARCIAL,
   `HANDOFF-PLAN-025.md` criado.** Suítes completas rodadas 1x: backend 353/353
   (unit) + 395/395 (integration — migração da fatia já aplicada no
