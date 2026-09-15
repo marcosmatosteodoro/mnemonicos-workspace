@@ -48,7 +48,7 @@ fora do MVP).
 | 3 | Instrumentação de etapas da fábrica | producao-material | entregue e mergeada (BRIEF-009 · SPEC-009 · PLAN-010 Done 3/3; PR #3 backend `6541d49`, 2026-09-06) |
 | 4 | Tira mnemônica como sequência de quadros | producao-material | entregue (BRIEF-011 · SPEC-011 · PLAN-012 Done 13/13; PR #5 backend `9063f9e`/PR #9 frontend `179e7f5` mergeados em `main`; DoD (Etapa 4) + Entrega ACEITA_COM_RESSALVAS 2026-09-07, ressalva R-1 do PO aplicada) |
 | 5 | Biblioteca visual reutilizável | producao-material | entregue e mergeada (BRIEF-022 · SPEC-022 · PLAN-023 Done 17/17; PR #6 backend `e316ab6`/PR #12 frontend `677b836` mergeados em `main` 2026-09-14) |
-| 6 | Pipeline de publicação — PDF (rascunho) | producao-material | em ciclo (BRIEF-024.md) |
+| 6 | Pipeline de publicação — PDF (rascunho) | producao-material | pronta para PR (BRIEF-024 · SPEC-024 · PLAN-025 Done 17/17; branch `feat/producao-material-mnemora-studio` pushada `83152fd`/`102c552`/`5c406ab`; Entrega ACEITA_COM_RESSALVAS 2026-09-15, ressalva R-1 do PO aplicada via TASK-025-014; PR/merge/deploy pendentes — ato do Diretor) |
 | 7 | Contrastes, pegadinhas, flashcards e protocolos impressos | producao-material | pendente |
 | 8 | Versionamento editorial e fechamento legislativo | producao-material | pendente |
 | 9 | Controle de qualidade e gate de versão aprovada | producao-material | pendente |
@@ -187,3 +187,29 @@ fora do MVP).
   suíte de integração (achado da Wave 2 de PLAN-023, estrutural, decisão de ficha para o
   Diretor). 15+ lições novas/estendidas roteadas a `guidelines/project/lessons.md` e
   `docs/_meta/learning-log.md` (LRN-020 a LRN-024, PROPOSTA_PLUGIN).
+- 2026-09-14: **F6 largada** via `/keelson:continue producao-material` →
+  `/keelson:auto` (BRIEF-024.md) — próxima elegível confirmada pelo Diretor
+  (AskUserQuestion), F6 depende só de F4/F5, ambas entregues.
+- 2026-09-15: **F6 implementada por completo e Entrega ACEITA_COM_RESSALVAS** —
+  PLAN-025 Done 14/14 TASKs (13 previstas + 1 retroativa, TASK-025-014), 8 waves
+  (Wave 8 retroativa), DoD (Etapa 4) satisfeito, suítes completas rodadas 1x nos 2
+  repos (backend 750, frontend 446, todas verdes). Módulo `publication` novo (motor
+  `pdf-lib`, 2 Variantes tira/resumo), endpoint `POST /contents/:id/publication`
+  atrás da barreira EDITOR/ADMIN. Convergência mais longa: defesa contra
+  decompression bomb PNG endurecida em 3 rodadas de gate 8 (Wave 2, achado→bypass→
+  bypass→convergência num parser estrutural único). **RISK-011-008 (herdada de F4,
+  não-bloqueante desde a Entrega de F5) deixou de ser hipótese e foi corrigida
+  nesta fatia** — confirmada por probe real em TASK-025-013 (`hasData`/`isNotFound`
+  não eram mutuamente exclusivos por construção), fechando uma pendência aberta
+  desde 2026-09-07. Aceitação do `po`: ACEITA_COM_RESSALVAS — 1 achado de
+  correspondência real (R-1, PDF de Tira vazia anunciado como sucesso pela tela do
+  Conteúdo bruto), corrigido via TASK-025-014 (`NothingToExportError`, 409;
+  SPEC-024 emendada para 17/17 FRs). Branches pushadas nos 2 repos (backend
+  `102c552`, frontend `5c406ab`) + workspace (`83152fd`) — merge/PR/deploy ficam
+  para o Diretor. Escalações em lote: migração de dev pendente de autorização,
+  RISK-025-005 (Turbopack — fix já commitado, servidor precisa reiniciar), E-2
+  (decisão do A/B tira×resumo, herdada de E-01/SPEC-011), E-4 (`/keelson:audit` de
+  `pdf-lib` + `npm audit fix` de `qs`, comandos humano-only), 2 mensagens ao
+  mantenedor (LRN-027 `PROPOSTA_DOUTRINA`, LRN-028 `PROPOSTA_PLUGIN` — reincidiu
+  1×, mesma sessão), staleness de `CLAUDE.md` (`jira.enabled: false` desatualizado
+  — ficha real já `true`, achado do `tracker-sync`).
