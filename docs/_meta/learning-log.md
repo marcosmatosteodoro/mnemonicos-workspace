@@ -340,3 +340,70 @@ artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensa
 patch: proposta de extensão in-line do parágrafo "Marca do despacho": rodada de confirmação ("diff vazio", isolamento, "nada mudou") deriva a âncora de base sempre da marca do último veredito **APROVADO** do gate em questão — nunca da marca de um veredito REPROVADO, que antecede a correção e a inclui em qualquer intervalo até HEAD; antes de afirmar "diff vazio", confere a relação de parentesco entre as duas pontas (`git merge-base --is-ancestor <base> <head>`); e o inventário de gatilhos dos gates 8/10/11 sobre o diff ACUMULADO da wave (decisão 4.335) nunca é dispensado por a rodada estar declarada restrita — escopo restrito reduz o QUE se revisa, nunca SE o gatilho se aplica. Saldo líquido ~+6 linhas
 reincidencia: 0
 estado: ativa
+
+## LRN-027: tabela de causas nomeadas do gate 9 (`docs/_meta/conventions/handoff-protocol.md` §8.1) não nomeia "app no ar e correta, banco atrás de migração já commitada" — colapsa em ambiguidade entre `app_fora_do_ar` e "bug"
+data: 2026-09-14
+gatilho: verificacao_falhou
+origem: PLAN-025 (slug producao-material), TASK-025-011, gate 9 (screenVerify) — o `qa` exercitou de verdade `POST /contents/:id/publication` (app real, login EDITOR real, RawContent+Quebra reais) e recebeu 500: a migração `20260914175940_add_publicacao_pdf_publication_event` (já commitada no diff) não estava aplicada no Postgres de dev. O `qa` corretamente NÃO aplicou a migração por conta própria (regra do workspace: `CLAUDE.md` exige autorização do Diretor antes de qualquer migração, mesmo em dev) — mas não havia causa nomeada para registrar o resultado do gate: a app estava no ar e correta (não é `app_fora_do_ar`), o login funcionou (não é `credencial`), e não é falha de implementação (não é bug do endpoint)
+causa_raiz: instrucao_ausente — a tabela de causas do §8.1 (`runtime_browser` | `credencial` | `app_fora_do_ar` | `permissao_ambiente`) e o enum do front-matter `motivo:` (§8.2, l.45) não têm valor para "app respondendo, código correto, banco atrás de migração já commitada e ainda não aplicada" — cenário distinto de `app_fora_do_ar` (aqui a app ESTÁ de pé) e de qualquer causa de bug (o código está certo, o schema é que está atrasado); sem causa nomeada, o `qa` não tem como declarar o PARCIAL do gate 9 de forma inequívoca, e quem ler o registro depois não sabe se é handoff de tela normal ou pendência de infra do ambiente de dev
+artefato_patchado: proposta_doutrina (não aplicado) — `docs/_meta/conventions/handoff-protocol.md` §8.1 (tabela de causas) + §8.2 (enum do front-matter `motivo:`, l.45)
+patch: proposta de nova linha na tabela §8.1 — causa nomeada `migracao_pendente`: "A sondagem checa" = app responde e o erro (500 ou equivalente) é rastreável a coluna/tabela/enum que só a migração do próprio diff introduz; "Falhou → causa" = **migração pendente de aplicação** (`migracao_pendente`); "O que o registro tem que dizer" = qual migração (nome do arquivo), que app e código estão corretos (não é `app_fora_do_ar` nem bug), e que aplicar exige autorização do Diretor antes de qualquer `migrate deploy`/`dev` — nunca aplicar por conta própria, mesma regra do CLAUDE.md do projeto. Frase companheira junto de "Uma causa não encobre a outra" (l.25): app no ar com erro rastreável a migração do próprio diff ainda não aplicada é `migracao_pendente`, não `app_fora_do_ar` — a app está de pé e o código está certo; é o banco que está atrás. Enum do `motivo:` (§8.2, l.45) ganha `migracao_pendente` na lista. Saldo líquido ~+3 linhas
+reincidencia: 0
+estado: ativa
+
+## LRN-028: autocheck do Art. 7 em `agents/developer.md` (item 5, Etapa 4) nomeia só "comentários" — nome/descrição de teste escapa da releitura por leitura literal do termo, e o autocheck continua mental, não mecânico
+data: 2026-09-14
+gatilho: gate_reprovado
+origem: PLAN-025 (slug producao-material), Wave 7, TASK-025-013 — retry que corrigia achados
+reais de gate (posicionamento de UI, mutualidade de estado, teste falsificável); o developer,
+ao fechar os achados 3+4 do code-reviewer (mais um achado do product-designer e uma nota de
+economia do próprio gate), escreveu a proveniência da rodada dentro do próprio código —
+comentários e nomes de `it()` em `mnemonicos-frontend/src/components/mnemonic-strip-board.test.tsx`:
+"(achados 3+4, code-reviewer)", "(nota de economia do gate)", "(achado 1, product-designer)",
+"(fecha achado 3)". Reprovou a rodada seguinte do gate 1-7 (achado bloqueante, só-texto — não
+reabriu o ciclo comportamental por 4.88); corrigido removendo a proveniência e mantendo só o
+porquê durável (âncoras DEC-025-003/RISK-011-008, legítimas pelo piso do Art. 7), commit `a55a2c9`
+causa_raiz: instrucao_ausente — o autocheck do Art. 7 já existente em `agents/developer.md`
+(Etapa 4, item 5, decisões 4.135/4.185/4.245/4.250) manda "releia os comentários que você
+introduziu/alterou" e aplicar o teste de proveniência/comparação temporal antes de reportar
+Done — mas o texto nomeia só "comentários"; nome/descrição de teste (`it(...)`/`describe(...)`/
+`test(...)`) não é comentário na leitura literal do termo, e foi exatamente o vetor que escapou
+aqui. Na palavra do próprio code-reviewer que achou o problema: "quem corrige no retry escreve
+endereçado ao revisor de hoje, não ao leitor de amanhã: a justificativa de que o achado foi
+fechado é redigida dentro do próprio código em vez de no report/artefato". O autocheck, tal como
+redigido, também não é mecânico — é releitura mental ("releia os comentários") — e o achado
+nomeou o mecanismo que falta: grep de proveniência de rodada sobre o diff acumulado da TASK,
+saída vazia como condição para fechar o retry
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`agents/developer.md`, Etapa 4 "Implementar", item 5 (autocheck do Art. 7)
+patch: proposta de extensão in-line do item 5, na mesma frase: (1) o escopo da releitura passa
+de "os comentários que você introduziu/alterou" para "os comentários e os nomes/descrições de
+teste (`it(...)`/`describe(...)`/`test(...)`) que você introduziu/alterou" — mesma narrativa,
+vetor que a palavra "comentário" sozinha não cobre; (2) logo após "Ambos falham o teste de
+apagar por definição", a frase "remova antes de reportar Done, não deixe para o gate 7 achar"
+ganha o mecanismo: "— antes de reportar Done num retry, rode `git diff <base>..HEAD --
+<arquivos tocados> | grep -inE 'achado|rodada|code-reviewer|product-designer|
+security-engineer|performance-engineer|\bqa\b|gate [0-9]'` sobre o próprio delta: saída vazia
+autoriza o Done, cada acerto é proveniência que a releitura mental deveria ter pego". Inserção
+na mesma frase/parágrafo já existente — saldo líquido ~0 linhas (mesma linha, mais caracteres)
+reincidencia: 1
+estado: ativa
+
+**Atualização 2026-09-15 (reincidência 1, achada pelo code-reviewer na re-revisão, rodada 2 —
+APROVADO no geral, achado não-bloqueante)**: TASK-025-014 (retrofit do achado R-1 da aceitação
+do PO, mesmo PLAN-025), retry do frontend (commit `cf386bd0`) reintroduziu a MESMA classe —
+proveniência da rodada de revisão narrada dentro do código, não no report — em
+`publication-export-control.tsx:100-102` (comentário "achado do code-reviewer sobre o fix de
+R-1") e `publication-export-control.test.tsx:165` (mesma frase no nome do `it(...)`). O vetor
+que escapou é exatamente o nomeado pelo patch proposto e ainda não aplicado — nome/descrição de
+teste — confirmando que a leitura literal de "comentários" no autocheck do Art. 7
+(`agents/developer.md`, Etapa 4, item 5) segue sem cobrir `it()`/`describe()`/`test()` no
+plugin instalado. Corrigido inline pelo Tech Lead (commit `5c406ab`), trocando a citação de
+proveniência por âncora de requisito (`AC-024-021`/`FR-024-017`) — mesmo padrão de correção do
+fix anterior (`a55a2c9`, origem desta entrada). Sem mudança de causa-raiz nem de artefato
+patchado: a proposta pendente (grep de proveniência sobre o delta, saída vazia como condição
+para reportar Done) já é o check mecânico exigido pela escada de promoção (decisão 4.149) —
+esta reincidência não pede reformular o patch, é evidência de que ele resolveria o problema se
+aplicado. Reforça a `mensagem_mantenedor`: 2ª ocorrência da mesma causa, mesma sessão, TASK
+diferente (TASK-025-014 vs. TASK-025-013), com a `PROPOSTA_PLUGIN` de LRN-028 ainda pendente de
+aplicação — o gap seguiu comendo retry/rodada de revisão enquanto esperava.
