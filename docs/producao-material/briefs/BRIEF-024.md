@@ -225,3 +225,12 @@ Diretor.
   (404 estruturado, nunca 500 cru). `HANDOFF-PLAN-025.md` fechado
   (`status: Concluído`). RISK-025-005 selado. Pendente: RISK-025-007
   (decisão de produto) + E-2/E-4 antes do merge/deploy.
+- 2026-09-15: **PRs mergeados pelo Diretor** — PR #7 backend (`5d6b4df`) e
+  PR #13 frontend (`b54b6ef`) em `main`. Sync automático de KAN-107 travou
+  (mapa `jira.KAN.md` sem Etapas/Colunas promovidas, teto = status atual —
+  só comentário aplicado). **Confirmado manualmente com o Diretor que o
+  trabalho está 100% concluído** (13/13 sub-tasks Concluído + merge real) —
+  transição direta `KAN-107 → Concluído` (id 41) aplicada pelo Tech Lead via
+  MCP Atlassian, fora do fluxo automático do `tracker-sync` (que preferiu
+  não arriscar por falta de mapa). Epic KAN-106 não tocado (segue "Em
+  andamento", correto — restam F7-F11 do épico).
