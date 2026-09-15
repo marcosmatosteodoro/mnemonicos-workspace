@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-15T03:20:00-0300 (PLAN-025 — Etapa 5/Entrega: aceitação do PO ACEITA_COM_RESSALVAS, achado R-1 corrigido via TASK-025-014, 17/17 FRs)
+**Última atualização**: 2026-09-15T21:20:00-0300 (PLAN-025 — Etapa 5/Entrega: gate 10 rodado, achado real de teto de duração corrigido, teto de volume/OOM escalado ao Diretor)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -163,6 +163,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | ~~TRISK-006-001~~ | **RESOLVIDO 2026-09-01** — Diretor confirmou "Gerar e executar" (ledger `intervencao` 2026-09-01T13:27:23Z, anterior à aplicação). Migração aditiva aplicada em dev + `mnemonicos_test`; auditada linha a linha pelo gate 8 (0 `DROP`/`ALTER` destrutivo). | — nenhuma | PLAN-006 §8 / Wave 1 |
 | RISK-006-005 | `npm audit` do backend (pós-`npm ci` de recuperação, Wave 2) = 3 vulnerabilidades nas deps transitivas via `prisma` (1 high — mysql2 auth plugin downgrade; 2 moderate — mysql2 decompression bomb, `qs`). Não introduzidas por este diff (lockfile intocado) | `/keelson:audit` na Entrega; `fixAvailable` do npm exige downgrade maior de Prisma (7→6, inaceitável); superfície `mysql2` provavelmente inalcançável em projeto PostgreSQL — hipótese a confirmar, não medição | security-engineer, re-review Wave 2 |
 | RISK-025-003 | `code-reviewer` (gate 1-7, Wave 6 de PLAN-025) achou 3 sinais de *staleness*/débito no frontend: (a) `guidelines/project/frontend/next-16.md` §7 prescreve `tests/components/<x>.test.tsx`, mas a casa real tem 12 arquivos co-localizados em `src/components` contra 2 em `tests/components`; (b) o mesmo §7 prescreve `user-event`, mas 4 arquivos (incl. o exemplar canônico da família, `visual-association-picker.test.tsx`) usam `fireEvent`, sem decisão declarada; (c) `renderWithProviders` (helper de `mount()`+`Provider`+`makeStore()`) foi previsto no perfil "a criar quando houver a 2ª cópia" — já são 9 cópias locais | atualizar o perfil (a/b) ou migrar os 4 arquivos; extrair `renderWithProviders` (c) — nenhum bloqueia esta wave, consolidação em diff próprio | code-reviewer, gate 1-7 Wave 6 de PLAN-025 |
+| RISK-025-007 | `performance-engineer` (gate 10, Etapa 5/Entrega de PLAN-025, medido contra Postgres real) — sem teto de custo CUMULATIVO (bytes+pixels de imagem), uma Tira com N Quadros grande o bastante pode: (a) estourar o teto de duração interno mesmo após o fix do event-loop-yield (N=20 com imagem de 4,76 MB = 12080ms, bate o teto de 12000ms; resíduo de `doc.save()` sozinho ~3,1s, sem ponto de cessão possível); (b) chegar perto do teto de memória da function (872 MB de 1024 MB); (c) **o corpo de resposta (95,3 MB) já excede o limite de ~4,5 MB de function serverless da Vercel hoje, para qualquer Tira acima de ~1 Quadro com imagem de 5 MB** — item (c) é o mais grave: pode já falhar em produção mesmo sem volume extremo | **decisão de produto do Diretor, não corrigível dentro do escopo desta fatia**: teto de custo cumulativo (bytes+pixels) antes de compor e/ou mover a composição para job assíncrono com entrega por URL (perfil node-22.md §10: "trabalho longo não roda no request"); Q-024-001 (SPEC-024) deixa de ser questão aberta | performance-engineer, gate 10 Etapa 5/Entrega de PLAN-025 |
 | RISK-025-005 | `qa` (gate 9, Etapa 4/DoD de PLAN-025) achou o pool de compilação do Turbopack do servidor de dev do frontend permanentemente quebrado desde o boot desta sessão (`turbopack.root` ausente fazia o Next resolver a raiz a partir do workspace-mãe symlinkado, que tem seu próprio `package-lock.json`) — 500 em QUALQUER rota ainda não compilada, confirmado não-específico do diff (`/content/:id/breakdown`, rota intocada, deu o mesmo 500). Fix de config aplicado e commitado (`3115fec`, `next build` limpo confirma), mas o PROCESSO já em execução continua quebrado até reiniciar — reinício é ato do Diretor (matar processo bloqueado pelo classificador de permissão da sessão) | Diretor reinicia o servidor de dev do frontend (`HANDOFF-PLAN-025.md` §3) — sem isso, gate 9 continua PARCIAL mesmo com a migração aplicada | qa, gate 9 Etapa 4/DoD de PLAN-025 |
 | RISK-025-004 | `product-designer` (gate 11, Wave 7 de PLAN-025, re-revisão do retry de TASK-025-013) achou que o feedback de uma exportação em voo (`isLoading`/`successMessage`/`errorMessage`, estado LOCAL de `PublicationExportControl`, COMP-025-010) se perde se o componente desmontar antes de resolver — 3 gatilhos mapeados em `mnemonic-strip-board.tsx`: remoção do último Quadro (`frames.length` 1→0), refetch que devolve 404, e erro real de leitura. Mesma classe já aceita no componente canônico (`content-form.tsx`: "Confirmar remoção" navega para `/content` e destrói o mesmo feedback) — não é regressão desta TASK, é debito pré-existente do componente compartilhado | follow-up sobre `publication-export-control.tsx` (COMP-025-010): elevar o resultado da exportação para um ponto que sobreviva ao desmonte, ou desabilitar o gatilho de remoção/navegação enquanto há exportação em voo — fora de escopo de PLAN-025, brief/ajuste pontual futuro | product-designer, gate 11 Wave 7 de PLAN-025 (re-revisão) |
 | — | `product-designer`/`code-reviewer` (Wave 6): o estado de SUCESSO de `PublicationExportControl` (download real) só é confirmável em browser real — jsdom não distingue "revogou depois do clique" de "revogou cedo demais", nem se o download efetivamente inicia. `gates.screenVerify.enabled: true` — recomendado que o gate 9 confirme o download real das 2 Variantes antes da Entrega desta fatia | gate 9 (consolidado, Etapa 4) confirma em ambiente com tela; sem tela disponível, vira handoff | code-reviewer, gate 1-7 Wave 6 de PLAN-025 |
@@ -224,6 +225,29 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 
 ## Histórico recente
 
+- 2026-09-15: **Gate 10 (performance) de PLAN-025, rodado pela 1ª vez nesta fatia
+  (gap identificado pelo próprio Tech Lead — o DoD do PLAN já pedia essa medição e
+  nunca tinha sido despachada).** REPROVOU com 2 achados reais, medidos contra
+  Postgres real e composição de PDF real (não estimados): **(1) defeito real,
+  corrigido** — o teto de duração (`withDeadline`/`Promise.race`+`setTimeout`,
+  DEC-025-002) não cortava no prazo quando a composição envolve decode/encode
+  síncrono de imagem (`pdf-lib`); medido: timer de 200ms atrasava 8318ms numa
+  composição de 20 Quadros — o teste de AC-024-017 usava um dublê `setTimeout` que
+  não provava nada. Corrigido cedendo o event loop 1x por Quadro no laço de
+  composição (commits `16bb218`/`6a5af2b`, gate 1-7 aprovado com 2 mutantes reais);
+  resíduo medido: `doc.save()` em si é um bloco síncrono sem ponto de cessão
+  possível, ~3,1s para N=20 — overshoot caiu de ~8,3s para ~3,2s, não foi
+  eliminado. **(2) risco real de produção, NÃO corrigido, escalado ao Diretor** —
+  sem teto cumulativo de custo (bytes+pixels), N=20 Quadros com imagem de 4,76 MB
+  cada bate o teto de 12s e chega a 872 MB de rss (perto do teto de 1024 MB da
+  function); pior, o CORPO DE RESPOSTA chega a 95,3 MB, muito acima do limite de
+  ~4,5 MB de function serverless da Vercel — qualquer Tira acima de ~1 Quadro com
+  imagem de 5 MB provavelmente já falha em produção hoje, antes mesmo de estourar
+  tempo/memória. TRISK-025-003 atualizado (REPROVOU); Q-024-001 deixa de ser
+  questão aberta e vira requisito (teto cumulativo e/ou job assíncrono — decisão de
+  produto do Diretor, fora do escopo desta fatia). TRISK-025-001 fechado por
+  medição (migração aditiva sem lock/reescrita, confirmado com 500k linhas). Lição
+  de código registrada (`lessons.md` + `node-22.md` §10).
 - 2026-09-15: **Etapa 5 (Entrega) de PLAN-025 — aceitação do PO contra BRIEF-024:
   ACEITA_COM_RESSALVAS.** Correspondência pedido×entregue confirmada em todos os itens
   do BRIEF (2 Variantes, rótulo rascunho, postura de segurança, imagem-nunca-bloqueia,
