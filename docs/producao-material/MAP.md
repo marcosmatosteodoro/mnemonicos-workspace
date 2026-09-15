@@ -184,9 +184,72 @@
   queries precisa invalidar todas — mnemonicos-frontend/src/store/api.ts (linhas das 2
   mutações de vínculo).
 
-## Publicação (ausente)
+## Publicação — pipeline de PDF (F6 · PLAN-025)
 
-- [2026-08-27 · epico] Nenhuma geração ou exportação de PDF existe nos dois repos — nem dependência, nem rota, nem script; F6 é greenfield total nesta área — busca em ambos os repos não retornou nada
+- [2026-09-14 · PLAN-025] **Corrige a entrada abaixo**: geração/exportação de PDF agora
+  existe, motor `pdf-lib` (DEC-025-001, irreversível na prática — fixa o padrão visual das
+  10 camadas do método), sem headless browser (compatível com `maxDuration:15`/`memory:1024`
+  do Vercel serverless). Migração desta fatia:
+  `mnemonicos-backend/prisma/migrations/20260914175940_add_publicacao_pdf_publication_event/migration.sql`
+  — **ainda não aplicada no Postgres de DEV** (aplicada só no `mnemonicos_test`, via
+  harness); autorização de aplicação em dev é ato do Diretor, pendente na Entrega.
+- [2026-09-14 · PLAN-025] `publication.service.ts` — `exportPublication` (orquestração
+  principal, linha 239) lê a Quebra da regra e lança `NotFoundError` se ausente
+  (linhas 247-253); auto-gera a Tira via `openMnemonicStrip` quando ainda não existe
+  (`resolveOrderedFramesForStrip`, linhas 164-181); grava, na MESMA `$transaction`, o
+  evento genérico (`recordProductionStageEvent`) E o evento dedicado
+  (`tx.publicationEvent.create`) nas linhas 262-273; teto de duração via `withDeadline`
+  (linhas 98-109) lança `GenerationTimeoutError` (linha 101), invocado com
+  `env.PUBLICATION_PDF_TIMEOUT_MS` (linhas 257-260). `assertRawContentExportable`
+  (linhas 78-89) é a guarda NOVA para LEITURA de material existente — só existência +
+  não soft-deleted, **sem** checagem de autoria — distinta da guarda de autoria
+  (`assertRawContentReachable`/`assertStripPrerequisites`, F4) usada quando a Tira precisa
+  ser auto-gerada — mnemonicos-backend/src/modules/publication/publication.service.ts:1-280.
+- [2026-09-14 · PLAN-025] `pdf-composer.ts` — `buildStripPdf` (variante Tira, linha 233) e
+  `buildSummaryPdf` (variante Resumo, linha 181). Imagem irrenderável degrada para
+  texto-only em vez de falhar o documento inteiro: `embedFrameImage` (linhas 152-172)
+  devolve `{ skipReason }`, consumido por `onImageSkipped` (linhas 253-271) — a página
+  segue só com texto. Regra "1 Quadro = 1 página": `for (const [frameIndex, frame] of
+  frames.entries())` seguido de `createPage` por iteração (linhas 242-243). Constantes de
+  layout/medida (margens, fontes, caixa máxima de imagem) vivem AQUI (linhas 46-69), não
+  em `pdf-layout.ts` (que só tem `wrapTextToLines`, quebra de texto pura) —
+  mnemonicos-backend/src/modules/publication/pdf-composer.ts:1-280.
+- [2026-09-14 · PLAN-025] Defesa contra decompression bomb via PNG, endurecida em 3
+  rodadas de gate 8 na Wave 2 (achado→bypass→bypass→convergência num único parser
+  estrutural): `walkPngChunks` (linhas 156-178, fail-closed em qualquer chunk
+  inválido/truncado) é a base de `exceedsPixelBudget` (linhas 275-280, teto
+  `IMAGE_PIXEL_BUDGET_PX` = 20M px, linha 272 — checado ANTES do decode, chamado por
+  `embedFrameImage` em `pdf-composer.ts:162`) e de `hasAnimatedPngChunk` (linhas 304-308,
+  detecção de APNG por TYPE de chunk `acTL`, nunca por substring) —
+  mnemonicos-backend/src/modules/visual-associations/image-signature.ts:1-320. **Nota**:
+  este teto protege só o pipeline de publicação (F6); a ADMISSÃO do upload em F5
+  (`visual-associations.routes.ts`) segue sem teto de dimensão decodificada (RISK-025-001,
+  fora de escopo desta fatia).
+- [2026-09-14 · PLAN-025] `openMnemonicStrip` (F4, `tira.service.ts`) ganhou o parâmetro
+  `options?: { suppressOpeningEvent?: boolean }` (assinatura linhas 247-251) — a supressão
+  é decidida na linha 314 (`if (options?.suppressOpeningEvent !== true)`), usada pela
+  auto-geração via exportação (FR-024-013) para NÃO emitir o evento de ABERTURA de F3
+  quando a Tira nasce de uma exportação, não de interação humana real — a 1ª visita humana
+  à tela da Tira confirma a ABERTURA depois, via `mnemonic-strip-board.tsx:236-241`
+  (efeito generalizado de `isNotFound` para `isNotFound || hasData`, TASK-025-013) —
+  mnemonicos-backend/src/modules/tira/tira.service.ts:247-320.
+- [2026-09-14 · PLAN-025] `POST /contents/:id/publication` (`publication.routes.ts:55-69`,
+  `requireRole('EDITOR','ADMIN')` + `verifyOrigin` como 1º handler) — montada em
+  `mnemonicos-backend/src/http/routes.ts:55` (`apiRoutes.use(publicationRoutes)`), tripwire
+  `route-authz-matrix` atualizado (achado da Wave 4: 1ª versão excluía a rota do censo em
+  vez de enumerá-la, corrigido antes do merge) — mnemonicos-backend/src/modules/publication/publication.routes.ts:1-70.
+- [2026-09-14 · PLAN-025] Frontend: `PublicationVariant` (`types/domain.ts:117`,
+  `'TIRA' | 'RESUMO'`, labels linha 119) → mutation `exportPublication`
+  (`store/api.ts:504-511`) com `responseHandler` custom (`publicationResponseHandler`,
+  linhas 201-210 — 1º consumidor de resposta BINÁRIA da store: `Content-Type
+  application/pdf` → `{ blob, filename }`, senão `.json()` do jeito de sempre) e
+  `extractContentDispositionFilename` (linhas 187-191) → componente
+  `PublicationExportControl` (`components/publication-export-control.tsx:1-125`, 1 botão
+  por Variante, 3 estados observáveis, `triggerDownload` via blob nas linhas 115-124) →
+  2 enxertos na mesma wave: `content-form.tsx:480` (depois do link da Quebra da regra,
+  corrigido por retry de gate 11) e `mnemonic-strip-board.tsx:874` (depois do formulário
+  de novo Quadro, condicionado a `frames.length > 0` — Tira vazia não oferece exportação,
+  evita PDF de 0 páginas úteis anunciado como sucesso) — mnemonicos-frontend/src/store/api.ts:1-520.
 - [2026-08-27 · epico] Nenhum versionamento editorial existe — sem data de fechamento de legislação, sem histórico de revisão, sem fonte normativa estruturada (só `source` como texto livre em `Mnemonic`) — mnemonicos-backend/prisma/schema.prisma:96-120
 
 ## Instalabilidade PWA (avulso · PLAN-013)
