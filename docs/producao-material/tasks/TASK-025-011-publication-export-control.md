@@ -7,7 +7,7 @@
 **Wave**: 6
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -110,19 +110,19 @@ consumo do `filename` já extraído por TASK-025-010 no nome do arquivo baixado.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-14T20:46:47-0300
+**Data conclusão**: 2026-09-14T21:12:55-0300
+**Commit SHA**: db1a3e4 (implementação) · a66e7da (retry — gate 11: estado de sucesso in-page)
 **Jira**: KAN-118
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (Wave 6)
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — sem superfície sensível (componente client puro, sem auth/injeção nova)
+- [x] Comportamento (gate 9): pendente_handoff — `qa` tentou exercitar de verdade (app real, login EDITOR real, Conteúdo bruto+Quebra real criados): achou 2 bloqueios reais, não ambientais — (1) migração `20260914175940_add_publicacao_pdf_publication_event` não aplicada no Postgres de dev (POST /contents/:id/publication → 500 nas 2 Variantes; autorização de aplicação é ato do Diretor, não decidida por mim); (2) o componente ainda não está enxertado em nenhuma tela (TASK-025-012/013, Wave 7, ainda não implementadas). Handoff consolidado na Etapa 4 (DoD), após a Wave 7.
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

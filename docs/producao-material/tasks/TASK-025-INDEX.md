@@ -26,7 +26,7 @@
 - [x] TASK-025-010 ✅ Done
 
 ### Wave 6 (depende de Wave 5)
-- [ ] TASK-025-011 ⏸ Todo
+- [x] TASK-025-011 ✅ Done
 
 ### Wave 7 (depende de Wave 6, paralelizável)
 - [ ] TASK-025-012 ⏸ Todo
