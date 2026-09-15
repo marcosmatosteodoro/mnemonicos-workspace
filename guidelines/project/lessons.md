@@ -1320,8 +1320,24 @@ Referência do gesto: `mnemonic-strip-board.tsx:120-142,355-367` (disabled na a�
 concorrente) e `content-form.tsx:129-144` (efeito de foco em estado único).
 **Validade:** todo componente frontend com diálogo/painel in-place cuja presença depende
 de mais de um estado local.
-**Estado:** em-observacao
-**Contadores:** confirmada 0 · contestada 0
+**Estado:** ativa
+**Contadores:** confirmada 1 · contestada 0
+
+**Corolário de operação assíncrona em voo (gate 11 da Wave 7 de PLAN-025, TASK-025-013,
+re-revisão da rodada 2):** a mesma família de defeito não se limita a diálogo/foco — o
+bloco que hospeda `PublicationExportControl` (COMP-025-010) em `mnemonic-strip-board.tsx`
+foi condicionado a `frames.length > 0` (correção legítima do achado de PDF vazio), mas o
+grep exaustivo não foi refeito para os setters/condições que podem DESMONTAR esse bloco
+ENQUANTO uma exportação está em voo — 3 gatilhos reais mapeados: remoção do último Quadro,
+refetch que devolve 404, erro de leitura. O feedback (`isLoading`/`successMessage`/
+`errorMessage`) é estado LOCAL do componente condicionado e se perde no desmonte, sem
+anunciar sucesso nem falha. A validade da lição se estende a QUALQUER elemento com estado
+próprio (não só diálogo) posto sob condição — o grep exaustivo de "todos os setters que
+decidem o ramo" precisa incluir também os que podem mudar DURANTE uma operação assíncrona
+que o elemento condicionado dispara, não só os que decidem sua presença no render inicial.
+Registrado como RISK-025-004 (não bloqueou a TASK — mesma classe já aceita no componente
+canônico `content-form.tsx`, fora de escopo de PLAN-025); follow-up sobre
+`publication-export-control.tsx` fica para brief/ajuste pontual futuro.
 
 ## [Testes] Teste de integração HTTP contra o App Router: `toContain` de corpo não discrimina qual rota respondeu — use o `<title>` da rota resolvida
 
@@ -1514,7 +1530,18 @@ idêntico para o mesmo tipo de dado, nascidos na mesma janela de tempo.
 **Validade:** geral (qualquer par de componentes de lista que renderizam a mesma entidade
 de domínio, neste frontend).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
+
+**Corolário de correção não-estrutural (gate 11 da Wave 7 de PLAN-025, TASK-025-013,
+re-revisão da rodada 1):** o mesmo defeito reincidiu fora de acessibilidade de lista — o
+enxerto de `PublicationExportControl` (COMP-025-010) em `content-form.tsx` (TASK-025-012)
+já tinha sido corrigido pelo gate 11 para ficar DEPOIS do material que a exportação
+consome (`453d84f`); o enxerto irmão em `mnemonic-strip-board.tsx` (TASK-025-013, mesma
+wave) nasceu com o controle no TOPO da tela, ignorando a correção já aprovada no irmão. A
+validade da lição se estende a QUALQUER correção de posicionamento/agrupamento aplicada a
+um irmão canônico na mesma wave, não só a correções de acessibilidade de item de lista —
+o sinal de alerta ("dois arquivos que compõem o MESMO componente compartilhado, nascidos
+na mesma janela de tempo") é o mesmo.
 
 ## [Design] Predicado que impede 2º diálogo/confirmação simultâneo mira só o gatilho que o abriria — nunca o contêiner que hospeda feedback de ação assíncrona não-relacionada
 
