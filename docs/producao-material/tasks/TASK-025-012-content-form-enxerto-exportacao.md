@@ -80,6 +80,6 @@ tela da Tira mnemônica é da TASK-025-013.
 - [x] Code review aprovado (Wave 7)
 - [x] ACs verificados
 - [x] Segurança (gate 8): n/a — sem superfície sensível (composição client pura, nenhum auth/injeção nova)
-- [x] Comportamento (gate 9): pendente_handoff — consolidação na Etapa 4 (DoD), junto de TASK-025-011/013 (mesmo bloqueio: migração `20260914175940_add_publicacao_pdf_publication_event` não aplicada no Postgres de dev)
+- [x] Comportamento (gate 9): pendente_handoff — **consolidado na Etapa 4 (DoD)**: migração ainda pendente + achado NOVO (pool de compilação do Turbopack do frontend quebrado, RISK-025-005, fix commitado `3115fec`, processo precisa reiniciar). Roteiro de re-verificação em `docs/producao-material/handoffs/HANDOFF-PLAN-025.md`.
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
