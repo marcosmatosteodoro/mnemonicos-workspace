@@ -82,7 +82,15 @@ paralelizável colidiria a escrita.
   `useListFlashcardsQuery(rawContentId, { refetchOnMountOrArgChange: true })`, sempre ordem
   de criação (nenhuma reordenação, A-026-008); botão remover por item abre
   `ConfirmRemoveDialog` (TASK-027-002, interface pública `{ open, itemLabel, onConfirm,
-  onClose }`) — item só sai da lista após o `DELETE` suceder.
+  onClose, focusAfterRemoveRef, triggerRef }` — as 2 últimas OBRIGATÓRIAS/decididas
+  nesta TASK: `triggerRef` aponta para o próprio botão "Remover" do item — mecanismo
+  determinístico, nunca só o fallback `document.activeElement`, que falha
+  silenciosamente em Safari/Firefox macOS — e `focusAfterRemoveRef` aponta para o 1º
+  campo do formulário de criação de Flashcard, alvo estável que sobrevive à remoção)
+  — item só sai da lista após o `DELETE` suceder. `ConfirmRemoveDialog` é montado
+  **incondicionalmente** dentro de `flashcard-list.tsx` (contrato de montagem do
+  componente, gate 11 rodada 2), alternando só `open` — nunca num ramo condicional que
+  o desmonta.
 - `mnemonicos-frontend/src/store/api.ts`: `TAG_TYPES` ganha `'ProductionFlashcard'`;
   `useCreateFlashcardMutation`/`useListFlashcardsQuery`/`useUpdateFlashcardMutation`/
   `useRemoveFlashcardMutation` — `invalidatesTags: ['ProductionFlashcard']` nas mutações,

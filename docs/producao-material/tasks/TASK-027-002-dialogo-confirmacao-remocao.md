@@ -28,24 +28,41 @@ Flashcard (DEC-027-008) — só o diálogo é extraído como componente comum; c
 
 ### Inclui
 
-- `mnemonicos-frontend/src/components/confirm-remove-dialog.tsx` (novo):
-  `ConfirmRemoveDialog({ open, itemLabel, onConfirm, onClose }: ConfirmRemoveDialogProps)`
-  — `role="alertdialog"` com `aria-label`/`aria-describedby` (mesma forma de
+- `mnemonicos-frontend/src/components/confirm-remove-dialog.tsx` (novo — **contrato
+  entregue**, atualizado pelo retry do gate 11/commit `cf11054`, workspace `db199f1`):
+  `ConfirmRemoveDialog({ open, itemLabel, onConfirm, onClose, focusAfterRemoveRef,
+  triggerRef }: ConfirmRemoveDialogProps)` — `focusAfterRemoveRef:
+  RefObject<HTMLElement | null>` **obrigatória** (alvo estável de foco no desfecho de
+  sucesso) e `triggerRef?: RefObject<HTMLElement | null>` opcional (ref explícito do
+  gatilho, com precedência sobre a captura por `document.activeElement`) — `role=
+  "alertdialog"` com `aria-label`/`aria-describedby` (mesma forma de
   `mnemonic-strip-board.tsx:637-644`/`content-form.tsx:484-491`, mensagem incluindo
   `itemLabel`), 3 estados internos do próprio ato de remover (`isRemoving`/
   `removeSucceeded`/`removeError`, molde `isSubmitting`/`submitSuccess`/`submitError` de
-  `content-form.tsx`) — clicar "Confirmar" chama `onConfirm()` (assíncrono, injetado pelo
-  consumidor), com `disabled`/`aria-busy` no botão de confirmação enquanto `isRemoving`;
-  sucesso chama `onClose()`; falha mantém o diálogo aberto, reabilita o botão de
-  confirmação e exibe mensagem de erro (`role="alert"`) — o item nunca é dado como
-  removido antes de `onConfirm()` resolver com sucesso (quem tira o item da lista real é o
-  consumidor, via tag RTK Query invalidada, fora desta TASK).
-  - Foco programático (molde `mnemonic-strip-board.tsx:151-181`/
-    `content-form.tsx:130-145`): `useEffect` reagindo a `open` — botão "Confirmar"
-    focado ao abrir (`open: true`); ao fechar (`open: false`), foco devolvido ao elemento
-    que estava focado antes da abertura (o gatilho, capturado pelo consumidor antes de
-    setar `open: true`, mesmo mecanismo de `wasConfirmingDeleteRef`/
-    `previousConfirmingFrameIdRef` dos moldes).
+  `content-form.tsx`, `isRemoving` resetado também na reabertura) — clicar "Confirmar"
+  chama `onConfirm()` (assíncrono, injetado pelo consumidor), com `disabled`/`aria-busy`
+  no botão de confirmação enquanto `isRemoving`; sucesso chama `onClose()`; falha mantém
+  o diálogo aberto, reabilita o botão de confirmação e exibe mensagem de erro (`role=
+  "alert"`, nomeando `itemLabel`) — o item nunca é dado como removido antes de
+  `onConfirm()` resolver com sucesso (quem tira o item da lista real é o consumidor, via
+  tag RTK Query invalidada, fora desta TASK).
+  - Foco programático **por PRODUTOR do fechamento** (molde `mnemonic-strip-board.tsx:
+    151-181`/`content-form.tsx:130-145`, ramos 'survivor'/'restore'): `useEffect`
+    reagindo a `open` — botão "Confirmar" focado ao abrir (`open: true`). No fechamento
+    há 2 produtores com estado de alvo distinto: **cancelar/falha** (gatilho sobrevive)
+    → foco devolvido a `triggerRef?.current ?? document.activeElement` (capturado antes
+    da abertura); **sucesso** (gatilho pode ser desmontado pelo `invalidatesTags` do
+    consumidor) → foco vai para `focusAfterRemoveRef.current`, nunca para o elemento
+    previamente focado.
+  - **Contrato de montagem (achado gate 11, rodada 2)**: o componente só é útil se o
+    consumidor o mantiver **montado incondicionalmente**, alternando apenas `open`
+    (`if (!open) return null` já cobre o caso fechado sem custo de markup) — montagem
+    CONDICIONAL (o padrão in-place dos moldes, `{confirmando === id ? <div
+    role="alertdialog">...} : null`) desmonta o componente inteiro em vez de re-renderizar
+    com `open: false`, e o efeito de restauração de foco nunca roda (nem o ramo
+    'restore' do cancelar). Documentado no JSDoc de `ConfirmRemoveDialogProps`; os 3
+    consumidores (TASK-027-003/004/005) carregam este item no próprio critério de
+    pronto.
 - `mnemonicos-frontend/src/components/confirm-remove-dialog.test.tsx` (novo): componente
   MONTADO isoladamente (`@testing-library/react`), `onConfirm` mockado (`jest.fn()`)
   resolvendo e rejeitando em casos distintos — asserção dos 3 estados internos

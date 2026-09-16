@@ -60,8 +60,16 @@ depende de TASK-027-003): as 3 TASKs de registro compartilham a escrita em
   export `PegadinhaField({ rawContentId, pegadinhaText }: PegadinhaFieldProps)` — campo
   único de texto (sem lista), 3 estados observáveis (salvar) via
   `useSavePegadinhaMutation`; ação "apagar" abre `ConfirmRemoveDialog` (TASK-027-002,
-  interface pública `{ open, itemLabel, onConfirm, onClose }`) antes de
-  `useRemovePegadinhaMutation` — texto só sai da UI após o `DELETE` suceder.
+  interface pública `{ open, itemLabel, onConfirm, onClose, focusAfterRemoveRef,
+  triggerRef }` — as 2 últimas OBRIGATÓRIAS/decididas nesta TASK: `triggerRef` aponta
+  para o próprio botão "Apagar" — mecanismo determinístico, nunca só o fallback
+  `document.activeElement`, que falha silenciosamente em Safari/Firefox macOS — e
+  `focusAfterRemoveRef` aponta para o textarea da Pegadinha, que permanece montado no
+  estado "vazia" e é o alvo estável) antes de `useRemovePegadinhaMutation` — texto só
+  sai da UI após o `DELETE` suceder. `ConfirmRemoveDialog` é montado
+  **incondicionalmente** dentro de `pegadinha-field.tsx` (contrato de montagem do
+  componente, gate 11 rodada 2), alternando só `open` — nunca num ramo condicional que
+  o desmonta.
 - `mnemonicos-frontend/src/store/api.ts`: `useSavePegadinhaMutation`/
   `useRemovePegadinhaMutation` — `invalidatesTags: ['RawContent']` (tag JÁ EXISTENTE, o
   campo é dela — nenhuma tag nova, ao contrário de Contraste/Flashcard).
