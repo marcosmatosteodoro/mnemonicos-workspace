@@ -186,6 +186,13 @@ depende de TASK-027-003): as 3 TASKs de registro compartilham a escrita em
 - [ ] Aderência à stack/padrões da ficha e do perfil `node-22.md`/`next-16.md` — extensão de
       arquivo existente segue a convenção já presente nele (schema→service→routes), toda
       escrita numa única `$transaction`, Client Component só onde há estado/evento.
+- [ ] **`savePegadinhaText` contra `RawContent` já soft-deleted** (achado do `qa`
+      pré-código — AC-026-007 só testava o caminho de LEITURA após a remoção, nunca a
+      ESCRITA tentada sobre um `RawContent` já removido): `RawContent` soft-deleted antes
+      da tentativa → `savePegadinhaText` recusa com `NotFoundError` (`count === 0` no
+      `updateMany`), `pegadinhaText` permanece com o valor anterior (leitura direta
+      confirma). Mesmo comando de `contents.service.integration.test.ts` acima → `OK (N
+      tests)`.
 - [ ] Code review aprovado.
 
 ## Riscos específicos

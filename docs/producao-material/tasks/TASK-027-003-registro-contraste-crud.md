@@ -221,6 +221,14 @@ compartilhado). A inclusão do Contraste no PDF exportado é TASK-027-006.
 - [ ] Aderência à stack/padrões da ficha e do perfil `node-22.md`/`next-16.md` — camadas
       schema→service→routes, toda escrita numa única `$transaction`, Client Component só
       onde há estado/evento, estado de servidor 100% via RTK Query.
+- [ ] **Prova do eixo POSITIVO de DEC-027-005** (achado do `qa` pré-código — só o eixo
+      negativo, "B não alcança RawContent de A", tinha prova; o eixo positivo que a
+      própria DEC declara não tinha nenhuma): `RawContent` de A com 2 Contrastes,
+      registrados por A e por um ADMIN — `listContrasts` chamado por A devolve AMBOS, sem
+      filtro por `authorId` do Contraste. Falsificável: um filtro acidental por `authorId`
+      adicionado a `listContrasts` no futuro (regressão plausível, já que
+      `updateContrast`/`removeContrast` FAZEM checar autoria) faz este caso reprovar.
+      Mesmo comando de `contrasts.service.integration.test.ts` acima → `OK (N tests)`.
 - [ ] Code review aprovado.
 
 ## Riscos específicos

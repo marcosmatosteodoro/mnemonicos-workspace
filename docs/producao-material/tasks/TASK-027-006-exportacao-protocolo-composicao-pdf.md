@@ -98,11 +98,15 @@ memo de exploração (`exploration-producao-material.md`, seção "Reconheciment
       apresenta nenhuma data calculada nem estado de conclusão — apenas os 6 rótulos
       textuais fixos. Verificação executável: `npm --prefix mnemonicos-backend test --
       review-protocol` (novo arquivo `tests/unit/review-protocol.test.ts`) → `OK (N
-      tests)`. Caso próprio chama `getReviewProtocolMarks()` sem nenhum parâmetro de tempo
-      (assinatura `(): ReviewProtocolMark[]`, sem `now`/`Date`) e confere que nenhum
-      `label` contém dígito de data calculada (regex sobre o texto literal de cada
-      `label`) — o rótulo de exemplo do PLAN ("☐ Revisão R0 — data: ___") não tem dígitos,
-      e o teste confirma que o `label` real também não tem. Fixada antes do código.
+      tests)`. Caso próprio: (1) confere estruturalmente que `getReviewProtocolMarks()`
+      não recebe nenhum parâmetro de tempo (assinatura `(): ReviewProtocolMark[]`, sem
+      `now`/`Date` — prova a ausência de cálculo, não o texto do rótulo); (2) compara os 6
+      `label`s devolvidos, um a um, contra os 6 textos literais esperados fixos (snapshot
+      exato, ex. `"☐ Revisão R0 — data: ___"`) — nunca uma regex de "ausência de dígito"
+      (os próprios códigos R0/R24/R3/R7/R14/R30 contêm dígitos por construção; essa regex
+      reprovaria a implementação correta). Falsificável: `getReviewProtocolMarks()`
+      devolvendo uma data calculada em vez do rótulo fixo faz a comparação literal
+      reprovar. Fixada antes do código.
 - [ ] **AC-026-017** (FR-026-023, gate 1) — Dado um Conteúdo bruto com Quebra da regra
       salva e nenhum Flashcard registrado, quando o EDITOR aciona a Exportação em
       qualquer Variante, então o documento é gerado sem seção de Flashcards e sem erro,
@@ -135,10 +139,16 @@ memo de exploração (`exploration-producao-material.md`, seção "Reconheciment
       adicional. Prova de gate 10 (medição, fora do gate 1): medir a duração de
       `composePublicationBuffer` ANTES desta TASK (baseline, Conteúdo bruto com Tira
       grande real) e DEPOIS (mesma carga + N Contrastes/Flashcards reais, com carga
-      SÍNCRONA real — nunca `setTimeout`/temporizador mockado, lição ativa abaixo); se a
-      duração aumentar, rodar o controle negativo (medir sem a fusão de páginas) antes de
-      arquivar o achado como dívida pré-existente. Registrado em **Riscos específicos**
-      da closure — não bloqueia o merge por si só (SHOULD).
+      SÍNCRONA real — nunca `setTimeout`/temporizador mockado, lição ativa abaixo).
+      **Condição de aprovação (falsificável)**: duração total pós-fusão <
+      `PUBLICATION_PDF_TIMEOUT_MS` (o teto que o próprio NFR-026-003 cita) — é essa
+      comparação, não a diferença antes/depois, que decide passa/reprova; o comparativo
+      antes/depois serve só de diagnóstico de causa quando o teto é ultrapassado. Se o
+      teto for respeitado mas a duração aumentar (ruído de medição tolerado, sem número
+      fixo de tolerância — julgamento do developer sobre variação run-a-run), registrar em
+      **Riscos específicos** sem bloquear; se o teto for ultrapassado, rodar o controle
+      negativo (medir sem a fusão de páginas) para isolar a causa antes de escalar — não
+      bloqueia o merge por si só (SHOULD), mas teto ultrapassado é achado real, não ruído.
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (`git diff --name-only
       main...HEAD`) — `npm --prefix mnemonicos-backend run lint` → exit 0.
 

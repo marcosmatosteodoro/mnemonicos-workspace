@@ -223,6 +223,17 @@ paralelizável colidiria a escrita.
 - [ ] Aderência à stack/padrões da ficha e do perfil `node-22.md`/`next-16.md` — camadas
       schema→service→routes, toda escrita numa única `$transaction`, Client Component só
       onde há estado/evento, estado de servidor 100% via RTK Query.
+- [ ] **`createFlashcard` contra `RawContent` já soft-deleted** (achado do `qa`
+      pré-código — TASK-027-003/AC-026-003 prova este caso para `createContrast`; aqui não
+      havia prova simétrica, mesmo sem FR dedicado na SPEC para o caso de CREATE):
+      `RawContent` titular soft-deleted → `createFlashcard` recusa com `NotFoundError`,
+      nenhuma linha criada (contagem antes/depois). Mesmo comando de
+      `flashcards.service.integration.test.ts` acima → `OK (N tests)`.
+- [ ] **Prova do eixo POSITIVO de DEC-027-005** (mesmo achado do `qa` que TASK-027-003
+      recebeu, simétrico para `ProductionFlashcard`): `RawContent` de A com 2 Flashcards,
+      registrados por A e por um ADMIN — `listFlashcards` chamado por A devolve AMBOS, na
+      ordem de criação, sem filtro por `authorId` do Flashcard. Mesmo comando acima → `OK
+      (N tests)`.
 - [ ] Code review aprovado.
 
 ## Riscos específicos
