@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-16T14:24:00-0300 (PLAN-027/F7 Wave 1 concluída — TASK-027-001/002 Done, branch `feat/producao-material-mnemora-studio`, ainda não mergeada)
+**Última atualização**: 2026-09-16T15:51:00-0300 (PLAN-027/F7 Wave 2 concluída — TASK-027-003 Done, branch `feat/producao-material-mnemora-studio`, ainda não mergeada)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -70,7 +70,7 @@ PLAN._
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
-| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 2/6 🟡 | Approved |
+| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 3/6 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -246,6 +246,19 @@ PLAN._
 
 ## Histórico recente
 
+- 2026-09-16: **Wave 2 de PLAN-027 concluída** (TASK-027-003, CRUD completo de Contraste —
+  commits `9b6115f`/`7b6380a`/`f4e97e6` backend, `6ccb21a`/`cbcc850` frontend). Gate 8
+  (security) e gate 10 (performance) aprovados 1ª rodada sem achados. Gates 1-7
+  (code-reviewer) e 11 (design) reprovaram 1ª rodada — 2 bloqueantes de prova
+  (500 genérico da rota, paridade cross-repo medindo tipo errado) e 3 achados alta de
+  acessibilidade (id de erro duplicado entre 2 instâncias de `ContrastForm`; edição
+  in-place sem "Cancelar"; nome acessível não-único nos botões da lista) — todos
+  corrigidos em 1 retry consolidado com prova por mutação, aprovados 2ª rodada. Pendência
+  não-bloqueante roteada a TASK-027-004/006: falta prova de forma do corpo de sucesso HTTP
+  de Contraste (`CONTRAST_DETAIL_SELECT` sem asserção comportamental — a rede de paridade
+  cobre só a interface declarada). Guarda autor-ou-ADMIN inline 2× (Contraste); nasce 3ª/4ª
+  cópia em TASK-027-004/005 — ponto natural de extração de helper compartilhado na Wave 3,
+  não é gap desta wave. Tracker (`jira.enabled: true`): ver ledger da sessão.
 - 2026-09-16: **Wave 1 de PLAN-027 concluída** (TASK-027-001 schema/migração aditiva —
   Contrast/ProductionFlashcard/pegadinhaText/MATERIAL_REFORCO, commit `c6f37f1`;
   TASK-027-002 `ConfirmRemoveDialog` compartilhado — commits `27e68b0`/`cf11054`/

@@ -1806,3 +1806,27 @@ com o motivo, ou se corta a citação. Vale nos dois repos — referência: `cor
 "mesma convenção de" outro arquivo do projeto).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Anotação `// Mutante: X faz esta asserção reprovar` é declaração de prova, não prosa — escrita sem executar X vira comentário falso que sobrevive ao próprio gate que a exige
+
+**Erro:** o retry de TASK-027-003 (Wave 2 de PLAN-027) corrigiu a rede de paridade cross-repo
+para comparar o tipo certo (`ContrastDetail`, o payload HTTP) e anotou
+`// Mutante: CONTRAST_DETAIL_SELECT deixar de projetar... faz esta comparação reprovar` — mas
+a asserção mede a DECLARAÇÃO da interface `ContrastDetail`, nunca a projeção real de
+`CONTRAST_DETAIL_SELECT` em runtime. O `code-reviewer`, na 2ª rodada, executou o mutante
+alegado (removeu um campo do `select`, depois acrescentou um campo de relação) em `git
+worktree` isolada — o teste ficou VERDE nos dois casos, provando que o comentário afirmava
+uma cobertura que não existe. Não bloqueou (é comentário, não comportamento), mas é a MESMA
+classe do achado bloqueante que motivou a correção: medição certa, declaração exagerada.
+**Causa:** a anotação foi redigida a partir da INTENÇÃO da correção ("agora comparo o tipo
+do payload, então isso deve pegar deriva do `select`"), não do mutante efetivamente
+executado — o teste ficou verde e o texto soa plausível, então nada mecânico acusa.
+**Solução:** neste projeto, `// Mutante: X faz esta asserção reprovar` só se escreve depois
+de aplicar X de fato (numa `git worktree` própria, restaurada ao fim) e ver o vermelho —
+nunca por dedução sobre o que a correção "deveria" cobrir. Quem revisa (`code-reviewer`)
+re-executa pelo menos um mutante declarado por bloco de teste novo, não aceita a alegação
+pela leitura. Exemplares corretos no mesmo arquivo: `contents-frontend-contract.test.ts`
+(blocos que comparam `RawContentSummary`/`RuleBreakdownDetail`/`RawContentDetail`).
+**Validade:** geral (qualquer comentário `// Mutante: ...` no acervo de testes do projeto).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

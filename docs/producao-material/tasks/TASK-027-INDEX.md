@@ -10,7 +10,7 @@
 - [x] TASK-027-002 ✅ Done
 
 ### Wave 2 (depende de Wave 1)
-- [ ] TASK-027-003 ⏸ Todo
+- [x] TASK-027-003 ✅ Done
 
 ### Wave 3 (depende de Wave 2 — sequenciada após TASK-027-003 por colisão de escrita em arquivo compartilhado, `task-wave-overlap-arquivo`/4.228)
 - [ ] TASK-027-004 ⏸ Todo

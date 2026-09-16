@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -263,19 +263,19 @@ compartilhado). A inclusão do Contraste no PDF exportado é TASK-027-006.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-09-16T14:42:57-0300
+**Data conclusão**: 2026-09-16T15:51:51-0300
+**Commit SHA**: 9b6115f (backend, retry 7b6380a/f4e97e6) · 6ccb21a (frontend, retry cbcc850)
+**Jira**: KAN-130
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (834/834, ambos os repos)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 2, rodada 2 — 2 achados bloqueantes na rodada 1, corrigidos com prova por mutação)
+- [x] ACs verificados — AC-026-001 a 004, 015, 016, 018, 019, 023
+- [x] Segurança (gate 8): aprovado (wave 2) — sem achados
+- [x] Comportamento (gate 9): n/a — FEAT-026-001 ainda não completa (falta TASK-027-006); ACs desta TASK fecham combinados com o gate 9 daquela
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

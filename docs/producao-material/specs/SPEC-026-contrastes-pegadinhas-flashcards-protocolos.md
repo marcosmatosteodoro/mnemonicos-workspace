@@ -278,6 +278,8 @@ Variante do PDF, Rascunho (PDF), Exportação, Remoção reversível (Conteúdo 
 
 ### FEAT-026-006: Instrumentação de etapa de produção para Contraste, Pegadinha elaborada e Flashcard
 
+**Jira**: KAN-129
+
 > A autoria de um Contraste, de uma Pegadinha elaborada ou de um Flashcard emite um
 > evento de etapa de produção (mecanismo já existente desde F3) — testável ponta a
 > ponta pela verificação do evento registrado após a 1ª mutação humana de cada
