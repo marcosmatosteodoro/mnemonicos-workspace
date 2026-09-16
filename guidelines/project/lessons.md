@@ -1721,3 +1721,37 @@ sobre trabalho que pode envolver decode/encode/processamento síncrono de tercei
 backend).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Critério de restauração de foco redigido pelo EVENTO de transição, não pelo ESTADO do alvo, deixa passar o produtor cujo alvo é desmontado
+
+**Erro:** o critério de pronto de TASK-027-002 dizia "ao transicionar `open: true → false`,
+o foco é devolvido ao elemento previamente focado" — o teste que o provava usava um harness
+em que o gatilho ("Remover") permanece SEMPRE montado. Isso satisfaz o EVENTO nos dois
+produtores possíveis da transição (cancelar E sucesso), mas só o produtor 'cancelar' tem o
+gatilho de fato sobrevivendo; no produtor 'sucesso' (o `<li>` do item é desmontado pelo
+`invalidatesTags` do consumidor real), `.focus()` no nó destacado é no-op silencioso e o
+foco cai no `<body>` — exatamente o sinal de falsificação que o próprio critério nomeava,
+só que nenhum teste o exercitava. Pego pelo `code-reviewer` na Wave 1 de PLAN-027,
+`confirm-remove-dialog.tsx` (TASK-027-002), com sonda em `git worktree` isolada medindo
+`document.activeElement.tagName === 'BODY'`.
+**Causa:** um harness com o gatilho sempre montado é uma simplificação legítima para o
+produtor 'cancelar', mas vira falso positivo estrutural para o produtor 'sucesso' — o
+critério nomeou o EVENTO (a transição de `open`) como se fosse uma condição só, quando na
+verdade cobre 2+ produtores com estado de alvo diferente (sobrevive/é desmontado), e só um
+deles foi provado. É o eixo de PROVA complementar ao eixo de DESIGN já coberto pela lição
+"Item de lista que renderiza a MESMA entidade... herda a correção do irmão canônico"
+(corolário de extração entre waves): aquela cobre "o código herdou o ramo certo?", esta
+cobre "o teste prova os dois ramos, ou só o que o harness já deixava fácil?".
+**Solução:** critério de restauração de foco (ou qualquer efeito colateral disparado por
+uma transição de estado com mais de um produtor possível) enumera os PRODUTORES da
+transição e, para cada um, o estado do alvo no instante do efeito (sobrevive / é
+desmontado) — um caso de teste por produtor, e o caso cujo alvo é desmontado usa harness
+que DE FATO o desmonta no ato (nunca um harness com o alvo sempre presente). Oráculo do
+ramo "alvo desmontado": asserção POSITIVA sobre o alvo estável esperado, nunca ausência de
+erro. Referência de critério corrigido: `docs/producao-material/tasks/TASK-027-003-*.md`
+(seção "Foco pós-fechamento por desfecho").
+**Validade:** geral (qualquer critério de pronto que descreve um efeito colateral por
+EVENTO de transição de estado, quando esse evento tem mais de um produtor com estado de
+alvo distinto — foco, invalidação de cache, desmonte condicional).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

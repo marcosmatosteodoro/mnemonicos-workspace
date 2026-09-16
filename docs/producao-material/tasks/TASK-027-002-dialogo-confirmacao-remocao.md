@@ -79,12 +79,24 @@ Flashcard (DEC-027-008) — só o diálogo é extraído como componente comum; c
       diálogo permanece montado (`onClose` NUNCA chamado), o botão "Confirmar" volta a
       `disabled={false}`, e um elemento `role="alert"` exibe mensagem de falha. Mesmo
       comando.
-- [ ] Foco gerenciado — item do Inclui sem AC isolado (herdado do molde
-      `mnemonic-strip-board.tsx`/`content-form.tsx`, DEC-027-008): ao montar com `open:
-      true`, o botão "Confirmar" recebe foco (`document.activeElement` aponta para ele);
-      ao transicionar `open: true → false`, o foco é devolvido ao elemento previamente
-      focado antes da abertura. Mesmo comando. Falsificável: remover o `useEffect` de
-      foco faz `document.activeElement` permanecer no `<body>` nos 2 momentos.
+- [ ] Foco gerenciado por PRODUTOR do fechamento (herdado do molde
+      `mnemonic-strip-board.tsx`/`content-form.tsx`, DEC-027-008; refinado pelo achado
+      alta do gate 11 na Wave 1 — o critério original media só o EVENTO `open: true →
+      false`, não distinguia produtor, e passava com harness de gatilho sempre montado;
+      lição registrada em `guidelines/project/lessons.md`, "[Testes] Critério de
+      restauração de foco redigido pelo EVENTO..."): ao montar com `open: true`, o botão
+      "Confirmar" recebe foco. No fechamento há 2 produtores com estado de alvo distinto:
+      (a) **cancelar/falha** (gatilho sobrevive) → foco devolvido ao elemento previamente
+      focado (via `triggerRef`, quando o consumidor o passa, com `document.activeElement`
+      como fallback); (b) **sucesso** (gatilho pode ser desmontado pelo
+      `invalidatesTags` do consumidor) → foco vai para `focusAfterRemoveRef` (prop nova
+      **obrigatória**), nunca para o elemento previamente focado. Verificação executável:
+      `npm --prefix mnemonicos-frontend test -- confirm-remove-dialog` cobrindo os 2
+      produtores separadamente — o caso 'sucesso' usa harness que desmonta o gatilho
+      quando `onConfirm` resolve (simulando `invalidatesTags` real) e assere foco em
+      `focusAfterRemoveRef.current`. Falsificável: remover o ramo 'survivor' (usar sempre
+      `previouslyFocusedRef`) faz o caso 'sucesso' medir `document.activeElement` no
+      `<body>` — provado por mutação no retry (commit `cf11054`).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (`git diff --name-only
       main...HEAD`) — `npm --prefix mnemonicos-frontend run lint` → exit 0.
 
