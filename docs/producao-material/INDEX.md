@@ -32,7 +32,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
-- Contrastes, pegadinha elaborada, flashcards e protocolo impresso de revisão (6 marcos fixos) sobre Conteúdo bruto, todos os 4 conceitos integrados à Exportação (F6) em ambas as Variantes — SPEC-026, F7 do épico MNEMORA STUDIO, `Approved` 2026-09-16. Precisa de PLAN.
+- Contrastes, pegadinha elaborada, flashcards e protocolo impresso de revisão (6 marcos fixos) sobre Conteúdo bruto, todos os 4 conceitos integrados à Exportação (F6) em ambas as Variantes — SPEC-026 (`Approved`) → **PLAN-027** (`Approved` 2026-09-16, cobertura 100% — 29/29 FRs + 5/5 NFRs, 18 COMPs, 8 DECs reversíveis, 5 TRISKs), F7 do épico MNEMORA STUDIO. Aguardando `/keelson:tasks`.
 
 _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 entregue e mergeada 2026-09-14
 (BRIEF-022/SPEC-022/PLAN-023, 17/17 TASKs Done, 6 waves, DoD satisfeito, PR #6 backend
@@ -70,6 +70,7 @@ PLAN._
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
+| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 0/? ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -238,9 +239,28 @@ PLAN._
 | RISK-026-005 | Flashcards sem teto (FR-026-014) somados a Contraste/Pegadinha/Protocolo agora todos exportados amplificam RISK-025-007 (limite de corpo de resposta serverless da Vercel) | Sem teto nesta fatia (default do `po`, E-03); decisão de introduzir teto fica com quem fechar RISK-025-007 antes do deploy em produção | SPEC-026 §9, po (E-03) |
 | E-026-01 | `po` escalou (degrau 2, default aplicado — vai à Entrega de F7): Contraste e Pegadinha elaborada também devem sair impressos no PDF (não só Flashcard/Protocolo)? | Default aplicado: **sim** — FR-026-026/027/028 acrescentados, os 4 conceitos entram na Exportação | po, aprovação de SPEC-026 (E-01) |
 | E-026-02 | `po` escalou (degrau 2, default aplicado — vai à Entrega de F7): a autoria desta fatia (Contraste/Pegadinha/Flashcard) deve emitir evento de etapa de produção, como F4/F5/F6 fizeram? | Default aplicado: **sim** — FR-026-029/NFR-026-005, novo valor aditivo no `ProductionStageType` | po, aprovação de SPEC-026 (E-02) |
+| TRISK-027-001 | `ALTER TYPE ... ADD VALUE` do Postgres não pode ser usado na mesma transação em que o novo valor (`MATERIAL_REFORCO`) é lido/escrito | Mesma mitigação já aplicada em `ASSOCIACAO_VISUAL`/`PUBLICACAO_PDF`: valor só referenciado pelo código após a migração já aplicada num deploy anterior | PLAN-027 §8 |
+| TRISK-027-002 | Volume de Contraste/`ProductionFlashcard` sem teto (FR-026-014) amplifica RISK-025-007/RISK-026-005 (limite de corpo de resposta serverless da Vercel) | Decisão de introduzir teto fica com quem fechar RISK-025-007, fora deste PLAN | PLAN-027 §8 |
+| TRISK-027-004 | Guarda de leitura de Contraste/`ProductionFlashcard`/Pegadinha (autoria herdada de `RawContent`, DEC-027-005) diverge da leitura irrestrita de `VisualAssociation` (F5) dentro do mesmo slug | DEC-027-005 documenta a distinção explicitamente; risco de confusão em extensão futura que copie o padrão errado | PLAN-027 §6, §8 |
+| TRISK-027-005 | Merge de 2 `PDFDocument`s (principal + suplementar) via `copyPages` pode tensionar NFR-026-003 (teto de duração já existente da Exportação) em Tiras grandes | Medir com teste de performance na implementação (gate 10), mesma régua de DEC-025-002 | PLAN-027 §8 |
 
 ## Histórico recente
 
+- 2026-09-16: **PLAN-027 criado via `/keelson:plan` e promovido a `Approved`** (SPEC-026,
+  F7, cobertura total Caso D: 29/29 FRs + 5/5 NFRs). 18 COMPs, 8 DECs (todas reversíveis),
+  5 TRISKs. Decisões estruturais: `Contrast`/`ProductionFlashcard` como models N:1 diretos
+  com `RawContent` (sem precedente pronto no slug — mais próximo é `MnemonicFrame`, um
+  nível abaixo); achado real do `scribe` durante a redação — já existe `model Flashcard`
+  legado (SRS/`CardState`/`Review`, dormente desde F2) que colidiria de nome com o
+  Flashcard novo, resolvido nomeando o model novo `ProductionFlashcard` (DEC-027-003) —
+  "Flashcard" na UI/vocabulário passa a cobrir 2 conceitos de backend distintos, sem
+  confusão para o usuário (rotas/telas usam só o termo de produto). Pegadinha elaborada
+  vira coluna nullable em `RawContent` (sem tabela própria). Protocolo impresso continua
+  sem persistência. Exportação ganha composição suplementar (`buildSupplementaryPagesPdf`
+  + `copyPages`) nas 2 Variantes. Validação: 0 errors reais — achado de mais um falso
+  positivo do lint (`plan-dec-irreversivel-enum` reprova `Irreversível: não` acentuado,
+  quando o próprio template e 2 PLANs aprovados do slug usam essa forma; roteado como
+  aprendizado junto do achado equivalente de SPEC-026). Próximo passo: `/keelson:tasks`.
 - 2026-09-16: **SPEC-026 criada via `/keelson:specify` e promovida a `Approved`**
   (F7 do épico MNEMORA STUDIO — Contrastes, pegadinha elaborada, flashcards e
   protocolo impresso de revisão). Validação de forma: 0 errors (`spec-validator`);

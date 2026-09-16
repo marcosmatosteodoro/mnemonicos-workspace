@@ -61,3 +61,4 @@ contraste/pegadinha por IA.
 ## Cronologia
 - largada: 2026-09-15T19:36:12-0300
 - specify: 2026-09-16T07:45:06-0300 · correções: 1 · classes: spec-ac-fora-gwt(23, falso positivo) · spec-ears-nao-casa(3) · spec-nfr-sem-numero(5) · spec-must-ratio(1) · spec-sem-should-may(1)
+- plan: 2026-09-16T08:11:22-0300 · correções: 1 · classes: plan-dec-irreversivel-enum(8, falso positivo) · plan-dec-alternativa-unica(7)
