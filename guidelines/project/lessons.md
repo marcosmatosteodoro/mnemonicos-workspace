@@ -1830,3 +1830,30 @@ pela leitura. Exemplares corretos no mesmo arquivo: `contents-frontend-contract.
 **Validade:** geral (qualquer comentário `// Mutante: ...` no acervo de testes do projeto).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Critério com efeito repartido entre 2 componentes irmãos (formulário + lista) prova só os efeitos que vivem no componente sob teste — o efeito do irmão evapora sem prova
+
+**Erro:** o critério de pronto de TASK-027-004 (Wave 3 de PLAN-027) prometia 3 efeitos ao
+criar um Flashcard: "controle desabilitado durante a chamada" e "confirmação visível"
+(ambos no `FlashcardForm`) e "o item aparece na lista" (efeito do `FlashcardList`, o
+componente IRMÃO). Os testes provaram os 2 primeiros no `FlashcardForm` montado
+isoladamente; o terceiro nunca ganhou teste em nenhum dos 2 arquivos. O `code-reviewer`
+executou o mutante (`invalidatesTags: ['ProductionFlashcard']` removido de
+`createFlashcard`/`updateFlashcard`) em `git worktree` isolada — a suíte inteira seguiu
+verde. O MESMO buraco existe no Contraste (Wave 2, já aprovada, não reaberta).
+**Causa:** a prova foi organizada POR COMPONENTE MONTADO, não por EFEITO do critério — o
+efeito cujo dono é o componente vizinho não tem casa natural em nenhum dos dois arquivos
+de teste e evapora sem que nada acuse. Invalidação de cache do RTK Query parece "fiação"
+de implementação, mas é o mecanismo que realiza a promessa de SPEC ("adicioná-lo à lista
+exibida") — é comportamento, e comportamento sem prova externa é não-verificado.
+**Solução:** ao escrever a prova de um critério com N efeitos observáveis, enumerar os N
+e marcar em qual ARQUIVO cada um mora antes de codar — efeito sem arquivo declarado é
+efeito sem prova. Toda mutação RTK Query cujo AC promete reflexo numa lista exibida ganha
+1 teste que monta o componente-LISTA, executa a mutação por dentro dele e assere o
+reflexo renderizado; fechamento é o mutante que remove `invalidatesTags` daquele endpoint
+e deve matar o teste. Molde correto já existente no repo: o caso de remoção de
+`flashcard-list.test.tsx` (mutante morre) — falta espelhar para criar/editar.
+**Validade:** geral (qualquer critério de pronto cujos efeitos observáveis se repartem
+entre 2+ componentes irmãos, neste frontend com RTK Query).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
