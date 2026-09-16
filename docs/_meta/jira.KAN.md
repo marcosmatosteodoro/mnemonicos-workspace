@@ -114,4 +114,6 @@ que não dispara. A medição justifica a régua; ela não é a régua.*
   `parent: KAN-6` — mesmo nível hierárquico (1), não adjacente (§7.0 do protocolo). O
   stub-raiz da largada (§16) nasce **sem parent** e é ligado ao épico-raiz por
   `createIssueLink` tipo `Relates` (id `10003`). Primeiro caso: KAN-85 (stub SPEC-022,
-  fatia F5) ↔ KAN-6, 2026-09-13.
+  fatia F5) ↔ KAN-6, 2026-09-13. Segundo caso: KAN-121 (SPEC-026, fatia F7,
+  `epicPolicy: multi-feature` com 4 FEATs — projeção plena, criação no gancho do
+  specify por exceção do §16) ↔ KAN-6, 2026-09-16.
