@@ -29,7 +29,7 @@ cadeia ganha um teste que monta a app real (sem popular o registro à mão) e pr
 legítimo — o mutante que move a escrita para o handler o mata.
 **Validade:** geral (qualquer registro consultado por um passo anterior na cadeia).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
 
 ## [Segurança] "Declarado" não é "autorizado"; prova de gate de autz exige topologia adversarial
 
@@ -49,7 +49,7 @@ a topologia adversarial mínima: rota irmã estática sem guarda ao lado de uma 
 papel; e o registro não ganha chave após o boot.
 **Validade:** geral (autorização por rota/ação).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
 
 ## [Segurança] Chave de decisão de autz que ganha uma dimensão: todos os leitores ganham, inclusive a allowlist de exceção
 
@@ -1562,7 +1562,7 @@ idêntico para o mesmo tipo de dado, nascidos na mesma janela de tempo.
 **Validade:** geral (qualquer par de componentes de lista que renderizam a mesma entidade
 de domínio, neste frontend).
 **Estado:** ativa
-**Contadores:** confirmada 2 · contestada 0
+**Contadores:** confirmada 3 · contestada 0
 
 **Corolário de correção não-estrutural (gate 11 da Wave 7 de PLAN-025, TASK-025-013,
 re-revisão da rodada 1):** o mesmo defeito reincidiu fora de acessibilidade de lista — o
@@ -1753,5 +1753,56 @@ erro. Referência de critério corrigido: `docs/producao-material/tasks/TASK-027
 **Validade:** geral (qualquer critério de pronto que descreve um efeito colateral por
 EVENTO de transição de estado, quando esse evento tem mais de um produtor com estado de
 alvo distinto — foco, invalidação de cache, desmonte condicional).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Design] Id de módulo para elemento referenciado por `aria-*` só vale para formulário de instância única — reuso em criação+edição simultâneas duplica o id
+
+**Erro:** `ContrastForm` (TASK-027-003, Wave 2 de PLAN-027) fixou `CONFUSABLE_ERROR_ID`/
+`DISTINCTION_ERROR_ID` como constantes de MÓDULO, copiando o molde `content-form.tsx`
+(formulário de página, instância única por tela). `ContrastList` monta `ContrastForm`
+DUAS vezes na mesma tela — edição in-place de um item e criação no rodapé, ambas
+incondicionais — produzindo 2 elementos com o MESMO `id` no documento; `aria-describedby`
+resolve para o PRIMEIRO, então o leitor de tela anuncia, no formulário de baixo, o erro
+do formulário de cima. Pego pelo `product-designer` na Wave 2 de PLAN-027.
+**Causa:** o molde copiado é um formulário de PÁGINA (cardinalidade 1), onde id de módulo
+é correto; o componente novo virou formulário de ITEM (cardinalidade N, reusado em
+criação e edição simultâneas), e a mudança de cardinalidade não foi reavaliada contra o
+padrão que o produto já usa para esse caso — id como FUNÇÃO do identificador da instância
+(`removeConfirmMessageId(frameId)` em `mnemonic-strip-board.tsx:51-52`,
+`removeConfirmMessageId(item.id)` em `visual-library-board.tsx:527`) — só que esse padrão
+vive no componente de LISTA, não no molde de formulário copiado, e não foi consultado.
+**Solução:** ao extrair/copiar um formulário para reuso em criação E edição in-place na
+mesma tela, declarar antes de codar quantas instâncias coexistem. Coexistindo ≥2, todo id
+referenciado por `aria-describedby`/`aria-labelledby`/`id`+`htmlFor` vira função do
+identificador da instância (`` `contrast-form-${contrast?.id ?? 'new'}-…` ``), nunca
+constante de módulo do padrão `content-form.tsx:50-54`. Sinal de alerta estrutural e
+verificável por leitura: o componente de lista monta o MESMO formulário em 2+ pontos do
+JSX.
+**Validade:** geral (qualquer formulário com id de módulo referenciado por `aria-*`,
+reusado em mais de uma instância simultânea na mesma árvore).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Performance] Docstring que cita "mesma convenção de <arquivo>" para justificar custo de rede/cache precisa do grep de conferência — sem ele, vira precedente falso que a próxima TASK copia
+
+**Erro:** o docstring de `contrast-list.tsx` (TASK-027-003, Wave 2 de PLAN-027) justificou
+`refetchOnMountOrArgChange: true` como "mesma convenção de `mnemonic-strip-board.tsx`" —
+convenção que NÃO EXISTE: `mnemonic-strip-board.tsx:104` chama a query sem essa opção, e
+um grep em todo o `src/` do frontend devolve `refetchOnMountOrArgChange` só no próprio
+`contrast-list.tsx`. Pego pelo `performance-engineer` na Wave 2 de PLAN-027. Não é
+padrão patológico (custo constante, não cresce com volume), mas o docstring virava a
+fonte que a wave seguinte (TASK-027-004, Flashcard) copiaria — "mesma convenção de
+`contrast-list.tsx`" propagando um precedente que nunca foi decisão, só citação de
+memória sem conferência.
+**Causa:** precedente de custo citado de memória ao redigir o comentário, sem `grep` do
+símbolo/opção no arquivo apontado antes de escrever a frase.
+**Solução:** docstring que justifica uma escolha de custo (refetch, cache, estratégia de
+carga, ausência de paginação/teto) citando outro arquivo do projeto só se escreve com o
+grep do símbolo/opção CONFERIDO naquele arquivo; sem o match, ou se declara decisão NOVA
+com o motivo, ou se corta a citação. Vale nos dois repos — referência: `core/PERFORMANCE.md`
+(Art. 8: otimização/decisão de custo não óbvia cita a evidência que a justifica).
+**Validade:** geral (qualquer comentário/docstring que justifica escolha de custo citando
+"mesma convenção de" outro arquivo do projeto).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
