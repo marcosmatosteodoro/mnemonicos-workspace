@@ -88,6 +88,10 @@ por tipo de issue.*
 | TASK concluída | subtask | ? | Concluído (10007) | closure da TASK (Done) |
 | Trabalho iniciado (Story) | story | ? | Em andamento (10005) | primeira TASK da Story despachada |
 | Funcionalidade pronta p/ QA | story | ? | Em análise (10006) | todas as TASKs da FEAT Done — decisão do Diretor (ver "Trilho do board" abaixo): a História fecha só após revisão própria, não vai direto a Concluído |
+| Fase iniciada (Story) | story | ? | Em andamento (10005) | --phase start-dev (linha acrescentada por /keelson:init 2026-09-16 — protocolo §13; ids já medidos acima) |
+| Fase concluída (Story) | story | ? | Em análise (10006) | --phase finish-dev (idem — alinhada à decisão do Diretor: História não vai direto a Concluído) |
+| Fase iniciada (Subtask) | subtask | ? | Em andamento (10005) | --phase start-dev (idem) |
+| Fase concluída (Subtask) | subtask | ? | Concluído (10007) | --phase finish-dev (idem) |
 | ? | epic | ? | — não medido — | --phase start-dev (linha nasce comentada — mover Epic é opt-in explícito do Diretor) |
 | ? | epic | ? | — não medido — | --phase finish-dev (idem) |
 
