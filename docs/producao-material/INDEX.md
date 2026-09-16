@@ -70,7 +70,7 @@ PLAN._
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
-| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 0/? ⏸ | Approved |
+| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 0/6 ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -246,6 +246,19 @@ PLAN._
 
 ## Histórico recente
 
+- 2026-09-16: **PLAN-027 decomposto em 6 TASKs via `/keelson:tasks`** (rota fan-out,
+  18 COMPs > teto de 10 — decompositor + 2 redatores em paralelo, decisão 4.310). 5
+  waves (não 3 como o manifesto original propunha): o `task-validator` achou uma
+  colisão de escrita real (`task-wave-overlap-arquivo`) — TASK-027-003/004/005
+  (Contraste/Flashcard/Pegadinha) editam os MESMOS arquivos compartilhados
+  (`domain/types.ts`, `types/domain.ts`, `store/api.ts`, `http/routes.ts`,
+  `contents-frontend-contract.test.ts`) e não podiam ficar na mesma wave
+  paralelizável — re-sequenciadas em cadeia (003→004→005, Waves 2-3-4), TASK-027-006
+  (Exportação) passa a Wave 5. 2ª correção mecânica: TASK-027-001 (chore) sem o
+  marcador `-chore-` no nome do arquivo, renomeada. Cobertura: 29/29 FRs, 5/5 NFRs,
+  23/23 ACs, 18/18 COMPs, 0 gap. `task-overlap-fr` (FR-026-024/029 realizados por
+  3-4 TASKs) é sobreposição justificada por desenho — mecanismo compartilhado
+  (TASK-002) + efeito por tipo (TASK-003/004/005), não erro de decomposição.
 - 2026-09-16: **PLAN-027 criado via `/keelson:plan` e promovido a `Approved`** (SPEC-026,
   F7, cobertura total Caso D: 29/29 FRs + 5/5 NFRs). 18 COMPs, 8 DECs (todas reversíveis),
   5 TRISKs. Decisões estruturais: `Contrast`/`ProductionFlashcard` como models N:1 diretos
