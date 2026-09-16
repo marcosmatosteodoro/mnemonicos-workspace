@@ -64,3 +64,4 @@ contraste/pegadinha por IA.
 - plan: 2026-09-16T08:11:22-0300 · correções: 1 · classes: plan-dec-irreversivel-enum(8, falso positivo) · plan-dec-alternativa-unica(7)
 - tasks: 2026-09-16T08:40:39-0300 · correções: 1 · classes: task-wave-overlap-arquivo(5) · task-nome-tipo(1) · task-criterio-grep-nao-ancorado(10) · task-overlap-fr(2, justificado)
 - pausa: 2026-09-16T15:45:31+0000 · sessão 273bb4c1@DESKTOP-DO75G16 · ponto: TASK-027-INDEX pronto (6 TASKs, 5 waves), QA pre-codigo aplicado, aguardando /keelson:implement (Wave 1: TASK-027-001+002) · motivo: Diretor troca de maquina
+- retomada: 2026-09-16T13:40:17-0300 · sessão dbd7e636@auto-avaliar-Latitude-3550 · parado desde 2026-09-16T15:45:31+0000 (marcada) · 0h54min
