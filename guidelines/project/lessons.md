@@ -1562,7 +1562,7 @@ idêntico para o mesmo tipo de dado, nascidos na mesma janela de tempo.
 **Validade:** geral (qualquer par de componentes de lista que renderizam a mesma entidade
 de domínio, neste frontend).
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0
+**Contadores:** confirmada 2 · contestada 0
 
 **Corolário de correção não-estrutural (gate 11 da Wave 7 de PLAN-025, TASK-025-013,
 re-revisão da rodada 1):** o mesmo defeito reincidiu fora de acessibilidade de lista — o
@@ -1574,6 +1574,21 @@ validade da lição se estende a QUALQUER correção de posicionamento/agrupamen
 um irmão canônico na mesma wave, não só a correções de acessibilidade de item de lista —
 o sinal de alerta ("dois arquivos que compõem o MESMO componente compartilhado, nascidos
 na mesma janela de tempo") é o mesmo.
+
+**Corolário de extração entre waves distintas (gate 11 da Wave 1 de PLAN-027,
+TASK-027-002):** `confirm-remove-dialog.tsx`, extraído do irmão canônico
+`mnemonic-strip-board.tsx` (PLAN-004/PLAN-023) como componente compartilhado, herdou a
+ESTRUTURA do foco gerenciado e só o ramo 'restore' (cancelar/falhar) — o ramo 'survivor'
+(gatilho desmontado após remoção bem-sucedida), que nasceu de uma correção do próprio
+gate 11 no irmão (`ae7bb78`), ficou de fora. O "sinal de alerta" original (dois arquivos
+nascidos na MESMA janela de tempo) não pega este caso: o irmão é de PLAN-004/PLAN-023, o
+extraído é de PLAN-027, waves e PLANs diferentes — extração de componente compartilhado é
+justamente o caso em que o irmão é velho. **Regra estendida:** ao EXTRAIR/compartilhar um
+padrão a partir de um irmão canônico — de qualquer wave, não só da mesma —, enumerar por
+leitura cada RAMO da lógica do irmão e declarar, ramo a ramo, se foi herdado ou por que
+não; `git log -S` no mecanismo do irmão revela quais ramos nasceram de correção de gate e
+por isso não podem se perder na extração. Componente extraído que gerencia foco declara o
+alvo de foco de CADA desfecho (sucesso/cancelar/falha), nunca só "devolve ao gatilho".
 
 ## [Design] Predicado que impede 2º diálogo/confirmação simultâneo mira só o gatilho que o abriria — nunca o contêiner que hospeda feedback de ação assíncrona não-relacionada
 

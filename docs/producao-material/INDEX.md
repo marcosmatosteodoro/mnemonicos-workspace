@@ -246,6 +246,19 @@ PLAN._
 
 ## Histórico recente
 
+- 2026-09-16: refino de waves ainda não despachadas (decisão 4.301) em TASK-027-003/
+  004/005 — critério "Integração do diálogo de confirmação" prescrevia "devolver o foco
+  ao gatilho" também no desfecho de SUCESSO, mas nesse caso o gatilho (botão "Remover" do
+  item) é desmontado pelo `invalidatesTags`; ficaria focando um nó morto. Origem: achado
+  alta do gate 11 (`product-designer`) na Wave 1 de PLAN-027 — `ConfirmRemoveDialog`
+  (TASK-027-002) reprovou por não distinguir o ramo 'survivor' (sucesso) do 'restore'
+  (cancelar/falha), mesmo defeito já corrigido no molde `mnemonic-strip-board.tsx`
+  (`ae7bb78`). Corrigidos os 3 critérios para nomear o alvo estável do SUCESSO
+  explicitamente (formulário de criação em 003/004, textarea em 005) via nova prop
+  obrigatória `focusAfterRemoveRef`; TASK-027-002 volta ao developer em retry para
+  implementar a prop e o ramo faltante. Lição registrada: `guidelines/project/lessons.md`
+  ("Item de lista que renderiza a MESMA entidade..." — corolário de extração entre
+  waves distintas).
 - 2026-09-16: **PLAN-027 decomposto em 6 TASKs via `/keelson:tasks`** (rota fan-out,
   18 COMPs > teto de 10 — decompositor + 2 redatores em paralelo, decisão 4.310). 5
   waves (não 3 como o manifesto original propunha): o `task-validator` achou uma

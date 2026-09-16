@@ -164,7 +164,14 @@ depende de TASK-027-003): as 3 TASKs de registro compartilham a escrita em
       vazia) é exibido e (b) se `ConfirmRemoveDialog` está aberto — confirma que nenhum
       caminho (sucesso ao salvar, sucesso ao apagar, falha em qualquer uma, cancelar) deixa
       o componente exibindo o texto antigo depois de apagar com sucesso, nem o diálogo aberto
-      sobre um estado que já mudou, nem fecha sem devolver o foco ao gatilho.
+      sobre um estado que já mudou. **Foco pós-fechamento por desfecho** (achado gate 11,
+      Wave 1 de PLAN-027, TASK-027-002 — `ConfirmRemoveDialog` agora exige a prop
+      `focusAfterRemoveRef: RefObject<HTMLElement | null>`): na FALHA/CANCELAR o foco
+      retorna ao próprio gatilho; no SUCESSO ao apagar, `pegadinha-field.tsx` aponta
+      `focusAfterRemoveRef` para o textarea da Pegadinha (que permanece montado no estado
+      "vazia" — o gatilho aqui não é desmontado como nas listas, mas o alvo correto ainda é
+      declarado explicitamente, nunca implícito). Falsificável: teste assere que o foco vai
+      ao textarea após o sucesso de apagar, nunca ao `<body>`.
 - [ ] **Paridade cross-repo `RawContentDetail`/`RawContent` com `pegadinhaText`**:
       `contents-frontend-contract.test.ts` (o `it` existente "RawContentDetail/RawContent:
       mesmo conjunto de campos", ATUALIZADO com `pegadinhaText` na lista esperada) confirma

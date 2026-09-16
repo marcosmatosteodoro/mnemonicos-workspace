@@ -203,7 +203,17 @@ compartilhado). A inclusão do Contraste no PDF exportado é TASK-027-006.
       `mnemonicos-frontend`) e leitura de CADA ocorrência que afeta o estado que decide se
       `ConfirmRemoveDialog` está aberto — confirma que nenhum caminho (sucesso, falha,
       cancelar, nova ação disparada durante a remoção em andamento) deixa o diálogo aberto
-      sobre um item já removido/inexistente nem fecha sem devolver o foco ao gatilho.
+      sobre um item já removido/inexistente. **Foco pós-fechamento por desfecho** (achado
+      gate 11, Wave 1 de PLAN-027, TASK-027-002 — `ConfirmRemoveDialog` agora exige a prop
+      `focusAfterRemoveRef: RefObject<HTMLElement | null>`): no CANCELAR/FALHA (gatilho
+      sobrevive), o foco retorna ao próprio gatilho (botão "Remover" do item); no SUCESSO
+      (o `<li>` do item removido é desmontado pelo `invalidatesTags`, o gatilho não existe
+      mais) `contrast-list.tsx` aponta `focusAfterRemoveRef` para um alvo estável que
+      permanece montado (o 1º campo do formulário de criação de Contraste, análogo ao
+      `newFrameTextRef` de `mnemonic-strip-board.tsx`) — nunca ao gatilho desmontado.
+      Falsificável: teste com harness que desmonta o gatilho quando `onConfirm` resolve
+      (simula `invalidatesTags`) e assere que o foco vai ao alvo estável, nunca ao
+      `<body>`.
 - [ ] **Paridade cross-repo `Contrast`**: `contents-frontend-contract.test.ts` (estendido,
       `describe` novo) confirma que os campos de `Contrast` (backend, `domain/types.ts`) e
       `Contrast` (frontend, `types/domain.ts`) são EXATAMENTE `id`/`rawContentId`/`authorId`/
