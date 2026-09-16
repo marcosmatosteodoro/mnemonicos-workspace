@@ -31,12 +31,15 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
-- Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14. Precisa de PLAN para decidir o motor concreto (DEC com alternativas).
+- Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
+- Contrastes, pegadinha elaborada, flashcards e protocolo impresso de revisão (6 marcos fixos) sobre Conteúdo bruto, todos os 4 conceitos integrados à Exportação (F6) em ambas as Variantes — SPEC-026, F7 do épico MNEMORA STUDIO, `Approved` 2026-09-16. Precisa de PLAN.
 
 _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 entregue e mergeada 2026-09-14
 (BRIEF-022/SPEC-022/PLAN-023, 17/17 TASKs Done, 6 waves, DoD satisfeito, PR #6 backend
-`e316ab6`/PR #12 frontend `677b836`). F6 em ciclo (BRIEF-024/SPEC-024, `Approved`
-2026-09-14) — próximo passo é o PLAN._
+`e316ab6`/PR #12 frontend `677b836`). F6 entregue e mergeada em `main` 2026-09-15
+(BRIEF-024/SPEC-024/PLAN-025, 14/14 TASKs Done, PR #7 backend `5d6b4df`/PR #13 frontend
+`b54b6ef`). F7 em ciclo (BRIEF-026/SPEC-026, `Approved` 2026-09-16) — próximo passo é o
+PLAN._
 
 ## SPECs
 
@@ -51,6 +54,7 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | SPEC-019 | Página 404 personalizada com volta à home | Approved | 2026-09-07 |
 | SPEC-022 | Biblioteca visual reutilizável | Approved | 2026-09-13 |
 | SPEC-024 | Pipeline de publicação — PDF (rascunho) | Approved | 2026-09-14 |
+| SPEC-026 | Contrastes, pegadinhas, flashcards e protocolos impressos | Approved | 2026-09-16 |
 
 ## PLANs
 
@@ -127,6 +131,12 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | Variante do PDF | "tira" (Quadros em ordem, com Associação visual vinculada quando existir) ou "resumo" (texto corrido da Quebra da regra, sem diagramação de Quadros — braço de controle do A/B de retenção, A-012) | SPEC-024 |
 | Rascunho (PDF) | Rótulo textual visível estampado em toda página de todo PDF emitido por F6, indicando que o documento não passou pelo carimbo de Versão aprovada (F8+F9) | SPEC-024 |
 | Exportação | Ação disparada pelo EDITOR ou ADMIN, na tela do Conteúdo bruto ou da Tira mnemônica, que aciona a Publicação e resulta no download do PDF gerado | SPEC-024 |
+| Contraste | Comparação registrada pelo EDITOR entre um Conteúdo bruto titular e um instituto/regra confundível (texto livre), com explicação sucinta da distinção — reforça a discriminação na memória | SPEC-026 |
+| Confundível | O texto livre que descreve o instituto/regra com o qual o Conteúdo bruto titular costuma ser confundido, dentro de um Contraste | SPEC-026 |
+| Pegadinha elaborada | Texto explicando por que um ponto de um Conteúdo bruto é um erro comum de prova — acrescenta explicação à Classe do radar de prova já persistida, não a redefine | SPEC-026 |
+| Flashcard | Par pergunta/resposta (frente/verso) derivado de um Conteúdo bruto/Quebra da regra, autorado pelo EDITOR, incluído no documento da Exportação | SPEC-026 |
+| Protocolo impresso de revisão | Checklist textual, gerada no momento da Exportação, listando os 6 Marcos de revisão na ordem fixa, sem cálculo nem rastreamento de cumprimento pelo sistema | SPEC-026 |
+| Marco de revisão | Cada um dos 6 rótulos fixos do Protocolo impresso — R0, R24, R3, R7, R14, R30 — herdados da TAP, nunca calculados pelo scheduler SM-2 existente (dormente) | SPEC-026 |
 
 ## Decisões irreversíveis
 
@@ -222,9 +232,31 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 | RISK-024-007 | Herdado de RISK-022-003: teto de 5 MB / resolução da imagem de F5 pode não bastar para impressão de qualidade a partir do PDF de F6 (NFR-024-004 proíbe reprocessamento nesta fatia) | `Reabrir se:` verificação real de impressão mostrar resolução insuficiente — reabre A-022-003/A-022-005, não SPEC-024 | SPEC-022 §9 → SPEC-024 §9 |
 | Q-024-001 | Teto de tamanho de texto por Quadro (paginação já fixada em 1 Quadro/página por FR-024-016) fica para o PLAN — não fecha o denominador de "página" da régua de tempo-por-página de F10 | PLAN avalia junto da escolha do motor | SPEC-024 §9 |
 | E-024-01 | `po` escalou (degrau 2, default aplicado — vai à Entrega de F6): a auto-geração da Tira mnemônica pela exportação (FR-024-006) deve, ou não, emitir o evento de abertura da etapa de produção "Tira mnemônica" (afeta a série de tempo-por-etapa de F3/F10)? | Default aplicado: **não** emite abertura na auto-geração via exportação (FR-024-013, correção aditiva sobre FR-011-008/SPEC-011) — confirmação ou reversão do Diretor na Entrega de F6 | po, aprovação de SPEC-024 |
+| RISK-026-001 | Soft-delete do Conteúdo bruto titular torna o Contraste inalcançável junto; reverter A-026-004 para vínculo estruturado exige re-vinculação MANUAL de todo Contraste já escrito (mesma classe de custo de RISK-005-001) | Aceito nesta fatia; reabrir se: antes de F8, ou ao 1º pedido real de Contraste entre 2 Conteúdos brutos estruturados | SPEC-026 §9 |
+| RISK-026-003 | Protocolo impresso sem persistência (A-026-006) — customizar os 6 Marcos por Conteúdo bruto no futuro exige retrofit de modelo de dados | Aceito nesta fatia, a TAP não pede customização hoje | SPEC-026 §9 |
+| RISK-026-004 | Concorrência de 2 EDITORES editando a Pegadinha elaborada do mesmo Conteúdo bruto (campo único) resolve por last-write-wins (herda RISK-011-005) | Aceito nesta fatia (operação de 1 pessoa); revisitar se o piloto rodar com 2+ editores simultâneos | SPEC-026 §9 |
+| RISK-026-005 | Flashcards sem teto (FR-026-014) somados a Contraste/Pegadinha/Protocolo agora todos exportados amplificam RISK-025-007 (limite de corpo de resposta serverless da Vercel) | Sem teto nesta fatia (default do `po`, E-03); decisão de introduzir teto fica com quem fechar RISK-025-007 antes do deploy em produção | SPEC-026 §9, po (E-03) |
+| E-026-01 | `po` escalou (degrau 2, default aplicado — vai à Entrega de F7): Contraste e Pegadinha elaborada também devem sair impressos no PDF (não só Flashcard/Protocolo)? | Default aplicado: **sim** — FR-026-026/027/028 acrescentados, os 4 conceitos entram na Exportação | po, aprovação de SPEC-026 (E-01) |
+| E-026-02 | `po` escalou (degrau 2, default aplicado — vai à Entrega de F7): a autoria desta fatia (Contraste/Pegadinha/Flashcard) deve emitir evento de etapa de produção, como F4/F5/F6 fizeram? | Default aplicado: **sim** — FR-026-029/NFR-026-005, novo valor aditivo no `ProductionStageType` | po, aprovação de SPEC-026 (E-02) |
 
 ## Histórico recente
 
+- 2026-09-16: **SPEC-026 criada via `/keelson:specify` e promovida a `Approved`**
+  (F7 do épico MNEMORA STUDIO — Contrastes, pegadinha elaborada, flashcards e
+  protocolo impresso de revisão). Validação de forma: 0 errors (`spec-validator`);
+  achado de falso positivo do lint no check `spec-ac-fora-gwt` roteado como
+  aprendizado (2 SPECs aprovadas do slug já usam o mesmo formato de AC). Crítica
+  de mérito do `product-analyst`: `REVISAR_ANTES_DE_APROVAR`, 9 achados reais.
+  `po` (modo aprovação): `ESCALAR` — 7 resoluções aplicadas direto (fecha
+  Q-026-001 amarrando-a a A-012 do A/B tira×resumo; selo de evidência corrigido
+  em A-026-001/002/003; novo estado de Exportação sem material; falha/confirmação
+  de remoção; herança de A-022-011/RISK-011-005) + 3 escalações (E-01/E-02/E-03,
+  ver Riscos ativos) resolvidas pelo Tech Lead via degrau 2 da escada (default do
+  `po` aplicado, reversível, não contamina o ciclo — confirmação em lote na
+  Entrega de F7). Maior mudança: Contraste e Pegadinha elaborada passam a entrar
+  na Exportação junto com Flashcard e Protocolo (os 4 conceitos, não 2). SPEC
+  final: 6 FEATs, 29 FRs, 5 NFRs, 23 ACs, 10 premissas, 5 riscos (RISK-026-002
+  resolvido). Jira: Epic KAN-121 (linked a KAN-6), Stories KAN-122/123/124/125.
 - 2026-09-15: **F6 (PLAN-025) mergeada em `main` nos 2 repos** — PR #7 backend
   (`5d6b4df`) e PR #13 frontend (`b54b6ef`), Diretor. Épico avança para F7/F8
   (ambas dependem só de F2/F6, entregues). RISK-025-007 segue aberto — Tira

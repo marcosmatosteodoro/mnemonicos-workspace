@@ -6,6 +6,7 @@
 **Largada**: 2026-09-15T19:36:12-0300
 **SPEC**: SPEC-026
 **Epico**: docs/producao-material/briefs/BRIEF-2026-08-27-mnemora-studio-epic.md
+**Jira**: KAN-121
 
 ## Pedido como dito
 
@@ -59,3 +60,4 @@ contraste/pegadinha por IA.
 
 ## Cronologia
 - largada: 2026-09-15T19:36:12-0300
+- specify: 2026-09-16T07:45:06-0300 · correções: 1 · classes: spec-ac-fora-gwt(23, falso positivo) · spec-ears-nao-casa(3) · spec-nfr-sem-numero(5) · spec-must-ratio(1) · spec-sem-should-may(1)
