@@ -69,17 +69,43 @@ repo, leia o README do guideline correspondente:
 - **Escopo mínimo** nos dois repos: seguir as convenções do módulo tocado; sem refactor
   em massa sem pedido.
 
-## Tracker (Jira) — projeto definido, sync ainda desligado
+## Ambiente local — portas
+
+Padrão: **frontend `3000`** (`next dev`) e **backend `3333`** (`PORT`, default em
+`mnemonicos-backend/src/config/env.ts`). Porta ocupada **não é motivo para parar**: suba na
+próxima livre (`3001`, `3334`, …) — sessão paralela nos dois repos é rotina aqui.
+
+🔴 **Mudar a porta do frontend tem contrapartida obrigatória no backend.** `CORS_ORIGINS` é
+allowlist explícita (`mnemonicos-backend/src/app.ts`) e a **mesma** lista governa a guarda
+de `Origin`/`Referer` das rotas de sessão (`src/modules/auth/auth.routes.ts`). Frontend em
+`3001` sem `http://localhost:3001` na allowlist → **o login falha calado**: sem erro na
+tela, sem log óbvio, a sessão simplesmente não se estabelece. Já aconteceu e já custou um
+gate 9 (lição registrada no INDEX de `producao-material`, 2026-09-07).
+
+Ao subir fora do padrão, o ajuste é parte da mesma ação, não um passo seguinte:
+
+- **frontend em porta nova** → acrescente a origem a `CORS_ORIGINS` no `.env` do backend;
+- **backend em porta nova** → aponte `BACKEND_API_URL` no `.env` do frontend para ela (é o
+  valor que o `rewrites()` do `next.config.ts` usa; não tem prefixo `NEXT_PUBLIC_` porque
+  não pode ir para o bundle).
+
+Os dois são `.env` **local, não versionado** — mexer neles é alteração de ambiente do
+Diretor, então **declare no relatório de fecho** qual arquivo mudou e para quê. Nunca edite
+`.env.example` para isso: ele é contrato de placeholders, não o seu ambiente.
+
+## Tracker (Jira) — ligado e medido
 
 O projeto é **`KAN`** em `mp-consultoria.atlassian.net`, board `2`. Site, `cloudId`,
-`projectKey`, `boardId` e `mapFile` já estão na ficha; o mapa é
+`projectKey`, `boardId` e `mapFile` estão na ficha; o mapa é
 [docs/_meta/jira.KAN.md](docs/_meta/jira.KAN.md).
 
-`jira.enabled` continua **`false`** porque os ids de `issueType` são `null` — eles são por
-projeto e exigem `createmeta` de um conector autorizado neste site. **Ligar antes de medir
-é pior que deixar desligado**: o sync é best-effort e não bloqueia o ciclo, então falha
-incompleta não aparece, ela só não acontece. Enquanto isso o ciclo roda sem tracker: SPEC,
-PLAN e TASKs vivem em `docs/` e nenhuma issue é criada.
+`jira.enabled` está **`true`** desde 2026-08-27, com os quatro papéis preenchidos a partir
+do `createmeta` real do projeto — `spec` → Epic (`10006`), `feature` → História (`10009`),
+`task` → Subtask (`10007`), `standalone` → Tarefa (`10008`). A régua que autorizou ligar
+continua valendo para toda medição futura: **ligar antes de medir é pior que deixar
+desligado** — o sync é best-effort e não bloqueia o ciclo, então falha incompleta não
+aparece, ela só não acontece. Id de tipo ou de transição que ainda não foi observado neste
+board se mede antes de usar; não se herda de outro projeto nem se deduz da sequência.
 
 🔴 **Não copie configuração de tracker de outro workspace para cá.** Os valores certos são
 `mp-consultoria.atlassian.net` / `455dadeb-0906-4adf-9500-c9bfb2b979bd` / `KAN`. Ver
@@ -87,8 +113,44 @@ PLAN e TASKs vivem em `docs/` e nenhuma issue é criada.
 do `b2b-workspace` — e o keelson passaria a criar os épicos e histórias deste produto no
 board `NOVA`, de outro produto.
 
-Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-key"` exige
-`jira.enabled: true` e o self-check do `/keelson:init` reprova a combinação.
+`git.branchNaming` segue em `"slug"` por escolha, não por impedimento: com `jira.enabled:
+true` o self-check do `/keelson:init` já aceitaria `"tracker-key"` — a troca é decisão do
+Diretor, não consequência automática de ter ligado o sync.
+
+### Trilho do card — quem move o quê
+
+O sync do keelson tem **teto**: nenhum gancho automático passa da coluna de desenvolvimento
+(§9 do protocolo, decisão 4.65 — uma Story já foi fechada indevidamente por régua
+automática). Acima do teto quem decide é o Diretor; o Tech Lead executa a ordem, nunca a
+antecipa. Ids medidos neste board — iguais para Epic, História, Tarefa e Subtask:
+`11` Tarefas pendentes · `21` Em andamento · `31` Em análise · `41` Concluído.
+
+| Momento | Quem dispara | Subtask | História | Epic |
+| --- | --- | --- | --- | --- |
+| TASK despachada | gancho do ciclo | `21` Em andamento | `21` Em andamento | intocado |
+| TASK fechada | closure da TASK | `41` Concluído | — | intocado |
+| Desenvolvimento terminado | `--phase finish-dev` | `41` Concluído | `31` **Em análise** | intocado |
+| **Diretor mergeou** | **aviso do Diretor** | — | `41` **Concluído** | condicional, abaixo |
+
+**Ao mergear, avise.** O Tech Lead não descobre merge sozinho, e o teto do §9 existe
+justamente para ele não adivinhar: História parada em "Em análise" significa "esperando o
+merge", não "esquecida". Recebido o aviso, o Tech Lead:
+
+1. move a História mergeada para `41` (Concluído);
+2. **consulta os filhos do épico** por JQL (`parent = <EPIC>`) — o estado vem do quadro,
+   nunca da memória da sessão nem do que o `INDEX.md` diz;
+3. se **todos** os filhos estiverem em `41`, move o épico para `41` também; se sobrar
+   qualquer filho aberto, **o épico não se toca**.
+
+O passo 2 não é formalidade. Épico com filho pendente é estado **correto**, não pendência
+a limpar — fechar épico por impressão de que "acabou" é a mesma classe de erro que o teto
+do §9 previne. Caso vivo: **KAN-106** tem a única História (KAN-107) em `41` e segue em
+`21` **de propósito**, porque ainda receberá trabalho (decisão do Diretor, 2026-09-16).
+
+Este trilho é doutrina **deste workspace**, executada pelo Tech Lead via conector MCP: o
+protocolo do plugin não tem verbo de fase pós-merge (só `start-dev` e `finish-dev`), então
+não espere que `/keelson:auto` ou `/keelson:integrate` fechem card — eles param no teto,
+por contrato. Story em "Concluído" ao fim de um `/keelson:auto` é bug, não sucesso.
 
 <!-- ============================================================= -->
 <!-- keelson — bloco gerenciado. Gerado por /keelson:init.          -->

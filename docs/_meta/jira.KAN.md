@@ -63,8 +63,12 @@ avulsos (BRIEF-007, BRIEF-008) já estavam com Status: Concluído localmente des
 2026-09-05, mas ficaram parados em "Tarefas pendentes" no board até este ponto por falta
 do id de transição para o tipo.
 
-Não medido ainda para o tipo **Epic** — meça antes de mover um card desse tipo; não
-assuma os mesmos ids só porque bateram em Subtask/História/Tarefa.
+**Epic medido em 2026-09-16** via `getTransitionsForJiraIssue` em `KAN-121` — fecha o
+quarto e último tipo: idêntico aos três acima, mesmo workflow global, ids `11`/`21`/`31`/
+`41`, `isGlobal: true` e `hasScreen: false` nas quatro. A suspeita que motivou a medição
+(Epic com workflow próprio, comum em projeto team-managed) **não se confirmou** — mas a
+régua que a gerou continua: tipo novo no board se mede antes de mover, não se deduz de
+ter batido nos outros quatro. Nenhum card foi transicionado nesta medição.
 
 ## Campos
 
@@ -104,6 +108,31 @@ TASK `Done` → id `41` (Concluído); História com todas as subtasks fechadas �
 análise, não Concluído — decisão do Diretor: a História só fecha depois de revisão
 própria, mesmo com as subtasks todas prontas). Epic não movido nesta rodada (fora do
 pedido).
+
+### Fecho pós-merge (decisão do Diretor, 2026-09-16)
+
+⚠️ **Procedimento humano, não gatilho de sync.** O catálogo de gatilhos do protocolo é
+fechado (§3): "pós-merge" não é um marco canônico, então nada aqui dispara sozinho — o
+motor ignora esta subseção. Ela existe para o **Tech Lead** executar via conector MCP
+quando o Diretor avisar que mergeou. A régua completa está no
+[CLAUDE.md](../../CLAUDE.md) do workspace, seção *Trilho do card*; o resumo operacional:
+
+1. História mergeada → `41` (Concluído). Ela vinha de `31` (Em análise), onde o
+   `--phase finish-dev` a deixou; `31 → 41` é transição direta, sem hop intermediário.
+2. Consultar os filhos do épico por JQL (`project = KAN AND parent = <EPIC>`) — estado
+   lido do quadro, nunca de memória de sessão nem do `INDEX.md` do slug.
+3. Todos os filhos em `41` → épico para `41`. **Qualquer** filho aberto → épico intocado.
+
+O passo 3 tem um caso vivo que contradiz a leitura ingênua: **KAN-106** ("Pipeline de
+publicação — PDF") tem sua única História, KAN-107, em `41`, e mesmo assim permanece em
+`21` (Em andamento) **por decisão do Diretor em 2026-09-16** — o épico ainda receberá
+trabalho. Épico aberto com todos os filhos fechados não é, por si só, dívida a limpar:
+confirme a intenção antes de mover, porque o quadro não distingue "esvaziou" de "vai
+receber mais".
+
+Isto é doutrina deste projeto, não do plugin. O keelson não tem verbo de fase pós-merge
+(só `start-dev` e `finish-dev`), e por contrato o `/keelson:auto` e o `/keelson:integrate`
+param no teto de desenvolvimento (§9) — nenhum dos dois fecha card.
 
 ## Achados de config
 
