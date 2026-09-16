@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -270,19 +270,19 @@ paralelizável colidiria a escrita.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-09-16T16:13:51-0300
+**Data conclusão**: 2026-09-16T17:17:42-0300
+**Commit SHA**: a0a892b (backend, retry adce2b3/dcaea3b) · c0fdfd4 (frontend, retry 5799394)
+**Jira**: KAN-131
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (1308+/1308+, ambos os repos)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 3, rodada 2 — 1 achado bloqueante de cobertura, corrigido com prova por mutação)
+- [x] ACs verificados — AC-026-008 a 011, 015, 016, 018, 019, 023
+- [x] Segurança (gate 8): aprovado (wave 3) — sem achados
+- [x] Comportamento (gate 9): n/a — FEAT-026-003 ainda não completa (falta TASK-027-006); ACs desta TASK fecham combinados com o gate 9 daquela
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-16T15:51:00-0300 (PLAN-027/F7 Wave 2 concluída — TASK-027-003 Done, branch `feat/producao-material-mnemora-studio`, ainda não mergeada)
+**Última atualização**: 2026-09-16T17:17:00-0300 (PLAN-027/F7 Wave 3 concluída — TASK-027-004 Done, branch `feat/producao-material-mnemora-studio`, ainda não mergeada; ciclo PAUSADO a pedido do Diretor antes da Wave 4)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -70,7 +70,7 @@ PLAN._
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
-| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 3/6 🟡 | Approved |
+| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 4/6 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -246,6 +246,30 @@ PLAN._
 
 ## Histórico recente
 
+- 2026-09-16: **Wave 3 de PLAN-027 concluída** (TASK-027-004, CRUD completo de Flashcard —
+  commits `4a27fb4`/`a0a892b`/`adce2b3`/`dcaea3b` backend, `dcd5881`/`c0fdfd4`/`5799394`
+  frontend). Gate 8 (security) e gate 10 (performance) aprovados 1ª rodada sem achados —
+  TRISK-027-002 (sem teto de volume) desta vez rastreado corretamente no docstring (não
+  reincidiu o silêncio da Wave 2). Gate 11 (design) aprovado 1ª rodada — os 3 achados alta
+  da Wave 2 honrados de fábrica. Gate 1-7 (code-reviewer) reprovou 1ª rodada — achado
+  bloqueante: critério com efeito repartido entre `FlashcardForm`/`FlashcardList` provava
+  só os efeitos do componente sob teste, faltando prova de que criar/editar reflete na
+  lista exibida (mutante `invalidatesTags` sobrevivia) — corrigido em retry com prova por
+  mutação, aprovado 2ª rodada. **Achado confirmado por MEDIÇÃO (não inferência) do mesmo
+  buraco em `contrast-list.test.tsx` (Wave 2, já aprovada, não reaberta — 4.88)**: decisão
+  de consolidação pendente do Diretor.
+  **3 pendências roteadas para ANTES da Wave 4** (TASK-027-005 traz a 5ª/6ª cópia da guarda
+  autor-ou-ADMIN e não tem par-de-2-textos, então DEC-027-008 não dispara a mesma forma):
+  (1) guarda `actor.role !== 'ADMIN' && ...authorId !== actor.id` inline 4× (Contraste ×2,
+  Flashcard ×2) — extrair helper compartilhado quebraria a âncora textual dos testes
+  estruturais existentes; decisão de reescrever essa âncora ou aceitar a duplicação fica
+  com quem retomar; (2) `extractFunctionBody`/`firstExecutableLine` triplicados em
+  `tira`/`contrasts`/`flashcards.service.guard-order.test.ts` (~90 linhas de mecanismo puro
+  cada) — candidato a `tests/support/`; (3) `ContrastList`/`FlashcardList` ainda não
+  montados em nenhuma página (FR-026-017/FR-026-020 sem tela hospedeira declarada em
+  nenhum COMP do PLAN-027) — item para a convergência de fecho ou próxima fatia.
+  **Ciclo pausado a pedido do Diretor** — `/keelson:continue` retoma na Wave 4
+  (TASK-027-005, Pegadinha elaborada).
 - 2026-09-16: **Wave 2 de PLAN-027 concluída** (TASK-027-003, CRUD completo de Contraste —
   commits `9b6115f`/`7b6380a`/`f4e97e6` backend, `6ccb21a`/`cbcc850` frontend). Gate 8
   (security) e gate 10 (performance) aprovados 1ª rodada sem achados. Gates 1-7
