@@ -104,6 +104,10 @@ Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-ke
   despacho de agent, `ficha.sh --get models.<agent>` vai em `model:` do spawn, vazio →
   frontmatter do agent (régua em `sdd-conventions.md`). **Antes de qualquer tarefa, leia a
   ficha** e use os valores dela; nunca assuma caminhos ou comandos fixos.
+- **Raiz do plugin:** os caminhos `${CLAUDE_PLUGIN_ROOT}/…` deste bloco só expandem
+  dentro de comando/agent/skill do keelson — no Bash desta sessão a variável pode chegar
+  **vazia**. Vazia → invoque `/keelson:version` (ele expande e imprime `raiz:`) e use esse
+  caminho; nunca `find` nem uma versão escolhida no cache (decisão 4.404).
 - **Constituição de qualidade:** o `QUALITY-CHARTER` do plugin — artigos agnósticos
   de linguagem.
 - **Perfil de linguagem ativo:** conforme `profile` da ficha — o backend e (se houver)
@@ -194,6 +198,13 @@ Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-ke
   nunca omitido. `/keelson:warroom close` roda os gates sobre o diff acumulado e cobra a
   dívida; linha aberta é pendência do Diretor, cutucada no encerramento. Régua:
   `${CLAUDE_PLUGIN_ROOT}/docs/_meta/conventions/warroom-contract.md`.
+- **Pausar é ato seu, e vira fato commitado** (decisão 4.382): `/keelson:pause [motivo]`
+  (humano-only) leva o ciclo ao ponto seguro — a closure em voo termina, a árvore fica
+  limpa — grava `- pausa:` na `Cronologia` do BRIEF, commita, pusha a branch e fecha o
+  run; `/keelson:continue` grava a `- retomada:` com o tempo parado **medido** (sem
+  pausa marcada, o piso pelo último commit, rotulado), e a linha `Duração` do relatório
+  ganha a cauda `pausas`. Fôlego continua não sendo gatilho: sem o comando ou o seu
+  pedido explícito nesta execução, o ciclo segue até a Entrega.
 - **Toda mudança fecha com relatório** (decisão 4.76): terminado o ajuste — sob demanda ou
   ciclo — o Tech Lead **exibe o fecho sem que você peça**, em 6–10 linhas: o que mudou
   (produção · teste · doc · migration/config) · **cada gate aplicável com estado
@@ -203,9 +214,10 @@ Enquanto estiver desligado: `git.branchNaming` fica em `"slug"` — `"tracker-ke
   commit — decisão 4.85) · decisões tomadas em seu nome · o que ficou fora de
   escopo ou pendente · **toda `licao_candidata` devolvida por qualquer gate da rodada
   — inclusive retry — com destino registrado e verificado** (`alvo: projeto` →
-  `guidelines/project/lessons.md` · `alvo: processo` → `agile-coach`; a linha só se
-  escreve com a lição conferida **presente** no destino — declarar "roteada" sem
-  escrever no destino é a forma que reincidiu, decisão 4.333): aplicar a
+  `guidelines/project/lessons/<slug>.md` · `alvo: processo` → `agile-coach`; a linha só se
+  escreve com a lição conferida **presente** no destino —
+  `bash "${CLAUDE_PLUGIN_ROOT}/scripts/lessons.sh" . show <id>` sai 0, decisão 4.376 —
+  declarar "roteada" sem escrever no destino é a forma que reincidiu, decisão 4.333): aplicar a
   correção de código que o achado pede **não é** rotear a lição que ele carrega — são
   dois atos, e lição sem destino também declara o fecho **parcial** (decisão 4.204) ·
   estado do tracker (com `jira.enabled`) · e o que depende de você
@@ -246,7 +258,10 @@ continuam humanos) ·
 `/keelson:warroom` (abrir/fechar janela sem gate bloqueante, dívida em `DEBT.md`) ·
 `/keelson:verify-handoff` (fechar gate de tela remoto) ·
 `/keelson:continue` (retomar um slug de onde parou — fila do épico, wave interrompida
-ou próxima fatia, derivado dos artefatos commitados) ·
+ou próxima fatia, derivado dos artefatos commitados; grava a marca de retomada com o
+tempo parado medido) ·
+`/keelson:pause` (parar o ciclo num ponto seguro — closure commitada, marca de pausa
+commitada e pushada no BRIEF, para o continue medir o tempo parado de qualquer máquina) ·
 `/keelson:mutation-setup` (instalar e configurar o mutation testing — grava
 `quality.mutation` na ficha após prova) ·
 `/keelson:e2e-setup` (instalar e configurar a suíte E2E Playwright — grava
