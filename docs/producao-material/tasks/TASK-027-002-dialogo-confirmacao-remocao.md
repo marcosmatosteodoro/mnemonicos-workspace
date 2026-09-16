@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -133,17 +133,17 @@ Flashcard (DEC-027-008) — só o diálogo é extraído como componente comum; c
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
-**Jira**:
+**Data início**: 2026-09-16T13:58:56-0300
+**Data conclusão**: 2026-09-16T14:24:28-0300
+**Commit SHA**: cf11054
+**Jira**: KAN-128
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (12/12 confirm-remove-dialog; 458/458 suíte default frontend)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 1, rodada 2 — 7/7, após retry do gate 11)
+- [x] ACs verificados — AC-026-018, AC-026-019
+- [x] Segurança (gate 8): aprovado (wave 1) — sem achados; componente de apresentação, sem I/O
+- [x] Comportamento (gate 9): n/a — FEAT-026-005 ainda não completa (faltam TASK-027-003/004/005); AC-026-024/025 desta TASK fecham combinados com o gate 9 daquelas TASKs

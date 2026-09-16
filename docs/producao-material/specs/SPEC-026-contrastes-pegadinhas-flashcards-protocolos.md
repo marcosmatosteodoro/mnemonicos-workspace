@@ -260,6 +260,8 @@ Variante do PDF, Rascunho (PDF), Exportação, Remoção reversível (Conteúdo 
 
 ### FEAT-026-005: Confirmação e tratamento de falha na remoção de registros desta fatia
 
+**Jira**: KAN-126
+
 > O EDITOR aciona remover um Contraste, uma Pegadinha elaborada ou um Flashcard, o
 > sistema pede confirmação antes de executar (ato destrutivo) e trata falha sem
 > perder o registro — testável ponta a ponta pelo fluxo de confirmar, remover com

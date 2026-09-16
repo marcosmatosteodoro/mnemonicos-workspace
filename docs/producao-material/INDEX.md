@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-15T21:45:00-0300 (PLAN-025/F6 mergeada em `main` nos 2 repos — PR #7 backend/PR #13 frontend)
+**Última atualização**: 2026-09-16T14:24:00-0300 (PLAN-027/F7 Wave 1 concluída — TASK-027-001/002 Done, branch `feat/producao-material-mnemora-studio`, ainda não mergeada)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -70,7 +70,7 @@ PLAN._
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
-| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 0/6 ⏸ | Approved |
+| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 2/6 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -246,6 +246,26 @@ PLAN._
 
 ## Histórico recente
 
+- 2026-09-16: **Wave 1 de PLAN-027 concluída** (TASK-027-001 schema/migração aditiva —
+  Contrast/ProductionFlashcard/pegadinhaText/MATERIAL_REFORCO, commit `c6f37f1`;
+  TASK-027-002 `ConfirmRemoveDialog` compartilhado — commits `27e68b0`/`cf11054`/
+  `8bab246`). Gates 1-7/8/10 aprovados 1ª rodada; gate 11 reprovou TASK-027-002 na 1ª
+  rodada (foco pós-sucesso incompleto), corrigido em retry e aprovado 2ª rodada — mesmo
+  achado reabriu gates 1/7 do code-reviewer, também aprovados na 2ª rodada. Migração
+  aplicada no Postgres de dev local (autorização do Diretor); produção não tocada.
+  Tracker (`jira.enabled: true`, KAN-121): gancho de closure best-effort, ver ledger da
+  sessão. Próximo: Wave 2 (TASK-027-003, Contraste CRUD).
+- 2026-09-16: gancho `closure` do sync Jira (Wave 1 de PLAN-027) executado — conector
+  autorizado (`atlassianUserInfo` respondeu). Story implícita de FEAT-026-005 criada
+  (`KAN-126`, sem key prévia); TASK-027-001 projetada como tarefa transversal sob o Epic
+  por não ter Funcionalidade primária (`KAN-127`, achado: TASK sem campo `Funcionalidade`
+  nem marcador `transversal (...)` — tratada pela régua de "TASK transversal sem
+  primária honesta" do `jira-sync-feat.md` por analogia, decisão de best-effort do
+  tracker-sync, não do humano); TASK-027-002 virou sub-task de `KAN-126` (`KAN-128`).
+  Transições `auto`: KAN-127/KAN-128 → Concluído; KAN-126 → Em andamento (teto de
+  desenvolvimento — marco "Funcionalidade pronta p/ QA" não se aplica, FEAT-026-005 tem
+  outras TASKs (003/004/005) ainda não concluídas). Descrição de `KAN-127` sem cenário
+  Dado/Quando/Então (chore sem AC) — lacuna nomeada, não é card ausente.
 - 2026-09-16: refino de waves ainda não despachadas (decisão 4.301) em TASK-027-003/
   004/005 — critério "Integração do diálogo de confirmação" prescrevia "devolver o foco
   ao gatilho" também no desfecho de SUCESSO, mas nesse caso o gatilho (botão "Remover" do

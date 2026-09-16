@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -130,17 +130,17 @@ técnico (code-scout) — PLAN de SPEC-026 / F7", itens 1 e 9).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
-**Jira**:
+**Data início**: 2026-09-16T13:45:04-0300
+**Data conclusão**: 2026-09-16T13:58:18-0300
+**Commit SHA**: c6f37f1
+**Jira**: KAN-127
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (400/400 integração, 353/353 unit, backend)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 1, rodada 1 — 7/7)
+- [x] ACs verificados — n/a (chore habilitador, sem AC; 3 critérios de pronto provados)
+- [x] Segurança (gate 8): aprovado (wave 1) — sem achados; FKs Restrict e migração aditiva conferidas
+- [x] Comportamento (gate 9): n/a — chore de schema/migração, sem efeito observável de tela

@@ -5,9 +5,9 @@
 
 ## Ordem de execução (waves)
 
-### Wave 1 (paralelizável)
-- [ ] TASK-027-001 ⏸ Todo
-- [ ] TASK-027-002 ⏸ Todo
+### Wave 1 (sequencial — sem worktree por task isolando a árvore, decisão 4.334)
+- [x] TASK-027-001 ✅ Done
+- [x] TASK-027-002 ✅ Done
 
 ### Wave 2 (depende de Wave 1)
 - [ ] TASK-027-003 ⏸ Todo
