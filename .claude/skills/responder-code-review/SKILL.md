@@ -5,26 +5,21 @@ description: Responde comentários de revisor humano num Pull Request do GitHub,
 
 # Responder code review no registro da casa
 
-Regra medida, não gosto. A calibração veio do workspace `b2b-workspace` (2026-08-13,
-PR 2087): as respostas produzidas por IA tinham **média de 1550 caracteres e 14 de 15
-usavam negrito/tabela/cerca de código**; os comentários dos revisores humanos do mesmo
-PR tinham **mediana de ~100 caracteres e 1 de 12 usava qualquer markdown**. Depois da
-reescrita: média **694**, zero com markdown pesado — e a informação não se perdeu.
+Regra medida, não gosto: revisores humanos escrevem em torno de 100 caracteres por
+comentário e quase nunca usam markdown. Uma resposta de ~700 caracteres, sem markdown
+pesado, carrega a mesma informação que uma de 1500 formatada.
 
-**Esta medição é herdada, não medida aqui.** Assim que houver revisor humano recorrente
-nos PRs de `mnemonicos-*`, refaça a medição (o bloco *Antes de fechar* traz o comando) e
-substitua os números acima pelos do time real. Até lá, a régua vale como default: enxuto
-é mais próximo do registro humano do que floreado, em qualquer time.
+Esses números são herdados do `b2b-workspace`. Quando houver revisor humano recorrente nos
+PRs de `mnemonicos-*`, refaça a medição (o bloco *Antes de fechar* traz o comando) e
+substitua-os pelos do time real.
 
 ## O registro da casa
 
 - **Frases curtas.** Uma ideia por parágrafo, parágrafos separados por linha em branco.
 - **Sem negrito, sem tabela, sem cerca de código, sem cabeçalho.** Identificador vai cru
   (`scheduleNext`, `disciplines.service.ts:31`), não em backtick nem em bloco.
-- **Sem preâmbulo e sem elogio.** Não abra com "Baita achado", "Boa observação", "Você
-  está certo, e...". Se o apontamento procede, diga que procede e mostre o número.
-- **Sem meta-narrativa da própria resposta.** Nada de "respondo os três", "detalhando o
-  ponto", "complemento com".
+- **A primeira frase já é o veredito.** A resposta fala do código e da medição — não
+  avalia o apontamento nem descreve a si mesma.
 - **Enumeração só quando há mais de um assunto** na mesma thread. Aí `1.` `2.` `3.` simples.
 - **Registro direto, sem agressividade**: "Entendo que...", "Preciso entender...",
   "Realmente é necessário...?".

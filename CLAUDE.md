@@ -49,7 +49,7 @@ repo, leia o README do guideline correspondente:
 - **Branch (repos de código) — a base é a `main`.** Os dois repos são novos e têm só `main`;
   não há `master`, `release` nem trilho de release. Branch nova sai de `origin/main`, PR
   para `main`. Nome: `feat/<slug>-<descrição-curta>` (`git.branchNaming: "slug"` na ficha).
-  Quando o tracker entrar, ver *Tracker* abaixo antes de mudar para `tracker-key`.
+  Trocar para `tracker-key` é decisão do Diretor (ver *Tracker*).
 - **Segredos**: nunca commitar (`.env*`) nem reproduzir valores de `.env` em respostas. Os
   dois repos têm `.env` no `.gitignore` e `.env.example` com placeholders — mantenha assim.
   Tudo prefixado `NEXT_PUBLIC_` vai para o bundle do browser e é **público**: chave, string
@@ -99,13 +99,12 @@ O projeto é **`KAN`** em `mp-consultoria.atlassian.net`, board `2`. Site, `clou
 `projectKey`, `boardId` e `mapFile` estão na ficha; o mapa é
 [docs/_meta/jira.KAN.md](docs/_meta/jira.KAN.md).
 
-`jira.enabled` está **`true`** desde 2026-08-27, com os quatro papéis preenchidos a partir
-do `createmeta` real do projeto — `spec` → Epic (`10006`), `feature` → História (`10009`),
-`task` → Subtask (`10007`), `standalone` → Tarefa (`10008`). A régua que autorizou ligar
-continua valendo para toda medição futura: **ligar antes de medir é pior que deixar
-desligado** — o sync é best-effort e não bloqueia o ciclo, então falha incompleta não
-aparece, ela só não acontece. Id de tipo ou de transição que ainda não foi observado neste
-board se mede antes de usar; não se herda de outro projeto nem se deduz da sequência.
+`jira.enabled` é **`true`**, com os quatro papéis medidos no `createmeta` real do projeto —
+`spec` → Epic (`10006`), `feature` → História (`10009`), `task` → Subtask (`10007`),
+`standalone` → Tarefa (`10008`). Id de tipo ou de transição ainda não observado neste board
+se mede antes de usar; não se herda de outro projeto nem se deduz da sequência. O motivo: o
+sync é best-effort e não bloqueia o ciclo, então um id errado não gera erro — a operação
+simplesmente não acontece.
 
 🔴 **Não copie configuração de tracker de outro workspace para cá.** Os valores certos são
 `mp-consultoria.atlassian.net` / `455dadeb-0906-4adf-9500-c9bfb2b979bd` / `KAN`. Ver
@@ -113,9 +112,8 @@ board se mede antes de usar; não se herda de outro projeto nem se deduz da sequ
 do `b2b-workspace` — e o keelson passaria a criar os épicos e histórias deste produto no
 board `NOVA`, de outro produto.
 
-`git.branchNaming` segue em `"slug"` por escolha, não por impedimento: com `jira.enabled:
-true` o self-check do `/keelson:init` já aceitaria `"tracker-key"` — a troca é decisão do
-Diretor, não consequência automática de ter ligado o sync.
+`git.branchNaming` é `"slug"`. O `/keelson:init` aceitaria `"tracker-key"`, mas a troca é
+decisão do Diretor — não a faça por iniciativa própria.
 
 ### Trilho do card — quem move o quê
 
@@ -144,8 +142,9 @@ merge", não "esquecida". Recebido o aviso, o Tech Lead:
 
 O passo 2 não é formalidade. Épico com filho pendente é estado **correto**, não pendência
 a limpar — fechar épico por impressão de que "acabou" é a mesma classe de erro que o teto
-do §9 previne. Caso vivo: **KAN-106** tem a única História (KAN-107) em `41` e segue em
-`21` **de propósito**, porque ainda receberá trabalho (decisão do Diretor, 2026-09-16).
+do §9 previne. O quadro também não distingue épico que "esvaziou" de épico que "vai receber
+mais": com todos os filhos em `41`, confirme a intenção com o Diretor antes de mover
+(histórico dos casos em [docs/_meta/jira.KAN.md](docs/_meta/jira.KAN.md)).
 
 Este trilho é doutrina **deste workspace**, executada pelo Tech Lead via conector MCP: o
 protocolo do plugin não tem verbo de fase pós-merge (só `start-dev` e `finish-dev`), então

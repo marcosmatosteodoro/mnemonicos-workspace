@@ -51,23 +51,20 @@ fixar.
 - Banco de desenvolvimento é o `docker-compose.yml` do repo: `npm run dev` sobe o Postgres
   antes da aplicação; `npm run dev:no-db` sobe só a aplicação.
 
-## Segurança — o que já está no lugar, e o que falta
+## Segurança
 
 No lugar: env validada na inicialização (o processo não sobe sem `DATABASE_URL`/`JWT_SECRET`
 válidos, e o erro cita **nomes**, nunca valores) · CORS deny-by-default por allowlist ·
 `helmet` · rate limit com `trust proxy` ajustado · corpo limitado a 100 kB · log com
-redação (`authorization`, `cookie`, `password`, `token`, `DATABASE_URL`, `JWT_SECRET`).
+redação (`authorization`, `cookie`, `password`, `token`, `DATABASE_URL`, `JWT_SECRET`) ·
+autenticação em `src/modules/auth/` (Argon2 em `src/lib/password.ts`, sessão com rotação e
+revogação) · auditoria de eventos de autenticação sem dado sensível (`recordAuthEvent`, em
+`src/lib/audit.ts`).
 
-**Falta, e é pré-requisito antes de expor dado de usuário:**
-
-- Autenticação — hash **Argon2id** (ou bcrypt), emissão e verificação de JWT, refresh.
-- **Autorização por recurso** — `CardState` e `Review` são dados pessoais. Toda consulta
-  filtra por `userId` **da sessão**, nunca do parâmetro da rota. Deny-by-default: sem
-  sessão, não lê.
-- Auditoria de eventos de autenticação (sucesso, falha, bloqueio) — sem dado sensível.
-
-Enquanto isso não existir, **nenhum endpoint que devolva dado por usuário entra em
-produção**. Se uma TASK pedir isso, o gate de segurança reprova — e está certo.
+**Autorização por recurso** — `CardState` e `Review` são dados pessoais. Toda consulta
+filtra por `userId` **da sessão**, nunca do parâmetro da rota. Deny-by-default: sem
+sessão, não lê. Endpoint que devolva dado por usuário sem esse filtro reprova no gate de
+segurança.
 
 **Consumidores de sessão do `src/modules/auth/auth.service.ts`** (checklist para qualquer
 predicado de negação novo — ex.: `disabledAt`, futura suspensão): `login`,

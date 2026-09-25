@@ -72,8 +72,8 @@ A leitura acontece num ponto só (`src/lib/env.ts`), com default — não espalh
 ## Verificação visual
 
 Mudança de tela fecha com o gate `screenVerify` (skill `keelson:screen-verify`, Playwright
-MCP headless). A aplicação hoje é pública — quando a autenticação entrar, preencha o realm
-em `keelson.local.json` (molde em `keelson.local.example.json`).
+MCP headless). Telas atrás de login usam o realm de `keelson.local.json` (molde em
+`keelson.local.example.json`).
 
 ## Comandos
 
