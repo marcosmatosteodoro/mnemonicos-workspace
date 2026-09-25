@@ -1092,7 +1092,18 @@ sem precedência. Referência: `mnemonicos-backend/src/modules/tira/tira.service
 **Validade:** toda TASK cujo critério de pronto recusa um valor composto (conjunto, faixa,
 combinação de campos validados em conjunto), neste projeto.
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0
+**Contadores:** confirmada 2 · contestada 0
+
+**Reincidência (Wave 4 de PLAN-027, TASK-027-005, gate 7):** o `where` composto de
+`removePegadinhaText`/`savePegadinhaText` (`ACTIVE_RAW_CONTENT_WHERE` + `scopeWhere(actor)`)
+teve o eixo AUTORIA provado nos 2 métodos (2 EDITORES), mas o eixo ATIVO/soft-delete só em
+`savePegadinhaText` — o `qa` pré-código enumerou "savePegadinhaText contra RawContent já
+soft-deleted" citando 1 método, e a prova foi organizada pelo achado citado, não pela matriz
+eixo × método do próprio `where`. `code-reviewer` confirmou por mutação: remover
+`...ACTIVE_RAW_CONTENT_WHERE` de `removePegadinhaText` sobrevive a toda a suíte. Mesma causa
+da 1ª ocorrência (fechamento contável na unidade errada), agora entre EIXOS de uma guarda
+composta em vez de entre métodos que a chamam — reforça que "N condições/eixos declarados
+exigem N provas", nunca herdadas de um achado que só nomeou uma instância.
 
 ## [Testes] Correção acrescentada de carona num retry passa pela MESMA régua do achado original
 
