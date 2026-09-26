@@ -811,7 +811,7 @@ mesma condição antes de despachar/commitar. Exemplar: `src/lib/prisma.ts` impo
 `{ env, isProduction }` de `../config/env` em vez de recalcular.
 **Validade:** geral (qualquer predicado derivado de configuração/env).
 **Estado:** ativa
-**Contadores:** confirmada 5 · contestada 0
+**Contadores:** confirmada 6 · contestada 0
 **Reincidência (2026-09-13, PLAN-023/TASK-023-008, Wave 3)**: o retry que consolidou 3
 fixtures duplicadas de `VisualAssociation` em `tests/support/visual-association-fixtures.ts`
 (achado de gate 7) re-derivou, no MESMO diff, **duas** ocorrências de bloco
@@ -851,6 +851,18 @@ extensão da validade: antes de commitar fixture/helper de teste novo, `git diff
 criados na branch corrente — canônico a reusar não precisa ser antigo, pode ter nascido
 poucos commits atrás na mesma wave. Home correto para o reuso: `tests/support/<domínio>-fixtures.ts`
 (exemplares: `production-events-fixtures.ts`, `visual-association-fixtures.ts`).
+**Reincidência (2026-09-26, PLAN-027/TASK-027-006, Wave 5)**: `seedContrast`/
+`seedFlashcard` nasceram locais em `tests/integration/publication.service.integration.test.ts`
+— MESMOS nomes e forma de `seedContrast`/`seedFlashcard` já locais em
+`tests/integration/contrasts.service.integration.test.ts` e
+`tests/integration/flashcards.service.integration.test.ts`, ambos criados por waves
+ANTERIORES do MESMO PLAN-027 (Waves 2/3). 6ª ocorrência: a varredura de reúso olhou só o
+helper que o developer já sabia existir de memória (`pdf-composer.test.ts`, mesma TASK),
+não os arquivos de teste criados por OUTRAS TASKs da mesma branch — o próprio `git diff
+--name-status --diff-filter=A` prescrito na extensão acima cobre exatamente esse caso,
+mas a checagem não foi rodada contra o slug inteiro da branch, só contra a memória local
+da TASK. Achado pelo `code-reviewer`, fechado em 1 retry (extração para
+`tests/support/material-reforco-fixtures.ts`).
 
 ## [Design] Cor semântica de texto (erro/sucesso/link) vem de token do tema, nunca de literal da paleta
 

@@ -243,6 +243,8 @@ PLAN._
 | TRISK-027-002 | Volume de Contraste/`ProductionFlashcard` sem teto (FR-026-014) amplifica RISK-025-007/RISK-026-005 (limite de corpo de resposta serverless da Vercel) | Decisão de introduzir teto fica com quem fechar RISK-025-007, fora deste PLAN | PLAN-027 §8 |
 | TRISK-027-004 | Guarda de leitura de Contraste/`ProductionFlashcard`/Pegadinha (autoria herdada de `RawContent`, DEC-027-005) diverge da leitura irrestrita de `VisualAssociation` (F5) dentro do mesmo slug | DEC-027-005 documenta a distinção explicitamente; risco de confusão em extensão futura que copie o padrão errado | PLAN-027 §6, §8 |
 | TRISK-027-005 | Merge de 2 `PDFDocument`s (principal + suplementar) via `copyPages` pode tensionar NFR-026-003 (teto de duração já existente da Exportação) em Tiras grandes | Medir com teste de performance na implementação (gate 10), mesma régua de DEC-025-002 | PLAN-027 §8 |
+| TRISK-027-006 | `code-reviewer` (gate 1-7, Wave 5 de PLAN-027) achou que a Exportação passou a DESENHAR o texto de Contraste/Flashcard/Pegadinha (TASK-027-006) — a fonte `StandardFonts.Helvetica`/WinAnsi (cp1252) usada por `pdf-composer.ts` não codifica caracteres fora dela (ex.: `→` U+2192, `≠` U+2260, confirmado por execução: `page.drawText` lança). Os 3 schemas de escrita (Contraste/Flashcard/Pegadinha, TASK-027-003/004/005, já Done) aceitam QUALQUER string sem restrição de charset — um único registro com esse caractere derruba a Exportação inteira nas 2 Variantes, sem que nada tenha impedido a gravação. TRISK-025-007 (mesma limitação, já aceita para conteúdo pré-existente) não foi estendido pelo PLAN-027 a estes 3 campos novos | **Decisão de produto do Diretor, não corrigível dentro do escopo de PLAN-027 fechado**: validar/sanear o charset no schema de escrita (TASK futura) e/ou trocar a fonte por uma com cobertura Unicode ampla, e/ou aceitar o risco declarado até a Exportação virar caminho quente para EDITORES que digitam esses caracteres | code-reviewer, gate 1-7 Wave 5 de PLAN-027 |
+| TRISK-027-007 | `code-reviewer`/`security-engineer` (Wave 5): DEC-027-005 (leitura DIRETA de Contraste/Flashcard/Pegadinha restrita ao autor-ou-ADMIN, decisão explícita de não abrir "porta lateral") diverge de COMP-027-018/DEC-025-007 (a Exportação lê os mesmos 3 registros SEM `scopeWhere`, para qualquer EDITOR/ADMIN que exporte o Conteúdo) — um EDITOR B que exporta o Conteúdo de A recebe, dentro do PDF, os Contrastes/Flashcards/Pegadinha que A escreveu e que B não alcançaria pela rota direta. Ambas as decisões estão documentadas e a leitura sem escopo é o que a TASK prescreveu (SPEC A-026-009: "qualquer um vê, independente de quem criou") — não é bug, é divergência de alcance entre 2 DECs do mesmo PLAN, nunca confrontada explicitamente | Confirmar com o Diretor se esse é o alcance pretendido (exportação como "visão agregada" que ultrapassa a autoria) ou se DEC-027-005 deveria valer também para a Exportação | code-reviewer + security-engineer, Wave 5 de PLAN-027 |
 
 ## Histórico recente
 
@@ -263,6 +265,14 @@ PLAN._
   rodar `/keelson:jira-sync producao-material`. Pendência não-bloqueante (gate 8):
   `store/api.ts` monta paths sem `encodeURIComponent` (~30 ocorrências pré-existentes) — só
   vira risco quando um componente montar com id vindo de `params` da URL.
+- 2026-09-16: **KAN-106 (Epic F6, Pipeline de publicação — PDF) fechado no Jira**
+  (transição `41`, Concluído), a pedido direto do Diretor — reverte, no mesmo dia, a
+  decisão registrada mais cedo de mantê-lo aberto porque "ainda receberia trabalho".
+  RISK-025-007 (Tira grande pode exceder o limite de corpo de resposta da Vercel,
+  recomendado resolver antes do deploy em produção) e RISK-024-001 (comparação A/B das
+  Variantes pendente de julgamento do Diretor) seguem **abertos como risco no INDEX**,
+  sem card Jira associado — se algum virar trabalho, nasce em brief/SPEC novo, não
+  reabre KAN-106.
 - 2026-09-16: **Wave 3 de PLAN-027 concluída** (TASK-027-004, CRUD completo de Flashcard —
   commits `4a27fb4`/`a0a892b`/`adce2b3`/`dcaea3b` backend, `dcd5881`/`c0fdfd4`/`5799394`
   frontend). Gate 8 (security) e gate 10 (performance) aprovados 1ª rodada sem achados —
