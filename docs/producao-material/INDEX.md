@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-26T13:35:00-0300 (PLAN-027/F7 completo, 8/8 TASKs Done, PRs abertos — backend #8/frontend #14 — aguardando revisão, merge e deploy humanos)
+**Última atualização**: 2026-09-26T14:05:00-0300 (PLAN-027/F7 mergeada — backend #8/frontend #14 em `main` — Jira fechado até o Épico KAN-121; deploy em produção e promoção do `Status` do PLAN a `Done` seguem pendentes de ato do Diretor)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -39,10 +39,10 @@ _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-
 (BRIEF-022/SPEC-022/PLAN-023, 17/17 TASKs Done, 6 waves, DoD satisfeito, PR #6 backend
 `e316ab6`/PR #12 frontend `677b836`). F6 entregue e mergeada em `main` 2026-09-15
 (BRIEF-024/SPEC-024/PLAN-025, 14/14 TASKs Done, PR #7 backend `5d6b4df`/PR #13 frontend
-`b54b6ef`). **F7 implementada, 8/8 TASKs Done 2026-09-26** (BRIEF-026/SPEC-026/PLAN-027,
-7 waves — Wave 6 e 7 fecharam furos achados nas 2 passadas da convergência de fecho da
-Entrega) — **ainda não mergeada**: branch `feat/producao-material-mnemora-studio` pronta
-para Etapa 4 (DoD)/Entrega (PR)._
+`b54b6ef`). **F7 entregue e mergeada 2026-09-26** (BRIEF-026/SPEC-026/PLAN-027, 8/8 TASKs
+Done, 7 waves — Wave 6 e 7 fecharam furos achados nas 2 passadas da convergência de fecho
+da Entrega — PR #8 backend `9b87acc`/PR #14 frontend `2ceaa6f`). Jira: Épico KAN-121
+fechado._
 
 ## SPECs
 
@@ -307,6 +307,15 @@ para Etapa 4 (DoD)/Entrega (PR)._
   confirmada 4×). Ajuste de ambiente local declarado pelo qa: `mnemonicos-backend/.env`
   (não commitado) ganhou `CORS_ORIGINS` com porta alternativa e credenciais de seed
   dev-only, para viabilizar o login real na verificação.
+- 2026-09-26: **PRs de PLAN-027 mergeados pelo Diretor** — backend
+  [#8](https://github.com/marcosmatosteodoro/mnemonicos-backend/pull/8) (`9b87acc`),
+  frontend [#14](https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/14)
+  (`2ceaa6f`), ambos em `main`. Trilho pós-merge (CLAUDE.md) executado: 6 Histórias
+  (KAN-122/123/124/125/126/129) movidas para Concluído; filhos do Épico **KAN-121**
+  consultados por JQL (`parent = KAN-121`, nunca por memória) — 7/7 Concluído; Diretor
+  confirmou que F7 não recebe mais filho e o Épico foi movido para Concluído também.
+  Pendente: promoção do front-matter `Status` de PLAN-027 para `Done` (decisão do
+  Diretor, ainda não pedida explicitamente).
 - 2026-09-26: **PRs abertos para PLAN-027** — backend
   [#8](https://github.com/marcosmatosteodoro/mnemonicos-backend/pull/8) (`d30a705`),
   frontend [#14](https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/14)
