@@ -49,7 +49,7 @@ fora do MVP).
 | 4 | Tira mnemônica como sequência de quadros | producao-material | entregue (BRIEF-011 · SPEC-011 · PLAN-012 Done 13/13; PR #5 backend `9063f9e`/PR #9 frontend `179e7f5` mergeados em `main`; DoD (Etapa 4) + Entrega ACEITA_COM_RESSALVAS 2026-09-07, ressalva R-1 do PO aplicada) |
 | 5 | Biblioteca visual reutilizável | producao-material | entregue e mergeada (BRIEF-022 · SPEC-022 · PLAN-023 Done 17/17; PR #6 backend `e316ab6`/PR #12 frontend `677b836` mergeados em `main` 2026-09-14) |
 | 6 | Pipeline de publicação — PDF (rascunho) | producao-material | **entregue e mergeada** (BRIEF-024 · SPEC-024 · PLAN-025 Done 17/17; PR #7 backend (`5d6b4df`) e PR #13 frontend (`b54b6ef`) mergeados em `main` 2026-09-15; gate 9 VERIFICADO de verdade em ambiente real; **RISK-025-007 ainda aberto** — risco real de produção não resolvido: Tira grande com imagens pode exceder o limite de corpo de resposta de function serverless da Vercel; recomendado resolver antes do deploy em produção, decisão do Diretor) |
-| 7 | Contrastes, pegadinhas, flashcards e protocolos impressos | producao-material | em ciclo (BRIEF-026.md) |
+| 7 | Contrastes, pegadinhas, flashcards e protocolos impressos | producao-material | **entregue e mergeada** (BRIEF-026 · SPEC-026 · PLAN-027 Done 8/8 — 6 previstas + 2 furos achados na convergência de fecho; PR #8 backend `9b87acc`/PR #14 frontend `2ceaa6f` mergeados em `main` 2026-09-26; gate 9 VERIFICADO em browser real, login EDITOR seed dev; 6 Histórias KAN-122/123/124/125/126/129 e Épico KAN-121 fechados no Jira pelo Diretor, 7/7 filhos confirmados por JQL; RISK-027-010/011 e TRISK-027-006/007 seguem abertos, não-bloqueantes — ver INDEX) |
 | 8 | Versionamento editorial e fechamento legislativo | producao-material | pendente |
 | 9 | Controle de qualidade e gate de versão aprovada | producao-material | pendente |
 | 10 | Painel estratégico e tempo por página | producao-material | pendente |
@@ -224,3 +224,16 @@ fora do MVP).
   (AskUserQuestion), F7 depende só de F2/F6, ambas entregues, sem dependência
   mútua com F8. Sync de largada dos dois repos de código com `main` (backend
   fast-forward `5d6b4df`; frontend fast-forward `b54b6ef`).
+- 2026-09-26: `/keelson:continue` — correção declarada da fila (princípio 2): F7 estava
+  como `em ciclo (BRIEF-026.md)` mas os artefatos filhos mostram **entregue e mergeada**
+  — PLAN-027 Done 8/8 TASKs (6 previstas + TASK-027-007/008, 2 furos achados na
+  convergência de fecho de `/keelson:integrate`), PR #8 backend (`9b87acc`) e PR #14
+  frontend (`2ceaa6f`) mergeados em `main`, gate 9 VERIFICADO em browser real. Trilho
+  pós-merge (CLAUDE.md) já executado pelo Diretor: 6 Histórias (KAN-122/123/124/125/126/
+  129) movidas para Concluído, filhos do Épico KAN-121 consultados por JQL (7/7
+  Concluído) e o Épico movido para Concluído também. Pendências não-bloqueantes
+  herdadas, sem fatia própria: RISK-027-010 (hidratação única de `content-form.tsx`,
+  território F2), RISK-027-011 (`npm audit` do backend — `mysql2`/`qs`, pré-existente em
+  `main`), TRISK-027-006/007 (charset fora de WinAnsi na Exportação; divergência de
+  alcance DEC-027-005 × COMP-027-018) — decisão do Diretor, fora do escopo de PLAN-027
+  fechado. Próxima elegível: F8 (depende de F2, F6 — ambas entregues e mergeadas).
