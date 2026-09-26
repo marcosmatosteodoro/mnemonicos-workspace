@@ -97,7 +97,7 @@ quando o titular está inalcançável/removido.
 **Data início**: 2026-09-26
 **Data conclusão**: 2026-09-26
 **Commit SHA**: 1cc4c5d (implementação) · 3280af7 (retry consolidado gates 1-7+11) · 3b91a8b (correção mecânica de prova, gate 1-7)
-**Jira**: —
+**Jira**: KAN-134
 
 **Quality gates**:
 - [x] Implementação completa

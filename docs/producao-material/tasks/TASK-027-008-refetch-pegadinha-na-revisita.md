@@ -86,7 +86,7 @@ aceito (achado de severidade baixa, mas é MUST literal do FR e a correção é 
 **Data início**: 2026-09-26
 **Data conclusão**: 2026-09-26
 **Commit SHA**: eabdf7b (implementação, local revisto no retry) · 94d1c88 (retry consolidado gate 1-7+10)
-**Jira**: —
+**Jira**: KAN-135
 
 **Quality gates**:
 - [x] Implementação completa

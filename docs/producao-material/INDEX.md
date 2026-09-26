@@ -257,6 +257,23 @@ para Etapa 4 (DoD)/Entrega (PR)._
 
 ## Histórico recente
 
+- 2026-09-26: **Reconciliação Jira + `--phase finish-dev` (`/keelson:jira-sync
+  producao-material --phase finish-dev`).** Sub-tasks criadas para os 2 furos de PLAN-027
+  achados após a reconciliação anterior: KAN-134 (TASK-027-007, sub-task de KAN-122/
+  FEAT-026-001 — primária, links "relates to" com KAN-123/FEAT-026-002 e KAN-124/
+  FEAT-026-003) e KAN-135 (TASK-027-008, sub-task de KAN-123/FEAT-026-002), ambas nascidas
+  já em Concluído (TASKs Done na origem). Verbo `finish-dev` aplicado de baixo para cima:
+  as 4 Histórias em "Em andamento" (KAN-122/123/124/126) avançaram para "Em análise" — ato
+  explícito do humano, ultrapassando o teto dos ganchos automáticos (§9/§13). KAN-125
+  (FEAT-026-004) e KAN-129 (FEAT-026-006) **seguem em "Tarefas pendentes", não movidas**:
+  nenhuma TASK do slug as lista como Funcionalidade (primária ou secundária) — cobertura
+  existe só via link "relates to" de TASKs concluídas (KAN-133→KAN-125, KAN-130→KAN-129),
+  nunca como sub-task filha; sem filho algum, não há sinal de estado real das TASKs para
+  alinhar a Story, e mover por impressão seria chute (mesma anomalia já registrada acima,
+  2ª sessão sem correção — decisão de produto/organização das FEATs é do Diretor, não do
+  sync). Epic KAN-121 intocado (nenhuma linha `epic` para `finish-dev` no mapa — doutrina
+  confirmada). Estado final da árvore: Epic `Tarefas pendentes` · 4 Histórias `Em análise`
+  · 2 Histórias `Tarefas pendentes` (sem sinal) · 8/8 sub-tasks `Concluído`.
 - 2026-09-26: **Reconciliação Jira (`/keelson:jira-sync producao-material`) — conector
   disponível no cloudId correto (`455dadeb-…`, `mp-consultoria`) nesta passada, ao
   contrário das Waves 4/5 (grant só cobria `autoavaliar.atlassian.net`).** Sub-task de
