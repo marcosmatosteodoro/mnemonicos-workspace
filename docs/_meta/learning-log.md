@@ -527,3 +527,70 @@ com verificação de tela; misturar as duas semânticas no mesmo enum viola um-d
 handoff estruturalmente infechável pelo protocolo que o declara
 reincidencia: 0
 estado: ativa
+
+## LRN-033: catálogo "resistir a contorno" de `commands/tasks.md` não exige rota/página quando o COMP de uma FR-que-nomeia-tela já existe e foi "verificado" isolado — gate 9 aceitou componente inalcançável como VERIFICADO
+data: 2026-09-26
+gatilho: gate_reprovado
+origem: PLAN-027 (slug producao-material), convergência de fecho (passada final, não os gates
+por wave) — o `code-reviewer` achou que FR-026-005/011/017 ("exibir na tela do Conteúdo bruto"/
+listas) foram realizados só por COMPs de componente isolado (`ContrastList`/`FlashcardList`/
+`PegadinhaField`); nenhum COMP ou TASK do PLAN criou/alterou a página que os hospeda. O ciclo
+chegou ao fecho com 6/6 TASKs Done e 6 FEATs "VERIFICADAS" no gate 9 — cada gate 9 da wave provou
+o componente MONTADO ISOLADAMENTE (`makeStore()` + fetch mockado ou HTTP real), prova válida do
+componente em si, mas não de que o usuário o alcança. Distinto de LRN-032 (mesmo PLAN, achado
+Wave 4 pelo `qa`): lá o furo era FR **sem COMP nenhum** no PLAN — não mecanizável em geral,
+porque FR sem COMP pode ser fasing legítimo entre PLANs do mesmo SPEC (LRN-032, causa
+`especificacao`, sem patch, roteado ao PO). Aqui o COMP **existe**, foi implementado E aceito
+`VERIFICADO` pelo gate 9 nesta mesma fatia — não há ambiguidade de fasing a proteger, e por isso
+é mecanizável sem o risco de falso-positivo que LRN-032 apontou
+causa_raiz: instrucao_ausente — `scripts/graph.sh --check` prova só cobertura textual
+FR→COMP→TASK; nenhum check nem instrução de geração confere se o COMP tem consumidor real
+(rota/página que o monta). O catálogo "resistir a contorno" (Etapa 3, `commands/tasks.md`, itens
+a-h) não nomeia a classe "FR nomeia uma superfície de tela, o COMP que a realiza precisa de um
+Escopo>Inclui tocando o arquivo de rota/página" — e a seção "Roteiro do gate 9" do mesmo comando
+não proíbe fixar um roteiro cujo alvo é o componente isolado quando o FR promete alcance por tela
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`commands/tasks.md`, catálogo "resistir a contorno" (Etapa 3, mesmo parágrafo dos itens a-h)
+patch: proposta de item novo (letra a atribuir pelo mantenedor — já há disputa por (i)/(j) com
+LRN-012/LRN-015/LRN-030): FR cujo texto nomeia explicitamente uma superfície de tela ("exibir na
+tela X", "na lista Y") exige, no Escopo > Inclui da TASK que fixa o Critério de pronto do COMP
+correspondente, também o arquivo de rota/página (ou layout — equivalente do perfil ativo) que o
+monta — nunca só o componente isolado; ausência desse arquivo no Inclui exige nota explícita
+"sem tela nesta fatia (motivo/fase)", nunca lacuna implícita. Componente aceito no gate 9
+(comportamento verificado) sem esse consumidor documentado é NÃO VERIFICÁVEL, nunca VERIFICADO —
+mesma régua de "condição, nunca instância" já aplicada aos itens acima. Saldo líquido ~+7 linhas
+reincidencia: 0
+estado: ativa
+
+## LRN-034: `commands/implement.md` §3.5 "Fora de escopo" estaciona pendência no INDEX sem forçar decisão do Diretor mesmo na Nª reincidência da MESMA causa
+data: 2026-09-26
+gatilho: gate_reprovado
+origem: PLAN-027 (slug producao-material) — a mesma lacuna de LRN-033 ("sem tela hospedeira")
+foi registrada no INDEX desde a Wave 3 (2026-09-16: "ContrastList/FlashcardList ainda não
+montados em nenhuma página... item para a convergência de fecho ou próxima fatia"), reaparecida
+na Wave 4 como achado do `qa` (LRN-032, roteada ao PO como furo de especificação) e de novo na
+convergência de fecho (LRN-033) — 3 postergações da MESMA causa (Wave 3, Wave 4, "próxima
+fatia") sem que nenhuma virasse decisão explícita do Diretor nem gate bloqueante, até o ciclo
+chegar ao fecho com FEATs marcadas "VERIFICADAS" sobre o furo ainda aberto
+causa_raiz: instrucao_ausente — o mecanismo de §3.5 "Fora de escopo" (`commands/implement.md`) —
+achado real fora da task registra 1 linha no Histórico do INDEX e "estaciona", deságuando na
+Entrega ou em `/keelson:triage` — está funcionando como desenhado, mas o desenho não distingue
+"1ª menção" (estacionar é a resposta certa: dá tempo de decidir) de "2ª+ menção da MESMA causa"
+(estacionar de novo é a MESMA decisão não tomada, disfarçada de rotina); nada no comando confere
+o Histórico do INDEX por reincidência do mesmo tema antes de estacionar de novo — cada wave trata
+a pendência como se fosse a primeira vez, e o furo sobrevive rounds inteiros de gate 9 "verificando"
+o sintoma sem nunca ser escalado. Autoria própria: eu (Tech Lead, via LRN-032) já tinha roteado
+este mesmo furo ao PO na Wave 4 — mas rotear para "decisão do PO" sem um mecanismo que force essa
+decisão a acontecer antes da próxima wave é a mesma classe de estacionamento silencioso, só que
+com um passo a mais; a régua de LRN-032 (routing correto) não bastou porque nada verificava se o
+routing tinha sido de fato resolvido
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`commands/implement.md`, §3.5, parágrafo "Fora de escopo (sinal Reviewer/QA → Tech Lead)"
+patch: proposta de extensão in-line, ao final do parágrafo: pendência que reaparece pela 2ª vez
+no Histórico do INDEX pela MESMA causa (mesmo FR/tema, achado por wave/gate diferente) não
+estaciona de novo — a main session escala ao Diretor antes de seguir (pergunta explícita com as
+alternativas: amendar o PLAN com wave/COMP novo, descopar com nota, aceitar risco registrado),
+nunca uma 3ª linha silenciosa com o mesmo destino "próxima fatia"/"convergência de fecho". Saldo
+líquido ~+4 linhas
+reincidencia: 0
+estado: ativa
