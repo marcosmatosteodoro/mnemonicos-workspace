@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -315,17 +315,17 @@ prévios do par), violando a DEC.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-26T17:01:03-0300
+**Data conclusão**: 2026-09-26T17:59:06-0300
+**Commit SHA**: d2d5a66
 **Jira**: KAN-139
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — 1 retry (3 achados bloqueantes de prova, mutation testing real)
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer, Wave 2
+- [x] Comportamento (gate 9): consolidado (FEAT-028-001) — completa quando TASK-029-004 (Wave 3) fechar

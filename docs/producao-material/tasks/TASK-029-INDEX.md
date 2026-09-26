@@ -9,8 +9,8 @@
 - [x] TASK-029-001 ✅ Done
 
 ### Wave 2 (depende de Wave 1 — as 2 TASKs abaixo NÃO dependem uma da outra, paralelizáveis)
-- [ ] TASK-029-002 ⏸ Todo
-- [ ] TASK-029-003 ⏸ Todo
+- [x] TASK-029-002 ✅ Done
+- [x] TASK-029-003 ✅ Done
 
 ### Wave 3 (depende de TASK-029-002 E TASK-029-003 — o roteiro do gate 9 exporta o PDF e
 confere o carimbo, exigindo as duas prontas; ajuste desta TASK-index à sugestão inicial de

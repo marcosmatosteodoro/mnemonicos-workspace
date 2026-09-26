@@ -2054,3 +2054,37 @@ Query com guard de execução única, neste frontend — `content-form.tsx`,
 `rule-breakdown-form.tsx` citados como candidatos a conferir se replicarem o padrão).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Espião de ausência (`not.toHaveBeenCalled`) num client Prisma que não é o mesmo objeto recebido pelo código sob teste nunca falsifica
+
+**Erro:** o teste de `production-events.service.ts` que prova "informar `transitionType`
+pula inteiramente `decideStageTransition`/`findMany`" (TASK-029-002, Wave 2 de PLAN-029)
+espionava `testPrisma.productionStageEvent` (o client Prisma raiz), mas
+`recordProductionStageEvent` recebe o `tx` de dentro de `db.$transaction(...)` — no Prisma
+7, o client de uma transação interativa tem delegates de modelo PRÓPRIOS, distintos do
+client raiz. O spy no objeto errado nunca observa a chamada real. Achado pelo
+`code-reviewer` por mutação: remover o `if` que pula o `findMany` (fazendo-o rodar sempre,
+violando a regra que o teste deveria proteger) deixava o teste VERDE do mesmo jeito.
+**Causa:** `jest.spyOn`/`not.toHaveBeenCalled()` só prova alguma coisa quando o objeto
+espionado é literalmente o mesmo que o código sob teste invoca. Client de transação
+interativa (Prisma `$transaction` com callback) e client raiz são objetos DISTINTOS, mesmo
+apontando para a mesma conexão/schema — espionar um não alcança chamadas feitas através do
+outro. Uma asserção de AUSÊNCIA sobre um espião "cego" passa sempre, qualquer que seja o
+código real (ela não pode falhar, então não prova nada).
+**Solução:** antes de escrever `not.toHaveBeenCalled()` sobre um método de model do Prisma,
+confirme que o objeto espionado é o MESMO client que a função sob teste de fato recebe —
+se ela recebe `tx` (de dentro de um `$transaction` interativo), espione o delegate do
+`tx` dentro do callback, injete um client dublê (`{ model: { findMany: jest.fn(), ... } }`)
+no lugar do `db`/`tx`, ou conte statements reais via sonda de round-trips
+(`tests/support/query-probe.ts`, `withQueryProbe`) — nunca o client raiz quando o código
+usa transação. Toda asserção de ausência ganha um controle POSITIVO no mesmo arranjo (o
+ramo que DEVERIA disparar a chamada faz o mesmo observador registrar ≥1 ocorrência) — sem
+o positivo, não há prova de que o observador de fato enxerga alguma coisa. Rodar o mutante
+("a chamada proibida acontece sempre") antes de declarar o critério coberto — exemplar
+válido do padrão OPOSTO (spy no client raiz é correto): `publication.service.integration.
+test.ts:640`, onde o código sob teste chama o `db` raiz diretamente, não um `tx`.
+**Validade:** geral (qualquer asserção de ausência sobre chamada de método/model do Prisma
+neste backend, sempre que o código sob teste possa estar operando dentro de
+`$transaction`).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
