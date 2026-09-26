@@ -261,6 +261,7 @@ Variante do PDF, Rascunho (PDF), Exportação, Remoção reversível (Conteúdo 
 ### FEAT-026-005: Confirmação e tratamento de falha na remoção de registros desta fatia
 
 **Jira**: KAN-126
+**Verificação (gate 9)**: 2026-09-26 — qa (fecho da Wave 4 de PLAN-027): AC-026-018/019 verificados para Contraste, Flashcard e Pegadinha via componentes montados com store real e rede interceptada (confirmação, andamento, sucesso, falha, foco gerenciado) e via rotas DELETE/PATCH reais contra Postgres (204, rollback com 500 genérico). Verificação em browser não aplicável nesta fatia: nenhum dos 3 componentes tem tela hospedeira — lacuna de escopo (FR-026-011/017 sem COMP de tela no PLAN-027), não indisponibilidade de ambiente; roteiro de tela guardado para quando a tela existir.
 
 > O EDITOR aciona remover um Contraste, uma Pegadinha elaborada ou um Flashcard, o
 > sistema pede confirmação antes de executar (ato destrutivo) e trata falha sem
@@ -279,6 +280,7 @@ Variante do PDF, Rascunho (PDF), Exportação, Remoção reversível (Conteúdo 
 ### FEAT-026-006: Instrumentação de etapa de produção para Contraste, Pegadinha elaborada e Flashcard
 
 **Jira**: KAN-129
+**Verificação (gate 9)**: 2026-09-26 — qa (fecho da Wave 4 de PLAN-027): VERIFICADO via HTTP real + leitura direta de `production_stage_events` — 1ª mutação de Contraste, Flashcard e Pegadinha grava exatamente 1 evento `MATERIAL_REFORCO`; falha forçada na emissão reverte a mutação inteira (12 casos de service + 7 de rota, 500 genérico).
 
 > A autoria de um Contraste, de uma Pegadinha elaborada ou de um Flashcard emite um
 > evento de etapa de produção (mecanismo já existente desde F3) — testável ponta a
