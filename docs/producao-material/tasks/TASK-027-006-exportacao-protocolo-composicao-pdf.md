@@ -8,7 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -176,17 +176,17 @@ memo de exploração (`exploration-producao-material.md`, seção "Reconheciment
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-26T00:06:54-0300
+**Data conclusão**: 2026-09-26T10:09:38-0300
+**Commit SHA**: 4dc5c91 (backend, retry 976736b/d30a705)
 **Jira**:
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (479/479 integração, 369/369 unit)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 5, rodada 2 — 4 bloqueantes na rodada 1, corrigidos com prova por mutação)
+- [x] ACs verificados — AC-026-012, 013, 014, 017, 020, 021, 022
+- [x] Segurança (gate 8): aprovado (wave 5) — sem achados; leitura sem scopeWhere é intencional (DEC-025-007), divergência com DEC-027-005 registrada em TRISK-027-007 para decisão do Diretor
+- [x] Comportamento (gate 9): consolidado FEAT-026-001, FEAT-026-002, FEAT-026-003, FEAT-026-004 (verificado via HTTP+Postgres real+PDF gerado, 2 Variantes)
