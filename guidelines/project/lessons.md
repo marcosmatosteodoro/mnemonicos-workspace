@@ -1972,3 +1972,85 @@ matar antes de considerar a troca de nome concluída.
 toque uma asserção `queryBy`/`getAllBy` de ausência ou contagem, neste frontend).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Performance] `refetchOnMountOrArgChange` num subscriber SECUNDÁRIO da mesma chave de cache gera GET redundante em série na carga fria, não só na revisita
+
+**Erro:** `content-supplementary-panel.tsx` (TASK-027-008, Wave 7 de PLAN-027) ganhou
+`refetchOnMountOrArgChange: true` em `useGetRawContentQuery` para cumprir FR-026-011
+("recarregada a cada visita"). O painel é subscriber SECUNDÁRIO da mesma cache entry que
+`ContentForm` já lê — e só monta DEPOIS que o 1º GET do `ContentForm` já voltou com
+sucesso (slot renderizado no ramo de sucesso, depois dos early returns de loading/erro).
+Nesse instante a entrada de cache já está `fulfilled`, e a opção força um 2º GET real —
+medido: carga fria = 2 GETs (era 1), revisita = 1. O RTK Query só dedupa requests
+CONCORRENTES/`pending`; um forçado contra entrada já resolvida não é deduplicado.
+**Causa:** o RTK Query decide o refetch POR SUBSCRIBER, no momento em que ele monta — não
+por cache key. Um subscriber que monta depois do primeiro já ter terminado sempre refaz o
+fetch quando a opção está ligada, mesmo que o dado já esteja fresco o bastante.
+**Solução:** para garantir dado novo a cada visita sem GET redundante, a opção vai no
+subscriber que MONTA PRIMEIRO e controla o render daquela tela (aqui, `ContentForm` —
+sempre monta antes do painel, que só existe no ramo de sucesso dele) — nunca num
+subscriber secundário/filho da mesma chave. Medir sempre os 2 números (GETs na carga fria
+E na revisita) antes de aprovar, nunca só a revisita — um teste que só prova "refetch ao
+remontar" pode passar mesmo com duplicação na carga fria, que é o custo real. Exemplar:
+`content-form.tsx:129` (opção) / `content-supplementary-panel.tsx` (sem opção, se
+beneficia do refetch do pai).
+**Validade:** geral (qualquer opção de refetch/invalidação ligada num subscriber que não é
+o primeiro a montar sobre a mesma chave de cache RTK Query, neste frontend).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Prova de "refetch ao remontar" que cria um store NOVO a cada montagem nunca exercita cache quente — mutante que remove a opção sobrevive
+
+**Erro:** os testes de revisita de `AC-026-001`/`AC-026-008` (FR-026-005/017,
+"recarregada a cada visita") em `contrast-list.test.tsx`/`flashcard-list.test.tsx` (Waves
+2/3 de PLAN-027, já Done) chamam um helper `mount()` que cria `makeStore()` novo a cada
+invocação. Achado ao verificar TASK-027-008 (Wave 7): o mutante que remove
+`refetchOnMountOrArgChange` de `contrast-list.tsx:81`/`flashcard-list.tsx:85` NÃO derruba
+nenhum teste — 21/21 continuam verdes.
+**Causa:** com um store novo por montagem, o cache está sempre FRIO — qualquer montagem
+dispara o 1º fetch, com ou sem a opção de refetch. O helper `mount()` foi herdado de
+testes de estado único, onde isolar o store por montagem é o padrão certo; reaplicado a um
+teste de REVISITA (que por definição depende de cache já preenchido), ele apaga
+justamente a condição que o comportamento testado precisa.
+**Solução:** a prova de qualquer comportamento que dependa de cache já preenchido
+(refetch ao remontar, invalidação, etc.) monta 2 VEZES no MESMO store, dentro do mesmo
+teste — nunca um `mount()` que recria o store a cada chamada — com contagem exata de
+requests antes/depois da 2ª montagem. Quando o subscriber que força o refetch não é o
+próprio componente sob teste (ver lição de Performance acima), a prova monta a
+COMPOSIÇÃO real (a página, não o componente isolado). Molde:
+`content-supplementary-panel.test.tsx` (monta `ContentDetailPage`, mesmo store, 2
+montagens, contagem exata). Rodar o mutante "remover a opção" antes de declarar o AC
+coberto.
+**Validade:** geral (qualquer teste de comportamento condicionado a cache RTK Query já
+preenchido, neste frontend).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Código] `refetchOnMountOrArgChange` não garante dado fresco em componente com hidratação ÚNICA de estado local a partir do cache
+
+**Erro:** o docblock novo de `content-form.tsx` (TASK-027-008, retry) sugeria que a opção
+de refetch faria o EDITOR "ver os dados em cache" atualizados na revisita — mas os campos
+do próprio `ContentForm` (`rawText`, `topicId`, `radarClass`, `source*`) hidratam o estado
+local a partir do cache UMA VEZ (guard `hydrated`, `content-form.tsx:145-155`) no 1º
+render da revisita, quando `isLoading` já é `false` porque há dado em cache — o refetch
+forçado chega DEPOIS e é descartado pelo guard. Confirmado por sonda: servir `rawText` V2
+na 2ª resposta, os campos do form continuam mostrando V1. A opção deixa o
+`ContentSupplementaryPanel`/`PegadinhaField` frescos (eles reagem à PROP, não hidratam
+estado local uma vez), mas não os campos do próprio `ContentForm`.
+**Causa:** `refetchOnMountOrArgChange` garante que o REQUEST saia de novo — não que todo
+CONSUMIDOR do resultado adote o valor novo. Um componente que copia `data` para estado
+local uma única vez (hidratação com guard) ignora qualquer atualização posterior da mesma
+query, refetch incluído.
+**Solução:** antes de documentar `refetchOnMountOrArgChange` como garantia de frescor de
+um componente específico, verificar COMO ele consome o resultado: se hidrata estado local
+com guard "uma vez", a opção não o alcança — para valer, a hidratação precisa esperar o
+refetch (gate em `isFetching`/`fulfilledTimeStamp` no próprio mount) ou o campo precisa ler
+direto da query (como `PegadinhaField` já faz). Nunca documentar a opção como garantia de
+frescor de um componente sem um teste de revisita que sirva um valor NOVO e afirme que
+ESSE componente específico o exibe (não outro componente irmão que só se beneficia por
+composição).
+**Validade:** geral (qualquer componente que hidrata estado local a partir de uma query RTK
+Query com guard de execução única, neste frontend — `content-form.tsx`,
+`rule-breakdown-form.tsx` citados como candidatos a conferir se replicarem o padrão).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

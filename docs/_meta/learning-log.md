@@ -594,3 +594,43 @@ nunca uma 3ª linha silenciosa com o mesmo destino "próxima fatia"/"convergênc
 líquido ~+4 linhas
 reincidencia: 0
 estado: ativa
+
+## LRN-035: `commands/plan.md` (Etapa 4, item 5 — Mapeamento FR→componente) nomeia mecanismo de
+qualidade transversal repetida em FRs irmãos POR COMP, não por LEITURA — sujeito irmão sem COMP
+de lista próprio (leitura herdada de outro titular) fica sem o mecanismo em todas as waves
+data: 2026-09-26
+gatilho: gate_reprovado
+origem: PLAN-027 (slug producao-material), convergência de fecho (2ª passada, reconfirmação
+pós-Wave 6 — mesma rodada de LRN-032/033/034) — o `code-reviewer` achou que o NFR "recarregada a
+cada visita", repetido em FR-026-005/011/017, ganhou mecanismo (`refetchOnMountOrArgChange`) só
+para os 2 sujeitos com COMP de lista próprio (Contraste via `contrast-list.tsx`, Flashcard via
+`flashcard-list.tsx` — ambos nomeados em COMP-027-005/014); o 3º sujeito (Pegadinha elaborada,
+lido via `useGetRawContentQuery` herdado de `RawContent`, sem COMP de lista próprio) ficou sem o
+mecanismo em TODAS as 6 waves e na 1ª passada de convergência de fecho — só achado na 2ª passada.
+Distinto de LRN-033 (mesmo PLAN): lá o COMP existia e faltava rota/página que o alcançasse (causa
+de reachability); aqui o COMP de lista nem existe para o 3º sujeito — a leitura é herdada — e o
+gap é de freshness (refetch), não de alcance. Mesma classe de raiz que LRN-030/033: FR
+multi-sujeito com qualidade transversal mecanizada só para o subconjunto que tem um certo tipo de
+artefato (COMP de lista), sujeito que se realiza por mecanismo heterogêneo (leitura herdada de
+outro titular) escapa por não caber na enumeração usada
+causa_raiz: instrucao_ausente — a Etapa 4 item 5 de `commands/plan.md` (decisão 4.409) já obriga
+"Mapeamento FR → componente é derivado": cada COMP declara `**Realiza**:`, única fonte da aresta —
+mas a derivação é POR COMP, e nada instrui o `scribe` a, quando a MESMA frase de qualidade
+transversal da SPEC se repete em FRs irmãos, enumerar toda LEITURA (query/hook) que alimenta a
+exibição de cada sujeito antes de nomear o mecanismo — sujeito cuja leitura é herdada de outro
+titular (sem COMP de lista próprio) não aparece na enumeração por COMP e o mecanismo nunca é
+declarado para ele, nem como presente nem como exceção nomeada. É o ponto mais cedo em que a
+prevenção seria possível: TASK/critério de pronto (`commands/tasks.md`) já herdam do PLAN a lista
+de mecanismos a implementar — se o PLAN não nomeia o 3º, nenhuma TASK das 6 waves tem motivo para
+cobri-lo
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`commands/plan.md`, Etapa 4, item 5 ("Mapeamento FR → componente é derivado")
+patch: proposta de extensão in-line do item 5, logo após a frase existente: "**Qualidade
+transversal repetida em FRs irmãos** (mesma frase da SPEC — ex.: NFR \"recarregada a cada
+visita\" — citada em FR-A/B/C) nomeia o mecanismo **por LEITURA** (cada query/hook que alimenta a
+exibição daquele dado), não só por COMP: sujeito irmão sem COMP de lista próprio (leitura herdada
+de outro titular) ainda exige a mesma declaração — mecanismo nomeado na leitura herdada, ou nota
+explícita de exceção — nunca lacuna implícita." Saldo líquido ~+5 linhas (mesmo item, dentro do
+orçamento ≤10; arquivo tem 142 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa

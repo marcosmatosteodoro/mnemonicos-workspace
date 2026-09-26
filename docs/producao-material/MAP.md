@@ -338,6 +338,16 @@
   que atribui uma causa só é motivo falso; ver lição em `lessons.md` antes de replicar o
   padrão de `rule-breakdown-form.tsx:81` (que trata QUERY com 1 causa só) numa mutação.
 
+- [2026-09-26 · PLAN-027, Wave 7/TASK-027-008] `refetchOnMountOrArgChange` (RTK Query) só
+  deve ir no subscriber que MONTA PRIMEIRO sobre uma cache entry compartilhada — um
+  subscriber secundário (que monta depois do 1º já resolvido) gera GET redundante em
+  série, não deduplicado (`content-form.tsx:129` tem a opção; `content-supplementary-panel.tsx`
+  não tem, e se beneficia do refetch do pai). Mesmo padrão, cuidado ao replicar: opção
+  garante que o REQUEST saia de novo, não que todo CONSUMIDOR do resultado adote o valor
+  novo — `content-form.tsx:145-155` hidrata estado local do próprio formulário uma única
+  vez (guard `hydrated`) e IGNORA o refetch (RISK-027-010, fora de escopo de PLAN-027,
+  território FR-005/F2) — mnemonicos-frontend/src/components/content-form.tsx:114-155.
+
 ## Instalabilidade PWA (avulso · PLAN-013)
 
 - [2026-09-07 · PLAN-013] `mnemonicos-frontend` ganhou manifesto (`app/manifest.ts`),
