@@ -72,7 +72,7 @@ para Etapa 4 (DoD)/Entrega (PR)._
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
-| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 6/6 ✅ | Approved |
+| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 6/6 ✅ | Done (sugerido) |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -252,6 +252,15 @@ para Etapa 4 (DoD)/Entrega (PR)._
 
 ## Histórico recente
 
+- 2026-09-26: **PLAN-027 implementado (6/6 TASKs), Status → `Done (sugerido)`.** DoD
+  validado na Etapa 4: suíte completa 100% verde (479+369 backend, 504 frontend), lint/
+  typecheck limpos nos 2 repos; métrica da SPEC (§1.3) confirmada executável contra o
+  schema real (`ProductionFlashcard` por `RawContent` ativo com `RuleBreakdown`); as 6
+  FEATs (001-006) com linha `**Verificação (gate 9)**:` gravada na SPEC-026 (`graph.sh
+  --check` não acusa `feat-sem-verificacao`); `diff-facts.sh --deploy-pending` limpo
+  (migração já declarada no INDEX); delta do MAP.md escrito (seção "F7 · PLAN-027") e
+  memo de exploração removido (já ausente nesta máquina). Promoção do front-matter do
+  PLAN a `Done` é decisão do Diretor, no merge. Aguardando `/keelson:integrate`.
 - 2026-09-26: **Wave 5 de PLAN-027 concluída — PLAN INTEIRO com 6/6 TASKs Done.**
   TASK-027-006 (Exportação — Protocolo impresso e composição suplementar no PDF), backend
   `4dc5c91`/`976736b`/`d30a705`. Gates 8 (security) e 10 (performance) aprovados 1ª rodada
