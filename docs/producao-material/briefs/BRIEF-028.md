@@ -5,7 +5,7 @@
 **Data**: 2026-09-26
 **Largada**: 2026-09-26T14:26:48-0300
 **Epico**: docs/producao-material/briefs/BRIEF-2026-08-27-mnemora-studio-epic.md
-**Jira**: —
+**Jira**: KAN-136
 
 ## Pedido como dito
 
@@ -60,6 +60,19 @@ STUDENT.
 - Painel estratégico e tempo por página (F10).
 - Fila de produção e calendário editorial (F11, fora do MVP).
 - Qualquer tela ou rota consumida pelo papel STUDENT.
+
+## Estimativa
+
+- **Base**: pedido (BRIEF-028) · INDEX de producao-material (fatias com a mesma forma: F2/PLAN-006 14 tasks, F4/PLAN-012 13 tasks/7 waves, F5/PLAN-023 17 tasks/6 waves, F6/PLAN-025 14 tasks, F7/PLAN-027 8 tasks/7 waves) · MAP §Acervo e §Publicação F6 · Cronologias de BRIEF-005/011/026. **Sem base histórica robusta**: `estimates.md` tem só 1 demanda fechada (avulsa), nenhum corretor aplicado.
+- **Dimensão**: ~5–7 waves · ~9–13 tasks (~4 small · ~7 medium).
+- **Por fase**: forja 0–1h · artefatos 2–4h · implementação 12–40h · gates 6–16h
+- **Total**: 20–61h (horas de ciclo, não prazo de calendário)
+- **Confiança**: baixa — sem base histórica, e a DEC arquitetural (snapshot × referência, já prevista como irreversível na "Interpretação do PO" acima) muda a forma das waves de schema/serviço/PDF. Fica para o PLAN, com alternativas explícitas.
+- **Lacunas resolvidas nesta largada** (degrau 1 — reversíveis, registradas como premissa; a `agent` estimator as levantou):
+  - Gatilho de versão: **ato explícito do EDITOR** ("fechar versão"), não automático a cada keystroke — mais barato, alinhado ao verbo "declarado" do BRIEF.
+  - Escopo do versionamento: **`RawContent` + `RuleBreakdown`** (conteúdo jurídico primário) — Contraste/Flashcard/Pegadinha (F7, reforço) ficam fora; a TAP fala em "fechamento de legislação" do conteúdo normativo, não do material de reforço.
+  - Backfill: **sem versão inicial gerada** para Conteúdo bruto pré-existente — PDF de conteúdo sem versão fechada sai com marca explícita "sem versão".
+  - Carimbo no PDF: **em toda página**, reusando o ponto onde o rótulo "Rascunho" (F6) já estampa.
 
 ## Cronologia
 
