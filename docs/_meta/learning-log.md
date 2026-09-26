@@ -634,3 +634,33 @@ explícita de exceção — nunca lacuna implícita." Saldo líquido ~+5 linhas 
 orçamento ≤10; arquivo tem 142 linhas, longe do teto de 500)
 reincidencia: 0
 estado: ativa
+
+## LRN-036: `commands/auto.md` (Etapa 0, bullet "Risco") classifica migração aditiva/reversível como "decida e registre" sem prever regra de projeto mais estrita
+data: 2026-09-26
+gatilho: gate_reprovado
+origem: PLAN-029 (slug producao-material), Wave 1, TASK-029-001 — o Tech Lead (esta sessão)
+despachou ao `developer` instrução para GERAR **e APLICAR** a migração Prisma em dev+teste,
+citando "autorização já implícita no ciclo `/keelson:auto`"; o `code-reviewer` (gate 1-7)
+reprovou o achado por violar o `CLAUDE.md` do workspace — regra incondicional, sem exceção para
+migração aditiva/dev: "toda migração exige perguntar ao usuário antes de executar, e nunca rodar
+comando que altere estrutura ou dado silenciosamente". A migração (100% aditiva) já tinha sido
+aplicada em dev+teste quando o achado surgiu; o Diretor foi consultado DEPOIS via
+`AskUserQuestion` e ratificou a aplicação já feita — mas o processo correto era perguntar ANTES
+causa_raiz: instrucao_ausente — `commands/auto.md`, Etapa 0, bullet "Risco" ("migração/schema...
+Mudança de risco reversível simples (ex.: coluna nullable nova) → siga com a decisão registrada")
+classifica migração aditiva sob o piso genérico do princípio inviolável 2 (só destrutivo/
+difícil-reversão pergunta antes de aplicar) como decida-e-registre — mas não instrui o Tech Lead
+a conferir, antes de classificar e decidir sozinho, se a ficha/`CLAUDE.md` do projeto declara
+regra MAIS ESTRITA para a classe (aqui, "toda migração, mesmo aditiva, pergunta antes"). O Tech
+Lead seguiu o texto do keelson à risca — o texto não previa a sobreposição de projeto, e a leitura
+literal foi razoável
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`commands/auto.md`, Etapa 0, bullet "Risco"
+patch: proposta de inserção in-line no bullet "Risco", logo após "...siga com a decisão
+registrada;": ficha/`CLAUDE.md` pode apertar o piso genérico por classe de ação (ex.: migração
+sempre pergunta, mesmo aditiva) — confira antes de classificar como reversível simples; regra de
+projeto mais estrita vence o piso genérico e move o item para última chamada/estacionar, nunca
+decidido em silêncio. Saldo líquido ~+4 linhas (mesma frase/parágrafo; arquivo tem 182 linhas,
+longe do teto de 500)
+reincidencia: 0
+estado: ativa

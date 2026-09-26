@@ -6,7 +6,7 @@
 ## Ordem de execução (waves)
 
 ### Wave 1 (setup-first)
-- [ ] TASK-029-001 ⏸ Todo
+- [x] TASK-029-001 ✅ Done
 
 ### Wave 2 (depende de Wave 1 — as 2 TASKs abaixo NÃO dependem uma da outra, paralelizáveis)
 - [ ] TASK-029-002 ⏸ Todo
