@@ -22,4 +22,4 @@
 - [x] TASK-027-006 ✅ Done
 
 ### Wave 6 (furo no plano achado na convergência de fecho da Entrega — decisão 4.301/§3.5; depende de Waves 2, 3, 4)
-- [ ] TASK-027-007 ⏸ Todo
+- [x] TASK-027-007 ✅ Done

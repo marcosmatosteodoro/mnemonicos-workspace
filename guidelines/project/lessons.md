@@ -1585,7 +1585,7 @@ idêntico para o mesmo tipo de dado, nascidos na mesma janela de tempo.
 **Validade:** geral (qualquer par de componentes de lista que renderizam a mesma entidade
 de domínio, neste frontend).
 **Estado:** ativa
-**Contadores:** confirmada 3 · contestada 0
+**Contadores:** confirmada 4 · contestada 0
 
 **Corolário de correção não-estrutural (gate 11 da Wave 7 de PLAN-025, TASK-025-013,
 re-revisão da rodada 1):** o mesmo defeito reincidiu fora de acessibilidade de lista — o
@@ -1612,6 +1612,18 @@ leitura cada RAMO da lógica do irmão e declarar, ramo a ramo, se foi herdado o
 não; `git log -S` no mecanismo do irmão revela quais ramos nasceram de correção de gate e
 por isso não podem se perder na extração. Componente extraído que gerencia foco declara o
 alvo de foco de CADA desfecho (sucesso/cancelar/falha), nunca só "devolve ao gatilho".
+
+**Corolário de enxerto de painel suplementar via composição (gate 11 da Wave 6 de
+PLAN-027, TASK-027-007):** ao enxertar `ContentSupplementaryPanel` (Contrastes/Pegadinha/
+Flashcards) na tela de `content/[id]`, o bloco final de `ContentForm` que hospeda
+`PublicationExportControl` ficou, no primeiro commit, ACIMA do painel novo — a mesma classe
+de defeito do corolário anterior (exportação antes do material que consome), desta vez não
+entre 2 irmãos que compõem o MESMO componente, mas entre um enxerto novo e um bloco final
+já posicionado corretamente por correção anterior (`453d84f`) no MESMO arquivo. Corrigido
+no retry: `ContentForm` passou a aceitar um slot (`supplementary?: ReactNode`), renderizado
+DEPOIS do `<form>` e ANTES do bloco final, que foi movido para fora do `<form>`. **Regra
+estendida:** o sinal de alerta vale também para um enxerto novo que se insere ENTRE o corpo
+de um componente já corrigido e o bloco final dele — não só entre 2 arquivos irmãos.
 
 ## [Design] Predicado que impede 2º diálogo/confirmação simultâneo mira só o gatilho que o abriria — nunca o contêiner que hospeda feedback de ação assíncrona não-relacionada
 
@@ -1878,5 +1890,85 @@ e deve matar o teste. Molde correto já existente no repo: o caso de remoção d
 `flashcard-list.test.tsx` (mutante morre) — falta espelhar para criar/editar.
 **Validade:** geral (qualquer critério de pronto cujos efeitos observáveis se repartem
 entre 2+ componentes irmãos, neste frontend com RTK Query).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Design] Wrapper de composição que passa `prop ?? null` para um componente onde `null` significa "vazio registrado" cria um 3º estado falso ("ainda não sei") nos ramos de loading/erro do produtor
+
+**Erro:** `ContentSupplementaryPanel` (TASK-027-007, Wave 6 de PLAN-027) montava
+`PegadinhaField` com `data?.pegadinhaText ?? null` sempre que `useGetRawContentQuery`
+ainda não tinha resposta OU tinha falhado. `PegadinhaField` foi provado, isolado, com o
+prop já resolvido — `null` ali sempre significou "pegadinha vazia registrada". Na
+composição real, o mesmo `null` passou a cobrir também "ainda não sei" (loading) e "não
+consigo saber" (erro), e o componente não distingue os 3 casos: exibiu "Nenhuma pegadinha
+registrada ainda", com o campo vazio e editável, durante o carregamento e durante erro do
+titular — convidando a sobrescrever, sem nunca ter mostrado, uma Pegadinha real já
+registrada (o backend grava sem condição).
+**Causa:** o componente foi provado montado ISOLADAMENTE com o prop já resolvido; na
+composição, o prop nullable ganhou um significado adicional que só existe no PRODUTOR
+(a query), e ninguém condicionou a montagem/o valor ao estado desse produtor.
+**Solução:** ao compor um componente cujo prop nullable codifica "vazio" (não "ainda não
+sei"), montar esse componente só no ramo de SUCESSO da query do titular — via slot dentro
+de um componente que já tem os early returns de loading/erro (ex.: `ContentForm` ganhou
+`supplementary?: ReactNode`, renderizado depois de `isLoadingContent`/`isContentError`) ou
+via gate explícito `isLoading || isError` no próprio wrapper — nunca `isFetching` (uma
+invalidação de cache em segundo plano não pode desmontar o campo, senão confirmação e foco
+se perdem). Nunca passar `data?.x ?? null` antes de haver `data`. Prova: teste que monta a
+PÁGINA real (não o componente isolado) e afirma AUSÊNCIA do campo durante loading e durante
+erro do titular — não apenas presença no caminho feliz.
+**Validade:** geral (qualquer composição em que um wrapper repassa um prop nullable de uma
+query de outro titular para um componente cujo `null` já tem significado próprio, neste
+frontend).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Código] Mensagem de erro que atribui causa a partir de um `status` HTTP só vale quando aquele status/rota/modo tem UMA causa possível — copiar a forma de um precedente de query para uma mutação com 2 causas atribui motivo falso
+
+**Erro:** `ContrastForm`/`FlashcardForm` (TASK-027-007, Wave 6 de PLAN-027) copiaram, para
+a mutação de EDIÇÃO (`PATCH`), a forma de um precedente (`rule-breakdown-form.tsx:81`,
+`mnemonic-strip-board.tsx:224`) que trata 404 de uma QUERY com uma única causa possível
+("Conteúdo bruto não encontrado"). Na edição, porém, o endpoint devolve o MESMO
+`code: NOT_FOUND` por 2 causas distintas — titular inalcançável OU o próprio item
+(Contraste/Flashcard) já removido (`contrasts.service.ts:146`/`flashcards.service.ts:150`)
+— e o frontend não tem como diferenciar pelo `status`. O componente atribuía sempre a causa
+do titular, um motivo falso quando quem sumiu era o item.
+**Causa:** a mensagem foi derivada da FORMA do precedente (guard `isFetchBaseQueryError` +
+`status === 404` ⇒ mensagem fixa), não da enumeração dos pontos de `throw` do backend
+para aquela ROTA e aquele MODO (criação tem 1 causa; edição, 2) — como o `code` HTTP é
+igual para as duas causas, nenhum typecheck ou teste mecânico acusa a cópia.
+**Solução:** antes de mapear um `status` para uma mensagem que AFIRMA uma causa, `grep` os
+pontos de `throw` no service da rota, separado por modo (criação/edição) — status com mais
+de 1 causa possível não pode gerar mensagem que atribua uma só; ou a mensagem cobre as
+causas possíveis sem escolher ("este item ou o conteúdo que o contém..."), ou o backend
+ganha um `code` distinto por causa. 1 caso de teste por causa possível, por modo.
+**Validade:** geral (qualquer mensagem de erro derivada de `status` HTTP em mutação cujo
+endpoint tem mais de uma causa de erro com o mesmo `code`, neste projeto).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Renomear o nome acessível de um elemento para desambiguar instâncias exige reconferir toda asserção de AUSÊNCIA/CONTAGEM que buscava o nome antigo — ela pode ficar sempre verde
+
+**Erro:** ao trocar o botão "Cancelar" genérico por `aria-label` contextual (ex.: `Cancelar
+a edição do contraste "<confundível>"`, TASK-027-007, Wave 6 de PLAN-027, retry de gate 11),
+4 asserções de AUSÊNCIA/CONTAGEM (`contrast-form.test.tsx`, `flashcard-form.test.tsx`,
+`contrast-list.test.tsx`, `flashcard-list.test.tsx`) continuaram buscando pelo `aria-label`
+completo de EDIÇÃO. A instância indevida que a asserção deveria pegar (ex.: um "Cancelar"
+vazando para o modo de CRIAÇÃO) nunca teria esse `aria-label` — seu nome acessível seria só
+"Cancelar" (sem contexto) — então a busca nunca encontrava nada e a asserção ficava sempre
+satisfeita, tenha o defeito acontecido ou não. Regressão de prova confirmada por mutação:
+o mutante que o teste deveria matar sobrevivia depois da troca de nome.
+**Causa:** a troca de rótulo foi aplicada igual em asserções POSITIVAS (o elemento
+legítimo existe, com o nome novo) e NEGATIVAS (o elemento indevido NÃO deveria existir) —
+mas numa asserção negativa, o seletor precisa casar com o nome que a VARIANTE INDEVIDA
+teria, não com o nome da variante legítima que acabou de ganhar contexto.
+**Solução:** em `queryBy`/`getAllBy` de ausência ou contagem, selecionar pelo traço que a
+variante indevida TERIA (ex.: prefixo do texto visível, `name: /^Cancelar/`), nunca pelo
+`aria-label` contextual da variante legítima. Ao renomear um nome acessível em qualquer
+diff, `grep` por esse nome nos arquivos de teste e separar as ocorrências em positivas
+(atualizar para o nome novo) e negativas/contagem (manter ou generalizar o seletor para o
+traço que a variante indevida teria) — e rodar o mutante que cada asserção negativa afirma
+matar antes de considerar a troca de nome concluída.
+**Validade:** geral (qualquer rename de nome acessível — `aria-label`, texto visível — que
+toque uma asserção `queryBy`/`getAllBy` de ausência ou contagem, neste frontend).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0

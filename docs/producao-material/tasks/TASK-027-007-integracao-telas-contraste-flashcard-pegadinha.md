@@ -8,7 +8,7 @@
 **Wave**: 6
 **Tamanho estimado**: small
 **Tipo**: feature (correção de furo no plano)
-**Status**: Todo
+**Status**: Done
 
 ## Origem
 
@@ -94,17 +94,18 @@ quando o titular está inalcançável/removido.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
-**Jira**:
+**Data início**: 2026-09-26
+**Data conclusão**: 2026-09-26
+**Commit SHA**: 1cc4c5d (implementação) · 3280af7 (retry consolidado gates 1-7+11) · 3b91a8b (correção mecânica de prova, gate 1-7)
+**Jira**: —
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (518/518, mnemonicos-frontend)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (reprovado em 1cc4c5d — A1-A4; retry 3280af7 resolveu a substância mas introduziu regressão de prova mecânica em 4 asserções; corrigido em 3b91a8b, aprovado)
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — diff é composição de tela + tratamento de erro no frontend, sem superfície sensível nova (sem endpoint/auth/dado pessoal tocado)
+- [x] Comportamento (gate 9): verificado — qa, 1ª verificação de tela REAL do PLAN-027 (browser, Postgres real, login EDITOR seed dev), FEAT-026-001/002/003 confirmadas ponta a ponta (registrar/persistir/remover via UI, 2 reloads completos)
+- [x] Design (gate 11): reprovado em 1cc4c5d (achado alta: painel de Pegadinha falso-vazio em loading/erro do titular; achado médio: posição do bloco final de exportação; achado médio: nomes acessíveis duplicados) — aprovado no retry 3280af7 após correção

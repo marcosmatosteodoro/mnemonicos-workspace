@@ -312,6 +312,31 @@
   aplicada em dev/teste locais desta sessão (autorização do Diretor) — **aplicação em
   produção ainda pendente**, mesmo protocolo de F6 (`vercel-build` roda `prisma migrate
   deploy` a cada deploy do backend).
+- [2026-09-26 · PLAN-027, Wave 6/TASK-027-007] `ContrastList`/`FlashcardList`/
+  `PegadinhaField` só ficaram alcançáveis em tela nesta wave — as TASKs 001-006 provaram
+  os 3 componentes MONTADOS ISOLADAMENTE (store real ou HTTP real), prova válida do
+  componente em si, mas nenhuma tocou a página que os hospeda; furo achado só na
+  convergência de fecho, não em nenhum gate de wave (lição roteada, `agile-coach`,
+  LRN-033/034). `ContentForm` (`mnemonicos-frontend/src/components/content-form.tsx:233-556`)
+  ganhou o slot `supplementary?: ReactNode`, renderizado SÓ depois dos early returns de
+  `isLoadingContent`/`isContentError` — nunca condicionado a `isFetching` (a invalidação
+  de cache da tag `'RawContent'` refaz a query em segundo plano sem poder desmontar o
+  painel). `content-supplementary-panel.tsx` é o wrapper `'use client'` que reusa a MESMA
+  chave de `useGetRawContentQuery` de `ContentForm` (sem round-trip extra). Padrão a seguir
+  por qualquer painel futuro que dependa de dado do MESMO titular já carregado pela
+  página: nunca `data?.campo ?? null` direto — o `null` de "vazio registrado" e o
+  `undefined` de "ainda carregando"/"erro" colidem se o consumidor não distingue.
+- [2026-09-26 · PLAN-027, Wave 6] `mnemonicos-frontend/src/lib/fetch-error.ts`
+  (`isFetchBaseQueryError` + `isNotFoundError`) é o módulo canônico para distinguir 404 de
+  erro genérico em RTK Query — usado por `contrast-form.tsx`/`flashcard-form.tsx`/
+  `pegadinha-field.tsx`; 4 cópias legadas (`visual-library-board.tsx`,
+  `mnemonic-strip-board.tsx`, `publication-export-control.tsx`, `rule-breakdown-form.tsx`)
+  ainda NÃO migradas (fora de escopo da Wave 6) — mesma pendência de dedup de
+  `material-reforco-fixtures.ts` acima, candidata a diff de limpeza futuro. Em mutação
+  (edição/PATCH), o mesmo `status: 404` pode ter 2 causas (titular inalcançável OU o
+  próprio item removido, `contrasts.service.ts:146`/`flashcards.service.ts:150`) — mensagem
+  que atribui uma causa só é motivo falso; ver lição em `lessons.md` antes de replicar o
+  padrão de `rule-breakdown-form.tsx:81` (que trata QUERY com 1 causa só) numa mutação.
 
 ## Instalabilidade PWA (avulso · PLAN-013)
 
