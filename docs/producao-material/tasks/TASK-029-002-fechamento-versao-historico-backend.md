@@ -259,9 +259,14 @@ prévios do par), violando a DEC.
       schema, não um teste executável repetível)**: `listContentVersions` roda dentro de
       `withQueryProbe` contra um `RawContent` com N Versões fechadas (N pequeno, ex. 5,
       basta — o que se prova é ausência de N+1/varredura, não o plano do otimizador sob
-      volume) — o array de queries devolvido tem EXATAMENTE 1 statement (nenhum round-trip
-      por Versão, nenhuma consulta ao acervo inteiro). Falsificável: uma implementação que
-      iterasse e buscasse cada Versão em loop reprovaria (>1 statement). Complementa (não
+      volume) — o array de queries devolvido tem um número FIXO de statements (2:
+      `assertRawContentReachable` + o `findMany` da listagem — furo no plano corrigido pelo
+      developer por medição direta, mesmo padrão de custo fixo já documentado em
+      `listContrasts`/`listRawContents`; a redação original ["EXATAMENTE 1 statement"] presumia
+      não reusar `assertRawContentReachable`, o que a própria TASK prescreve reusar),
+      **constante independente de N** (nenhum round-trip por Versão, nenhuma consulta ao
+      acervo inteiro). Falsificável: uma implementação que iterasse e buscasse cada Versão em
+      loop reprovaria (>2 statements, crescendo com N). Complementa (não
       substitui) a leitura estrutural: `grep -n "where: { rawContentId"
       src/modules/content-versions/content-versions.service.ts` confirma que o predicado é
       literalmente escopado por `rawContentId` (nunca uma consulta sem filtro seguida de

@@ -290,6 +290,16 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-26: **furo no plano (baseline vermelho) em TASK-029-003 — sancionado, não
+  corrigido.** `tests/integration/publication.service.integration.test.ts` (teste de
+  teto de duração CPU-bound, AC-024-017/F6, última alteração TASK-027-006) falha
+  nesta máquina — a composição real termina DENTRO do teto de 400ms/1500ms
+  (calibrado para hardware mais lento), então `GenerationTimeoutError` nunca dispara.
+  Confirmado independentemente por 2 developers (Wave 1 e Wave 2 de PLAN-029),
+  reproduzível, não-relacionado a F8. Destino: sancionado — a TASK-029-003 prossegue
+  com esse vermelho declarado como baseline conhecido (gate 2 mede regressão contra
+  ele, não contra suíte 100% verde); corrigir o threshold é fora de escopo de F8
+  (território F6/SPEC-024), candidato a `/keelson:triage` futuro.
 - 2026-09-26: **Wave 1 de PLAN-029 concluída — TASK-029-001 Done (F8).** Migração
   `20260926185454_add_content_version_versao_editorial` (model `ContentVersion` +
   enum `VERSAO_EDITORIAL`) aplicada em dev+teste. **Furo de processo**: o Tech Lead
