@@ -252,6 +252,67 @@
   evita PDF de 0 páginas úteis anunciado como sucesso) — mnemonicos-frontend/src/store/api.ts:1-520.
 - [2026-08-27 · epico] Nenhum versionamento editorial existe — sem data de fechamento de legislação, sem histórico de revisão, sem fonte normativa estruturada (só `source` como texto livre em `Mnemonic`) — mnemonicos-backend/prisma/schema.prisma:96-120
 
+## Contraste, pegadinha, flashcard e protocolo impresso (F7 · PLAN-027)
+
+- [2026-09-26 · PLAN-027] 3 formas de pendurar dado novo em `RawContent`, cada uma
+  deliberadamente diferente: `Contrast`/`ProductionFlashcard` são models N:1 diretos com
+  guarda em 2 passos (`assertRawContentReachable` + leitura + checagem
+  autor-ou-ADMIN, `contrasts.service.ts:77-100`/`flashcards.service.ts` espelho); Pegadinha
+  elaborada é a coluna nullable `RawContent.pegadinhaText`, escrita por `updateMany` com
+  `where` composto (guarda+escrita no MESMO statement — `ACTIVE_RAW_CONTENT_WHERE` +
+  `scopeWhere(actor)`, sem `findFirst` prévio) — gate 8 confirmou que este 2º padrão é MAIS
+  seguro (fecha janela TOCTOU que o 1º tem) — mnemonicos-backend/src/modules/contents/contents.service.ts:249-322.
+- [2026-09-26 · PLAN-027] `ProductionFlashcard` (não `Flashcard`, DEC-027-003) — o model
+  `Flashcard` legado (`schema.prisma:222-243`, SRS/CardState/Review) é dormente desde F2 e
+  NUNCA é tocado por este PLAN; qualquer código futuro que confundir os dois nomes aponta
+  para a tabela errada silenciosamente (sem erro de tipo, os dois são strings) — a rede de
+  paridade cross-repo (`contents-frontend-contract.test.ts`) é a única prova contra isso —
+  mnemonicos-backend/prisma/schema.prisma:222-243,538-578.
+- [2026-09-26 · PLAN-027] `ConfirmRemoveDialog` (`mnemonicos-frontend/src/components/confirm-remove-dialog.tsx`)
+  virou o 3º consumidor compartilhado desta fatia (Contraste/Flashcard/Pegadinha) — exige
+  `focusAfterRemoveRef` (obrigatória, alvo estável de foco no desfecho de SUCESSO — o
+  gatilho pode ser desmontado pelo `invalidatesTags`) e `triggerRef` (opcional, ref
+  determinístico do gatilho, precedência sobre `document.activeElement` — que falha
+  silenciosamente em Safari/Firefox macOS); DEVE ser montado INCONDICIONALMENTE pelo
+  consumidor (só alternando `open`) — montagem condicional no padrão in-place dos moldes
+  antigos (`mnemonic-strip-board.tsx`) desmonta o componente e quebra a restauração de foco
+  inteira, achado real do gate 11 na Wave 2 — mnemonicos-frontend/src/components/confirm-remove-dialog.tsx:1-110.
+- [2026-09-26 · PLAN-027] `RISK-027-006` (ativo): a Exportação (F6) passou a DESENHAR o
+  texto de Contraste/Flashcard/Pegadinha no PDF suplementar — a fonte
+  `StandardFonts.Helvetica`/WinAnsi (cp1252) usada por `pdf-composer.ts` não codifica
+  caracteres fora dela (`→`, `≠`, confirmado por execução: `page.drawText` lança); os 3
+  schemas de escrita aceitam QUALQUER string sem restrição de charset — um único registro
+  com esse caractere derruba a Exportação inteira, nas 2 Variantes, sem que nada tenha
+  impedido a gravação — TRISK-025-007 (mesma limitação, F6) não foi estendido a estes 3
+  campos — mnemonicos-backend/src/modules/publication/pdf-composer.ts:1-50.
+- [2026-09-26 · PLAN-027] `RISK-027-007` (ativo, divergência de PLAN nunca confrontada): a
+  guarda de LEITURA direta (Contraste/Flashcard/Pegadinha) é restrita ao autor-ou-ADMIN
+  (DEC-027-005), mas a Exportação (`loadSupplementarySections`,
+  `publication.service.ts:257-269`) lê os MESMOS 3 registros SEM `scopeWhere` — um EDITOR
+  que exporta o Conteúdo de outro autor recebe, dentro do PDF, dados que não alcançaria
+  pela rota direta. Decisão de produto pendente de confirmação do Diretor.
+- [2026-09-26 · PLAN-027] `drawSupplementarySection` (`pdf-composer.ts:330-391`) desenha um
+  `title` em CAIXA ALTA na 1ª página de cada seção (`CONTRASTES`/`PEGADINHA`/`FLASHCARDS`/
+  `PROTOCOLO DE REVISÃO`) — achado real do gate 11 (Wave 5): sem título a Pegadinha saía
+  indistinguível do texto principal (risco pedagógico — o estudante podia decorar o "erro
+  comum de prova" como se fosse a regra). Páginas de TRANSBORDO não repetem o título — para
+  a Pegadinha (sem rótulo de campo, sem limite de tamanho) isso é risco residual
+  (RISK-027-008, aceito, baixa incidência) — mnemonicos-backend/src/modules/publication/pdf-composer.ts:330-391.
+- [2026-09-26 · PLAN-027] `getReviewProtocolMarks()` (`review-protocol.ts`) é função PURA
+  sem parâmetro de tempo — os 6 Marcos (R0/R24/R3/R7/R14/R30) são rótulo textual fixo,
+  NUNCA calculados; o scheduler SM-2 existente (`review/scheduler.ts`, dormente por A-005)
+  não é reusado (incompatibilidade de design deliberada, ver linha do épico acima) —
+  mnemonicos-backend/src/modules/publication/review-protocol.ts:1-40.
+- [2026-09-26 · PLAN-027] Fixture de teste `seedContrast`/`seedFlashcard` tem 3 cópias
+  locais no repo (`contrasts.service.integration.test.ts`, `flashcards.service.integration.test.ts`,
+  e a canônica nova `tests/support/material-reforco-fixtures.ts`) — as 2 primeiras NÃO
+  foram migradas (fora de escopo da TASK que criou o helper), pendência de dedup para
+  quem tocar esses arquivos de novo — mnemonicos-backend/tests/support/material-reforco-fixtures.ts.
+- [2026-09-26 · PLAN-027] Migração `20260916165114_add_contrast_flashcard_pegadinha`
+  aplicada em dev/teste locais desta sessão (autorização do Diretor) — **aplicação em
+  produção ainda pendente**, mesmo protocolo de F6 (`vercel-build` roda `prisma migrate
+  deploy` a cada deploy do backend).
+
 ## Instalabilidade PWA (avulso · PLAN-013)
 
 - [2026-09-07 · PLAN-013] `mnemonicos-frontend` ganhou manifesto (`app/manifest.ts`),
