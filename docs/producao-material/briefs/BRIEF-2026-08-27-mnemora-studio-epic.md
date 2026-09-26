@@ -50,7 +50,7 @@ fora do MVP).
 | 5 | Biblioteca visual reutilizável | producao-material | entregue e mergeada (BRIEF-022 · SPEC-022 · PLAN-023 Done 17/17; PR #6 backend `e316ab6`/PR #12 frontend `677b836` mergeados em `main` 2026-09-14) |
 | 6 | Pipeline de publicação — PDF (rascunho) | producao-material | **entregue e mergeada** (BRIEF-024 · SPEC-024 · PLAN-025 Done 17/17; PR #7 backend (`5d6b4df`) e PR #13 frontend (`b54b6ef`) mergeados em `main` 2026-09-15; gate 9 VERIFICADO de verdade em ambiente real; **RISK-025-007 ainda aberto** — risco real de produção não resolvido: Tira grande com imagens pode exceder o limite de corpo de resposta de function serverless da Vercel; recomendado resolver antes do deploy em produção, decisão do Diretor) |
 | 7 | Contrastes, pegadinhas, flashcards e protocolos impressos | producao-material | **entregue e mergeada** (BRIEF-026 · SPEC-026 · PLAN-027 Done 8/8 — 6 previstas + 2 furos achados na convergência de fecho; PR #8 backend `9b87acc`/PR #14 frontend `2ceaa6f` mergeados em `main` 2026-09-26; gate 9 VERIFICADO em browser real, login EDITOR seed dev; 6 Histórias KAN-122/123/124/125/126/129 e Épico KAN-121 fechados no Jira pelo Diretor, 7/7 filhos confirmados por JQL; RISK-027-010/011 e TRISK-027-006/007 seguem abertos, não-bloqueantes — ver INDEX) |
-| 8 | Versionamento editorial e fechamento legislativo | producao-material | em ciclo (BRIEF-028.md) |
+| 8 | Versionamento editorial e fechamento legislativo | producao-material | entregue (BRIEF-028 · SPEC-028 · PLAN-029 Done 4/4; convergência de fecho CONVERGIU; ambas FEATs VERIFICADAS por execução real; branches pushadas nos 2 repos — backend `5cfdb18`, frontend `8f76e6d` — merge/PR fica para `/keelson:integrate`; DEC-029-003 irreversível pendente de confirmação explícita do Diretor) |
 | 9 | Controle de qualidade e gate de versão aprovada | producao-material | pendente |
 | 10 | Painel estratégico e tempo por página | producao-material | pendente |
 | 11 | Fila de produção e calendário editorial *(fora do MVP — confirmado pelo Diretor)* | producao-material | pendente |
@@ -243,3 +243,22 @@ fora do MVP).
   largada dos dois repos de código com `main` (backend fast-forward `9b87acc`;
   frontend fast-forward `2ceaa6f`) — branch do épico reutilizada (`feat/producao-material-
   mnemora-studio`, já mergeada nas duas fatias anteriores, sem drift contra `main`).
+- 2026-09-26: **F8 implementada por completo e Entrega ACEITA_COM_RESSALVAS** —
+  PLAN-029 Done 4/4 TASKs, 3 waves. Model `ContentVersion` append-only (snapshot JSON
+  dos campos versionados, DEC-029-003 irreversível — hash sozinho perderia o texto
+  histórico para sempre se o Conteúdo mudasse depois do fechamento), lock de linha do
+  `RawContent` pai fechando corrida real de numeração, carimbo de Versão/Data no PDF
+  exportado (F6) com marca fail-secure de alteração pós-fechamento. Convergência de
+  fecho CONVERGIU (dedup aplicada, 1 achado não-bloqueante). Ambas as FEATs (FEAT-028-001
+  fechamento+histórico, FEAT-028-002 carimbo no PDF) VERIFICADAS por execução real
+  ponta a ponta (MCP Playwright, servidor + Postgres reais). Furo de processo na Wave 1
+  (migração aplicada sem autorização prévia, ratificada pelo Diretor durante o ciclo,
+  LRN-036 roteada) e furo no plano sancionado na Wave 2 (baseline vermelho pré-existente
+  e não-relacionado, território F6). Aceitação do `po`: ACEITA_COM_RESSALVAS — nenhum
+  item do brief ficou sem entrega, 1 escalação pendente (DEC-029-003 sem confirmação
+  explícita do Diretor — aplicada pelo Tech Lead via escada de reação, degrau 2, sem
+  pausar o ciclo). Branches pushadas nos 2 repos (backend `5cfdb18`, frontend
+  `8f76e6d`) — merge/PR/deploy ficam para o Diretor. Próxima elegível: F9 (depende de
+  F1 — entregue e mergeada — e F8 — entregue, **ainda não mergeada**: decisão 4.190,
+  não propor até o merge de F8 acontecer) ou F10 (depende de F3 — entregue — mais F8/F9
+  parcial). Sem dependência mútua declarada com F11 (fora do MVP).
