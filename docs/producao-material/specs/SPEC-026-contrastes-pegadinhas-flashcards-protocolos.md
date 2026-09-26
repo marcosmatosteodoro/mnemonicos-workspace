@@ -135,6 +135,7 @@ Variante do PDF, Rascunho (PDF), Exportação, Remoção reversível (Conteúdo 
 ### FEAT-026-001: Registro de contraste entre institutos confundíveis e sua inclusão na Exportação
 
 **Jira**: KAN-122
+**Verificação (gate 9)**: 2026-09-26 — qa (fecho da Wave 5, última de PLAN-027): VERIFICADO via HTTP real (POST /api/v1/contents/:id/publication) + Postgres real + PDF gerado, nas 2 Variantes (RESUMO/TIRA). AC-026-001 a 004/015/016/020/022 confirmados; AC-026-018/019/023 (parte Contraste) já verificados na Wave 4.
 
 > O EDITOR abre um Conteúdo bruto, registra um ou mais Contrastes (confundível +
 > distinção), os revê, edita ou remove depois, e os vê incluídos no documento gerado
@@ -175,6 +176,7 @@ Variante do PDF, Rascunho (PDF), Exportação, Remoção reversível (Conteúdo 
 ### FEAT-026-002: Registro da pegadinha elaborada e sua inclusão na Exportação
 
 **Jira**: KAN-123
+**Verificação (gate 9)**: 2026-09-26 — qa (fecho da Wave 5): VERIFICADO via HTTP real + Postgres real + PDF gerado, nas 2 Variantes. AC-026-005 a 007/015/016/021/022 confirmados; AC-026-018/019/023 (parte Pegadinha) já verificados na Wave 4.
 
 > O EDITOR abre um Conteúdo bruto e registra, edita ou remove o texto que explica por
 > que aquele ponto é um erro comum de prova, e o vê incluído no documento gerado pela
@@ -206,6 +208,7 @@ Variante do PDF, Rascunho (PDF), Exportação, Remoção reversível (Conteúdo 
 ### FEAT-026-003: Autoria de flashcards e inclusão na exportação
 
 **Jira**: KAN-124
+**Verificação (gate 9)**: 2026-09-26 — qa (fecho da Wave 5): VERIFICADO via HTTP real + Postgres real + PDF gerado, nas 2 Variantes. AC-026-008 a 012/015/016/020/022 confirmados (ordem de criação provada com spy no orderBy); AC-026-018/019/023 (parte Flashcard) já verificados na Wave 4.
 
 > O EDITOR abre um Conteúdo bruto, registra um ou mais Flashcards (pergunta/resposta)
 > e os vê incluídos no PDF gerado pela Exportação — testável ponta a ponta por criar
@@ -242,6 +245,7 @@ Variante do PDF, Rascunho (PDF), Exportação, Remoção reversível (Conteúdo 
 ### FEAT-026-004: Protocolo impresso de revisão na exportação
 
 **Jira**: KAN-125
+**Verificação (gate 9)**: 2026-09-26 — qa (fecho da Wave 5): VERIFICADO via HTTP real + Postgres real + PDF gerado, nas 2 Variantes. AC-026-013/014 confirmados: os 6 Marcos na ordem canônica fixa, sem cálculo de tempo/estado (getReviewProtocolMarks sem parâmetro de tempo, comparação literal contra lista fixa).
 
 > O EDITOR aciona a Exportação de um Conteúdo bruto e o documento gerado inclui o
 > Protocolo impresso de revisão com os 6 Marcos fixos — testável ponta a ponta pela
