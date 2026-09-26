@@ -501,3 +501,29 @@ aplicada ao MOTIVO do comentário, não só ao molde copiado); alegação não c
 parágrafo)
 reincidencia: 0
 estado: ativa
+
+## LRN-032: causa "sem tela hospedeira" (FR sem COMP no PLAN) não é causa de handoff (§8.1) — é furo de especificação, roteado ao PO
+data: 2026-09-26
+gatilho: verificacao_falhou
+origem: PLAN-027 (slug producao-material), Wave 4, gate 9 (`qa`) — o `qa` tentou exercitar FR-026-011/017
+("exibir na tela do Conteúdo bruto") e não achou nenhuma rota/COMP do PLAN-027 que montasse o
+componente; propôs nomear causa nova no enum fechado do §8.1 (`sem_tela_hospedeira`, distinta de
+`app_fora_do_ar`). O Tech Lead tratou como lacuna de ESCOPO, não como handoff, antes de escalar
+causa_raiz: especificacao — nenhum COMP do PLAN-027 monta a tela que FR-026-011/017 prometem; furo de
+mapeamento FR→COMP no PLAN, não indisponibilidade de AMBIENTE (o app está de pé, o código está certo —
+só não existe superfície para montar). Não é mecanizável de forma genérica: FR sem COMP na fatia pode
+ser fasing legítimo entre PLANs do mesmo SPEC (FRs frequentemente se distribuem por várias waves/PLANs
+de um mesmo épico), então um check automático de cobertura FR→COMP produziria falso-positivo em todo
+PLAN parcial — decidir se é furo real ou fase futura exige julgamento do PO, não uma régua mecânica
+artefato_patchado: nenhum — causa `especificacao` não gera patch de instrução; rota é o furo de plano,
+já corretamente tratado pelo Tech Lead como lacuna de escopo, para o PO decidir entre amendar PLAN-027
+com wave/COMP novo ou descopar/adiar FR-026-011/017 com nota explícita no PLAN
+patch: proposta do `qa` de estender o enum fechado do §8.1 de `docs/_meta/conventions/handoff-protocol.md`
+(nova causa `sem_tela_hospedeira`) REJEITADA — dono errado: §8.1 é escopado explicitamente a
+indisponibilidade de AMBIENTE ("ambiente sem acesso a testes de tela", linhas 6-8 do próprio doc), e um
+handoff `Pendente` com essa causa nunca fecharia pelo protocolo de fechamento do próprio §8.1 ("exercitar
+cada item com a rotina de verificação de tela" — item 4) — fecharia só com uma wave de PLAN nova, nunca
+com verificação de tela; misturar as duas semânticas no mesmo enum viola um-dono-por-regra e produz
+handoff estruturalmente infechável pelo protocolo que o declara
+reincidencia: 0
+estado: ativa
