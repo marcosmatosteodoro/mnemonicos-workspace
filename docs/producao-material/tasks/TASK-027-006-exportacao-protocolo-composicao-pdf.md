@@ -179,7 +179,7 @@ memo de exploração (`exploration-producao-material.md`, seção "Reconheciment
 **Data início**: 2026-09-26T00:06:54-0300
 **Data conclusão**: 2026-09-26T10:09:38-0300
 **Commit SHA**: 4dc5c91 (backend, retry 976736b/d30a705)
-**Jira**:
+**Jira**: KAN-133
 
 **Quality gates**:
 - [x] Implementação completa
