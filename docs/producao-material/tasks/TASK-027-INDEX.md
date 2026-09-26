@@ -1,7 +1,7 @@
 # Índice de tarefas do PLAN-027
 
-**Total de tasks**: 6
-**Tamanho dominante**: medium (3 medium, 3 small)
+**Total de tasks**: 7
+**Tamanho dominante**: medium (3 medium, 4 small)
 
 ## Ordem de execução (waves)
 
@@ -20,3 +20,6 @@
 
 ### Wave 5 (depende de Wave 2, 3 e 4)
 - [x] TASK-027-006 ✅ Done
+
+### Wave 6 (furo no plano achado na convergência de fecho da Entrega — decisão 4.301/§3.5; depende de Waves 2, 3, 4)
+- [ ] TASK-027-007 ⏸ Todo
