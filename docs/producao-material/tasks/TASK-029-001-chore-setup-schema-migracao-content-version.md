@@ -111,8 +111,12 @@ Entrega).
       própria acima dele (nunca colado), `onDelete: Restrict` nos 2 FKs novas
       (`ContentVersion.rawContent`, `ContentVersion.author`), `@@unique([rawContentId,
       number])`, `@@map("content_versions")`, e a AUSÊNCIA literal de `updatedAt`/
-      `deletedAt` no corpo do model `ContentVersion` (grep negativo dentro do bloco do
-      model, universo = corpo do model entre `model ContentVersion {` e o `}` que o
+      `deletedAt` no corpo do model `ContentVersion` — comando literal (achado do `qa` em
+      modo pré-código: o critério anterior descrevia o universo em prosa sem comando
+      executável): `sed -n '/^model ContentVersion {/,/^}/p'
+      mnemonicos-backend/prisma/schema.prisma | grep -E 'updatedAt|deletedAt'` (a partir
+      da raiz do workspace) → 0 ocorrências (exit 1 do grep, sem match) — universo = só o
+      corpo do model entre `model ContentVersion {` e o `}` que o
       fecha — nunca o arquivo inteiro, para não colidir com `updatedAt`/`deletedAt` de
       OUTROS models legítimos). Fixada antes do código.
 - [ ] Migração aditiva — verificação executável: leitura do `migration.sql` gerado

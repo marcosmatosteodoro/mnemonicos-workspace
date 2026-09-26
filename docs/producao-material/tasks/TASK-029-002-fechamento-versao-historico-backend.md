@@ -197,21 +197,20 @@ prévios do par), violando a DEC.
       `RawContent` inalcançável), nenhuma `ContentVersion` criada. Mesmo comando acima →
       `OK (N tests)`.
 - [ ] Testes cobrem AC-028-006 (FR-028-004) — **prova de ausência por leitura de
-      texto-fonte, universo = arquivo inteiro** (lição ativa "[Testes] Prova de ausência
+      texto-fonte, universo = SISTEMA INTEIRO** (lição ativa "[Testes] Prova de ausência
       por leitura de texto-fonte precisa declarar o universo lido, derivado do
-      quantificador do critério" — "nenhuma rota ou ação" é quantificador total, não
-      "nenhuma dentro do que eu already escrevi"): leitura de
-      `content-versions.routes.ts` confirma que só `.post(`/`.get(` são chamados no
-      Router (nenhum `.patch(`/`.put(`/`.delete(`); leitura de
-      `content-versions.service.ts` confirma que nenhuma função exportada chama
-      `tx.contentVersion.update`/`updateMany`/`delete`/`deleteMany` em NENHUM lugar do
-      arquivo (grep negativo sobre o arquivo inteiro, não só dentro de
-      `closeContentVersion`/`listContentVersions`). Verificação executável (grep negativo
-      excluindo comentário — uma menção em docblock/`//` não deve fazer este critério
-      falhar por engano nem mascarar uma chamada real): `grep -nE
-      "contentVersion\.(update|delete)"
-      src/modules/content-versions/content-versions.service.ts | grep -vE ':\s*(//|\*)'`
-      (cwd `mnemonicos-backend`) → 0 ocorrências (exit 1 do grep, sem match).
+      quantificador do critério" — AC-028-006/FR-028-004 dizem "nenhuma rota ou ação DO
+      SISTEMA", quantificador total sobre `mnemonicos-backend/src` inteiro, não só os 2
+      arquivos que esta TASK escreve — achado do `qa` em modo pré-código, escopo original
+      corrigido): leitura de `content-versions.routes.ts` confirma que só `.post(`/`.get(`
+      são chamados no Router (nenhum `.patch(`/`.put(`/`.delete(`). Verificação executável
+      (grep recursivo sobre TODO `src/`, excluindo comentário — uma menção em
+      docblock/`//` não deve fazer este critério falhar por engano nem mascarar uma
+      chamada real, e uma chamada real em QUALQUER outro arquivo do backend, não só nos 2
+      novos, precisa reprovar): `grep -rnE "contentVersion\.(update|updateMany|delete|
+      deleteMany)" src | grep -vE ':\s*(//|\*)'` (cwd `mnemonicos-backend`) → 0
+      ocorrências (exit 1 do grep, sem match) — cobre `content-versions.service.ts` e
+      qualquer outro módulo presente ou futuro que toque o model.
 - [ ] Testes cobrem AC-028-008 (FR-028-007) e DEC-029-005: fechamento de Versão registra o
       evento de etapa (`stageType: 'VERSAO_EDITORIAL'`) com `transitionType: 'CONCLUSAO'`
       MESMO na 1ª chamada do par (`listProductionStageEvents` confirma), sem exibir
@@ -252,16 +251,21 @@ prévios do par), violando a DEC.
       `'2026-09-15'`) → aceito, SEM checagem de monotonicidade (nenhuma leitura de Versão
       anterior no schema). Verificação executável: `npm --prefix mnemonicos-backend test --
       content-versions.schema.test.ts` → `OK (3 tests)`.
-- [ ] **NFR-028-003/AC-028-012 (gate 10 — medição real, lição ativa "[Performance]
-      include/select aninhado... Ressalva 2")**: `listContentVersions` faz `where:
-      {rawContentId} + orderBy: {number}` sobre tabela de volume variável — antes de
-      fechar a TASK, `EXPLAIN (ANALYZE, BUFFERS)` do SQL real capturado do driver contra
-      base semeada em volume (≥10k linhas de `content_versions` distribuídas entre
-      milhares de `RawContent` distintos, `ANALYZE` rodado) confirma AUSÊNCIA de `Seq Scan
-      on content_versions` no plano — o `@@unique([rawContentId, number])`
-      (TASK-029-001) é o índice usado. Registrar o plano capturado no PR/relatório de
-      fecho da wave (mesma régua de `listRawContents`, F2). Falsificável: `Seq Scan on
-      content_versions` no plano reprova o critério.
+- [ ] **NFR-028-003/AC-028-012 (gate 10 — medição real via `withQueryProbe`,
+      `tests/support/query-probe.ts` — mesma técnica de TRISK-010-001/TRISK-012-002,
+      nunca EXPLAIN sobre seed sintético de volume: não há precedente disso no projeto —
+      achado do `qa` em modo pré-código, a citação original a "mesma régua de
+      `listRawContents`/F2" descrevia uma análise MANUAL registrada em comentário do
+      schema, não um teste executável repetível)**: `listContentVersions` roda dentro de
+      `withQueryProbe` contra um `RawContent` com N Versões fechadas (N pequeno, ex. 5,
+      basta — o que se prova é ausência de N+1/varredura, não o plano do otimizador sob
+      volume) — o array de queries devolvido tem EXATAMENTE 1 statement (nenhum round-trip
+      por Versão, nenhuma consulta ao acervo inteiro). Falsificável: uma implementação que
+      iterasse e buscasse cada Versão em loop reprovaria (>1 statement). Complementa (não
+      substitui) a leitura estrutural: `grep -n "where: { rawContentId"
+      src/modules/content-versions/content-versions.service.ts` confirma que o predicado é
+      literalmente escopado por `rawContentId` (nunca uma consulta sem filtro seguida de
+      filtro em memória).
 - [ ] `ROUTE_ROLES` declara `{EDITOR, ADMIN}` para `POST /contents/:id/versions` e `GET
       /contents/:id/versions`; STUDENT recusado (403) nas 2 rotas — `route-authz-matrix`
       continua verde com as 2 chaves novas montadas (`collectRoutes`, sem asserção fixa a
