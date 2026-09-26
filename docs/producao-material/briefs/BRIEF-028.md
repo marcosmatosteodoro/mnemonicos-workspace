@@ -1,7 +1,7 @@
 # BRIEF-028: Versionamento editorial e fechamento legislativo
 
 **Slug**: producao-material
-**Status**: Emitido
+**Status**: Aceito
 **Data**: 2026-09-26
 **Largada**: 2026-09-26T14:26:48-0300
 **Epico**: docs/producao-material/briefs/BRIEF-2026-08-27-mnemora-studio-epic.md

@@ -280,6 +280,20 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-26: **Convergência de fecho verde de PLAN-029 (F8)** — backend `5cfdb18`/
+  frontend `8f76e6d` (dedup: aplicada — 1 achado). `graph.sh --check`: 0 achados em
+  SPEC-028/PLAN-029/TASK-029-*. Cobertura semântica confirmada FR a FR contra o código
+  final (11/11 FRs, 7/7 DECs respeitadas, nenhuma inconsistência entre as 3 waves).
+  Achado de dedup, não-bloqueante, registrado como pendência (não desta fatia):
+  `content-version-history.tsx` (2 extratores do envelope de erro do backend) repete o
+  mesmo caminho já presente em `publication-export-control.tsx`/`visual-library-board.tsx`
+  — candidato a consolidar em `lib/fetch-error.ts` (o canônico já existe e já é
+  importado por todos), diff de limpeza futuro. Nota de manutenção (não-gap): o
+  "único ponto de manutenção" de `versioned-content-diff.ts` não tem checagem de
+  exaustividade de tipo — um 12º campo futuro em `VersionedContentFields` entraria no
+  snapshot sem entrar automaticamente na comparação (falso negativo silencioso);
+  correção barata (lista de chaves `as const`), candidata a fatia futura que tocar o
+  recorte. `/keelson:integrate` pode dispensar a repetição desta convergência.
 - 2026-09-26: **Wave 2 de PLAN-029 concluída — TASK-029-002/003 Done, FEAT-028-002
   VERIFICADA (F8).** Backend completo de fechamento de Versão + histórico
   (`content-versions.service.ts`, lock `SELECT...FOR UPDATE` + `Promise.all` provando
