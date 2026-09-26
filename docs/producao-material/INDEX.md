@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-26T14:05:00-0300 (PLAN-027/F7 mergeada — backend #8/frontend #14 em `main` — Jira fechado até o Épico KAN-121; deploy em produção e promoção do `Status` do PLAN a `Done` seguem pendentes de ato do Diretor)
+**Última atualização**: 2026-09-26T15:10:00-0300 (SPEC-028/F8 criada e aprovada pelo `po` — Jira KAN-136/137/138; `/keelson:plan` é o próximo passo)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -34,6 +34,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
+- Versionamento editorial do Conteúdo bruto — fechamento explícito de Versão editorial (autor-ou-ADMIN) recortado por campo (texto normativo, radar, fonte normativa, blocos da Quebra da regra — Pegadinha elaborada fora), append-only, histórico exposto para leitura, e carimbo de Versão/Data de fechamento legislativo em toda página do PDF exportado (coexistindo com "Rascunho"), com marca fail-secure de "alterado após o fechamento" quando o texto muda depois da Versão vigente — SPEC-028, F8 do épico MNEMORA STUDIO, `Approved` 2026-09-26.
 
 _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 entregue e mergeada 2026-09-14
 (BRIEF-022/SPEC-022/PLAN-023, 17/17 TASKs Done, 6 waves, DoD satisfeito, PR #6 backend
@@ -58,6 +59,7 @@ fechado._
 | SPEC-022 | Biblioteca visual reutilizável | Approved | 2026-09-13 |
 | SPEC-024 | Pipeline de publicação — PDF (rascunho) | Approved | 2026-09-14 |
 | SPEC-026 | Contrastes, pegadinhas, flashcards e protocolos impressos | Approved | 2026-09-16 |
+| SPEC-028 | Versionamento editorial e fechamento legislativo | Approved | 2026-09-26 |
 
 ## PLANs
 
@@ -141,6 +143,9 @@ fechado._
 | Flashcard | Par pergunta/resposta (frente/verso) derivado de um Conteúdo bruto/Quebra da regra, autorado pelo EDITOR, incluído no documento da Exportação | SPEC-026 |
 | Protocolo impresso de revisão | Checklist textual, gerada no momento da Exportação, listando os 6 Marcos de revisão na ordem fixa, sem cálculo nem rastreamento de cumprimento pelo sistema | SPEC-026 |
 | Marco de revisão | Cada um dos 6 rótulos fixos do Protocolo impresso — R0, R24, R3, R7, R14, R30 — herdados da TAP, nunca calculados pelo scheduler SM-2 existente (dormente) | SPEC-026 |
+| Versão editorial (do Conteúdo bruto) | Registro imutável (número sequencial, Data de fechamento legislativo, autor do fechamento, timestamp técnico), recortado por campo (texto normativo, radar, fonte normativa, blocos da Quebra da regra — Pegadinha elaborada fora) — a trilha histórica que o Carimbo de última alteração (SPEC-005) já previa como pendente para F8 | SPEC-028 |
+| Fechar uma Versão (ato) | Ação explícita do EDITOR-autor ou ADMIN sobre um Conteúdo bruto, disparando o registro de uma nova Versão editorial — nunca automática a cada edição | SPEC-028 |
+| Versão vigente | A Versão editorial mais recente fechada de um Conteúdo bruto — a que aparece estampada no PDF exportado dele | SPEC-028 |
 
 ## Decisões irreversíveis
 
@@ -159,8 +164,8 @@ fechado._
 | PIL-001 | Teste da tira aprovado sem limiar (Q-11) e cinco das seis métricas da §5.4 sem instrumento (Q-12) — não bloqueiam a SPEC, bloqueiam a conclusão do piloto | decidir antes do beta; retomar via /keelson:brief producao-material | BRIEF-001 |
 | ~~RDR-001~~ | **RESOLVIDO 2026-09-01** — SPEC-005 A-005-001: as 5 classes da TAP são o dado persistido; as 3 prioridades do mockup são derivação de apresentação, exibição adiada para F10. Não é 2ª dimensão gravada. | selado (premissa com `Reabrir se:` F7/F10/F11 precisarem priorizar natureza acima de grau) | BRIEF-001 → SPEC-005 |
 | RISK-005-001 | Colapso das 5 classes do radar numa prioridade única de apresentação: reverter o mapeamento exigiria reclassificação **manual** de todo o acervo já produzido (trabalho humano, A-007), não só migração de schema | classe das 5 fica persistida; exibição da prioridade adiada p/ F10; `Reabrir se:` em A-005-001 | SPEC-005 §9 |
-| RISK-005-004 | **Reclassificado por SPEC-011 (2026-09-06), não baixado**: a fatia F4 não migra nem expurga dado — apenas desliga o `Mnemonic` legado da fábrica (já sem consumidor desde F2/A-005-013). Severidade cai de "duas representações vivas da fonte" para "dado dormente duplicado", sucedido por RISK-011-001 | Baixa exige ato destrutivo (migração/expurgo) do Diretor, fatia futura (F8 ou limpeza de schema dedicada) | SPEC-005 §9 → SPEC-011 §9 |
-| RISK-011-001 | `Mnemonic.hook`/`decoding`/`source` permanecem no schema sem consumidor após F4 — dado dormente duplicado (sucessor de RISK-005-004) | Nomeado no Out-of-scope de SPEC-011; revisitar quando F8 (versionamento) ou limpeza de schema for planejada | SPEC-011 §9 |
+| RISK-005-004 | **Reclassificado por SPEC-011 (2026-09-06), não baixado**: a fatia F4 não migra nem expurga dado — apenas desliga o `Mnemonic` legado da fábrica (já sem consumidor desde F2/A-005-013). Severidade cai de "duas representações vivas da fonte" para "dado dormente duplicado", sucedido por RISK-011-001. **F8 (SPEC-028) confirmou, em §4.2, que não é esta fatia** — destino segue em aberto (limpeza de schema dedicada), não mais "F8 ou..." | Baixa exige ato destrutivo (migração/expurgo) do Diretor, fatia de limpeza de schema dedicada | SPEC-005 §9 → SPEC-011 §9 → SPEC-028 §4.2 |
+| RISK-011-001 | `Mnemonic.hook`/`decoding`/`source` permanecem no schema sem consumidor após F4 — dado dormente duplicado (sucessor de RISK-005-004) | Nomeado no Out-of-scope de SPEC-011; **SPEC-028 (§4.2) declarou que F8 não resolve isso** — revisitar em limpeza de schema dedicada | SPEC-011 §9 → SPEC-028 §4.2 |
 | RISK-011-002 | Sem drag-and-drop, usabilidade de reordenar Tiras com mais Quadros do que o teto inicial de 5 pode ficar pobre com controles simples | Aceito nesta fatia; revisitar se o piloto (PIL-001) reportar atrito real | SPEC-011 §9 |
 | RISK-011-003 | Atomicidade da reordenação (NFR-011-002) depende do mecanismo técnico que o PLAN escolher — estratégia sem reversão conjunta reabre o risco original do épico na prática | Gate de revisão de código do PLAN/TASKs deve provar a atomicidade, não apenas declará-la | SPEC-011 §9 |
 | RISK-011-004 | Payload mínimo do evento de etapa (herdado de RISK-009-001) não distingue qual ação de CRUD gerou um retrabalho de "Tira mnemônica" | Aceito nesta fatia pelo mesmo motivo de RISK-009-001; gap só se soma para eventos futuros | SPEC-011 §9 |
@@ -254,9 +259,38 @@ fechado._
 | RISK-027-008 | `code-reviewer`/`product-designer` (Wave 5, rodada 2): o achado alta do gate 11 (Pegadinha sem rótulo, indistinguível do texto principal) foi corrigido com título de seção — mas a página de TRANSBORDO da seção Pegadinha (quando o texto é longo o bastante para virar página) NÃO repete o título, e `updatePegadinhaSchema` não limita tamanho — resíduo do mesmo risco pedagógico, agora restrito a Pegadinha longa | Decisão do `product-designer`/PO: repetir o título no transbordo (mesma régua de custo zero do achado original) ou aceitar como risco residual de baixa incidência | code-reviewer + product-designer, Wave 5 de PLAN-027 (re-review) |
 | RISK-027-010 | `code-reviewer` (verificação do retry de TASK-027-008, Wave 7): confirmado por sonda que `content-form.tsx` hidrata os campos do próprio Conteúdo bruto (`rawText`/`topicId`/`radarClass`/`source*`) a partir do cache UMA VEZ (guard `hydrated`, :145-155) — na revisita, mesmo com `refetchOnMountOrArgChange` já ligado (TASK-027-008), esses campos continuam mostrando o valor VELHO; só `PegadinhaField`/painel suplementar (que leem a prop, não hidratam estado local) ficam frescos. Território FR-005/F2 (`SPEC-005`, PLAN-006, já entregue), **fora do escopo de SPEC-026/PLAN-027** — não bloqueia esta Entrega, mas a tela hoje fica inconsistente (Pegadinha fresca, form do Conteúdo bruto velho) e um "Salvar" nesses campos sobrescreve mudança de outro escritor sem tê-la exibido | Decisão do Diretor/PO: gate na hidratação por `isFetching`/`fulfilledTimeStamp` no 1º mount, ou aceitar como risco de F2 pré-existente (comportamento não piorado por PLAN-027, só ficou mais visível ao lado da Pegadinha agora fresca) — candidato a brief avulso ou próxima fatia que tocar `content-form.tsx` | code-reviewer, verificação de TASK-027-008 (Wave 7 de PLAN-027) |
 | — | `code-reviewer` (Wave 5): `tests/integration/contrasts.service.integration.test.ts:37` e `flashcards.service.integration.test.ts:38` continuam com `seedContrast`/`seedFlashcard` LOCAIS, equivalentes ao helper canônico `tests/support/material-reforco-fixtures.ts` que a Wave 5 criou — migração explicitamente aceita como fora de escopo pela régua da rodada 1, mas segue pendente | Migrar os 2 arquivos para importar do helper compartilhado — candidata a diff de limpeza na convergência de fecho do PLAN, ou task própria | code-reviewer, Wave 5 de PLAN-027 |
+| RISK-028-001 | Decisão entre snapshot imutável e referência mutável (A-028-004) ainda não tomada — muda a forma como o histórico de Versões preserva (ou não) o texto de Versões anteriores | Decisão arquitetural irreversível, cabe ao PLAN-028 com alternativas explícitas | SPEC-028 §9 |
+| RISK-028-002 | `Mnemonic` legado dormente (RISK-011-001/RISK-005-004) segue sem solução — SPEC-028 não o expurga nem migra | Aceito nesta fatia; revisitar em limpeza de schema dedicada | SPEC-028 §9 |
+| RISK-028-003 | Sem teto de cadência entre fechamentos de Versão (A-028-011) — histórico pode acumular Versões sem mudança real de texto | Aceito nesta fatia; revisitar se o piloto (PIL-001) reportar ruído real | SPEC-028 §9 |
+| RISK-028-004 | A "Versão aprovada" que F9 vai avaliar recai sobre um PDF que também imprime material de reforço (Contraste/Pegadinha/Flashcard/Tira/Associação visual) não coberto pelo versionamento desta fatia (recorte por campo, A-028-002) | Decidir se o gate de F9 cobre ou não esse material é assunto de F9, não desta SPEC | SPEC-028 §9 |
+| RISK-028-005 | Um expurgo físico futuro de Conteúdo bruto, em cascata, apagaria as Versões editoriais dele — contradiz o requisito append-only (FR-028-004) | A fatia que definir expurgo (fora de F8, ver §4.2 de SPEC-028) precisa resolver o destino das Versões antes de agir; nenhum mecanismo futuro pode remover uma Versão, direta ou indiretamente | SPEC-028 §9 |
 
 ## Histórico recente
 
+- 2026-09-26: **SPEC-028 criada e aprovada (F8, `/keelson:continue` → `/keelson:auto`,
+  BRIEF-028).** `spec-validator`: 0 ERROR, 4 WARNING não-bloqueantes (`spec-must-ratio`,
+  `spec-nfr-sem-numero` ×2, `spec-sem-should-may`). `product-analyst`: veredito
+  `REVISAR_ANTES_DE_APROVAR`, 3 riscos de mérito (carimbo verdadeiro pós-edição; escopo
+  do versionamento por tabela vs. o que a Exportação realmente imprime — `pegadinhaText`
+  é coluna do próprio `RawContent`; promessas herdadas de expurgo/restauração de
+  Conteúdo bruto de SPEC-005/PLAN-006/PLAN-027 não endereçadas). `po` (modo aprovação):
+  `APROVAR` com 3 resoluções em nome do Diretor, nenhuma escalação (nenhum dos 3 pontos
+  batia nos critérios de escalação) — FR-028-011 nova (marca fail-secure "alterado após
+  o fechamento" quando campo versionado muda pós-fechamento, com AC-028-013 e ajuste em
+  AC-028-009/métrica §1.3); A-028-002 reescrita recortando o versionamento por CAMPO
+  (texto normativo, radar, fonte normativa, 5 blocos+síntese da Quebra — Pegadinha
+  elaborada fora, RISK-028-004 novo sobre o alcance do gate de F9); §4.2 ganhou item
+  explícito declarando expurgo/restauração de Conteúdo bruto fora de F8 (RISK-028-005
+  novo sobre expurgo futuro × append-only). Status Draft → Approved, Versão 0.1 → 0.2.
+  0 escalação pendente ao Diretor. Próximo: `/keelson:plan` (DEC irreversível
+  snapshot × referência, A-028-004/RISK-028-001, decide lá com alternativas explícitas).
+- 2026-09-26: **Sync Jira — gancho `specify` de SPEC-028 (F8).** KAN-136 (Epic-raiz da
+  largada, §16) enriquecido: descrição do stub substituída pelo template Epic real
+  (Contexto/Escopo/Funcionalidades). `epicPolicy: multi-feature` com 2 FEATs → projeção
+  plena confirmada; Stories criadas via `jira-sync-feat.md`: KAN-137 (FEAT-028-001,
+  parent KAN-136) e KAN-138 (FEAT-028-002, parent KAN-136), ambas com descrição completa
+  (Como testar por AC). Keys gravadas em SPEC-028 (`**Jira**:` sob cada heading FEAT).
+  Sem sub-tasks nesta passada (gancho `specify` não cria TASKs — fica para `/keelson:tasks`).
 - 2026-09-26: **Reconciliação Jira + `--phase finish-dev` (`/keelson:jira-sync
   producao-material --phase finish-dev`).** Sub-tasks criadas para os 2 furos de PLAN-027
   achados após a reconciliação anterior: KAN-134 (TASK-027-007, sub-task de KAN-122/
