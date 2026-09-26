@@ -260,6 +260,22 @@ antes do `.save()` final, para AMBAS as Variantes (A-026-007). `PublicationClien
 intocada (extensão interna).
 **Dependências**: COMP-027-017; estende COMP-025-005 (`publication.service.ts`, PLAN-025)
 
+### COMP-027-019: `content-supplementary-panel.tsx`
+**Responsabilidade**: client wrapper (`'use client'`) montado por `ContentForm`
+(COMP-025-012, via slot `supplementary`, só no ramo de sucesso — depois dos early returns
+de loading/erro) que hospeda `ContrastList`/`FlashcardList`/`PegadinhaField`
+(COMP-027-005/014/013) na tela `(interno)/content/[id]`, fechando o furo de
+alcançabilidade achado na convergência de fecho da Entrega (nenhuma TASK 001-006 montava
+os 3 componentes numa página). Lê `pegadinhaText` via `useGetRawContentQuery` — mesma
+chave de cache que `ContentForm` já usa, sem round-trip extra; a opção
+`refetchOnMountOrArgChange` que cumpre "recarregada a cada visita" (FR-026-011) fica no
+subscriber PRIMÁRIO (`ContentForm`, monta antes), não neste componente, para não duplicar
+o `GET` na carga fria.
+**Realiza**: FR-026-005, FR-026-011, FR-026-017
+**Interface pública**: `{ rawContentId: string }`
+**Dependências**: COMP-025-012 (`content-form.tsx`, PLAN-006, slot `supplementary`);
+COMP-027-005/013/014
+
 ## 4. Fluxos principais
 
 **Fluxo 1 — Registro de Contraste** (AC-026-001/002/003/004): EDITOR abre
