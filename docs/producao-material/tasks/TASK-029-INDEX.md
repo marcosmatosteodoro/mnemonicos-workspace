@@ -15,4 +15,4 @@
 ### Wave 3 (depende de TASK-029-002 E TASK-029-003 — o roteiro do gate 9 exporta o PDF e
 confere o carimbo, exigindo as duas prontas; ajuste desta TASK-index à sugestão inicial de
 waves, que citava só a dependência de TASK-029-002)
-- [ ] TASK-029-004 ⏸ Todo
+- [x] TASK-029-004 ✅ Done

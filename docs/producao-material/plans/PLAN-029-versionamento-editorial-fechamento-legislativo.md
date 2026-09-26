@@ -501,12 +501,12 @@ slot; nenhuma mudança na assinatura de `ContentForm`.
 
 ## 9. Definition of Done deste PLAN
 
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs
-- [ ] Todos os NFRs cobertos têm verificação
-- [ ] Decisões DEC refletidas no código
-- [ ] Aderência à ficha/perfil validada
-- [ ] Todos os ACs cobertos por teste (gate 1 dos quality gates)
-- [ ] Métrica da SPEC operacional (§1.3, `Fonte de medição: instrumentação`): consulta
+- [x] Todos os FRs cobertos têm implementação satisfazendo os ACs
+- [x] Todos os NFRs cobertos têm verificação
+- [x] Decisões DEC refletidas no código
+- [x] Aderência à ficha/perfil validada
+- [x] Todos os ACs cobertos por teste (gate 1 dos quality gates)
+- [x] Métrica da SPEC operacional (§1.3, `Fonte de medição: instrumentação`): consulta
   cruzando `PublicationEvent` (F6, `rawContentId`/`occurredAt`) com a existência de
   `ContentVersion` do mesmo `rawContentId` fechada até a data da exportação
   (`ContentVersion.closedAt <= PublicationEvent.occurredAt`) — e, para excluir do

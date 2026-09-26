@@ -2088,3 +2088,52 @@ neste backend, sempre que o código sob teste possa estar operando dentro de
 `$transaction`).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Design] Componente novo num slot já ocupado por irmãos canônicos herda a CONVENÇÃO deles, não só o contrato de composição
+
+**Erro:** `content-version-history.tsx` (TASK-029-004, PLAN-029) nasceu no mesmo slot
+`supplementary` de `ContentForm` já ocupado por `ContentSupplementaryPanel` (Contraste/
+Flashcard, F7) e divergiu dos irmãos em 4 pontos, todos achados pelo `product-designer`
+no gate 11: (1) ordem — formulário ANTES da lista, irmãos mostram lista/vazio primeiro e
+formulário no rodapé; (2) texto de estado vazio sem orientação de próximo passo, irmãos
+orientam ("Registre o primeiro... abaixo."); (3) campo do formulário de criação NÃO
+limpo após sucesso, irmãos limpam; (4) nenhum desses 4 pontos tinha âncora `arquivo:linha`
+no molde citado pela TASK — ela citava `contrast-form.tsx` só para os 3 estados de
+UI (loading/sucesso/falha), não para ordem/copy/reset.
+**Causa:** a TASK descreveu o COMPORTAMENTO (3 estados, dados exibidos) com precisão, mas
+tratou layout/copy/reset como detalhe livre do developer — sem citar o irmão canônico do
+MESMO slot como referência obrigatória para esses eixos, o componente novo reimplementou
+cada decisão do zero, e nenhuma delas coincidiu com o padrão já estabelecido.
+**Solução:** ao redigir uma TASK que introduz componente novo num slot/grupo onde já
+existem irmãos (mesmo grupo funcional, mesma tela, mesmo padrão de composição), cite
+`arquivo:linha` do irmão canônico para CADA eixo observável — ordem dos blocos, texto de
+estado vazio, comportamento pós-sucesso do formulário (reset ou não), mapeamento de
+erro por status — não só para os "3 estados de UI" genéricos. "Molde X para os 3
+estados" não cobre ordem/copy/reset; cada eixo pede sua própria âncora.
+**Validade:** geral (qualquer componente novo que ocupe um slot de composição já usado por
+componentes irmãos, neste frontend).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0
+
+## [Testes] Extrator com cadeia de fallback (`a ?? b ?? c`) exige 1 teste por ramo — fixture sempre "completo" nunca exercita o 2º/3º fallback
+
+**Erro:** `content-version-history.tsx` (TASK-029-004, PLAN-029) mapeia a mensagem de
+erro de fechamento de Versão com `extractFieldMessage(err, path) ?? extractBackendErrorMessage(err)
+?? GENERIC_SUBMIT_ERROR` (e uma cadeia irmã de 2 elos para 4xx genérico) — mas os
+fixtures de teste do retry que introduziu essa cadeia sempre vinham com `details`/
+`message` completos, exercitando só o 1º ramo. Achado do `code-reviewer` por mutação:
+zerar o 2º/3º fallback (trocar por `''`) deixava a suíte inteira verde.
+**Causa:** ao escrever o teste "no caminho feliz" de um extrator com fallback, o fixture
+natural já contém tudo — não força o código a "cair" para o próximo `??`. A cobertura de
+linha/branch do coverage tool não distingue "ramo executado porque o valor era undefined"
+de "ramo nunca alcançado porque o valor sempre veio preenchido".
+**Solução:** todo extrator de envelope de erro (ou qualquer cadeia `a ?? b ?? c`) usado
+para decidir o que o usuário vê ganha 1 teste por elo da cadeia, com fixture que
+DELIBERADAMENTE omite os elos anteriores (ex.: `details` sem o campo esperado; corpo
+`{}` sem `message` nem `details`) — nunca só o fixture "feliz" que já teria o 1º elo.
+Rodar o mutante (zerar cada fallback, um de cada vez) antes de declarar o critério
+coberto.
+**Validade:** geral (qualquer extrator/cadeia de fallback usada para decidir texto exibido
+ao usuário, neste frontend ou backend).
+**Estado:** ativa
+**Contadores:** confirmada 0 · contestada 0

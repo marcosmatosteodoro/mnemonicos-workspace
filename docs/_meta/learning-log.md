@@ -664,3 +664,49 @@ decidido em silêncio. Saldo líquido ~+4 linhas (mesma frase/parágrafo; arquiv
 longe do teto de 500)
 reincidencia: 0
 estado: ativa
+
+## LRN-037: catálogo "resistir a contorno" de `commands/tasks.md` (itens a-h) não cobre AC/FR
+que promete uma CLASSE de falha por causa ("mensagem do motivo") sobre mutação — nada obriga
+enumerar as causas alcançáveis via grep dos `throw` do service antes de fixar o critério
+data: 2026-09-26
+gatilho: gate_reprovado
+origem: PLAN-029 (slug producao-material), Wave 3, TASK-029-004 — o Critério de pronto de
+AC-028-007/FR-028-006 ("... ao concluir mostra sucesso ... ou falha (mensagem do motivo)") foi
+instanciado como "em FALHA (erro do sistema) ... mensagem de falha visível" — só o caso 5xx
+genérico, um exemplo, não a condição completa que o AC promete. O `developer` implementou e
+testou exatamente esse exemplo; as recusas com motivo real da rota (`content-versions.service.ts`:
+`NotFoundError` "Conteúdo bruto não encontrado", `ForbiddenError` "sem permissão",
+`NotFoundError` "Quebra da regra precisa existir") chegavam à tela sob o mesmo texto genérico
+("Tente novamente"), inclusive para causas PERMANENTES em que tentar de novo nunca resolve.
+Achado pelo `code-reviewer` no gate 1-7/gate 11 da wave — não no gate 9 (caminho feliz, que não
+exercita cenário de recusa) — depois de o `developer` já ter implementado e testado o exemplo
+único: 1 rodada de retry para reabrir o critério, reimplementar os 3 ramos e recobrir com teste
+próprio por causa
+causa_raiz: instrucao_ausente — o catálogo "resistir a contorno" (Etapa 3, `commands/tasks.md`,
+itens a-h, decisão 4.107 + família) cobre literal (a), estrutural/grep (b), escopo contável (c),
+consumidor compartilhado (d), contradição (e), round-trip/conjunção (f), comparativo de
+unicidade (g) e molde/exemplar (h) — nenhum item nomeia a classe "AC/FR promete falha
+classificada por CAUSA (não um único caso) sobre uma mutação": nada instrui, ao mapear esse AC
+para o Critério de pronto, enumerar via `grep` dos pontos de `throw` do service da rota (por
+status/causa) o universo de ramos alcançáveis antes de escrever o cenário de "falha" — a TASK
+fixou o exemplo mais óbvio (erro genérico 5xx) no lugar da condição, leitura literal razoável do
+texto atual, e nem o gate 2 nem o gate 9 (caminho feliz) tinham como acusar a ausência dos outros
+ramos. Distinto da lição-irmã de projeto já `ativa` em `guidelines/project/lessons.md` ("[Código]
+Mensagem de erro que atribui causa a partir de um `status` HTTP..." — PLAN-027, TASK-027-007):
+aquela cobre o developer/reviewer atribuindo causa errada quando um MESMO status tem 2+ causas
+possíveis (já implementado, já em código); esta cobre o gerador da TASK (`/keelson:tasks`), que
+nem chegou a enumerar os ramos de falha antes do código nascer — um dono por regra, dedupe
+conferido contra o acervo de projeto antes de registrar esta entrada (nenhuma reincidência)
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`,
+catálogo "resistir a contorno" (Etapa 3, mesmo parágrafo dos itens a-h, l.189 da v0.180.0)
+patch: proposta de item novo (letra a atribuir pelo mantenedor — mesma situação de LRN-012/030,
+que também disputam slot na mesma lista): AC/FR cujo texto promete falha classificada por CAUSA
+("mensagem do motivo", "falha com o motivo da recusa" — uma CLASSE, não um caso único) sobre uma
+mutação nasce com o Critério de pronto enumerando, por `grep` dos pontos de `throw` do service
+daquele endpoint, TODA causa hoje alcançável (por status e por texto de causa, quando um status
+tem mais de uma) — um cenário de teste por causa alcançável, nunca um único exemplo (ex.: só o
+5xx genérico) no lugar da condição; causa nomeada no AC/FR e ausente do grep é exclusão explícita
+no "Não inclui", nunca lacuna implícita. Saldo líquido estimado ~+7 linhas (mesmo parágrafo,
+dentro do orçamento ≤10; arquivo tem 247 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa

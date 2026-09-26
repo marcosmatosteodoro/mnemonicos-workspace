@@ -348,6 +348,65 @@
   vez (guard `hydrated`) e IGNORA o refetch (RISK-027-010, fora de escopo de PLAN-027,
   território FR-005/F2) — mnemonicos-frontend/src/components/content-form.tsx:114-155.
 
+## Versionamento editorial e fechamento legislativo (F8 · PLAN-029)
+
+- [2026-09-26 · PLAN-029] `ContentVersion` (append-only, mesmo padrão de
+  `ProductionStageEvent`/`Contrast`: sem `updatedAt`/`deletedAt`, garantia é ausência de
+  caminho de update/delete no código) — `id`, `rawContentId`→RawContent (`onDelete:
+  Restrict`), `number Int` (sequencial por `rawContentId`, `@@unique([rawContentId,
+  number])`), `legislativeClosureDate DateTime` (data declarada pelo ator, `<= hoje`,
+  sem monotonicidade — DEC-029-006), `authorId`→User (`onDelete: Restrict`), `closedAt
+  DateTime @default(now())`, `contentSnapshot Json` (cópia dos 11 campos versionados —
+  `rawText`/`radarClass`/`sourceType`/`sourceCitation`/`sourceUrl` de `RawContent` +
+  `concept`/`action`/`object`/`condition`/`exception`/`essence` de `RuleBreakdown` —
+  **DEC-029-003, irreversível**: snapshot completo, não hash, para preservar a opção de
+  reprodução histórica). Valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`
+  (`recordProductionStageEvent` ganhou parâmetro opcional `transitionType` para emitir
+  sempre `CONCLUSAO` direto, sem passar por `decideStageTransition` — DEC-029-005) —
+  mnemonicos-backend/prisma/schema.prisma (model `ContentVersion`).
+- [2026-09-26 · PLAN-029] `content-versions.service.ts` — `closeContentVersion`: guarda
+  DENTRO da `$transaction`, NESTA ORDEM: (1) `tx.$queryRaw SELECT ... FOR UPDATE` na
+  linha do `RawContent` pai (mesmo molde de `removeVisualAssociation`/F5, fecha corrida
+  real de numeração — provado com `Promise.all`, DEC-029-004); (2)
+  `assertRawContentReachable` (herdada de F2); (3) checagem explícita `actor.role ===
+  'ADMIN' || rawContent.authorId === actor.id`, `ForbiddenError` senão (padrão de
+  `contrasts.service.ts`, não o `scopeWhere` de `contents.service.ts` — é um CREATE de
+  linha filha, não update de `RawContent`); (4) `RuleBreakdown` deve existir; (5) próximo
+  `number`; (6) monta `contentSnapshot` por ALLOWLIST explícita de campo (nunca
+  espalhamento — vazaria `authorId`/`lastEditedById`/`deletedAt`/timestamps internos,
+  CWE-915, alerta do security-engineer da Wave 1); (7) `create`; (8)
+  `recordProductionStageEvent` override. `listContentVersions`: mesma guarda de alcance,
+  SEM restrição por autoria (leitura comum, mesmo padrão de F7) — 2 statements fixos
+  (`assertRawContentReachable` + `findMany`), independente de N (medido, NFR-028-003) —
+  mnemonicos-backend/src/modules/content-versions/content-versions.service.ts.
+- [2026-09-26 · PLAN-029] `versioned-content-diff.ts` — `toVersionedContentFields`
+  (função pura, ÚNICO ponto de montagem do objeto de 11 campos, usado tanto para gravar
+  o `contentSnapshot` no fechamento quanto para o "estado atual" na exportação — com
+  `satisfies VersionedContentFields`, não anotação de retorno, porque
+  `Prisma.InputJsonObject` não aceita a interface sem index signature) e
+  `hasVersionedContentChanged` (comparação campo a campo, sem hash) — usada só na
+  exportação (`publication.service.ts`), nunca no fechamento — mnemonicos-backend/src/
+  modules/content-versions/versioned-content-diff.ts.
+- [2026-09-26 · PLAN-029] Carimbo de Versão no PDF: `publication.service.ts` busca a
+  Versão mais recente (`number` desc) e recomputa `hasVersionedContentChanged` contra o
+  estado atual — monta o dado de versão para `PublicationPdfMeta` (estendida);
+  `pdf-composer.ts`/`drawDraftHeader` desenha a linha extra ("Versão N — verificado até
+  <data>" ou "sem versão", mais "alterado após o fechamento da Versão N" quando
+  aplicável) em TODA página, ao lado do rótulo "Rascunho" (F6, sem alteração) — 1
+  consulta indexada a mais na exportação, fora do `withDeadline`, custo medido ~25ms
+  estável independente de N (RISK-025-007 não agravado) — mnemonicos-backend/src/
+  modules/publication/{publication.service,pdf-composer}.ts.
+- [2026-09-26 · PLAN-029] Frontend: `content-version-history.tsx` — componente ÚNICO
+  (form + lista) no slot `supplementary` de `ContentForm`, IRMÃO de
+  `ContentSupplementaryPanel` (nunca aninhado — DEC-029-007). Mensagem de erro por
+  status: 4xx conhecido mostra `error.data.error.message` do backend (nunca genérico);
+  422 vira erro NO CAMPO (`aria-invalid`/`aria-describedby`); genérico "tente novamente"
+  reservado a rede/5xx. Ordem lista-antes-do-form e texto de estado vazio seguem o molde
+  dos irmãos `contrast-list.tsx`/`flashcard-list.tsx` — lição nova: componente novo em
+  slot já ocupado por irmãos canônicos precisa citar `arquivo:linha` do irmão para CADA
+  eixo observável (ordem, copy, reset pós-sucesso), não só para os "3 estados de UI" —
+  mnemonicos-frontend/src/components/content-version-history.tsx.
+
 ## Instalabilidade PWA (avulso · PLAN-013)
 
 - [2026-09-07 · PLAN-013] `mnemonicos-frontend` ganhou manifesto (`app/manifest.ts`),
