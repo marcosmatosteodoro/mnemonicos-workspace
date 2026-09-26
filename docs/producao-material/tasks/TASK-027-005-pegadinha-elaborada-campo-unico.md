@@ -8,7 +8,7 @@
 **Wave**: 4
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -226,19 +226,19 @@ depende de TASK-027-003): as 3 TASKs de registro compartilham a escrita em
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-09-16T20:48:36-0300
+**Data conclusão**: 2026-09-26T00:05:38-0300
+**Commit SHA**: 477909f/2cb738e (backend) · 3dc4a0f/3773048/be21bb6 (frontend)
+**Jira**: KAN-132
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (backend 365+466, frontend 504)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 4, rodada 2 — 3 bloqueantes de prova na rodada 1, corrigidos com mutantes mortos)
+- [x] ACs verificados — AC-026-005, 006, 007, 015, 016, 018, 019, 023
+- [x] Segurança (gate 8): aprovado (wave 4) — sem achados; guarda em 1 `updateMany` fecha a janela TOCTOU
+- [x] Comportamento (gate 9): consolidado FEAT-026-005/FEAT-026-006 (qa no fecho da Wave 4); FEAT-026-002 fecha com o gate 9 de TASK-027-006
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

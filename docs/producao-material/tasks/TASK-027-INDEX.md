@@ -16,7 +16,7 @@
 - [x] TASK-027-004 ✅ Done
 
 ### Wave 4 (depende de Wave 3 — mesma razão de colisão de escrita)
-- [ ] TASK-027-005 ⏸ Todo
+- [x] TASK-027-005 ✅ Done
 
 ### Wave 5 (depende de Wave 2, 3 e 4)
 - [ ] TASK-027-006 ⏸ Todo

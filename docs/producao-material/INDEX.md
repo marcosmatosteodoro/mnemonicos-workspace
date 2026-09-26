@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-16T17:17:00-0300 (PLAN-027/F7 Wave 3 concluída — TASK-027-004 Done, branch `feat/producao-material-mnemora-studio`, ainda não mergeada; ciclo PAUSADO a pedido do Diretor antes da Wave 4)
+**Última atualização**: 2026-09-26T00:07:00-0300 (PLAN-027/F7 Wave 4 concluída — TASK-027-005 Done; Wave 5 em execução; branch `feat/producao-material-mnemora-studio`, não mergeada)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -70,7 +70,7 @@ PLAN._
 | PLAN-021 | SPEC-002 | 1 FR + 1 NFR re-cobertos (FR-002-001/NFR-002-008, já contabilizados em PLAN-003) — rewrite same-origin do cookie de sessão para topologia cross-site em produção, reabre DEC-003-004 | 2/2 ✅ | Done (sugerido) |
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
-| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 4/6 🟡 | Approved |
+| PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado) | 5/6 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -246,6 +246,23 @@ PLAN._
 
 ## Histórico recente
 
+- 2026-09-26: **Wave 4 de PLAN-027 concluída** (TASK-027-005, Pegadinha elaborada —
+  backend `477909f`/`2cb738e`, frontend `3dc4a0f`/`3773048`/`be21bb6`). Retomada após pausa
+  de ~9 dias e 4 reinícios de sessão (developer caiu por rate-limit e por encerramento da
+  sessão host; trabalho parcial preservado e continuado, nunca refeito). Gates 8 e 10
+  aprovados 1ª rodada sem achados — gate 8 confirmou que a guarda em 1 `updateMany` é mais
+  segura que o padrão de 2 passos de Contraste/Flashcard (fecha janela TOCTOU; se aquele
+  padrão for revisto, o modelo é este). Gates 7 e 11 reprovaram 1ª rodada — 3 bloqueantes de
+  prova (eixo soft-delete de `removePegadinhaText`, valor do evento, reflexo real do salvar —
+  reincidências de lições ativas, contadores incrementados) e 3 achados de UX (validação
+  por erro-no-campo, vazio com próximo passo, verbo canônico "Remover") — corrigidos em 1
+  retry, aprovados 2ª rodada; limpeza de fim de wave 4/4 aplicada. FEAT-026-005 e
+  FEAT-026-006 completaram nesta wave — gate 9 (qa) em execução. **Tracker degradado**: o
+  conector Atlassian desta sessão só tem grant para `autoavaliar.atlassian.net` (outro
+  produto); KAN-132 não transicionou — reconexão: autorizar `mp-consultoria.atlassian.net` e
+  rodar `/keelson:jira-sync producao-material`. Pendência não-bloqueante (gate 8):
+  `store/api.ts` monta paths sem `encodeURIComponent` (~30 ocorrências pré-existentes) — só
+  vira risco quando um componente montar com id vindo de `params` da URL.
 - 2026-09-16: **Wave 3 de PLAN-027 concluída** (TASK-027-004, CRUD completo de Flashcard —
   commits `4a27fb4`/`a0a892b`/`adce2b3`/`dcaea3b` backend, `dcd5881`/`c0fdfd4`/`5799394`
   frontend). Gate 8 (security) e gate 10 (performance) aprovados 1ª rodada sem achados —
