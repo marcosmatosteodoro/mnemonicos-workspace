@@ -87,7 +87,7 @@ fechado._
 | PLAN-023 | SPEC-022 | 25/25 FRs + 7/7 NFRs (módulo `visual-associations` — CRUD, upload validado por assinatura de bytes, binário como bytea no Postgres; extensão de `tira` para vínculo N:1 com `MnemonicFrame`, alcance por autoria herdado, evento de etapa `ASSOCIACAO_VISUAL`, log dedicado de reuso) | 17/17 ✅ | Approved |
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
-| PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 0/? ⏸ | Approved |
+| PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 0/4 ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -290,6 +290,35 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-26: **sync Jira (gancho `tasks`, PLAN-029/F8) — 4 sub-tasks criadas.**
+  `TASK-029-002` → KAN-139 (sub-task de KAN-137, FEAT-028-001) · `TASK-029-003` → KAN-140
+  (sub-task de KAN-138, FEAT-028-002) · `TASK-029-004` → KAN-141 (sub-task de KAN-137,
+  FEAT-028-001) · `TASK-029-001` (sem `Funcionalidade` declarada — chore transversal às
+  duas FEATs) → KAN-142, projetada como Tarefa sob o Epic KAN-136 (regra "TASK transversal
+  sem primária honesta", `jira-sync-feat.md`) + link "relates to" com KAN-137 e KAN-138;
+  **julgamento do sync, não do artefato — revisar com o Diretor se o parentesco pretendido
+  para TASK-029-001 era outro.** Nenhuma transição aplicada (gancho de criação, não de
+  despacho); as 4 issues nasceram na coluna padrão do projeto (`11` Tarefas pendentes).
+- 2026-09-26: **TASK-029-001..004 geradas (F8), rota única.** 4 TASKs em 3 waves: Wave 1
+  `TASK-029-001` (chore, migração `ContentVersion`+`VERSAO_EDITORIAL`); Wave 2 paralelas
+  `TASK-029-002` (fechamento+histórico, backend, fatia sensível) e `TASK-029-003`
+  (carimbo de Versão no PDF); Wave 3 `TASK-029-004` (frontend completo — o scribe
+  corrigiu a dependência sugerida pelo Tech Lead, acrescentando TASK-029-003 além de
+  TASK-029-002, porque o roteiro do gate 9 exporta o PDF e confere o carimbo). 14/14
+  COMPs distribuídos, 11/11 FRs + 3/3 NFRs + 13/13 ACs cobertos. Achado real do scribe
+  via cadeia do dado: `recordProductionStageEvent` precisou ganhar um parâmetro opcional
+  `transitionType` (retrocompatível) para DEC-029-005 (emissão sempre `CONCLUSAO` direta)
+  ser cumprível — extensão de arquivo compartilhado por 6 chamadores existentes,
+  conferida sem mudança de comportamento. `graph.sh --check`: 0 ERROR (1 correção do
+  Tech Lead — `TASK-029-002` tinha 3 NFRs indevidamente no campo `Realiza (FRs)`, que é
+  TASK→FR only por contrato; NFR se verifica na DoD do PLAN, nunca por TASK — e
+  `task-overlap-fr` apontou FR-028-005 duplicado entre `TASK-029-002`/`004`: removido de
+  `TASK-029-004`, que só CONSOME o endpoint já realizado por `TASK-029-002`, nunca o
+  realiza de novo). `task-validator`: 0 ERROR, WARNINGs de `task-criterio-grep-nao-
+  ancorado` revisados um a um (nenhum atinge o padrão de escalação a ERROR, exceto 1 em
+  `TASK-029-002`/AC-028-006 que foi corrigido — grep de ausência de
+  `contentVersion.update/delete` passou a excluir linha de comentário, evitando falso-
+  positivo/negativo). Próximo: `/keelson:implement`.
 - 2026-09-26: **PLAN-029 criado e aprovado (F8).** Cobertura: 11/11 FRs + 3/3 NFRs de
   SPEC-028 (Caso D). Reconhecimento técnico via `code-scout` (schema de RawContent/
   RuleBreakdown, precedente append-only `ProductionStageEvent`, 2 padrões distintos de
