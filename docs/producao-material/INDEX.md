@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-26T19:03:04-0300 (PLAN-029/F8 **entregue** — 4/4 TASKs Done, convergência CONVERGIU, ambas FEATs VERIFICADAS, DEC-029-003 confirmada pelo Diretor na Entrega, branches pushadas — merge/PR fica para `/keelson:integrate`)
+**Última atualização**: 2026-09-27 (PLAN-029/F8 **mergeado** — PR #9 backend/#15 frontend; Histórias KAN-137/138 fechadas, Épico KAN-136 pendente de fechamento manual — classificador de permissão recusou a transição; próxima elegível: F9)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -279,6 +279,15 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-27: **PRs de F8 mergeados pelo Diretor** — backend
+  [#9](https://github.com/marcosmatosteodoro/mnemonicos-backend/pull/9), frontend
+  [#15](https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/15). Trilho
+  pós-merge (CLAUDE.md) executado: Histórias KAN-137/138 movidas para Concluído;
+  filhos do Épico **KAN-136** consultados por JQL (`parent = KAN-136`, nunca por
+  memória) — 3/3 Concluído (KAN-137, KAN-138, KAN-142). **Épico KAN-136 NÃO movido**:
+  a transição foi recusada pelo classificador de permissão desta sessão ("ação
+  perigosa", sem detalhe) — mover épicos parece exigir ação humana direta no Jira ou
+  uma sessão com essa permissão liberada. Pendência declarada, não contornada.
 - 2026-09-26: **Entrega de PLAN-029 (F8) fechada — DEC-029-003 confirmada pelo
   Diretor.** `po`: ACEITA_COM_RESSALVAS (nenhum item do brief sem entrega). Sync
   `entrega`: reconciliação (§12) corrigiu 2 sub-tasks presas em "Tarefas pendentes"
