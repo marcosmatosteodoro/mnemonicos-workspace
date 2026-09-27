@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-27 (SPEC-030 criada e aprovada — F9 do épico, "Controle de qualidade e gate de versão aprovada"; ciclo em PLAN/TASKs/implement)
+**Última atualização**: 2026-09-27 (PLAN-031 criado e aprovado para SPEC-030 — F9 do épico, "Controle de qualidade e gate de versão aprovada"; ciclo em TASKs/implement)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -15,6 +15,9 @@ legislação e checklist de revisão jurídica. O estudante não é usuário des
 compra é o PDF. A régua de valor é tempo de produção por página, instrumentado por etapa.
 
 ## Capacidades
+
+### Em desenvolvimento
+- Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica (SPEC-030/**PLAN-031**, F9 do épico MNEMORA STUDIO, 🟡 0/? tasks Done — TASKs ainda não decompostas). Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate.
 
 ### Implementadas
 - Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, ✅ 2026-08-30) — módulo `users/` (criar/listar/desativar/resetar senha) + seed; gate 9 APROVADO. Montagem das rotas em `apiRoutes` fica com TASK-003-011 (Wave 6).
@@ -36,7 +39,6 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
-- Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções aplicada pelo sistema por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica — SPEC-030, F9 do épico MNEMORA STUDIO, `Approved` 2026-09-27. Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate (default do PO aplicado).
 
 _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 entregue e mergeada 2026-09-14
 (BRIEF-022/SPEC-022/PLAN-023, 17/17 TASKs Done, 6 waves, DoD satisfeito, PR #6 backend
@@ -80,6 +82,7 @@ fechado._
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
+| PLAN-031 | SPEC-030 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 0/? ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -288,6 +291,26 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-27: **PLAN-031 criado e aprovado para SPEC-030 (F9).** Cobertura derivada
+  (`graph.sh --format=tables`): 18/18 FRs + 3/3 NFRs, gap 0. 13 COMPs — migração
+  aditiva (2 colunas nullable `approvedById`/`approvedAt` + FK + valor
+  `APROVACAO_VERSAO`); `approveContentVersion` no mesmo padrão transacional/lock de
+  F8 (DEC-029-004 herdada), idempotência por `updateMany` condicionado a
+  `approvedById: null` (2ª camada de defesa, DEC-031-009); segregação de funções por
+  3 identidades produtoras lidas ao vivo (`ContentVersion.authorId`,
+  `RawContent.authorId`/`lastEditedById` — seguro por construção, já que
+  FR-030-015 bloqueia aprovação sempre que há edição pós-fechamento, DEC-031-006);
+  `resolveAlterationSignal` estende o sinal de F8 (`hasVersionedContentChanged`)
+  com um sinal novo para a Tira mnemônica, reusando o `ProductionStageEvent` que
+  `tira.service.ts` já emite — zero mudança naquele módulo (DEC-031-007); carimbo
+  de aprovação no PDF (`pdf-composer.ts`) substitui "Rascunho" só quando aprovada e
+  sem sinal de alteração aceso. 9 DECs (3 herdadas + 6 novas, todas reversíveis).
+  `artifact-lint`: 0 ERROR (5 WARNING `plan-dec-alternativa-unica`, mesmo padrão
+  aceito de PLAN-029). `graph.sh --check --stage=plan`: 0 ERROR após 2 correções
+  mecânicas (campo `**Realiza**` de COMP-031-004 quebrado em 3 linhas escondia
+  FR-030-013/017/018 do parser; `**Dependências**` de COMP-031-003 com anotação
+  extra quebrava o parse) — aplicadas diretamente pelo Tech Lead. Próximo:
+  `/keelson:tasks`.
 - 2026-09-27: **SPEC-030 criada e aprovada via `/keelson:continue` → `/keelson:auto`
   (BRIEF-030, F9 do épico MNEMORA STUDIO).** `spec-validator`: 0 ERROR, 4 WARNING
   não-bloqueantes (`spec-must-ratio`, `spec-nfr-sem-numero` ×2, `spec-sem-should-may`
