@@ -271,3 +271,4 @@ fora do MVP).
   permissão liberada, não contornada. Próxima elegível: **F9** (depende de F1 e F8,
   ambas agora entregues e mergeadas — decisão 4.190 satisfeita) ou F10 (depende de F3
   — entregue — mais F8/F9 parcial, sem dependência mútua com F9).
+- retomada: 2026-09-27T01:04:18-0300 · sessão b1505f46@auto-avaliar-Latitude-3550 · parado desde 2026-09-27T01:01:11-0300 (piso: último commit e46ee3c) · 0h03min
