@@ -1,0 +1,428 @@
+# TASK-031-003: Aprovação de Versão vigente — backend completo (segregação de funções + idempotência)
+
+**Slug**: producao-material
+**Pertence a**: PLAN-031
+**Realiza (FRs)**: FR-030-001, FR-030-002, FR-030-003, FR-030-004, FR-030-005, FR-030-009, FR-030-013, FR-030-014, FR-030-015, FR-030-016, FR-030-017, FR-030-018
+**Funcionalidade**: FEAT-030-001 (primária)
+**Componente**: COMP-031-002 (principal), COMP-031-004, COMP-031-006, COMP-031-012
+**Wave**: 2
+**Tamanho estimado**: medium
+**Tipo**: feature
+**Status**: Todo
+
+## Dependências
+
+- **Depende de**: TASK-031-001, TASK-031-002
+- **Bloqueia**: TASK-031-004, TASK-031-006
+
+## Contexto
+
+**Fatia sensível** (princípio 8: autorização nova + segregação de funções + regra de
+negócio central + migração já aplicada na Wave 1): endpoint novo, ponta a ponta
+(`POST /contents/:id/versions/:number/approve`), que registra a aprovação de uma Versão
+editorial vigente — 2 confirmações de julgamento humano, duplo travamento anti-corrida
+(número da Versão + sinal de alteração), segregação de funções por 3 identidades
+produtoras lidas ao vivo, e idempotência garantida por `updateMany` condicionado
+(DEC-031-009), nunca por disciplina de ordem de código. Segue o MESMO padrão transacional
+de `closeContentVersion` (F8) — lock de linha do `RawContent` pai como 1ª chamada
+(DEC-031-001 herdada de DEC-029-004). Território e precedentes:
+`docs/producao-material/MAP.md`,
+`mnemonicos-backend/src/modules/content-versions/content-versions.service.ts` (leitura
+direta confirmada — `closeContentVersion`/`listContentVersions` já existentes, F8),
+`content-versions.routes.ts`, e PLAN-031 §1, §3 (COMP-031-002/004/006/012), §4 Fluxo 1/2/3,
+§6 (DEC-031-001/002/003/004/005/006/008/009).
+
+**Prova do vertical slicing**: esta TASK, sozinha, prova via HTTP real (rota montada) o
+fluxo completo de aprovação — o ponto de entrada (a rota) pertence a ela, nunca a uma
+TASK de wiring posterior (princípio 4).
+
+## Escopo
+
+### Inclui
+
+- `mnemonicos-backend/src/modules/content-versions/content-versions.schema.ts` (estende):
+  - `approveContentVersionSchema` — exatamente 2 campos, `legalCheckConfirmed:
+    z.literal(true, 'Confirmação da checagem jurídica é obrigatória.')` e
+    `pedagogicalCheckConfirmed: z.literal(true, 'Confirmação da checagem pedagógica é
+    obrigatória.')` (mesma sintaxe de mensagem-string curta já usada por
+    `closeContentVersionSchema`/`z.iso.date`) — qualquer valor diferente de `true`
+    (`false`, ausente, string) falha o `parse` com 422, ANTES de qualquer leitura do
+    service (A-030-004). Tipo inferido `ApproveContentVersionInput`.
+  - `approveContentVersionParamsSchema` — `z.object({ id: z.uuid('Identificador de
+    conteúdo bruto inválido.'), number: z.coerce.number('Número de Versão inválido.').int().positive() })`
+    (reuso da MESMA mensagem de `rawContentIdParamSchema` para `id`, mas schema PRÓPRIO —
+    nunca reexporta `rawContentIdParamSchema` isoladamente, porque o `:number` é parte do
+    MESMO objeto de params desta rota, FR-030-014: o duplo travamento exige o número como
+    parte da URL). Tipo inferido `ApproveContentVersionParams`.
+- `mnemonicos-backend/src/modules/content-versions/content-versions.service.ts` (estende):
+  - `RAW_CONTENT_VERSIONED_SELECT` ganha `lastEditedById: true` (extensão do `select`
+    já existente, reusado por `closeContentVersion` sem efeito — o campo extra é
+    ignorado por quem não o consome; nunca duplicar o objeto).
+  - `CONTENT_VERSION_DETAIL_SELECT`/`ContentVersionDetail` ganham `approvedById: true`/
+    `approvedById: string | null` e `approvedAt: true`/`approvedAt: Date | null` (colunas
+    novas da Wave 1, leitura direta — **sem** `contentSnapshot`, que segue nunca exposto,
+    DEC-029-003). `closeContentVersion` (F8, intocado no CORPO) passa a devolver esses 2
+    campos automaticamente como `null` pelo próprio `select` — nenhuma linha de código
+    daquela função muda.
+  - Nova função:
+    ```ts
+    export async function approveContentVersion(
+      rawContentId: string,
+      number: number,
+      input: ApproveContentVersionInput,
+      actor: ContentActor,
+      db: ContentVersionClient = prisma,
+    ): Promise<ContentVersionDetail> {
+      return db.$transaction(async (tx) => {
+        // 1 (DEC-031-001 herdada): lock da linha do RawContent pai, 1ª chamada.
+        const locked = await tx.$queryRaw<Array<{ id: string }>>`
+          SELECT id FROM raw_contents WHERE id = ${rawContentId} FOR UPDATE
+        `;
+        if (locked[0] === undefined) {
+          throw new NotFoundError('Conteúdo bruto não encontrado.');
+        }
+
+        // 2 (FR-030-018): alcance por autoria/soft-delete.
+        await assertRawContentReachable(rawContentId, actor, tx);
+
+        // 3: detalhe do RawContent (authorId, lastEditedById + 5 campos versionados).
+        const rawContent = await tx.rawContent.findUniqueOrThrow({
+          where: { id: rawContentId },
+          select: RAW_CONTENT_VERSIONED_SELECT,
+        });
+
+        // 4: RuleBreakdown (6 campos versionados) — invariante herdada de F8/F2: uma
+        // ContentVersion só existe se a RuleBreakdown existia no fechamento, e não há
+        // rota de remoção de RuleBreakdown nesta fatia nem em nenhuma anterior.
+        const ruleBreakdown = await tx.ruleBreakdown.findUniqueOrThrow({
+          where: { rawContentId },
+          select: RULE_BREAKDOWN_VERSIONED_SELECT,
+        });
+
+        // 5 (FR-030-003): Versão vigente.
+        const vigente = await tx.contentVersion.findFirst({
+          where: { rawContentId },
+          orderBy: { number: 'desc' },
+          select: { ...CONTENT_VERSION_DETAIL_SELECT, contentSnapshot: true },
+        });
+        if (vigente === null) {
+          throw new NotFoundError('Não há Versão para aprovar.');
+        }
+
+        // 6 (FR-030-014/AC-030-015): duplo travamento — número informado.
+        if (vigente.number !== number) {
+          throw new ConflictError('O número informado não é mais o da Versão vigente.');
+        }
+
+        // 7 (FR-030-017, checagem antecipada — a garantia real é o passo 11).
+        if (vigente.approvedById !== null) {
+          throw new ConflictError('Esta Versão já foi aprovada.');
+        }
+
+        // 8 (FR-030-004/A-030-002, NFR-030-002 — mensagem genérica, nunca revela QUAL
+        // identidade bateu): segregação de funções.
+        const producerIds = new Set([vigente.authorId, rawContent.authorId, rawContent.lastEditedById]);
+        if (producerIds.has(actor.id)) {
+          throw new ForbiddenError('Você não tem permissão para aprovar esta Versão.');
+        }
+
+        // 9 (FR-030-013, herdado de A-005-008): fonte normativa lida do contentSnapshot
+        // da Versão vigente — o dado JÁ VERSIONADO, nunca o RawContent ao vivo.
+        const snapshot = vigente.contentSnapshot as unknown as VersionedContentFields;
+        if (snapshot.sourceType === null || snapshot.sourceCitation === null) {
+          throw new ConflictError('Falta fonte normativa registrada nesta Versão.');
+        }
+
+        // 10 (FR-030-015/AC-030-016): sinal de alteração combinado (conteúdo OU Tira).
+        const current = toVersionedContentFields(rawContent, ruleBreakdown);
+        const altered = await resolveAlterationSignal(rawContentId, current, vigente, tx);
+        if (altered) {
+          throw new ConflictError(
+            'O conteúdo ou a Tira mnemônica foram alterados após o fechamento desta Versão.',
+          );
+        }
+
+        // 11 (DEC-031-009): escrita condicional — a garantia REAL de exatamente 1.
+        const now = new Date();
+        const result = await tx.contentVersion.updateMany({
+          where: { id: vigente.id, approvedById: null },
+          data: { approvedById: actor.id, approvedAt: now },
+        });
+        if (result.count !== 1) {
+          throw new ConflictError('Esta Versão já foi aprovada.');
+        }
+
+        // 12 (DEC-031-008): sempre CONCLUSAO direto — ÚLTIMA chamada do corpo.
+        await recordProductionStageEvent(tx, {
+          rawContentId,
+          stageType: 'APROVACAO_VERSAO',
+          transitionType: 'CONCLUSAO',
+          actorId: actor.id,
+          now,
+        });
+
+        return {
+          id: vigente.id,
+          rawContentId,
+          number: vigente.number,
+          legislativeClosureDate: vigente.legislativeClosureDate,
+          authorId: vigente.authorId,
+          closedAt: vigente.closedAt,
+          approvedById: actor.id,
+          approvedAt: now,
+        };
+      });
+    }
+    ```
+    Import novo: `ConflictError`/`ForbiddenError` de `../../http/errors` (`ForbiddenError`
+    já importado; acrescenta `ConflictError`), `resolveAlterationSignal` (TASK-031-002,
+    mesmo arquivo — sem import cross-file) e `type ApproveContentVersionInput` de
+    `./content-versions.schema`.
+- `mnemonicos-backend/src/modules/content-versions/content-versions.routes.ts` (estende):
+  `POST /contents/:id/versions/:number/approve` — `verifyOrigin` como 1º handler +
+  `requireRole('POST', '/contents/:id/versions/:number/approve', 'ADMIN')` (**sem**
+  `'EDITOR'` — FR-030-016, deny-by-default: nunca copiar a lista `'EDITOR', 'ADMIN'` das 2
+  rotas irmãs por reflexo). `actorOf(req)` reusado (já existente no arquivo). Responde
+  `200` (atualiza um recurso já existente, ao contrário do `201` de `POST
+  /contents/:id/versions`, que cria uma Versão nova):
+  ```ts
+  contentVersionsRoutes.post(
+    '/contents/:id/versions/:number/approve',
+    verifyOrigin,
+    requireRole('POST', '/contents/:id/versions/:number/approve', 'ADMIN'),
+    async (req, res) => {
+      const { id, number } = approveContentVersionParamsSchema.parse({
+        id: req.params.id,
+        number: req.params.number,
+      });
+      const input = approveContentVersionSchema.parse(req.body);
+      const approved = await approveContentVersion(id, number, input, actorOf(req));
+      res.status(200).json(approved);
+    },
+  );
+  ```
+- `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (estende —
+  molde `describe('TASK-029-002 — as 2 rotas de Versão editorial...')`, linhas 583-593):
+  novo `describe('TASK-031-003 — a rota de aprovação sob a barreira (topologia
+  adversarial)')` — lição ativa "[Segurança] 'Declarado' não é 'autorizado'; prova de gate
+  de autz exige topologia adversarial": a rota nova compartilha o PREFIXO
+  `/contents/:id/versions` com as 2 rotas irmãs já `{EDITOR, ADMIN}` — o risco adversarial
+  específico é herdar essa declaração por cópia. Confirma (a)
+  `REGISTRY.get('POST /contents/:id/versions/:number/approve')` é EXATAMENTE
+  `new Set<UserRole>(['ADMIN'])` — nunca `{EDITOR, ADMIN}`; (b) com sessão de EDITOR → 403
+  (a suíte genérica de `describe('AC-002-011 / AC-002-012...')`, linhas 234-256, já cobre
+  isso automaticamente por derivar de `REGISTRY`/`isAdminOnly` — este teste é a
+  confirmação ESPECÍFICA de que a rota entrou nesse conjunto, não uma duplicata); (c) sem
+  sessão → 401 (mesma cobertura automática de `describe('AC-002-010...')`, confirmação
+  específica); (d) com sessão de ADMIN elegível (não produtor) → NÃO 403 (chega ao
+  service — pode devolver 200, 404 ou 409 dependendo do fixture, nunca 401/403), provando
+  que ADMIN não é bloqueado pela barreira.
+- `mnemonicos-backend/tests/unit/content-versions.service.guard-order.test.ts` (estende):
+  novo `describe('approveContentVersion — ordem das guardas (TASK-031-003, estrutural)')`,
+  mesmo `extractFunctionBody` já genérico do arquivo (âncora
+  `'export async function approveContentVersion'`): (a) `tx.$queryRaw`/`FOR UPDATE` é a
+  1ª chamada, ANTES de `assertRawContentReachable`; (b) `ruleBreakdown.findUniqueOrThrow(`
+  ANTES de `contentVersion.findFirst(`; (c) `contentVersion.findFirst(` ANTES da 1ª
+  comparação `producerIds.has(`; (d) `producerIds.has(` ANTES de
+  `resolveAlterationSignal(`; (e) `resolveAlterationSignal(` ANTES de
+  `contentVersion.updateMany(`; (f) `recordProductionStageEvent(` é a ÚLTIMA chamada,
+  depois de `contentVersion.updateMany(`.
+- `mnemonicos-backend/tests/unit/content-versions.schema.test.ts` (estende): novo
+  `describe('approveContentVersionSchema')` — `legalCheckConfirmed`/
+  `pedagogicalCheckConfirmed` com `false`, ausente ou string ⇒ `ZodError` (3 casos por
+  campo — 6 no total); os 2 `true` ⇒ aceito. Novo `describe('approveContentVersionParamsSchema')`
+  — `number` como string numérica (`'3'`, vindo de `req.params`) ⇒ coagido para `3`
+  (number); `number: '0'`/`'-1'`/`'abc'` ⇒ `ZodError`; `id` não-uuid ⇒ `ZodError`.
+- `mnemonicos-backend/tests/integration/content-versions.service.integration.test.ts`
+  (estende — molde dos `describe` já existentes no mesmo arquivo): novos blocos, cada um
+  com fixture PRÓPRIA (`createUser`/`createRawContent`/`seedRuleBreakdown` +
+  `testPrisma.rawContent.update` para setar `sourceType`/`sourceCitation`, ausentes por
+  padrão em `createRawContent` — necessário para que a aprovação passe a barreira de
+  FR-030-013 nos cenários de sucesso):
+  - AC-030-001 (parte ESCRITA — a parte de leitura no histórico é TASK-031-004):
+    ADMIN elegível (não produtor) aprova com as 2 confirmações → `approvedById`/
+    `approvedAt` gravados, `ProductionStageEvent` `APROVACAO_VERSAO`/`CONCLUSAO` emitido.
+  - AC-030-002 (FR-030-002): 3 sub-casos (`legalCheckConfirmed: false`,
+    `pedagogicalCheckConfirmed` ausente, os 2 `false`) via `approveContentVersionSchema.parse`
+    direto (schema, não o service) — `ZodError`, nenhuma leitura do service acontece.
+  - AC-030-003 (FR-030-003): `RawContent` sem nenhuma Versão fechada → `NotFoundError`
+    'Não há Versão para aprovar.'.
+  - AC-030-004 (FR-030-004, NFR-030-002) + AC-030-023 (FR-030-004) — **prova COMPORTAMENTAL
+    própria** (lição ativa "[Segurança] Guarda reusada continua exigindo prova
+    comportamental própria por novo método de escrita" — `approveContentVersion` é
+    `approveContentVersion` é escrita NOVA sobre `content_versions`, mesmo reusando
+    `assertRawContentReachable`): 3 sub-casos, 1 por identidade produtora (quem fechou =
+    autor da Versão vigente; `RawContent.authorId`; `RawContent.lastEditedById`, setado
+    via `updateRawContent` — importado de `contents.service.ts` — depois do fechamento) →
+    `ForbiddenError` com a MESMA mensagem literal nos 3 (`'Você não tem permissão para
+    aprovar esta Versão.'`), nenhuma das 3 revela qual identidade bateu, nenhum
+    `approvedById` gravado.
+  - AC-030-005 (FR-030-005) — **prova de ausência, universo = `src` inteiro** (lição
+    ativa "[Testes] Prova de ausência por leitura de texto-fonte precisa declarar o
+    universo lido": estende o mesmo grep de AC-028-006/TASK-029-002, universo já correto
+    lá — só ACRESCENTA os 2 nomes de coluna novos ao padrão): `grep -rnE
+    "contentVersion\.(update|updateMany|delete|deleteMany)" src | grep -vE ':\s*(//|\*)'`
+    (cwd `mnemonicos-backend`) → EXATAMENTE 1 ocorrência (a `updateMany` desta própria
+    TASK, passo 11) — nenhuma outra função em `src` grava/apaga um `ContentVersion`, e
+    nenhuma tem `where` sem `approvedById: null` (leitura confirma o `where` completo da
+    única ocorrência).
+  - AC-030-006 — estrutural, sem teste PRÓPRIO nesta TASK (a Versão nova nasce com
+    `approvedById: null` pela ausência de escrita em `closeContentVersion`, F8 intocado);
+    o comportamento OBSERVÁVEL (leitura mostrando "não aprovada") é TASK-031-004.
+  - AC-030-008 (FR-030-009): aprovação bem-sucedida grava exatamente 1
+    `ProductionStageEvent` (`stageType: 'APROVACAO_VERSAO'`, `transitionType: 'CONCLUSAO'`
+    — MESMA na 1ª chamada, nunca `decideStageTransition`, DEC-031-008).
+  - AC-030-014 (FR-030-013): Versão vigente com `sourceType`/`sourceCitation` `null` no
+    `contentSnapshot` (fechada ANTES de a fonte ser preenchida, ou nunca preenchida) →
+    `ConflictError` 'Falta fonte normativa registrada nesta Versão.'.
+  - AC-030-015 (FR-030-014) — corrida: fecha Versão 3, tenta aprovar informando
+    `number: 3`, mas ANTES da chamada uma Versão 4 é fechada por outro ator (simulado
+    sequencialmente, sem `Promise.all` — é uma corrida de ESTADO, não de concorrência real
+    de escrita) → `ConflictError` 'O número informado não é mais o da Versão vigente.'.
+  - AC-030-016 (FR-030-015): 2 sub-casos — conteúdo alterado após fechamento (campo
+    versionado do `RawContent` mudado via `updateRawContent` depois do `closeContentVersion`)
+    e Tira alterada após fechamento (evento `TIRA_MNEMONICA` emitido depois do fechamento,
+    via `recordProductionStageEvent` direto no fixture ou via `tira.service.ts` real) →
+    `ConflictError` nos 2, mesma mensagem.
+  - AC-030-017 (FR-030-016): coberto pela topologia adversarial de
+    `route-authz-matrix.integration.test.ts` acima — não duplicado aqui (nível de
+    service não distingue papel do ator via HTTP, `requireRole` já barra antes de chegar
+    ao service).
+  - AC-030-018 (FR-030-017, NFR-030-001) — **prova de CONCORRÊNCIA REAL** (lição ativa
+    "[Segurança] Corrida (TOCTOU) só se fecha com prova de CONCORRÊNCIA real contando
+    linhas no fim"): 2 chamadas de `approveContentVersion` para a MESMA Versão vigente,
+    por 2 ADMINs elegíveis DISTINTOS, disparadas de fato em paralelo (`Promise.all`, nunca
+    sequenciais) → resultado esperado é exatamente 1 sucesso e 1 `ConflictError`
+    ('Esta Versão já foi aprovada.'), NUNCA os 2 sucessos; ao final, exatamente 1 linha de
+    `ContentVersion` com `approvedById` não-nulo e exatamente 1 `ProductionStageEvent`
+    `APROVACAO_VERSAO` para aquele `rawContentId` (contagem, nunca `instanceof`/mensagem
+    de erro como oráculo primário). 2º sub-caso, sequencial (NFR-030-001 "nunca
+    sobrescrita"): após 1ª aprovação bem-sucedida por ADMIN A, uma 2ª tentativa por ADMIN
+    B elegível → `ConflictError`, e `approvedById` da Versão permanece IGUAL a A (nunca
+    sobrescrito para B).
+  - AC-030-019 (FR-030-018): `RawContent` soft-deletado (`deletedAt` setado) com Versão
+    fechada → `NotFoundError` (mesma mensagem/guarda de `assertRawContentReachable` já
+    usada por qualquer outra operação).
+  - **Precedência entre guardas — um caso por PAR de ramos que pode coincidir** (lição
+    ativa "[Testes] Árvore de decisão com precedência: um caso por PAR de ramos que
+    coincide" — os 7 guards sequenciais dos passos 5-10 formam exatamente essa árvore):
+    (i) número mismatch (6) ∧ já aprovada (7): Versão vigente já aprovada, ator informa um
+    número MAIS ANTIGO (não o vigente) → mensagem de NÚMERO (6 vence, nunca "já
+    aprovada"); (ii) já aprovada (7) ∧ segregação (8): Versão vigente já aprovada POR
+    OUTRO ator, o ator da 2ª tentativa é ele próprio um produtor → mensagem de "já foi
+    aprovada" (7 vence, nunca a de permissão); (iii) segregação (8) ∧ fonte ausente (9):
+    ator é produtor E a Versão não tem fonte normativa → mensagem de PERMISSÃO (8 vence,
+    nunca a de fonte); (iv) fonte ausente (9) ∧ sinal de alteração (10): Versão sem fonte
+    normativa E com sinal de alteração aceso → mensagem de FONTE (9 vence, nunca a de
+    alteração). Cada caso nomeia no `it(...)` qual guard vence.
+- `mnemonicos-backend/tests/integration/content-versions.routes.integration.test.ts`
+  (estende — molde `describe('NFR-028-001/002...')` já existente no arquivo): novo
+  `describe('POST /contents/:id/versions/:number/approve — camada HTTP')`: (a) fluxo feliz
+  ponta a ponta (fixture com `sourceType`/`sourceCitation` setados) → `200`, corpo com
+  `approvedById`/`approvedAt` preenchidos; (b) `verifyOrigin` recusa origem forjada
+  (`Origin` diferente do allowlist) → `403`, mesmo padrão já provado para as rotas
+  irmãs (topologia adversarial NÃO duplicada aqui — só confirma que o handler novo
+  também passa por `verifyOrigin`, por leitura da ordem dos middlewares, mais 1 caso
+  HTTP); (c) NFR-030-001/002 fail-secure na camada HTTP: `recordProductionStageEvent`
+  rejeitando (`jest.spyOn` no MÓDULO `production-events.service`, nunca no client Prisma —
+  mesmo padrão já usado pelo teste de `closeContentVersion` acima no arquivo) → `500`
+  genérico, sem detalhe da exceção, e `approvedById` da Versão permanece `null` (rollback
+  completo).
+
+### Não inclui
+
+- Leitura estendida de `listContentVersions` (`validApprovalForExport`) — TASK-031-004
+  (embora esta TASK já extenda `CONTENT_VERSION_DETAIL_SELECT`/`ContentVersionDetail` com
+  `approvedById`/`approvedAt`, o campo COMPUTADO `validApprovalForExport` nasce só em
+  TASK-031-004, que também acrescenta esse campo ao retorno desta função — ver Escopo de
+  TASK-031-004).
+- Extensão de `publication.service.ts`/`pdf-composer.ts` — TASK-031-005.
+- Tipos TS `ContentVersion` espelhados (backend/frontend), `store/api.ts`, painel de
+  aprovação — TASK-031-006/007.
+- Qualquer rota `PATCH`/`PUT`/`DELETE` sobre Versão ou aprovação — proibido por
+  FR-030-005 em toda a fatia (a ausência é o que a prova de AC-030-005 confirma).
+
+## Critérios de pronto
+
+- [ ] Testes cobrem AC-030-001 (parte escrita), AC-030-002, AC-030-003, AC-030-004,
+      AC-030-005, AC-030-008, AC-030-014, AC-030-015, AC-030-016, AC-030-018, AC-030-019,
+      AC-030-023 — verificação executável: `npm --prefix mnemonicos-backend run
+      test:integration -- --testPathPatterns=content-versions.service.integration.test.ts`
+      → `OK (N tests)`.
+- [ ] AC-030-017 confirmado pela topologia adversarial (ver Inclui) — verificação
+      executável: `npm --prefix mnemonicos-backend run test:integration --
+      --testPathPatterns=route-authz-matrix.integration.test.ts` → `OK (N tests)`.
+- [ ] Testes cobrem a camada HTTP (fluxo feliz + `verifyOrigin` + fail-secure) —
+      verificação executável: `npm --prefix mnemonicos-backend run test:integration --
+      --testPathPatterns=content-versions.routes.integration.test.ts` → `OK (N tests)`.
+- [ ] Guarda estrutural (ordem do corpo de `approveContentVersion`) — verificação
+      executável: `npm --prefix mnemonicos-backend test --
+      content-versions.service.guard-order.test.ts` → `OK (N tests)`. Fixada antes do
+      código.
+- [ ] `approveContentVersionSchema`/`approveContentVersionParamsSchema` — verificação
+      executável: `npm --prefix mnemonicos-backend test -- content-versions.schema.test.ts`
+      → `OK (N tests)`. Fixada antes do código.
+- [ ] Precedência entre guardas (4 pares, ver Inclui) — cobertos pelos mesmos testes de
+      integração acima, nomeados individualmente no relatório do Jest.
+- [ ] **Comparação com o molde canônico** (decisão 4.307; lição ativa "[Código] Lista de
+      Interface pública do PLAN é contrato mínimo, não gabarito de transcrição"): antes de
+      commitar, `approveContentVersion` é conferida contra a FORMA REAL de
+      `closeContentVersion` (mesmo arquivo, acima) — mesmo padrão de lock, mesmo padrão de
+      `ContentVersionClient`, nomes de `select` reusados (nunca duplicados) — e a
+      declaração da rota nova contra `contentVersionsRoutes.post`/`.get` já existentes
+      (mesmo `actorOf`, mesma ordem `verifyOrigin` → `requireRole`).
+- [ ] `ROUTE_ROLES.get('POST /contents/:id/versions/:number/approve')` é EXATAMENTE
+      `{ADMIN}` — supplementar à prova real (topologia adversarial de
+      `route-authz-matrix.integration.test.ts`, AC-030-017 acima): `grep -n
+      "requireRole('POST', '/contents/:id/versions/:number/approve'"
+      mnemonicos-backend/src/modules/content-versions/content-versions.routes.ts | grep
+      -vE ':\s*(//|\*)'` (a partir da raiz do workspace) → 1 ocorrência, sem `'EDITOR'`
+      na mesma linha.
+- [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (`git diff --name-only
+      main...HEAD`), produção e teste — `npm --prefix mnemonicos-backend run lint` →
+      exit 0.
+- [ ] Aderência à stack/padrões da ficha e do perfil `node-22.md` — camadas
+      schema→service→routes, toda escrita numa única `$transaction`, `select` explícito em
+      toda leitura, `AppError`/subclasse para todo erro previsto, handler `async` sem
+      `try/catch`.
+- [ ] Segurança (gate 8): `security-engineer` revisa o diff completo — fatia sensível
+      (autorização nova + segregação de funções + regra de negócio central).
+- [ ] Code review aprovado.
+
+## Riscos específicos
+
+- TRISK-031-001 (PLAN §8) — corrida entre `approveContentVersion` e `closeContentVersion`
+  no mesmo `RawContent` (ex.: aprovar a Versão 3 enquanto outro fecha a Versão 4): as duas
+  tomam `SELECT ... FOR UPDATE` na mesma linha do `RawContent` pai, serializando por
+  construção (DEC-031-001 herdada) — não testado por concorrência real NESTA TASK (o
+  fixture de AC-030-015 simula a corrida por ESTADO sequencial, suficiente para o AC; a
+  concorrência real de ESCRITA entre os 2 verbos fica como risco aceito, mesma régua do
+  PLAN).
+- TRISK-031-005 (PLAN §8) — RISK-030-005 (contas ADMIN fantoche) segue sem controle
+  técnico nesta TASK — herdado, sem mitigação nova.
+- A checagem de segregação (passo 8) usa um `Set` com as 3 identidades — `null` (quando
+  `rawContent.lastEditedById` nunca foi setado) nunca entra no `Set` como valor útil
+  porque `actor.id` é sempre uma string não-nula; um `Set` contendo `null` não corresponde
+  a nenhum `actor.id` real, então o comportamento é seguro por construção, sem checagem
+  extra.
+
+---
+
+## Histórico de execução (preenchido pelo /keelson:implement)
+
+<!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
+
+**Data início**:
+**Data conclusão**:
+**Commit SHA**:
+**Jira**:
+
+**Quality gates**:
+- [ ] Implementação completa
+- [ ] Testes passando
+- [ ] Lint limpo
+- [ ] Aderência à ficha/perfil
+- [ ] Code review aprovado
+- [ ] ACs verificados
+- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
+- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
