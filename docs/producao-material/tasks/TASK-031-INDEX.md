@@ -6,8 +6,8 @@
 ## Ordem de execução (waves)
 
 ### Wave 1 (setup-first, paralelizável)
-- [ ] TASK-031-001 ⏸ Todo
-- [ ] TASK-031-002 ⏸ Todo
+- [x] TASK-031-001 ✅ Done
+- [x] TASK-031-002 ✅ Done
 
 ### Wave 2 (depende de Wave 1 — as 2 TASKs abaixo NÃO dependem uma da outra, arquivos
 distintos: `content-versions.*` vs. `publication.service.ts`/`pdf-composer.ts`,

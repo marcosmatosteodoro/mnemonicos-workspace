@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-27 (PLAN-031 criado e aprovado para SPEC-030 — F9 do épico, "Controle de qualidade e gate de versão aprovada"; ciclo em TASKs/implement)
+**Última atualização**: 2026-09-27 (PLAN-031/F9 em implementação — Wave 1 fechada, TASK-031-001/002 Done; migração `20260927135234_add_content_version_approval` aplicada em dev e `mnemonicos_test`)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -82,7 +82,7 @@ fechado._
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
-| PLAN-031 | SPEC-030 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 0/7 ⏸ | Approved |
+| PLAN-031 | SPEC-030 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 2/7 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -291,6 +291,23 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-27 19:15: **Wave 1 de PLAN-031 fechada — TASK-031-001/002 Done.** Migração
+  aditiva `20260927135234_add_content_version_approval` (2 colunas nullable
+  `approvedById`/`approvedAt` + FK `ON DELETE RESTRICT` + valor `APROVACAO_VERSAO`)
+  aplicada em dev e `mnemonicos_test` com autorização do Diretor — a aplicação foi feita
+  por ele no terminal: o classificador de permissão do harness recusou `prisma migrate
+  dev` e `test:integration` para os agents até ele liberar a regra de permissão.
+  `resolveAlterationSignal` (sinal de alteração de conteúdo OU Tira, via
+  `ProductionStageEvent`). Gates: 8 APROVADO (0 achados; notas de herança N1/N2/N3/N6
+  viraram critérios de TASK-031-003/004/005 antes do despacho, 4.140; N5 — troca de
+  imagem de Associação visual não acende o sinal — vai ao Diretor na Entrega, junto de
+  E-1); 10 APROVADO (EXPLAIN real confirma DEC-031-007: sem índice composto); 1-7
+  TASK-031-001 APROVADO, TASK-031-002 1 retry + degrau 1 da escada (docblocks maiores
+  que o código — só-texto). Critério C1 de TASK-031-001 contava "3 ocorrências" num
+  universo com 2 pré-existentes (devolve 5; condição verificada pelo delta). Fora de
+  escopo: COMP-031-003 do PLAN cita tipo inexistente `ContentVersionRecord`; fixture de
+  `VersionedContentFields` duplicada → builder em `tests/support` entrou como critério
+  de TASK-031-003.
 - 2026-09-27: **PLAN-031 criado e aprovado para SPEC-030 (F9).** Cobertura derivada
   (`graph.sh --format=tables`): 18/18 FRs + 3/3 NFRs, gap 0. 13 COMPs — migração
   aditiva (2 colunas nullable `approvedById`/`approvedAt` + FK + valor

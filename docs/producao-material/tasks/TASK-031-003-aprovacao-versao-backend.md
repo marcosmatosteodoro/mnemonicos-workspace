@@ -328,6 +328,29 @@ TASK de wiring posterior (princípio 4).
   mesmo padrão já usado pelo teste de `closeContentVersion` acima no arquivo) → `500`
   genérico, sem detalhe da exceção, e `approvedById` da Versão permanece `null` (rollback
   completo).
+- **Herdado do gate 8 da Wave 1 (security-engineer, notas N1/N2/N6 — decisão 4.140)**:
+  - (N1) `approveContentVersion` resolve a Versão vigente pelo PRÓPRIO `rawContentId` do
+    path (`where: { rawContentId }`, `orderBy: { number: 'desc' }`) e passa a
+    `resolveAlterationSignal` o `current` lido DENTRO da mesma `$transaction`, depois do
+    `FOR UPDATE` — nunca uma Versão/leitura vinda de fora da transação. Caso de teste em
+    `content-versions.service.integration.test.ts`: 2 Conteúdos brutos, cada um com
+    Versão fechada; aprovar pelo `rawContentId` de A com o `number` da Versão de B (que
+    não existe em A) → recusa de número (FR-030-014), `approvedById` das 2 Versões
+    permanece `null`.
+  - (N2) Fail-secure do sinal: `resolveAlterationSignal` rejeitando (o `productionStageEvent`
+    do client injetado rejeita) → a aprovação NÃO é gravada (`approvedById` permanece
+    `null`), o erro sobe — nenhum `catch → false`/`?? false` em torno da chamada. Caso de
+    teste na mesma suíte de integração (injetar um `db` cujo `productionStageEvent.findFirst`
+    rejeita dentro da transação, ou `jest.spyOn` no método do `tx` — nunca no client raiz,
+    lição ativa sobre espionar o client Prisma errado numa transação).
+  - (N6) Todo `select` que expõe o estado de aprovação lista `approvedById`/`approvedAt`
+    explicitamente — nunca `include: { approver: true }` (User carrega `passwordHash`).
+- **Fixture compartilhada** (fora de escopo do gate 7 da Wave 1 — a fixture de 11 campos de
+  `VersionedContentFields` já existe duplicada em 2 testes e as TASK-031-003/004/005 vão
+  precisar dela): criar um builder em `tests/support/` (siga o padrão de nomenclatura dos
+  builders que já existem lá — confira por `ls mnemonicos-backend/tests/support` antes)
+  e usá-lo nos testes novos desta TASK. Migrar os 2 testes existentes que duplicam a
+  fixture é opcional (se tocados, suíte deles verde).
 
 ### Não inclui
 
@@ -378,6 +401,22 @@ TASK de wiring posterior (princípio 4).
       mnemonicos-backend/src/modules/content-versions/content-versions.routes.ts | grep
       -vE ':\s*(//|\*)'` (a partir da raiz do workspace) → 1 ocorrência, sem `'EDITOR'`
       na mesma linha.
+- [ ] Herança N1 do gate 8 W1 (Versão resolvida pelo `rawContentId` do path, `current`
+      lido na mesma transação): caso "number de Versão de outro Conteúdo bruto" →
+      recusa de número, 0 aprovações gravadas nas 2 Versões — mesmo comando da suíte
+      `content-versions.service.integration.test.ts` acima → `OK (N tests)`, com o caso
+      nomeado no relatório do Jest.
+- [ ] Herança N2 do gate 8 W1 (fail-secure do sinal): `resolveAlterationSignal`
+      rejeitando → aprovação não gravada, erro propaga — mesmo comando acima, caso
+      nomeado. Mutante (em `git worktree add`, nunca na árvore principal): envolver a
+      chamada em `.catch(() => false)` → o caso fica vermelho.
+- [ ] Herança N6 do gate 8 W1: `grep -rn "approver" mnemonicos-backend/src | grep -vE
+      ':\s*(//|\*)' | grep -v generated` (raiz do workspace) → 0 ocorrências de
+      `include: { approver` em código de produção.
+- [ ] Fixture compartilhada: o builder de `VersionedContentFields` existe em
+      `mnemonicos-backend/tests/support/` e é importado pelos testes novos desta TASK —
+      `grep -rln "<nome do builder>" mnemonicos-backend/tests` → ≥ 1 arquivo de teste
+      novo desta TASK (nome do builder é escolha do developer, registrado no report).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (`git diff --name-only
       main...HEAD`), produção e teste — `npm --prefix mnemonicos-backend run lint` →
       exit 0.

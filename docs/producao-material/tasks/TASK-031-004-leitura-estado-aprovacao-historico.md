@@ -87,6 +87,21 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
     provam que o custo NÃO cresce com N. 3º caso: Versão vigente aprovada mas com sinal de
     alteração de CONTEÚDO aceso (short-circuit de `resolveAlterationSignal`, TASK-031-002)
     → EXATAMENTE 4 statements (pula a leitura de `productionStageEvent`).
+- **Herdado do gate 8 da Wave 1 (security-engineer, notas N1/N2/N6 — decisão 4.140)**,
+  mesma suíte `content-versions.service.integration.test.ts`:
+  - (N1) `resolveAlterationSignal` recebe só a Versão VIGENTE (a de maior `number` do
+    array já filtrado pelo `rawContentId` do chamador) e o `current` lido do MESMO
+    `rawContentId` — nunca uma Versão de outro Conteúdo bruto. Caso: 2 Conteúdos brutos
+    com Versões aprovadas, alterar o conteúdo só de B → `listContentVersions(A)` devolve
+    `validApprovalForExport: true` para a vigente de A e `listContentVersions(B)` devolve
+    `false` (o sinal não vaza entre Conteúdos brutos).
+  - (N2) Fail-secure da leitura: `productionStageEvent.findFirst` rejeitando durante o
+    cálculo de `validApprovalForExport` → a chamada rejeita (erro propaga), nunca devolve
+    `validApprovalForExport: true` nem cai para um default silencioso.
+  - (N6) O estado de aprovação exposto usa `select` explícito de `approvedById`/`approvedAt`
+    — nunca `include: { approver: true }` (User carrega `passwordHash`).
+  - Fixture: usar o builder de `VersionedContentFields` que TASK-031-003 cria em
+    `tests/support/` (nunca uma 3ª cópia local).
 - `mnemonicos-frontend`/`mnemonicos-backend`: nenhum arquivo de tipos/frontend tocado
   nesta TASK (TASK-031-006 é quem espelha `validApprovalForExport`).
 
@@ -116,6 +131,15 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
       (`{ ...CONTENT_VERSION_DETAIL_SELECT, contentSnapshot: true }`) segue EXATAMENTE o
       padrão já usado por `approveContentVersion` (TASK-031-003, mesmo arquivo) para a
       leitura da Versão vigente — nunca uma 2ª forma de compor o `select`.
+- [ ] Heranças N1/N2 do gate 8 W1 (ver Inclui): caso "sinal não vaza entre Conteúdos
+      brutos" e caso "`findFirst` rejeitando → chamada rejeita" — mesmo comando da suíte
+      acima → `OK (N tests)`, os 2 casos nomeados no relatório do Jest. Mutante (em
+      `git worktree add`): envolver a chamada de `resolveAlterationSignal` em
+      `.catch(() => false)` → o caso N2 fica vermelho.
+- [ ] Herança N6: `grep -rn "include: { approver" mnemonicos-backend/src | grep -vE
+      ':\s*(//|\*)' | grep -v generated` (raiz do workspace) → 0 ocorrências.
+- [ ] Fixture: `grep -rln "BASE_FIELDS\|const BASE = " mnemonicos-backend/tests` não
+      ganha nenhum arquivo novo desta TASK (a fixture vem do builder de `tests/support/`).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (`git diff --name-only
       main...HEAD`) — `npm --prefix mnemonicos-backend run lint` → exit 0.
 - [ ] Aderência à stack/padrões da ficha e do perfil `node-22.md` — `select` explícito,

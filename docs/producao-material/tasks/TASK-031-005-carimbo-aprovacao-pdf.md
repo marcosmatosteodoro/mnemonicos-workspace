@@ -108,6 +108,16 @@ PLAN-031 §1, §3 (COMP-031-007/008), §4 Fluxo 5.
     o teste existente de AC-028-010, `latest === null`, nunca alcança o cálculo de
     `approvedAndValid`). Comentário adicionado nos 2 blocos existentes citando os IDs
     novos, sem alterar asserção.
+  - **Herdado do gate 8 da Wave 1 (security-engineer, notas N2/N3 — decisão 4.140)**:
+    (N3) o carimbo recalcula o sinal combinado NA HORA da exportação e nunca estampa
+    "aprovada" só porque `approvedById !== null` — já provado pelo caso AC-030-024 acima
+    (aprovada + evento de Tira posterior ao fechamento → RASCUNHO); o critério abaixo
+    torna isso explícito com mutante. (N2) `productionStageEvent.findFirst` rejeitando
+    durante `resolveVersionStampForPdf` → a Exportação falha (erro propaga, sem PDF) —
+    nunca um PDF com "aprovada" nem um `catch → false` silencioso que estamparia
+    RASCUNHO escondendo a falha. Caso novo na mesma suíte.
+  - Fixture: usar o builder de `VersionedContentFields` que TASK-031-003 cria em
+    `tests/support/` quando o teste precisar dos 11 campos (nunca uma 3ª cópia local).
 
 ### Não inclui
 
@@ -137,6 +147,11 @@ PLAN-031 §1, §3 (COMP-031-007/008), §4 Fluxo 5.
       explicitamente a AUSÊNCIA do hex de `'RASCUNHO'` em toda página quando aprovada e
       válida — nunca assumido, sempre testado (universo = todas as páginas, mesmo
       quantificador das demais provas de "toda página" desta suíte).
+- [ ] Herança N3 do gate 8 W1: mutante (em `git worktree add`, nunca na árvore
+      principal) que troca `approvedAndValid` por `latest.approvedById !== null` (ignora o
+      sinal) → o caso AC-030-024 fica vermelho. Mesmo comando da suíte acima.
+- [ ] Herança N2 do gate 8 W1: `findFirst` rejeitando → `exportPublication` rejeita,
+      nenhum PDF devolvido — caso nomeado, mesmo comando da suíte acima → `OK (N tests)`.
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (`git diff --name-only
       main...HEAD`) — `npm --prefix mnemonicos-backend run lint` → exit 0.
 - [ ] Aderência à stack/padrões da ficha e do perfil `node-22.md` — função pura sem I/O
