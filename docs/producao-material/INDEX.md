@@ -4,9 +4,9 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-28 (PLAN-031 criado — redesenho visual de `/login`,
-SPEC-030/KAN-73, `Approved`, cobertura 100%, ainda sem TASKs; demanda avulsa fora do
-épico MNEMORA STUDIO)
+**Última atualização**: 2026-09-28 (TASK-031-001..006 criadas — redesenho visual de
+`/login`, PLAN-031/SPEC-030/KAN-73, 6 tasks em 4 waves, pronto para `/keelson:implement`;
+demanda avulsa fora do épico MNEMORA STUDIO)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -91,7 +91,7 @@ fechado._
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
-| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 0/? ⏸ | Approved |
+| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 0/6 ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -302,6 +302,17 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-28: **TASK-031-001..006 criadas via `/keelson:tasks`** (6 tasks, 4 waves: W1
+  tokens `@theme` — TASK-001 chore; W2 backdrop/painel ilustrado/PasswordField restyle —
+  TASK-002/003/006, paralelas; W3 LoginForm restyle — TASK-005; W4 LoginCardFrame/
+  `page.tsx` — TASK-004, integra tudo). Jira: 6 sub-tasks criadas sob KAN-73 (KAN-143..
+  148). Rodada consolidada (task-validator + `qa` pré-código, decisão 4.116): 0 ERROR;
+  achados reais do `qa` (credencial de seed ambígua no roteiro do gate 9, TRISK-031-004
+  sem passos numerados, AC-030-010 sem asserção ligando token usado ao medido, rótulo
+  sr-only vs visível, AC-030-005 sem inventário fechado de controles) resolvidos em
+  degrau 1 (sem escalação — nenhum era decisão de produto nova). `TASK-031-001` renomeada
+  para incluir marcador `-chore-` (achado `task-nome-tipo`). Revalidação: 0 ERROR/WARNING
+  nos 6 arquivos.
 - 2026-09-28: **PLAN-031 criado via `/keelson:plan`**, cobrindo 100% de SPEC-030 (14 FRs
   + 6 NFRs). `code-scout` (triagem técnica) achou que este projeto tem um único root
   layout — route group não desliga a moldura de `/login` sem reestruturar todo

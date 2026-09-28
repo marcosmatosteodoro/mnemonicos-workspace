@@ -167,3 +167,18 @@ LoginForm/page.tsx/PasswordField além de estilo; alteração de outras rotas.
   desliga a moldura do root layout sem reestruturar `src/app/` inteiro — DEC-031-001
   resolve com `position: fixed` sem route group, decisão tomada pelo Tech Lead (degrau
   1, sem escalação)
+- TASKS: 2026-09-28T16:14:56-0300 · correções: 1 (rodada consolidada — decisão 4.116 —
+  `task-validator` + `qa` pré-código: 5 `task-criterio-grep-nao-ancorado` reforçados com
+  fronteira de símbolo + exclusão de comentário; 5 achados reais do `qa` — credencial de
+  seed ambígua no roteiro do gate 9 (resolvido: ADMIN via `db:seed`/`db:setup`,
+  credenciais do `.env`, nunca chutadas), TRISK-031-004 sem passos numerados (5 passos
+  novos com pré-condição/ação/esperado), AC-030-010 sem asserção ligando token
+  usado-pelo-componente ao token medido por TASK-001, rótulo sr-only vs visível
+  (resolvido: visível, releitura de NFR-030-001 já aprovado), AC-030-005 sem inventário
+  fechado de controles (`getAllByRole` N=4) — todos resolvidos em degrau 1 pelo Tech
+  Lead, sem escalação ao PO (nenhum era decisão de produto nova)) · classes:
+  task-criterio-grep-nao-ancorado(5, real — corrigido), task-nome-tipo(1, real —
+  TASK-031-001 renomeada para incluir `-chore-`, operação de arquivo da main session),
+  task-overlap-fr(5, aceito — FRs particionados entre TASKs irmãs por design do PLAN).
+  Revalidação: 0 ERROR/WARNING nos 6 arquivos e no grafo. Jira: 6 sub-tasks criadas sob
+  KAN-73 (KAN-143..148)
