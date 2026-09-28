@@ -302,6 +302,11 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-28: fora de escopo achado em TASK-031-002 — 11 erros de lint em
+  `mnemonicos-backend/.claude/worktrees/kan-49-vercel-entrypoint/` (worktree paralelo de
+  outra feature, KAN-49; parsing error de `eslint.config.mjs` + 10 `console` em
+  `prisma/seed.ts`), fora do repo/escopo desta TASK (frontend-only) — não corrigido,
+  sinal para quem estiver com KAN-49 aberto.
 - 2026-09-28: furo no plano em TASK-031-002 — branch
   `feat/producao-material-login-redesign` existia só no checkout local da main session,
   nunca pushada para `origin`; o subagent `developer` (ambiente isolado) não a encontrou,
