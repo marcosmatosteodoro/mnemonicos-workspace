@@ -155,3 +155,15 @@ LoginForm/page.tsx/PasswordField além de estilo; alteração de outras rotas.
   spec-must-ratio(1, aceito — redesenho onde todo requisito é mandatório),
   spec-sem-should-may(1, aceito), fr-sem-ac(1, real — corrigido), spec-ears-nao-casa(1,
   real — corrigido)
+- PLAN: 2026-09-28T15:42:21-0300 · correções: 1 (3 ERROR reais
+  `plan-dec-irreversivel-enum` — mesma classe de bug de acentuação em "ã" já vista na
+  etapa SPEC, agora bloqueante; + 2 WARNING de parsing multi-linha do campo `Realiza`,
+  conteúdo correto, só quebra de linha — normalizado para forma sem acento/ponto e
+  linha única) · classes: plan-dec-irreversivel-enum(3, bug de ferramenta — roteado ao
+  agile-coach), plan-dec-alternativa-unica(1, aceito — DEC-031-001 com custo concreto
+  documentado da única alternativa descartada), fr-sem-comp(2, falso — parser lê só a
+  1ª linha do campo `Realiza` multi-linha, roteado ao agile-coach), comp-sem-fr(1,
+  falso, mesma causa). `code-scout` (triagem técnica): achou que route group não
+  desliga a moldura do root layout sem reestruturar `src/app/` inteiro — DEC-031-001
+  resolve com `position: fixed` sem route group, decisão tomada pelo Tech Lead (degrau
+  1, sem escalação)
