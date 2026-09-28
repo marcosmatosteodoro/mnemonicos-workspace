@@ -62,6 +62,21 @@ reescrita (NFR-030-004).
       TASK-031-001 (`src/app/globals-theme-contrast.test.ts`) cobrindo os pares de token
       usados aqui e cobrindo o rótulo visível (nunca apenas `getByLabelText`, que passa
       também com rótulo oculto).
+- [ ] **Herdado do gate 11 de TASK-031-001** (product-designer, achado não-bloqueante
+      roteado como critério — decisão 4.140): a borda da pílula precisa de contraste
+      ≥3:1 contra o **fundo adjacente externo** ao campo (o painel de formulário, não o
+      fundo interno da própria pílula — WCAG 1.4.11, "identifica o componente"), medido
+      contra o token real que TASK-031-004/005 definirem para o painel; se o painel
+      ainda não existir nesta wave, deixe o teste de contraste preparado para o par
+      borda×painel (parametrizado pelo token, não hardcoded) e documente em comentário
+      no teste qual token falta — verificação executável: mesmo comando de
+      `globals-theme-contrast.test.ts` acima, com o par borda×painel incluído assim que
+      o token do painel existir.
+- [ ] **Herdado do gate 11 de TASK-031-001**: o placeholder do campo (quando aplicável)
+      usa `--color-night-pill-icon` (medido 6,45:1/7,97:1, passa o piso de texto) como
+      cor — nunca opacidade de `pill-text` sem medir. Verificação executável: asserção no
+      teste de estilo/contraste ligando a cor computada do placeholder ao token
+      `pill-icon`.
 - [ ] `password-field.test.tsx` continua passando sem alteração de asserção (toggle
       mostrar/ocultar idêntico, `value`/`onChange`, alvo de toque, foco visível) — Testes
       cobrem AC-030-011 (parte — `password-field.test.tsx`): verificação executável:

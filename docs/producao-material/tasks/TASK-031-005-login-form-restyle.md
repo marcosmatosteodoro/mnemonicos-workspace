@@ -73,6 +73,23 @@ real (NFR-030-002).
       TASK-031-001 (`src/app/globals-theme-contrast.test.ts`) cobrindo os pares de token
       usados aqui e cobrindo o rótulo visível (nunca apenas `getByLabelText`, que passa
       também com rótulo oculto).
+- [ ] **Herdado do gate 11 de TASK-031-001** (product-designer, achado não-bloqueante
+      roteado como critério — decisão 4.140): o preenchimento do botão em tom escuro
+      (`--color-night-button-bg`) precisa se distinguir do fundo do painel de formulário
+      no tema escuro (o valor de hoje mede ~1,00-1,08:1 contra os candidatos a fundo de
+      painel — quase indistinguível) — ou o `--color-night-button-bg` escuro ganha um tom
+      que se separe do painel, ou o painel (definido em TASK-031-004) fica claramente
+      mais claro que o botão; meça o par botão×painel com o token real do painel assim
+      que ele existir e registre em comentário, no mesmo padrão dos pares já documentados
+      em `globals.css`. Se TASK-031-004 ainda não rodou nesta wave, deixe apontado no
+      código/teste qual token falta.
+- [ ] **Herdado do gate 11 de TASK-031-001**: a borda da pílula precisa de contraste ≥3:1
+      contra o **fundo adjacente externo** (o painel, não o fundo interno da pílula —
+      WCAG 1.4.11), medido contra o token real do painel; mesma régua de "documentar se o
+      token do painel ainda não existir" do item acima.
+- [ ] **Herdado do gate 11 de TASK-031-001**: o placeholder do campo de e-mail usa
+      `--color-night-pill-icon` (6,45:1/7,97:1) como cor — nunca opacidade de `pill-text`
+      sem medir.
 - [ ] `login-form.test.tsx` continua passando sem alteração de asserção — `method="post"`,
       gate de hidratação, mensagem genérica de erro `role="alert"`, `aria-busy` durante o
       envio, ausência de `aria-invalid`, status "Entrando…", redirecionamento para
