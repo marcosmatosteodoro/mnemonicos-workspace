@@ -4,9 +4,9 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-28 (TASK-031-001..006 criadas — redesenho visual de
-`/login`, PLAN-031/SPEC-030/KAN-73, 6 tasks em 4 waves, pronto para `/keelson:implement`;
-demanda avulsa fora do épico MNEMORA STUDIO)
+**Última atualização**: 2026-09-28 (TASK-031-001 Done — Wave 1/4 de PLAN-031, tokens
+`@theme` da paleta noturna, contraste AA medido/provado; demanda avulsa fora do épico
+MNEMORA STUDIO)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -91,7 +91,7 @@ fechado._
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
-| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 0/6 ⏸ | Approved |
+| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 1/6 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -302,6 +302,19 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-28: **TASK-031-001 Done** (Wave 1/4 de PLAN-031) — 12 tokens `--color-night-*`
+  aditivos no `@theme` de `globals.css` (céu, dunas, lua, estrela, pílula, botão),
+  contraste AA medido e provado nos dois temas (`pill-text` 11,92/14,08:1, `pill-icon`
+  6,45/7,97:1, `pill-border` 4,20/5,13:1, `button-text` 14,16/15,26:1). 1 retry no gate
+  1-7 (`code-reviewer` REPROVOU: prova de ausência de colisão de tokens era tautológica,
+  só lia a constante do próprio teste — corrigida para ler `globals.css` real, fixada com
+  2 mutantes plantados e confirmados vermelhos pelo revisor em worktree própria). Gate 11
+  (`product-designer`) aprovou de primeira, com 3 sugestões não-bloqueantes roteadas como
+  critério explícito para TASK-031-005/006 (contraste borda/botão contra o fundo adjacente
+  externo — só medível quando os tokens forem consumidos; token de placeholder
+  `--color-night-pill-icon`). Gates 8/9/10 n/a (sem superfície sensível/observável/custo
+  nesta wave). 569/569 testes verdes. Jira: KAN-143/KAN-73 movidos para Em andamento no
+  despacho.
 - 2026-09-28: **TASK-031-001..006 criadas via `/keelson:tasks`** (6 tasks, 4 waves: W1
   tokens `@theme` — TASK-001 chore; W2 backdrop/painel ilustrado/PasswordField restyle —
   TASK-002/003/006, paralelas; W3 LoginForm restyle — TASK-005; W4 LoginCardFrame/

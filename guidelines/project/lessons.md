@@ -1183,7 +1183,25 @@ verificado 9/9 verde. Extensão da lição: declarar o universo certo não basta
 textual que varre esse universo precisa enumerar TODOS os identificadores pelos quais o
 quantificador do critério pode se manifestar (todo cliente de dados alcançável no
 escopo), não só o mais óbvio/injetado.
-**Contadores:** confirmada 2 · contestada 0
+**Reincidência (code-reviewer, Wave 1 de PLAN-031):** `globals-theme-tokens.test.ts`
+provava "os tokens `--color-night-*` não reutilizam nem sobrescrevem
+`--color-ink-*`/`--color-brand-*`/`--color-recall-*`" calculando a ausência de colisão só
+a partir das constantes de `night-palette-tokens.ts` (a lista que o próprio teste mantém)
+— nunca lia `globals.css`. Universo nenhum foi lido: a "prova" comparava o inventário
+contra ele mesmo, então plantar `--color-ink-50: #000;` fora do `@theme` ou redeclarar um
+`--color-brand-*` dentro dele passava batido, sem qualquer mutante morto — variação mais
+extrema da classe (0% de leitura do artefato, não só universo estreito). Corrigido com
+`countCssPropertyDeclarations` (novo, `theme-css-parser.ts`) lendo `globals.css` inteiro
+via regex `--color-(ink|brand|recall)-[\w-]+\s*:` (exige `:` para não casar
+`var(--nome)`), fixado com 2 mutantes (redeclaração fora do `@theme` e dentro dele) —
+mas a 1ª fixação do developer (mutação em string em memória, réplica da lógica de
+produção) foi rejeitada pelo revisor: só a suíte real rodando contra o artefato mutado,
+numa worktree própria, fecha a prova — réplica que diverge do teste real não garante
+nada sobre a suíte. Extensão da lição: quando a fonte de comparação de uma prova de
+ausência é uma constante que o PRÓPRIO teste mantém (não o artefato de produção), a prova
+é tautológica por construção — nenhum universo foi lido, e a régua do mutante "fora da
+região esperada" nem chega a se aplicar.
+**Contadores:** confirmada 3 · contestada 0
 
 ## [Config] `CORS_ORIGINS` de origem única quebra silenciosamente o padrão de porta alternativa entre sessões paralelas
 
