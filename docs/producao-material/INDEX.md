@@ -302,6 +302,11 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-28: furo no plano em TASK-031-002 — branch
+  `feat/producao-material-login-redesign` existia só no checkout local da main session,
+  nunca pushada para `origin`; o subagent `developer` (ambiente isolado) não a encontrou,
+  devolveu Blocked — destino: `git push -u origin` a partir do checkout local (degrau 1,
+  ajuste localizado), TASK redespachada.
 - 2026-09-28: **TASK-031-001 Done** (Wave 1/4 de PLAN-031) — 12 tokens `--color-night-*`
   aditivos no `@theme` de `globals.css` (céu, dunas, lua, estrela, pílula, botão),
   contraste AA medido e provado nos dois temas (`pill-text` 11,92/14,08:1, `pill-icon`
