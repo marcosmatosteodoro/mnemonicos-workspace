@@ -1603,7 +1603,20 @@ idêntico para o mesmo tipo de dado, nascidos na mesma janela de tempo.
 **Validade:** geral (qualquer par de componentes de lista que renderizam a mesma entidade
 de domínio, neste frontend).
 **Estado:** ativa
-**Contadores:** confirmada 4 · contestada 0
+**Contadores:** confirmada 6 · contestada 0
+
+**Corolário de prova assimétrica (code-reviewer, retry da Wave 2 de PLAN-031,
+TASK-031-002/003):** o achado de gate 11 (direção da estrela cadente errada + estrela
+some sob `prefers-reduced-motion`) foi corrigido nos DOIS componentes irmãos
+(`login-night-backdrop.tsx`/`login-illustrated-panel.tsx`, mesma wave, retries
+despachados em paralelo a developers distintos) — mas o teste falsificável (cosseno
+traço×`translate` > 0,9; `opacity` > 0 sob `reduced-motion`) só nasceu em
+`login-night-backdrop.test.tsx`. `login-illustrated-panel.tsx` recebeu a MESMA correção
+sem par de teste algum. **Regra estendida:** quando um retry consolidado corrige o mesmo
+defeito em N componentes irmãos via developers/despachos distintos, o despacho nomeia o
+teste-prova como entregável de CADA um (não só "aplique a correção") — herdar a correção
+sem herdar a prova é a mesma classe de furo que esta lição já cobre, um nível abaixo do
+código: no código, não só na estrutura/posicionamento.
 
 **Corolário de correção não-estrutural (gate 11 da Wave 7 de PLAN-025, TASK-025-013,
 re-revisão da rodada 1):** o mesmo defeito reincidiu fora de acessibilidade de lista — o

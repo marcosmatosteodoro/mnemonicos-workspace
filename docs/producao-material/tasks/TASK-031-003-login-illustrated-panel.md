@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -71,17 +71,17 @@ a tecnologia assistiva.
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-28T19:59:05-0300
+**Data conclusão**: 2026-09-28T20:34:33-0300
+**Commit SHA**: `e6457ff` (correções + prova simétrica sobre `2702b1b`, retry gate 11 sobre `4b1b6b9`)
 **Jira**: KAN-145
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [ ] Segurança (gate 8): n/a — componente decorativo/aria-hidden, sem superfície de auth
+- [ ] Comportamento (gate 9): n/a — SPEC-030 sem FEATs; gate 9 consolida na Etapa 4 contra o DoD do PLAN-031

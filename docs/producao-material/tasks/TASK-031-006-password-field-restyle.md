@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -98,17 +98,17 @@ reescrita (NFR-030-004).
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-28T20:06:08-0300
+**Data conclusão**: 2026-09-28T20:40:28-0300
+**Commit SHA**: `17069ae` (retry gate 11 — ícone à esquerda — sobre `80d7879`)
 **Jira**: KAN-148
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer (superfície: `password-field.tsx`, campo de senha do formulário de login)
+- [ ] Comportamento (gate 9): n/a — SPEC-030 sem FEATs; gate 9 consolida na Etapa 4 contra o DoD do PLAN-031
