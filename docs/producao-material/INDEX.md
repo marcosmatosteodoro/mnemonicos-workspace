@@ -4,7 +4,8 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-27 (PLAN-029/F8 **mergeado** — PR #9 backend/#15 frontend; Histórias KAN-137/138 fechadas, Épico KAN-136 pendente de fechamento manual — classificador de permissão recusou a transição; próxima elegível: F9)
+**Última atualização**: 2026-09-28 (SPEC-030 criada — redesenho visual de `/login`,
+KAN-73, `Approved`; demanda avulsa fora do épico MNEMORA STUDIO)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -34,6 +35,12 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 - Contrastes, pegadinha elaborada, flashcards e protocolo impresso de revisão (SPEC-026/**PLAN-027**, F7 do épico MNEMORA STUDIO, 8/8 TASKs Done 2026-09-26, branch `feat/producao-material-mnemora-studio` não mergeada) — 3 registros novos pendurados em `RawContent` (Contraste e `ProductionFlashcard`, N:1 diretos, guarda `assertRawContentReachable`+autor-ou-ADMIN; Pegadinha elaborada como coluna `pegadinhaText` nullable, guarda em 1 `updateMany` composto — mais seguro que o padrão de 2 passos, fecha janela TOCTOU), `ConfirmRemoveDialog` compartilhado com foco gerenciado por desfecho (survivor/restore), valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`, composição suplementar no PDF exportado (F6) com título por seção e Protocolo impresso de 6 Marcos fixos (sem cálculo de tempo), fundida via `copyPages` nas 2 Variantes. Contraste/Pegadinha/Flashcard **alcançáveis pela tela real** de `content/[id]` desde a Wave 6 (`ContentSupplementaryPanel`, TASK-027-007) — furo achado na convergência de fecho da Entrega (nenhuma TASK 001-006 montava o componente numa página), corrigido antes do PR por decisão do Diretor; Pegadinha **recarregada a cada visita** desde a Wave 7 (TASK-027-008 — 2º furo, achado na RECONFIRMAÇÃO da convergência: `refetchOnMountOrArgChange` faltava para o único dos 3 sujeitos de FR-026-005/011/017 sem COMP de lista próprio; retry moveu a opção do subscriber secundário para o primário depois que gate 10 mediu 1 GET redundante na 1ª tentativa). 18 COMPs, 8 DECs (todas reversíveis), 7 TRISKs (2 são risco de produto ainda aberto — ver TRISK-027-006/007) + 1 risco novo fora de escopo (RISK-027-010, território F2). 8/8 TASKs Done, 7 waves — retomada de sessão múltiplas vezes (pausa de ~9 dias entre Wave 3 e 4, developer interrompido por rate-limit e por reinício de sessão host na Wave 4, trabalho parcial sempre preservado e continuado, nunca refeito). Todas as 5 rodadas de gate reprovaram na 1ª tentativa e fecharam na 2ª (Wave 6 precisou de uma 3ª passada — retry consolidado resolveu a substância mas introduziu regressão de prova mecânica em 4 asserções de teste, corrigida à parte): Wave 2 (2 bloqueantes de prova + 3 de acessibilidade), Wave 3 (1 bloqueante — reflexo real na UI, mesma classe da Wave 4), Wave 4 (3 bloqueantes de prova + 3 de UX), Wave 5 (3 bloqueantes de prova + 1 achado alta de design — Pegadinha sem rótulo no PDF, risco pedagógico real, corrigido com título de seção), Wave 6 (achado alta de design + 4 bloqueantes de código — Pegadinha falso-vazia em loading/erro do titular, id duplicado em `aria-*`, 404 mal atribuído em edição, DRY). 6 reincidências da lição DRY (fixture de teste duplicada) ao longo do slug + 1 nova reincidência da lição de posicionamento de exportação (Wave 6), 1 lição nova de teste (critério com efeito repartido entre componentes irmãos), 1 de performance (docstring citando precedente não verificado), 3 lições novas da Wave 6 (composição de wrapper com prop nullable ambíguo; mensagem de erro por status com causa múltipla; rename de nome acessível quebrando asserção negativa). 6 FEATs VERIFICADAS por execução real (HTTP+Postgres+PDF gerado nas 2 Variantes; componente montado com store real para as 3 de remoção) — **FEAT-026-001/002/003 reverificadas na Wave 6 em browser real** (1ª verificação de tela de fato do PLAN, `gates.screenVerify`), fechando a lacuna que as 3 primeiras verificações (Wave 4/5) tinham deixado PARCIAL por falta de tela. **2 riscos de produto abertos para decisão do Diretor na Entrega**: TRISK-027-006 (caractere fora de WinAnsi em Contraste/Flashcard/Pegadinha derruba a Exportação inteira) e TRISK-027-007 (DEC-027-005 diverge de COMP-027-018/DEC-025-007 no alcance de leitura da exportação). Migração aplicada só em dev local nesta sessão, com autorização do Diretor — produção não tocada. Tracker: `jira.enabled: true` — degradado (grant só para `autoavaliar.atlassian.net`) nas Waves 4/5, **reconciliado com sucesso em 2026-09-26** via `/keelson:jira-sync` (conector respondeu no cloudId correto na 3ª tentativa) — 6/6 Stories e 6/6 sub-tasks sincronizadas, marco "Funcionalidade pronta p/ QA" comentado nas 6 FEATs.
 
 ### Especificadas, ainda não planejadas
+- Redesenho visual da tela `/login` — card central em duas metades (painel ilustrado
+  decorativo + painel de formulário) sobre um fundo de página em tela cheia que estende a
+  mesma atmosfera, campos em pílula, paleta nova como tokens aditivos do `@theme`, sem
+  alterar o comportamento de autenticação (SPEC-002/SPEC-016) nem a aparência das demais
+  rotas — SPEC-030, KAN-73 (demanda avulsa fora do épico MNEMORA STUDIO), brief BRIEF-030,
+  `Approved` 2026-09-28.
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
 
@@ -61,6 +68,7 @@ fechado._
 | SPEC-024 | Pipeline de publicação — PDF (rascunho) | Approved | 2026-09-14 |
 | SPEC-026 | Contrastes, pegadinhas, flashcards e protocolos impressos | Approved | 2026-09-16 |
 | SPEC-028 | Versionamento editorial e fechamento legislativo | Approved | 2026-09-26 |
+| SPEC-030 | Redesenho visual da tela de login | Approved | 2026-09-28 |
 
 ## PLANs
 
@@ -148,6 +156,10 @@ fechado._
 | Versão editorial (do Conteúdo bruto) | Registro imutável (número sequencial, Data de fechamento legislativo, autor do fechamento, timestamp técnico), recortado por campo (texto normativo, radar, fonte normativa, blocos da Quebra da regra — Pegadinha elaborada fora) — a trilha histórica que o Carimbo de última alteração (SPEC-005) já previa como pendente para F8 | SPEC-028 |
 | Fechar uma Versão (ato) | Ação explícita do EDITOR-autor ou ADMIN sobre um Conteúdo bruto, disparando o registro de uma nova Versão editorial — nunca automática a cada edição | SPEC-028 |
 | Versão vigente | A Versão editorial mais recente fechada de um Conteúdo bruto — a que aparece estampada no PDF exportado dele | SPEC-028 |
+| Card em duas metades | Unidade visual central de `/login`: um painel ilustrado no topo e um painel de formulário na base, percebidos como um único bloco flutuante sobre o fundo da página | SPEC-030 |
+| Painel ilustrado | Metade superior do card de `/login`, com ilustração autoral decorativa (motivo noturno: montanhas/dunas em camadas, lua cheia, estrelas, estrelas cadentes, céu em degradê), sem função interativa nem conteúdo lido por tecnologia assistiva | SPEC-030 |
+| Fundo em tela cheia (do login) | Camada de fundo da página `/login`, atrás do card, que estende a mesma atmosfera visual do painel ilustrado em escala maior e com profundidade/desfoque | SPEC-030 |
+| Campo em pílula | Estilo visual de campo de formulário com bordas totalmente arredondadas e um indicador visual (ícone) à esquerda do valor digitado | SPEC-030 |
 
 ## Decisões irreversíveis
 
@@ -276,9 +288,23 @@ fechado._
 | RISK-028-004 | A "Versão aprovada" que F9 vai avaliar recai sobre um PDF que também imprime material de reforço (Contraste/Pegadinha/Flashcard/Tira/Associação visual) não coberto pelo versionamento desta fatia (recorte por campo, A-028-002) | Decidir se o gate de F9 cobre ou não esse material é assunto de F9, não desta SPEC | SPEC-028 §9 |
 | RISK-028-005 | Um expurgo físico futuro de Conteúdo bruto, em cascata, apagaria as Versões editoriais dele — contradiz o requisito append-only (FR-028-004) | A fatia que definir expurgo (fora de F8, ver §4.2 de SPEC-028) precisa resolver o destino das Versões antes de agir; nenhum mecanismo futuro pode remover uma Versão, direta ou indiretamente | SPEC-028 §9 |
 | TRISK-029-006 | Sem teto de retenção, o armazenamento de `ContentVersion.contentSnapshot` cresce sem limite com fechamentos sucessivos (A-028-011 não exige mudança real de texto entre eles) | Aceito nesta fatia; revisitar via PIL-001 ou medição real de armazenamento em produção — poda é decisão reversível (ver `Reabrir se` de DEC-029-003) | PLAN-029 §8 |
+| RISK-030-001 | Contraste AA de placeholder/rótulo sobre o fundo preenchido da pílula (NFR-030-001) é o ponto mais provável de retrabalho no gate de design | Medir contraste nos dois temas antes de fechar a wave que toca os campos; margem para 1 rodada extra do `product-designer` | SPEC-030 §9 |
+| RISK-030-002 | Peso do SVG/CSS autoral da ilustração no bundle de `/login` pode acionar o gate de performance | PLAN mantém a ilustração simples (poucos paths); `performance-engineer` avalia na implementação | SPEC-030 §9 |
+| RISK-030-003 | Cenários de cenário/robustez sem AC formal (trânsito guard→`/login?next=`→login→`next`, foco de teclado, robustez da ilustração/autofill/`forced-colors`, aviso de sessão expirada acima da dobra em 360px) — decisão do PO: cobertos pelo roteiro de verificação dos gates 9/11, não por AC | Roteiro do `qa`/`product-designer` na implementação deve exercitar os itens listados em SPEC-030 §9 | SPEC-030 §9 (veredito PO) |
+| Q-030-001 | Alternativa técnica concreta para o fundo em tela cheia escapar do layout raiz sem alterar outras rotas (ex.: route group dedicado) — decisão do PLAN | `/keelson:plan` registra com alternativas descartadas (DEC) | SPEC-030 §9 (A-030-002) |
 
 ## Histórico recente
 
+- 2026-09-28: **SPEC-030 criada via `/keelson:specify`** (BRIEF-030, KAN-73) — redesenho
+  visual da tela `/login`. 14 FRs, 6 NFRs, 14 ACs, 6 premissas, 3 RISKs + 1 Q. `po` (modo
+  aprovação): APROVAR sobre crítica do `product-analyst`, com pacote de correção de 17
+  ajustes (header/footer preservados em `/login`, motivo noturno fixo nos 2 temas,
+  cobertura título/preenchimento de pílula/tom escuro/tokens-only, aria-busy/aria-invalid,
+  juiz de outcome estético por capturas na Entrega). `spec-validator`: 0 ERROR (2
+  falso-positivos conhecidos da ferramenta — `spec-ac-fora-gwt` por acentuação,
+  `spec-nfr-sem-numero` por leitura de 1 linha só em bloco multi-linha — roteados ao
+  `agile-coach` na Etapa 4.5). Demanda avulsa fora do épico MNEMORA STUDIO — Jira Story
+  KAN-73 (issuetype 10009, standalone, projeção compacta — sem Epic).
 - 2026-09-27: **PRs de F8 mergeados pelo Diretor** — backend
   [#9](https://github.com/marcosmatosteodoro/mnemonicos-backend/pull/9), frontend
   [#15](https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/15). Trilho
