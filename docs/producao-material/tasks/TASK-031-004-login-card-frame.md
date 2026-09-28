@@ -61,6 +61,17 @@ import.
       `page.tsx` importa `@/proxy`, que importa `next/server` transitivamente; mockar o
       guard de open-redirect como sempre-permissivo reprova o gate mesmo com o resto do
       diff correto.
+- [ ] **Herdado do gate 1-7 de TASK-031-006** (code-reviewer, decisão 4.288 — quem
+      define o token do painel promove o `it.todo` pendente): esta TASK define o token do
+      fundo do painel de formulário (ex.: `--color-night-panel-bg` ou nome equivalente,
+      aditivo no `@theme`). Ao defini-lo, promova o `it.todo` de
+      `src/app/globals-theme-contrast.test.ts:25-35` (criado em TASK-031-001,
+      complementado em TASK-031-006) para um `it.each` real nos dois temas, medindo
+      `--color-night-pill-border` ≥3:1 e `--color-night-button-bg` (contraste de
+      preenchimento, achado do gate 11 de TASK-031-001 sobre botão×painel escuro — ver
+      TASK-031-005) contra o novo token do painel. Verificação executável:
+      `npm --prefix mnemonicos-frontend test -- src/app/globals-theme-contrast.test.ts`
+      → OK, sem nenhum `.todo` restante nesse arquivo.
 - [ ] Painel de formulário abre com título curto e de destaque, alinhado à esquerda —
       Testes cobrem AC-030-013: mesmo comando acima, asserção de heading/texto e de classe
       de alinhamento à esquerda.

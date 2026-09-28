@@ -49,6 +49,16 @@ real (NFR-030-002).
       `npm --prefix mnemonicos-frontend test -- src/components/login-form.test.tsx` → OK
       (N tests), incluindo `getByLabelText('E-mail')` e asserção de classe/estrutura de
       pílula.
+- [ ] **Herdado do gate 11 de TASK-031-006** (product-designer, achado ALTA — decisão
+      4.140): o ícone à esquerda do campo de e-mail usa a MESMA soma de larguras
+      (padding + largura do ícone + gap) que o ícone à esquerda do campo de senha
+      (acrescentado em TASK-031-006 nesta mesma wave — cadeado, `shrink-0
+      text-night-pill-icon`, mesmo tamanho/stroke dos ícones de toggle) — os dois campos
+      alinham horizontalmente, o texto digitado começa na mesma posição nos dois.
+      Confira o valor real aplicado em `password-field.tsx` (px-4 + largura do ícone +
+      gap-2) antes de implementar o campo de e-mail, para reproduzir a mesma soma, não
+      estimar de memória. Verificação executável: asserção de estrutura/classe
+      comparando os dois campos (mesmo padding/gap/tamanho de ícone).
 - [ ] Botão de envio ocupa a largura total (ou próxima) do painel de formulário, em tom
       escuro da paleta nova — Testes cobrem AC-030-003 (parte — botão): mesmo comando
       acima, asserção de classe de largura total no botão de envio.
