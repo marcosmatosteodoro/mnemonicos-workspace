@@ -4,9 +4,9 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-29 (TASK-031-005 Done — Wave 3/4 de PLAN-031, LoginForm
-reestilizado, restam só TASK-031-004 para fechar o PLAN; demanda avulsa fora do épico
-MNEMORA STUDIO)
+**Última atualização**: 2026-09-29 (PLAN-031 implementado — 6/6 TASKs Done, redesenho
+visual de `/login`, KAN-73; capacidade movida para Implementadas; demanda avulsa fora do
+épico MNEMORA STUDIO)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -35,15 +35,26 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 
 - Contrastes, pegadinha elaborada, flashcards e protocolo impresso de revisão (SPEC-026/**PLAN-027**, F7 do épico MNEMORA STUDIO, 8/8 TASKs Done 2026-09-26, branch `feat/producao-material-mnemora-studio` não mergeada) — 3 registros novos pendurados em `RawContent` (Contraste e `ProductionFlashcard`, N:1 diretos, guarda `assertRawContentReachable`+autor-ou-ADMIN; Pegadinha elaborada como coluna `pegadinhaText` nullable, guarda em 1 `updateMany` composto — mais seguro que o padrão de 2 passos, fecha janela TOCTOU), `ConfirmRemoveDialog` compartilhado com foco gerenciado por desfecho (survivor/restore), valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`, composição suplementar no PDF exportado (F6) com título por seção e Protocolo impresso de 6 Marcos fixos (sem cálculo de tempo), fundida via `copyPages` nas 2 Variantes. Contraste/Pegadinha/Flashcard **alcançáveis pela tela real** de `content/[id]` desde a Wave 6 (`ContentSupplementaryPanel`, TASK-027-007) — furo achado na convergência de fecho da Entrega (nenhuma TASK 001-006 montava o componente numa página), corrigido antes do PR por decisão do Diretor; Pegadinha **recarregada a cada visita** desde a Wave 7 (TASK-027-008 — 2º furo, achado na RECONFIRMAÇÃO da convergência: `refetchOnMountOrArgChange` faltava para o único dos 3 sujeitos de FR-026-005/011/017 sem COMP de lista próprio; retry moveu a opção do subscriber secundário para o primário depois que gate 10 mediu 1 GET redundante na 1ª tentativa). 18 COMPs, 8 DECs (todas reversíveis), 7 TRISKs (2 são risco de produto ainda aberto — ver TRISK-027-006/007) + 1 risco novo fora de escopo (RISK-027-010, território F2). 8/8 TASKs Done, 7 waves — retomada de sessão múltiplas vezes (pausa de ~9 dias entre Wave 3 e 4, developer interrompido por rate-limit e por reinício de sessão host na Wave 4, trabalho parcial sempre preservado e continuado, nunca refeito). Todas as 5 rodadas de gate reprovaram na 1ª tentativa e fecharam na 2ª (Wave 6 precisou de uma 3ª passada — retry consolidado resolveu a substância mas introduziu regressão de prova mecânica em 4 asserções de teste, corrigida à parte): Wave 2 (2 bloqueantes de prova + 3 de acessibilidade), Wave 3 (1 bloqueante — reflexo real na UI, mesma classe da Wave 4), Wave 4 (3 bloqueantes de prova + 3 de UX), Wave 5 (3 bloqueantes de prova + 1 achado alta de design — Pegadinha sem rótulo no PDF, risco pedagógico real, corrigido com título de seção), Wave 6 (achado alta de design + 4 bloqueantes de código — Pegadinha falso-vazia em loading/erro do titular, id duplicado em `aria-*`, 404 mal atribuído em edição, DRY). 6 reincidências da lição DRY (fixture de teste duplicada) ao longo do slug + 1 nova reincidência da lição de posicionamento de exportação (Wave 6), 1 lição nova de teste (critério com efeito repartido entre componentes irmãos), 1 de performance (docstring citando precedente não verificado), 3 lições novas da Wave 6 (composição de wrapper com prop nullable ambíguo; mensagem de erro por status com causa múltipla; rename de nome acessível quebrando asserção negativa). 6 FEATs VERIFICADAS por execução real (HTTP+Postgres+PDF gerado nas 2 Variantes; componente montado com store real para as 3 de remoção) — **FEAT-026-001/002/003 reverificadas na Wave 6 em browser real** (1ª verificação de tela de fato do PLAN, `gates.screenVerify`), fechando a lacuna que as 3 primeiras verificações (Wave 4/5) tinham deixado PARCIAL por falta de tela. **2 riscos de produto abertos para decisão do Diretor na Entrega**: TRISK-027-006 (caractere fora de WinAnsi em Contraste/Flashcard/Pegadinha derruba a Exportação inteira) e TRISK-027-007 (DEC-027-005 diverge de COMP-027-018/DEC-025-007 no alcance de leitura da exportação). Migração aplicada só em dev local nesta sessão, com autorização do Diretor — produção não tocada. Tracker: `jira.enabled: true` — degradado (grant só para `autoavaliar.atlassian.net`) nas Waves 4/5, **reconciliado com sucesso em 2026-09-26** via `/keelson:jira-sync` (conector respondeu no cloudId correto na 3ª tentativa) — 6/6 Stories e 6/6 sub-tasks sincronizadas, marco "Funcionalidade pronta p/ QA" comentado nas 6 FEATs.
 
-### Em desenvolvimento
-- Redesenho visual da tela `/login` — card central em duas metades (painel ilustrado
-  decorativo + painel de formulário) sobre um fundo de página em tela cheia que estende a
-  mesma atmosfera (fundo `position: fixed` dentro da árvore normal do root layout, sem
-  route group — DEC-031-001), campos em pílula, paleta nova como tokens aditivos do
-  `@theme`, sem alterar o comportamento de autenticação (SPEC-002/SPEC-016) nem a
-  aparência das demais rotas — SPEC-030/**PLAN-031**, KAN-73 (demanda avulsa fora do
-  épico MNEMORA STUDIO), brief BRIEF-030. 6 COMPs, 3 DECs (todas reversíveis), 4 TRISKs.
-  `Approved` 2026-09-28, ainda sem TASKs.
+- Redesenho visual da tela de login (SPEC-030/**PLAN-031**, ✅ 2026-09-29) — card central
+  em duas metades (painel ilustrado decorativo: dunas/montanhas em camadas, lua cheia,
+  estrelas, estrelas cadentes, céu em degradê roxo→rosa; painel de formulário) sobre um
+  fundo de página em tela cheia com a mesma atmosfera desfocada (`position: fixed` dentro
+  da árvore normal do root layout, sem route group — DEC-031-001, achado técnico do
+  `code-scout`: este projeto só tem 1 root layout); campos em pílula com ícone à esquerda
+  (e-mail e senha, mesma soma de larguras); botão largo em tom da paleta; paleta noturna
+  nova como 15+ tokens aditivos no `@theme` (DEC-031-003); `SiteHeader`/footer e o
+  comportamento de autenticação (SPEC-002/SPEC-016) 100% preservados; `prefers-reduced-motion`
+  respeitado. 6 COMPs, 3 DECs (todas reversíveis), 4+ TRISKs (todos fechados com medição
+  real — contraste AA nos dois temas, bundle sem JS extra do cliente, `@utility` sem
+  dependência de custom properties internas do Tailwind). Demanda avulsa fora do épico
+  MNEMORA STUDIO — brief BRIEF-030, Jira Story KAN-73 (projeção compacta, sub-tasks
+  KAN-143..148 concluídas). 6/6 TASKs Done, 4 waves — 6 rodadas de retry reais ao todo
+  (achados genuínos de `product-designer`/`code-reviewer`: prova de ausência tautológica,
+  ícone à esquerda faltando na senha, DRY real entre `LoginForm`/`PasswordField`,
+  dependência de custom property Tailwind não registrada — regressão de a11y evitada
+  antes de chegar a produção, botão sem hover/cursor). 5 lições novas/estendidas em
+  `lessons.md`. 1 furo de plano (branch local não pushada, corrigido em degrau 1). 620/620
+  testes verdes. Gate 9 (comportamento/tela) pendente de consolidação na Entrega.
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
@@ -91,7 +102,7 @@ fechado._
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
-| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 5/6 🟡 | Approved |
+| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -302,6 +313,22 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-29: **TASK-031-004 Done — PLAN-031 implementado (6/6 TASKs)** (Wave 4/4, final)
+  — `page.tsx` monta `LoginNightBackdrop` + card em duas metades (`LoginIllustratedPanel`
+  + `LoginForm`) por inteiro pela 1ª vez. Token `--color-night-panel-bg` definido; os 3
+  `it.todo` pendentes (borda×painel, botão×painel, rótulo×painel) promovidos a provas
+  reais, todos ≥3:1/4,5:1 nos dois temas. `--color-night-button-bg` (tema escuro)
+  reajustado para mauve `#6e5d77` — prova matemática de que nenhum tom quase-preto da
+  paleta atinge 3:1 contra um painel também quase-preto; `product-designer` confirmou
+  coerência visual e fechamento do achado da Wave 1. `code-reviewer` sinalizou (não
+  bloqueante, decisão do Tech Lead registrada): o botão ficou mais claro que o painel,
+  tensionando a letra de FR-030-005 ("tom escuro") — contraste AA prevalece sobre o
+  adjetivo, nota para a Entrega. Hover do botão trocado de `opacity-90` (que derrubava o
+  contraste no tema escuro) para `brightness-105`. `performance-engineer` mediu o bundle
+  real: os 2 componentes SVG decorativos não vazam JS ao cliente — TRISK-031-002 fechado.
+  `security-engineer` confirmou guard de open-redirect e aviso de sessão expirada
+  intactos. 620/620 testes verdes, 0 `it.todo` restante. Jira: KAN-146/KAN-73 movidos —
+  KAN-73 permanece no teto do trilho (Em andamento) até o merge do Diretor.
 - 2026-09-29: **TASK-031-005 Done** (Wave 3/4 de PLAN-031) — `LoginForm` reestilizado:
   campo de e-mail em pílula com `MailIcon` (mesma soma de larguras do `LockIcon` da
   senha, achado ALTA da Wave 2 já respeitado), botão largura total em tom escuro,

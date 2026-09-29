@@ -7,7 +7,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -175,17 +175,17 @@ bem-sucedida, fazer logout para restaurar o estado limpo antes do próximo passo
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-29T09:57:20-0300
+**Data conclusão**: 2026-09-29T10:27:44-0300
+**Commit SHA**: `55dbf61` (2 commits: `c89d3cb` implementação + `55dbf61` limpeza final)
 **Jira**: KAN-146
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer (superfície: `page.tsx`, montagem final)
+- [ ] Comportamento (gate 9): n/a — SPEC-030 sem FEATs; consolida na Etapa 4 contra o DoD do PLAN-031 (screen-verify)
