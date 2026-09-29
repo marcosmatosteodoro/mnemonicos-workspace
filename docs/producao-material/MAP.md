@@ -27,6 +27,15 @@
 - [2026-08-31 · F1] Guard de navegação: `proxy.ts` `config.matcher` é array literal (o Next lê `config` por AST estático — sem `.flatMap`/spread); a equivalência com `INTERNAL_ROUTE_PREFIXES` vive no teste; `(interno)` é route group, nunca catch-all por exclusão — mnemonicos-frontend/src/proxy.ts:42-52
 - [2026-08-31 · F1] `INTERNAL_ROUTE_PREFIXES` / `INTERNAL_MIN_ROLE` / `roleSatisfies` — fonte única do contrato de área interna — mnemonicos-frontend/src/lib/internal-routes.ts:1-40
 - [2026-08-31 · F1] Telas mínimas de F1: `/login` (`LoginForm`, 3 estados, `<form method="post">`, gate de hidratação) e `(interno)/` (`InternalShell` resolve `me`, 3 estados de navegação protegida + logout com 3 estados). Apresentação, não fronteira — mnemonicos-frontend/src/components/internal-shell.tsx:1-125
+- [2026-09-29 · PLAN-031] `/login` deixou de ser um formulário cru: `page.tsx` monta um
+  card em duas metades (painel ilustrado decorativo + painel de formulário) sobre um
+  fundo em tela cheia com a mesma atmosfera noturna — `LoginNightBackdrop`/
+  `LoginIllustratedPanel` (Server Components, `aria-hidden`, SVG inline, sem asset
+  externo), `position: fixed` DENTRO da árvore normal do root layout (route group foi
+  cogitado e rejeitado — este projeto só tem 1 root layout; um 2º exigiria mover todas as
+  rotas soltas de `src/app/` para um grupo irmão). Paleta noturna nova em 15+ tokens
+  `--color-night-*` aditivos no `@theme`. Comportamento de `LoginForm`/`page.tsx`/
+  `PasswordField` (SPEC-002/SPEC-016) 100% preservado — mnemonicos-frontend/src/app/login/page.tsx:1-90
 
 ## Revisão espaçada (dormente por A-005)
 

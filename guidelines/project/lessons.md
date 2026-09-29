@@ -1199,7 +1199,25 @@ verificado 9/9 verde. Extensão da lição: declarar o universo certo não basta
 textual que varre esse universo precisa enumerar TODOS os identificadores pelos quais o
 quantificador do critério pode se manifestar (todo cliente de dados alcançável no
 escopo), não só o mais óbvio/injetado.
-**Contadores:** confirmada 2 · contestada 0
+**Reincidência (code-reviewer, Wave 1 de PLAN-031):** `globals-theme-tokens.test.ts`
+provava "os tokens `--color-night-*` não reutilizam nem sobrescrevem
+`--color-ink-*`/`--color-brand-*`/`--color-recall-*`" calculando a ausência de colisão só
+a partir das constantes de `night-palette-tokens.ts` (a lista que o próprio teste mantém)
+— nunca lia `globals.css`. Universo nenhum foi lido: a "prova" comparava o inventário
+contra ele mesmo, então plantar `--color-ink-50: #000;` fora do `@theme` ou redeclarar um
+`--color-brand-*` dentro dele passava batido, sem qualquer mutante morto — variação mais
+extrema da classe (0% de leitura do artefato, não só universo estreito). Corrigido com
+`countCssPropertyDeclarations` (novo, `theme-css-parser.ts`) lendo `globals.css` inteiro
+via regex `--color-(ink|brand|recall)-[\w-]+\s*:` (exige `:` para não casar
+`var(--nome)`), fixado com 2 mutantes (redeclaração fora do `@theme` e dentro dele) —
+mas a 1ª fixação do developer (mutação em string em memória, réplica da lógica de
+produção) foi rejeitada pelo revisor: só a suíte real rodando contra o artefato mutado,
+numa worktree própria, fecha a prova — réplica que diverge do teste real não garante
+nada sobre a suíte. Extensão da lição: quando a fonte de comparação de uma prova de
+ausência é uma constante que o PRÓPRIO teste mantém (não o artefato de produção), a prova
+é tautológica por construção — nenhum universo foi lido, e a régua do mutante "fora da
+região esperada" nem chega a se aplicar.
+**Contadores:** confirmada 3 · contestada 0
 
 ## [Config] `CORS_ORIGINS` de origem única quebra silenciosamente o padrão de porta alternativa entre sessões paralelas
 
@@ -1601,7 +1619,20 @@ idêntico para o mesmo tipo de dado, nascidos na mesma janela de tempo.
 **Validade:** geral (qualquer par de componentes de lista que renderizam a mesma entidade
 de domínio, neste frontend).
 **Estado:** ativa
-**Contadores:** confirmada 4 · contestada 0
+**Contadores:** confirmada 6 · contestada 0
+
+**Corolário de prova assimétrica (code-reviewer, retry da Wave 2 de PLAN-031,
+TASK-031-002/003):** o achado de gate 11 (direção da estrela cadente errada + estrela
+some sob `prefers-reduced-motion`) foi corrigido nos DOIS componentes irmãos
+(`login-night-backdrop.tsx`/`login-illustrated-panel.tsx`, mesma wave, retries
+despachados em paralelo a developers distintos) — mas o teste falsificável (cosseno
+traço×`translate` > 0,9; `opacity` > 0 sob `reduced-motion`) só nasceu em
+`login-night-backdrop.test.tsx`. `login-illustrated-panel.tsx` recebeu a MESMA correção
+sem par de teste algum. **Regra estendida:** quando um retry consolidado corrige o mesmo
+defeito em N componentes irmãos via developers/despachos distintos, o despacho nomeia o
+teste-prova como entregável de CADA um (não só "aplique a correção") — herdar a correção
+sem herdar a prova é a mesma classe de furo que esta lição já cobre, um nível abaixo do
+código: no código, não só na estrutura/posicionamento.
 
 **Corolário de correção não-estrutural (gate 11 da Wave 7 de PLAN-025, TASK-025-013,
 re-revisão da rodada 1):** o mesmo defeito reincidiu fora de acessibilidade de lista — o
@@ -2153,3 +2184,36 @@ coberto.
 ao usuário, neste frontend ou backend).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Config] `@utility` escrito à mão no Tailwind 4 nunca referencia `var(--tw-*)` — a custom property só existe quando um utilitário NATIVO a registra
+
+**Erro:** o `@utility night-pill`/`night-pill-input` novo (extração de DRY, Wave 3 de
+PLAN-031, TASK-031-005) copiou do CSS gerado `border-style: var(--tw-border-style)` e
+`outline-style: var(--tw-outline-style)` — propriedades internas do Tailwind 4 que só
+ganham `@property` (e o fallback que dá a elas um valor inicial) quando o SCANNER de
+conteúdo encontra, nos arquivos de PRODUÇÃO, algum utilitário nativo que as usa
+(`border-*`, `outline-*`). Compilando só com os fontes de produção (sem `.test.tsx`),
+`@property --tw-outline-style` não era emitida — `outline-style` ficava `var(--tw-outline-style)`
+sem valor, e o anel de foco visível das duas pílulas (e-mail e senha) sumiria de verdade
+em produção (WCAG 2.4.7, NFR-030-004). Em desenvolvimento e nos testes "funcionava" só
+porque a palavra solta "outline" aparecia dentro de um título de teste — acoplamento
+acidental entre um `@utility` e um arquivo que nada tem a ver com ele.
+**Causa:** um `@utility` escrito à mão não é um utilitário nativo — copiar literalmente o
+CSS que o Tailwind GERA para uma combinação de classes (`border` + `has-[...]:outline-2`)
+não copia o registro do `@property` que sustenta aquele CSS. A dependência fica invisível
+até compilar com o conjunto exato de arquivos de produção (sem testes, sem código morto)
+e ler o CSS resultante.
+**Solução:** dentro de qualquer `@utility` do `globals.css`, nunca referenciar `--tw-*` —
+(a) escrever o valor final LITERAL (`border-style: solid`, `outline-style: solid`), no
+mesmo padrão que `surface-card` (`globals.css:124`, `border: 1px solid ...`) já usa; ou
+(b) compor com `@apply` das classes nativas (`@apply border ... has-[input:focus-visible]:outline-2 ...`),
+que registra o `@property` sozinho. Validar SEMPRE compilando com o build real do
+framework (aqui, `next build`/Turbopack — não uma CLI standalone do Tailwind, que pode ter
+o scanner de conteúdo não-funcional em ambiente sandboxed) usando só os arquivos de
+produção (mover `.test.ts(x)` para fora da árvore antes de compilar, restaurar depois) e
+conferir se o `@property` necessário aparece no CSS gerado — nunca inferir pela leitura do
+CSS-fonte do `@utility`.
+**Validade:** geral (qualquer `@utility` de Tailwind 4 escrito à mão neste frontend que
+referencie uma custom property `--tw-*`).
+**Estado:** ativa
+**Contadores:** confirmada 1 · contestada 0
