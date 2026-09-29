@@ -53,8 +53,13 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   ícone à esquerda faltando na senha, DRY real entre `LoginForm`/`PasswordField`,
   dependência de custom property Tailwind não registrada — regressão de a11y evitada
   antes de chegar a produção, botão sem hover/cursor). 5 lições novas/estendidas em
-  `lessons.md`. 1 furo de plano (branch local não pushada, corrigido em degrau 1). 620/620
-  testes verdes. Gate 9 (comportamento/tela) pendente de consolidação na Entrega.
+  `lessons.md`. 1 furo de plano (branch local não pushada, corrigido em degrau 1). 627/627
+  testes verdes (HEAD `f328321`). Gate 9 (`qa`) consolidado na Entrega: 10/11 passos do
+  roteiro VERIFICADOS via navegador real; AC-030-012 (clique físico de login)
+  **pendente_handoff** (causa `permissao_ambiente` — ver HANDOFF-PLAN-031). Convergência
+  de fecho (revisão da branch inteira, fora do escopo de qualquer wave/TASK isolada)
+  achou e fechou 1 gap real: contraste do header/footer herdado do root layout contra o
+  novo fundo em tela cheia. PO: ACEITA_COM_RESSALVAS (5 ressalvas — ver Entrega).
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
@@ -195,7 +200,7 @@ fechado._
 
 | ID | Risco | Mitigação | Origem |
 |----|-------|-----------|--------|
-| — | AC-030-012 (login real, clique físico) PARCIAL no gate 9 de PLAN-031 — sandbox do subagent `qa` bloqueou digitação de credencial real em UI (política de segurança, não indisponibilidade); evidência composta forte já obtida (POST real ao endpoint que `LoginForm` chama, direto e via proxy, 200 + cookies `HttpOnly` + role correta nos dois caminhos; guard `isSafeRelativePath`/`INTERNAL_HOME` coberto por teste automatizado sem regressão) | 1 clique real de login (com `next` e sem `next`) por alguém sem a mesma restrição de sandbox — Diretor ou sessão local, 2 min | SPEC-030 §1.3 (gate 9), PLAN-031 |
+| — | Verificação de tela pendente — HANDOFF-PLAN-031 (`docs/producao-material/handoffs/HANDOFF-PLAN-031.md`) — V1 (AC-030-012, login real por clique físico com e sem `next`): sandbox do subagent `qa` bloqueou digitação de credencial real em UI (causa `permissao_ambiente`, não indisponibilidade); evidência composta forte já obtida (POST real ao endpoint que `LoginForm` chama, direto e via proxy, 200 + cookies `HttpOnly` + role correta nos dois caminhos; guard `isSafeRelativePath`/`INTERNAL_HOME` coberto por teste automatizado sem regressão) | roteiro completo no handoff; 1 clique real de login (com `next` e sem `next`) por alguém sem a mesma restrição de sandbox — Diretor ou sessão local, 2 min | HANDOFF-PLAN-031 |
 | — | Borda de 1px do `SiteHeader` cruza a ilustração da lua em `/login` (achado do `product-designer`, verificado por captura real + medição de luminância) — comportamento pré-existente de TODAS as rotas (não é regressão nem parte deste diff), só fica mais visível sobre a ilustração noturna | Nenhuma — registrado a critério do Diretor, se quiser tratar em outra rodada | product-designer, convergência de fecho de PLAN-031 |
 | — | Ausência de regra CSS `:-webkit-autofill`/`:autofill` nos campos de `/login` (`login-form.tsx`/`password-field.tsx`/`globals.css`) — risco plausível para o autofill do navegador sobrescrever o estilo em pílula, não confirmado empiricamente (Chromium headless não expõe o password manager nativo) | Verificar com navegador real + credencial salva; se confirmado, adicionar regra de override usando os tokens `night-pill-*` | qa, gate 9 de PLAN-031 (achado fora de escopo) |
 | — | Verificação de tela pendente — HANDOFF-PLAN-013 (`docs/producao-material/handoffs/HANDOFF-PLAN-013.md`) — V1/V2 (instalação nativa, UI fora do alcance de Playwright headless) e V3/V4 (ciclo login/logout com SW ativo, bloqueado por `CORS_ORIGINS` de origem única do backend) | roteiro completo no handoff; exercitar em navegador real com backend aceitando a origem do frontend | HANDOFF-PLAN-013 |
