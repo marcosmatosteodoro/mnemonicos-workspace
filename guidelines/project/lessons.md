@@ -2217,3 +2217,35 @@ CSS-fonte do `@utility`.
 referencie uma custom property `--tw-*`).
 **Estado:** ativa
 **Contadores:** confirmada 1 · contestada 0
+
+## [Design] Centralizar com `items-center` num container `fixed`/tela cheia corta o topo do conteúdo que transborda, sem scroll alcançável
+
+**Erro:** `src/app/login/page.tsx` centralizou o card com `fixed inset-0 flex items-center
+justify-center overflow-y-auto` (BRIEF-032, avulso, KAN-73). Em janela mais baixa que o
+card (medido em 740×360 e 640×360), o alinhamento `center` empurra o topo do card para
+posição NEGATIVA (`top: -58px` com `scrollTop: 0`), e `overflow-y-auto` só permite rolar
+para BAIXO — o trecho que "vazou" para cima do viewport fica inalcançável por scroll. O
+critério de aceite do brief ("scroll aceitável quando o conteúdo não cabe, desde que o
+scroll funcione") ficou violado: o scroll existe mas não mostra o card inteiro. Achado
+pelo `product-designer` (gate 11), medição real via `getBoundingClientRect` + scroll
+forçado, não por leitura de código.
+**Causa:** com `align-items: center`, o navegador distribui o overflow simetricamente
+para os dois lados (metade para cima, metade para baixo) — a metade "de cima" fica em
+coordenada negativa, fora do alcance do scroll padrão, que só rola do topo do conteúdo
+em diante. `overflow-y-auto` parece cobrir o caso ("se não couber, rola"), mas não cobre
+overflow para cima de um item centralizado.
+**Solução:** em qualquer container de centralização que pode transbordar (`fixed`/`inset-0`,
+modal, tela cheia, qualquer camada fora do fluxo normal do documento) — usar
+`items-center-safe`/`justify-center-safe` (Tailwind 4.1+, presente neste projeto) no lugar
+de `items-center`/`justify-center` puros; o CSS gerado (`align-items: safe center`) muda o
+comportamento só quando o conteúdo transborda: passa a se comportar como `start` (scroll
+alcança o topo) em vez de cortar. Verificado ao vivo: aplicando o utilitário, em 740×360 o
+recuo top/bottom fica simétrico (40/40px) com scroll alcançando o card inteiro, sem mudar
+o resultado em janelas altas o bastante para não transbordar. Testar sempre numa janela
+mais baixa que o conteúdo centralizado (não só larguras — altura também), nunca só nos
+breakpoints de largura padrão do projeto (360/768/1280).
+**Validade:** geral (qualquer centralização flex fora do fluxo normal — `position: fixed`
+ou `absolute` cobrindo o viewport/um container — neste frontend ou em outro projeto
+Tailwind 4.1+).
+**Estado:** ativa
+**Contadores:** confirmada 1 · contestada 0
