@@ -1,10 +1,10 @@
-# TASK-031-007: Painel de aprovação de Versão — frontend completo
+# TASK-033-007: Painel de aprovação de Versão — frontend completo
 
 **Slug**: producao-material
-**Pertence a**: PLAN-031
-**Realiza (FRs)**: FR-030-007, FR-030-008
-**Funcionalidade**: FEAT-030-001 (primária)
-**Componente**: COMP-031-011
+**Pertence a**: PLAN-033
+**Realiza (FRs)**: FR-032-007, FR-032-008
+**Funcionalidade**: FEAT-032-001 (primária)
+**Componente**: COMP-033-011
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
@@ -12,22 +12,22 @@
 
 ## Dependências
 
-- **Depende de**: TASK-031-006
+- **Depende de**: TASK-033-006
 - **Bloqueia**: nenhuma
 
 ## Contexto
 
 Acrescenta, dentro do MESMO componente `ContentVersionHistory` (F8 — form de fechamento +
 lista do histórico, sem edição/remoção), um bloco de aprovação: 2 confirmações
-(checkboxes) + botão "Aprovar Versão" com os 3 estados de FR-030-008, visível só para
+(checkboxes) + botão "Aprovar Versão" com os 3 estados de FR-032-008, visível só para
 ADMIN e só quando existe Versão vigente sem `approvedById`. A autorização REAL é a rota do
-backend (`requireRole`, TASK-031-003); a ocultação/desabilitação aqui é best-effort de UX,
-nunca a garantia (a MESMA régua de FR-030-004, replicada no cliente). Nenhuma mudança de
+backend (`requireRole`, TASK-033-003); a ocultação/desabilitação aqui é best-effort de UX,
+nunca a garantia (a MESMA régua de FR-032-004, replicada no cliente). Nenhuma mudança de
 wiring em `content/[id]/page.tsx` — o slot `supplementary` já monta este componente desde
 TASK-029-004. Território e precedentes: `docs/producao-material/MAP.md`,
 `mnemonicos-frontend/src/components/content-version-history.tsx` (arquivo INTEIRO —
 extensão, não arquivo novo), `content-supplementary-panel.tsx` (padrão de dedup de
-`useGetRawContentQuery`), e PLAN-031 §1, §3 (COMP-031-011), §4 Fluxo 1/2.
+`useGetRawContentQuery`), e PLAN-033 §1, §3 (COMP-033-011), §4 Fluxo 1/2.
 
 **Gate 9 ativo** (`gates.screenVerify.enabled: true`) — roteiro fixado abaixo, ANTES do
 código. Nenhum handoff anterior do slug (`docs/producao-material/handoffs/`) cobre este
@@ -76,7 +76,7 @@ Versão) — roteiro escrito do zero, sem herança de "não-exercitável".
       formatado}'` + `'Válida para a próxima Exportação: sim'`/`'não'` (refletindo
       `validApprovalForExport`).
     - `!isAdmin`: nenhum dos 2 blocos renderiza (EDITOR não vê o painel — best-effort de
-      UX, FR-030-016 é a garantia real).
+      UX, FR-032-016 é a garantia real).
   - `handleApprove(event)`: `event.preventDefault()`, limpa `approveError`/
     `approveSuccess`, chama `approveContentVersion({ rawContentId, number:
     currentVersion.number, legalCheckConfirmed, pedagogicalCheckConfirmed }).unwrap()` —
@@ -123,25 +123,25 @@ Versão) — roteiro escrito do zero, sem herança de "não-exercitável".
 ### Não inclui
 
 - Qualquer alteração ao backend (`content-versions.*`, `publication.*`) — já entregues
-  por TASK-031-003/004/005, das quais esta TASK só consome.
+  por TASK-033-003/004/005, das quais esta TASK só consome.
 - Qualquer mudança em `content/[id]/page.tsx` — o slot já monta o componente (DEC-029-007,
   TASK-029-004), sem alteração de wiring.
 - Papel/tela dedicados de "revisor jurídico" — fora do escopo da SPEC (§4.2).
 
 ## Critérios de pronto
 
-- [ ] Testes cobrem AC-030-007 (FR-030-008): 3 estados observáveis (desabilitado/
+- [ ] Testes cobrem AC-032-007 (FR-032-008): 3 estados observáveis (desabilitado/
       `aria-busy` durante envio, sucesso, falha) — verificação executável: `npx jest
       --runTestsByPath src/components/content-version-history.test.tsx` (cwd
       `mnemonicos-frontend`) → `PASS`.
-- [ ] Testes cobrem AC-030-023 (parte UI — negação de autoaprovação visível; a garantia
-      REAL é backend, AC-030-023 já provada em TASK-031-003): 3 casos (quem fechou, autor
+- [ ] Testes cobrem AC-032-023 (parte UI — negação de autoaprovação visível; a garantia
+      REAL é backend, AC-032-023 já provada em TASK-033-003): 3 casos (quem fechou, autor
       original, último editor), botão sempre desabilitado + mensagem visível. Mesmo
       comando acima → `PASS`.
-- [ ] Testes cobrem AC-030-001 (parte RENDERIZAÇÃO — o dado já é provado em
-      TASK-031-004; este teste prova que o leitor real, o componente montado, exibe
+- [ ] Testes cobrem AC-032-001 (parte RENDERIZAÇÃO — o dado já é provado em
+      TASK-033-004; este teste prova que o leitor real, o componente montado, exibe
       "Aprovada por…"/"em `<data>`" a partir da resposta real de `listContentVersions`) e
-      AC-030-020 (parte renderização — mesma régua, "Válida para a próxima Exportação"
+      AC-032-020 (parte renderização — mesma régua, "Válida para a próxima Exportação"
       refletindo `validApprovalForExport: false` quando o sinal de alteração está aceso).
       Mesmo comando acima → `PASS`.
 - [ ] Extrator de erro — 1 teste por elo (ver Inclui) — mesmo comando acima → `PASS`.
@@ -180,7 +180,7 @@ slug) com `{ name, email, password, role: 'ADMIN' }`, criando uma 2ª conta ADMI
 a este roteiro (credencial anotada como realm `admin2` em `keelson.local.json`). Sem essa
 2ª conta, o fluxo de APROVAÇÃO BEM-SUCEDIDA (passo 1 abaixo) não é exercitável — a
 segregação de funções recusaria qualquer aprovador que seja o único ADMIN existente
-(RISK-030-001/005).
+(RISK-032-001/005).
 
 **Sujeitos concretos**: `admin1` (ADMIN semeado — usado para fechar Versões, portanto
 PRODUTOR delas) e `admin2` (ADMIN recém-criado no passo acima — não-produtor de nenhum
@@ -190,15 +190,15 @@ Conteúdo bruto deste roteiro, sujeito da aprovação bem-sucedida).
 este passo) → `/content/new` → criar um NOVO Conteúdo bruto descartável (texto normativo
 trivial, disciplina/tema do seed) → salvar a Quebra da regra em `/content/:id/breakdown`
 → voltar a `/content/:id` e preencher/salvar a fonte normativa (tipo do dispositivo +
-citação — FR-030-013 exige, sem ela a aprovação recusa) → no bloco "Histórico de
+citação — FR-032-013 exige, sem ela a aprovação recusa) → no bloco "Histórico de
 Versões", preencher Data de fechamento legislativo e clicar "Fechar versão" (form já
 existente, F8). **Restaurar ao fim**: usar "Remover" em `ContentForm` sobre o Conteúdo
 bruto descartável (soft-delete reversível) — a Versão fechada e a aprovação registrada
-PERMANECEM no banco por design (FR-030-005, ato irreversível); se `admin2` foi criado só
+PERMANECEM no banco por design (FR-032-005, ato irreversível); se `admin2` foi criado só
 para este roteiro num ambiente compartilhado, desativá-lo via `POST
 /users/:id/disable` (rota já existente).
 
-1. **AC-030-007 (estados da UI, FR-030-008), fluxo feliz** — login como `admin2` →
+1. **AC-032-007 (estados da UI, FR-032-008), fluxo feliz** — login como `admin2` →
    `/content/:id`: confirmar que o bloco de aprovação aparece (2 checkboxes desmarcadas,
    botão "Aprovar Versão" desabilitado). Marcar as 2 checkboxes → botão habilita. Clicar
    "Aprovar Versão": usar o painel de rede para SEGURAR a resposta de `POST
@@ -206,17 +206,17 @@ para este roteiro num ambiente compartilhado, desativá-lo via `POST
    latência real do ambiente local) e confirmar que o botão fica desabilitado/`aria-busy`
    durante a espera; liberar a resposta e confirmar a mensagem de sucesso ("Versão
    aprovada.") e que o bloco passa a mostrar "Aprovada por `<id de admin2>` em `<data>`".
-2. **FR-030-007 (leitura do estado)** — recarregar `/content/:id`: confirmar que o
+2. **FR-032-007 (leitura do estado)** — recarregar `/content/:id`: confirmar que o
    histórico de Versões mostra a Versão como aprovada (sem precisar reabrir o formulário)
    e que o texto "Válida para a próxima Exportação: sim" aparece (sinal de alteração
    apagado).
-3. **AC-030-023 (parte UI — negação de autoaprovação visível)** — repetir a pré-condição
+3. **AC-032-023 (parte UI — negação de autoaprovação visível)** — repetir a pré-condição
    num 2º Conteúdo bruto descartável, fechando a Versão como `admin1` → login como
    `admin1` (o próprio produtor) → `/content/:id`: confirmar que o bloco de aprovação
    aparece com o botão "Aprovar Versão" DESABILITADO e a mensagem "Você não pode aprovar
    uma Versão que você mesmo produziu." visível, mesmo marcando as 2 checkboxes — a
    garantia REAL (o backend recusaria de qualquer forma) já está provada por gate 1 em
-   TASK-031-003; este passo confirma só que o FRONTEND não deixa o clique parecer
+   TASK-033-003; este passo confirma só que o FRONTEND não deixa o clique parecer
    possível.
 4. **Restaurar**: aplicar a receita de restauração acima nos 2 Conteúdos brutos
    descartáveis usados neste roteiro.
@@ -225,8 +225,8 @@ para este roteiro num ambiente compartilhado, desativá-lo via `POST
 
 - Gate 8 (security-engineer): **n/a** — diff é composição de tela + formulário +
   leitura, sem endpoint/rota/dado sensível novo tocado neste lado (o backend já foi
-  revisado em TASK-031-003).
-- RISK-030-001/RISK-030-005 (herdados) — a necessidade de 2 contas ADMIN distintas para
+  revisado em TASK-033-003).
+- RISK-032-001/RISK-032-005 (herdados) — a necessidade de 2 contas ADMIN distintas para
   exercitar o fluxo de sucesso é o próprio sintoma do risco de produto que a SPEC nomeia;
   esta TASK não o mitiga, só o roteiro de gate 9 o torna visível/nomeado (nunca assumido).
 - Nenhum consumidor de nome/e-mail do aprovador por `approvedById` existe nesta fatia — o

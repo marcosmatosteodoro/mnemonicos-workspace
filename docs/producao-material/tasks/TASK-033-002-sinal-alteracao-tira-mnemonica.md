@@ -1,9 +1,9 @@
-# TASK-031-002: Sinal de alteração pós-fechamento estendido à Tira mnemônica (`resolveAlterationSignal`)
+# TASK-033-002: Sinal de alteração pós-fechamento estendido à Tira mnemônica (`resolveAlterationSignal`)
 
 **Slug**: producao-material
-**Pertence a**: PLAN-031
+**Pertence a**: PLAN-033
 **Realiza (FRs)**: nenhuma
-**Componente**: COMP-031-003
+**Componente**: COMP-033-003
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
@@ -12,7 +12,7 @@
 ## Dependências
 
 - **Depende de**: nenhuma
-- **Bloqueia**: TASK-031-003, TASK-031-005
+- **Bloqueia**: TASK-033-003, TASK-033-005
 
 ## Contexto
 
@@ -20,15 +20,15 @@ Combina, por OU lógico, o sinal de alteração de CONTEÚDO já existente (`has
 F8, `versioned-content-diff.ts`, intocado) com um sinal NOVO de alteração da Tira
 mnemônica — reusando o `ProductionStageEvent` que `tira.service.ts` já emite em todo
 CRUD/reordenação de Quadro (`stageType: 'TIRA_MNEMONICA'`, intocado), sem índice novo
-(DEC-031-007). Função sem AC próprio — é o único ponto de manutenção do sinal combinado
-para os 3 consumidores da fatia: a leitura do histórico (TASK-031-004), o gate de
-aprovação (TASK-031-003) e o carimbo do PDF (TASK-031-005), nenhum dos quais monta a
+(DEC-033-007). Função sem AC próprio — é o único ponto de manutenção do sinal combinado
+para os 3 consumidores da fatia: a leitura do histórico (TASK-033-004), o gate de
+aprovação (TASK-033-003) e o carimbo do PDF (TASK-033-005), nenhum dos quais monta a
 combinação por conta própria. Contrato já congelado pelo PLAN (assinatura exata) —
-princípio 2: a fusão entre CONTEÚDO e TIRA já foi negociada em PLAN §1/§6 (DEC-031-007),
+princípio 2: a fusão entre CONTEÚDO e TIRA já foi negociada em PLAN §1/§6 (DEC-033-007),
 então extrair esta função para uma TASK própria não é dividir um contrato ainda em
 negociação. Território e precedentes: `docs/producao-material/MAP.md`,
 `tira.service.ts:274/287-289` (emissão do evento, molde de leitura do par
-`(rawContentId, 'TIRA_MNEMONICA')`) e PLAN-031 §1/§3 (COMP-031-003), §6 (DEC-031-007).
+`(rawContentId, 'TIRA_MNEMONICA')`) e PLAN-033 §1/§3 (COMP-033-003), §6 (DEC-033-007).
 
 ## Escopo
 
@@ -40,7 +40,7 @@ negociação. Território e precedentes: `docs/producao-material/MAP.md`,
     `toVersionedContentFields`).
   - `type ContentVersionClient` ganha `'productionStageEvent'` no `Pick` (ao lado de
     `'contentVersion' | 'rawContent' | 'ruleBreakdown' | '$transaction'`) — os 3
-    consumidores (TASK-031-003/004) chamam `resolveAlterationSignal` passando o próprio
+    consumidores (TASK-033-003/004) chamam `resolveAlterationSignal` passando o próprio
     `tx`/`db`, que precisa satisfazer estruturalmente o parâmetro dela.
   - Nova função:
     ```ts
@@ -63,7 +63,7 @@ negociação. Território e precedentes: `docs/producao-material/MAP.md`,
       return latestTiraEvent !== null && latestTiraEvent.occurredAt > version.closedAt;
     }
     ```
-    Short-circuit (TRISK-031-002): se o conteúdo já mudou, a função retorna sem consultar
+    Short-circuit (TRISK-033-002): se o conteúdo já mudou, a função retorna sem consultar
     `productionStageEvent` — custo evitado quando desnecessário. `orderBy: { sequence:
     'desc' }` (nunca `occurredAt`) — mesmo critério de desempate determinístico já usado
     por `listProductionStageEvents` (AC-009-008); `stageType: 'TIRA_MNEMONICA'` é o valor
@@ -74,8 +74,8 @@ negociação. Território e precedentes: `docs/producao-material/MAP.md`,
 - Qualquer mudança em `tira.service.ts` — o valor `stageType: 'TIRA_MNEMONICA'` já é
   emitido por esse módulo desde F4; esta TASK só lê o evento, nunca o escreve.
 - Consumo de `resolveAlterationSignal` por `approveContentVersion`/`listContentVersions`/
-  `resolveVersionStampForPdf` — TASK-031-003/004/005, respectivamente.
-- Índice composto novo em `ProductionStageEvent` — DEC-031-007 aceita o índice existente
+  `resolveVersionStampForPdf` — TASK-033-003/004/005, respectivamente.
+- Índice composto novo em `ProductionStageEvent` — DEC-033-007 aceita o índice existente
   (`@@index([rawContentId, sequence])`) para o volume desta fatia.
 
 ## Critérios de pronto
@@ -114,11 +114,11 @@ negociação. Território e precedentes: `docs/producao-material/MAP.md`,
 
 ## Riscos específicos
 
-- TRISK-031-002 (PLAN §8) — até 3 leituras extras por chamada nos consumidores
+- TRISK-033-002 (PLAN §8) — até 3 leituras extras por chamada nos consumidores
   (`RawContent`/`RuleBreakdown` atuais + `ProductionStageEvent` condicional); esta TASK
   não introduz o custo ainda (só as TASKs consumidoras o pagam) — citado para registro, a
-  medição real fica com TASK-031-004 (NFR-030-003).
-- TRISK-031-004 (PLAN §8) — acoplamento novo entre `content-versions.service.ts` (dono de
+  medição real fica com TASK-033-004 (NFR-032-003).
+- TRISK-033-004 (PLAN §8) — acoplamento novo entre `content-versions.service.ts` (dono de
   `resolveAlterationSignal`, que agora também lê `ProductionStageEvent` do módulo `tira`) e
   o CONTRATO do evento `stageType: 'TIRA_MNEMONICA'` — nenhum import de função de
   `tira.service.ts`, só o valor do enum (já compartilhado); dependência unidirecional, sem
@@ -143,4 +143,4 @@ negociação. Território e precedentes: `docs/producao-material/MAP.md`,
 - [x] Code review aprovado
 - [x] ACs verificados
 - [x] Segurança (gate 8): aprovado (wave 1) — security-engineer
-- [x] Comportamento (gate 9): n/a — função sem FR/AC próprio e sem ponto de entrada nesta TASK; o sinal é exercitado de ponta a ponta nas FEATs pelas TASK-031-003/004/005
+- [x] Comportamento (gate 9): n/a — função sem FR/AC próprio e sem ponto de entrada nesta TASK; o sinal é exercitado de ponta a ponta nas FEATs pelas TASK-033-003/004/005

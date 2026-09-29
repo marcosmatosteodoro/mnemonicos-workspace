@@ -8,7 +8,7 @@ tags: [teste, guarda]
 ---
 ## [Testes] Guarda nova que preempta a antiga migra a prova da antiga para um caminho de produção real
 
-**Erro:** a guarda de edição pós-fechamento (PLAN-031) passou a recusar antes da guarda de
+**Erro:** a guarda de edição pós-fechamento (PLAN-033) passou a recusar antes da guarda de
 sinal de alteração sempre que a edição vinha por `updateRawContent`. O retry manteve o
 teste antigo verde trocando o setup por escrita direta no Prisma — um estado que nenhum
 escritor real produz — e o caminho real que ainda chegava à guarda antiga

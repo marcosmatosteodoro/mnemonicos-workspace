@@ -1,10 +1,10 @@
-# BRIEF-030: Controle de qualidade e gate de versão aprovada
+# BRIEF-032: Controle de qualidade e gate de versão aprovada
 
 **Slug**: producao-material
 **Status**: Emitido
 **Data**: 2026-09-27
 **Largada**: 2026-09-27T09:14:48-0300
-**SPEC**: SPEC-030
+**SPEC**: SPEC-032
 **Epico**: docs/producao-material/briefs/BRIEF-2026-08-27-mnemora-studio-epic.md
 
 ## Pedido como dito
@@ -38,16 +38,16 @@ fail-secure, não disciplina operacional. Só a versão **aprovada** pode sair c
 oficial (F6 segue emitindo rascunho para o resto).
 
 **Premissas decididas**:
-- A-030-001 `[assumido]` O checklist de qualidade é um conjunto de itens verificáveis
+- A-032-001 `[assumido]` O checklist de qualidade é um conjunto de itens verificáveis
   vinculados à `ContentVersion` (não ao `RawContent` mutável) — travados pelo mesmo
   motivo append-only de F8 (DEC-029-003): mudar o conteúdo depois do fechamento não
   pode alterar retroativamente um checklist já satisfeito.
-- A-030-002 `[assumido]` Segregação de funções por sistema: `approvedById != authorId`
+- A-032-002 `[assumido]` Segregação de funções por sistema: `approvedById != authorId`
   da mesma `ContentVersion`. Não introduz papel novo no `UserRole` enum — reaproveita
   ADMIN/EDITOR existentes (RISK-002-001 apontava "separar o papel de revisor" como uma
   alternativa; a mais simples e reversível é checar identidade do ator, não criar
   papel) — mecanismo exato (rota/campo) é decisão do PLAN.
-- A-030-003 `[assumido]` "Versão aprovada" é terminal e append-only na mesma lógica de
+- A-032-003 `[assumido]` "Versão aprovada" é terminal e append-only na mesma lógica de
   F8: uma vez aprovada, não há reversão por edição — revogar exige nova versão
   (`ContentVersion` nova), nunca mutação da aprovada.
 
@@ -61,7 +61,7 @@ estratégico (F10, fatia seguinte, parcialmente dependente desta).
 
 ## Estimativa
 
-- **Base**: pedido (BRIEF-030 com A-030-001..003) · INDEX de producao-material
+- **Base**: pedido (BRIEF-032 com A-032-001..003) · INDEX de producao-material
   (PLAN-029/F8 com 4 tasks e 3 waves, PLAN-027/F7 com 8/7, PLAN-025/F6 com 14;
   histórico de re-gates por wave) · MAP (território de `content-versions/` e
   `publication/`) · `model ContentVersion` no schema · ficha (security, review e
@@ -78,7 +78,7 @@ estratégico (F10, fatia seguinte, parcialmente dependente desta).
   persistido por `ContentVersion` e atestado no ato de aprovar, sem estado incremental
   por item · aprovador é ADMIN (glossário SPEC-002), segregação por identidade
   `approvedById != authorId`, sem papel novo, recusa fail-secure no servidor ·
-  aprovação terminal, sem revogação (A-030-003), com a corrida de aprovação dupla
+  aprovação terminal, sem revogação (A-032-003), com a corrida de aprovação dupla
   fechada pelo lock que F8 já usa · PDF oficial só quando a versão vigente está
   aprovada e sem alteração depois do fechamento (reusa `versioned-content-diff`); nos
   outros casos sai rascunho, sem variante nova nem mudança estrutural no pipeline F6 ·
@@ -102,6 +102,6 @@ estratégico (F10, fatia seguinte, parcialmente dependente desta).
 ## Cronologia
 - largada: 2026-09-27T09:14:48-0300
 - specify: 2026-09-27T09:50:09-0300 · correções: 2 · classes: spec-out-of-scope-vazio(1, formato — numerado em vez de bullet) · spec-ac-fora-gwt(1) · spec-ears-nao-casa(1) · mérito: product-analyst REVISAR_ANTES_DE_APROVAR (3 achados ancorados) · po ESCALAR (1 escalação não-bloqueante, default aplicado) · pacote de correção do po aplicado pelo scribe em modo reescrita (v0.1→v0.2)
-- plan: 2026-09-27T10:12:26-0300 · correções: 2 · classes: fr-sem-comp(2, campo Realiza quebrado em 3 linhas escondia FR-030-013/017/018) · nao-parseavel(1, campo Dependências com anotação extra) · cobertura 18/18 FRs + 3/3 NFRs, gap 0 · 5 WARNING plan-dec-alternativa-unica aceitos (mesmo padrão de PLAN-029)
+- plan: 2026-09-27T10:12:26-0300 · correções: 2 · classes: fr-sem-comp(2, campo Realiza quebrado em 3 linhas escondia FR-032-013/017/018) · nao-parseavel(1, campo Dependências com anotação extra) · cobertura 18/18 FRs + 3/3 NFRs, gap 0 · 5 WARNING plan-dec-alternativa-unica aceitos (mesmo padrão de PLAN-029)
 - tasks: 2026-09-27T10:46:39-0300 · correções: 1 · classes: task-criterio-grep-nao-ancorado(1, endurecido com exclusão de comentário — resto aceito, precedente TASK-029-002 Done) · 7 TASKs/5 waves, graph.sh --check --stage=tasks --plan 031: 0 ERROR · qa pré-código: sem achados bloqueantes
-- pausa: 2026-09-29T18:25:08-0300 · sessão b1505f46@auto-avaliar-Latitude-3550 · ponto: Wave 2 de PLAN-031 com codigo aprovado (gates 1-7/8/10/11); falta gate 9 da FEAT-030-002 (qa interrompido por limite de uso) e closure de TASK-031-003/005 · motivo: limite de uso atingido; Diretor pediu para salvar e parar
+- pausa: 2026-09-29T18:25:08-0300 · sessão b1505f46@auto-avaliar-Latitude-3550 · ponto: Wave 2 de PLAN-033 com codigo aprovado (gates 1-7/8/10/11); falta gate 9 da FEAT-032-002 (qa interrompido por limite de uso) e closure de TASK-033-003/005 · motivo: limite de uso atingido; Diretor pediu para salvar e parar

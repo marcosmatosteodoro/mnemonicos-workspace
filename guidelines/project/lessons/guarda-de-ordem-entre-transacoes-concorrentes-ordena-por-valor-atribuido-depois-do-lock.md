@@ -12,7 +12,7 @@ tags: [seguranca, concorrencia]
 ---
 ## [Segurança] Guarda de ordem entre transações concorrentes ordena por valor atribuído depois do lock
 
-**Erro:** a correção de um bypass de segregação (PLAN-031) trocou "identidade lida ao
+**Erro:** a correção de um bypass de segregação (PLAN-033) trocou "identidade lida ao
 vivo" por "`lastEditedAt` > `closedAt`", mas os dois timestamps são `new Date()` da
 aplicação: o `now` de `updateRawContent` é calculado ANTES de o UPDATE esperar o
 `FOR UPDATE` do fechamento. Uma edição concorrente commitava depois do fechamento com

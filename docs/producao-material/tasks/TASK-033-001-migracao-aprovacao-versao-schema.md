@@ -1,9 +1,9 @@
-# TASK-031-001: Migração — colunas de aprovação (`approvedById`/`approvedAt`) e valor `APROVACAO_VERSAO`
+# TASK-033-001: Migração — colunas de aprovação (`approvedById`/`approvedAt`) e valor `APROVACAO_VERSAO`
 
 **Slug**: producao-material
-**Pertence a**: PLAN-031
+**Pertence a**: PLAN-033
 **Realiza (FRs)**: nenhuma
-**Componente**: COMP-031-001
+**Componente**: COMP-033-001
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: chore
@@ -12,20 +12,20 @@
 ## Dependências
 
 - **Depende de**: nenhuma
-- **Bloqueia**: TASK-031-003, TASK-031-005
+- **Bloqueia**: TASK-033-003, TASK-033-005
 
 ## Contexto
 
 Habilita, no schema Prisma, o estado de aprovação de `ContentVersion` — 2 colunas nullable
-na MESMA linha (DEC-031-004, nunca uma tabela 1:1 separada) e o valor aditivo
+na MESMA linha (DEC-033-004, nunca uma tabela 1:1 separada) e o valor aditivo
 `APROVACAO_VERSAO` do mecanismo de instrumentação de etapas (F3) — pré-requisito estrutural
-das TASKs de capacidade das Waves 2/3 (aprovação em TASK-031-003, carimbo no PDF em
-TASK-031-005), setup-first (princípio 5). Toda Versão nasce sempre não aprovada
+das TASKs de capacidade das Waves 2/3 (aprovação em TASK-033-003, carimbo no PDF em
+TASK-033-005), setup-first (princípio 5). Toda Versão nasce sempre não aprovada
 (`approvedById: null`) porque nenhuma escrita de `closeContentVersion` (F8, intocado) toca
-essas 2 colunas — FR-030-006 (não-propagação) fica satisfeito estruturalmente por esta
+essas 2 colunas — FR-032-006 (não-propagação) fica satisfeito estruturalmente por esta
 TASK, mesmo sem AC próprio aqui (a leitura que prova o comportamento observável vive em
-TASK-031-004). Território e precedentes: `docs/producao-material/MAP.md` e PLAN-031 §3
-(COMP-031-001), §5 (modelo de dados), §6 (DEC-031-004).
+TASK-033-004). Território e precedentes: `docs/producao-material/MAP.md` e PLAN-033 §3
+(COMP-033-001), §5 (modelo de dados), §6 (DEC-033-004).
 
 ## Escopo
 
@@ -37,19 +37,19 @@ TASK-031-004). Território e precedentes: `docs/producao-material/MAP.md` e PLAN
     `MATERIAL_REFORCO`, exigida por `extractPrismaEnum`/`domain-types-parity.test.ts`),
     mantendo os 7 valores existentes intocados e na mesma ordem.
   - `model ContentVersion` ganha, ao final do model (depois de `contentSnapshot`), forma
-    literal do PLAN-031 §5:
+    literal do PLAN-033 §5:
     ```prisma
-    /// NOVO (F9, DEC-031-004): estado de aprovação — colunas na MESMA linha, não uma
+    /// NOVO (F9, DEC-033-004): estado de aprovação — colunas na MESMA linha, não uma
     /// tabela 1:1 separada. `null` = ainda não aprovada (estado inicial de toda Versão
-    /// recém-fechada, FR-030-006). Nunca sobrescrito depois de setado uma vez
-    /// (FR-030-005) — a garantia é o `updateMany` condicional em `approveContentVersion`
-    /// (TASK-031-003), não a ausência de coluna de update.
+    /// recém-fechada, FR-032-006). Nunca sobrescrito depois de setado uma vez
+    /// (FR-032-005) — a garantia é o `updateMany` condicional em `approveContentVersion`
+    /// (TASK-033-003), não a ausência de coluna de update.
     approvedById String?
     approver     User?     @relation("ContentVersionApprover", fields: [approvedById], references: [id], onDelete: Restrict)
     approvedAt   DateTime?
     ```
     Ambas nullable — nenhuma migração de dado existente necessária. **Sem**
-    `legalCheckConfirmed`/`pedagogicalCheckConfirmed` (DEC-031-005: a existência de
+    `legalCheckConfirmed`/`pedagogicalCheckConfirmed` (DEC-033-005: a existência de
     `approvedById`/`approvedAt` não-nulos já É a prova de que as 2 confirmações
     ocorreram).
   - `model User`: relação reversa nova `contentVersionApprovals ContentVersion[]
@@ -61,7 +61,7 @@ TASK-031-004). Território e precedentes: `docs/producao-material/MAP.md` e PLAN
   1 diretório novo em `prisma/migrations/`: `ALTER TYPE "ProductionStageType" ADD VALUE
   'APROVACAO_VERSAO'`, 2× `ALTER TABLE "content_versions" ADD COLUMN` (`approvedById`
   nullable, `approvedAt` nullable), 1× `ADD CONSTRAINT` (FK `approvedById` → `users.id`,
-  `ON DELETE RESTRICT`) — texto exato já no PLAN-031 §3/§5, nenhum `DROP`/`ALTER`
+  `ON DELETE RESTRICT`) — texto exato já no PLAN-033 §3/§5, nenhum `DROP`/`ALTER`
   destrutivo. **Aplicar exige autorização do Diretor** (mesmo protocolo de
   TASK-023-001/TASK-025-001/TASK-027-001/TASK-029-001) — passo explícito do
   `/keelson:implement` (`AskUserQuestion`), nunca aplicado em produção por esta TASK.
@@ -70,17 +70,17 @@ TASK-031-004). Território e precedentes: `docs/producao-material/MAP.md` e PLAN
   `Topic`/`User`(2, um autor e um aprovador)/`RawContent` via
   `tests/support/production-events-fixtures.ts` (existente, sem alteração), cria 1
   `ContentVersion` sem aprovação (`approvedById`/`approvedAt` ausentes do `data`) e lê de
-  volta confirmando os 2 campos `null` por padrão (FR-030-006 estrutural); 2º caso:
+  volta confirmando os 2 campos `null` por padrão (FR-032-006 estrutural); 2º caso:
   `testPrisma.contentVersion.update` setando `approvedById`/`approvedAt` para o 2º `User`
   e lê de volta confirmando os 2 valores persistidos e o relacionamento `approver`
   navegável (`include: { approver: true }`).
 
 ### Não inclui
 
-- Interface TS `ContentVersion` estendida (backend/frontend) — TASK-031-006.
+- Interface TS `ContentVersion` estendida (backend/frontend) — TASK-033-006.
 - `content-versions.schema.ts`/`.service.ts`/`.routes.ts` (`approveContentVersion`,
-  `resolveAlterationSignal`, rota `/approve`) — TASK-031-002/003.
-- Qualquer extensão de `publication.service.ts`/`pdf-composer.ts` — TASK-031-005.
+  `resolveAlterationSignal`, rota `/approve`) — TASK-033-002/003.
+- Qualquer extensão de `publication.service.ts`/`pdf-composer.ts` — TASK-033-005.
 - Aplicação da migração em produção.
 
 ## Critérios de pronto
@@ -110,7 +110,7 @@ TASK-031-004). Território e precedentes: `docs/producao-material/MAP.md` e PLAN
 
 ## Riscos específicos
 
-- TRISK-031-003 (PLAN §8) — `onDelete: Restrict` na FK `approvedById → User` bloqueia
+- TRISK-033-003 (PLAN §8) — `onDelete: Restrict` na FK `approvedById → User` bloqueia
   hard-delete de um ADMIN que já aprovou alguma Versão, enquanto essa Versão existir;
   aceito nesta fatia (herda RISK-028-005), fica para a fatia futura que definir expurgo.
   Nenhum código desta TASK tenta expurgo.
@@ -146,4 +146,4 @@ TASK-031-004). Território e precedentes: `docs/producao-material/MAP.md` e PLAN
 - [x] Code review aprovado
 - [x] ACs verificados
 - [x] Segurança (gate 8): aprovado (wave 1) — security-engineer
-- [x] Comportamento (gate 9): n/a — chore habilitador sem FR realizado nem efeito observável próprio; comportamento das colunas novas é provado nas FEATs pelas TASK-031-003/004/005
+- [x] Comportamento (gate 9): n/a — chore habilitador sem FR realizado nem efeito observável próprio; comportamento das colunas novas é provado nas FEATs pelas TASK-033-003/004/005

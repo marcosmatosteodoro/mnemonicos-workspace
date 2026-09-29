@@ -11,7 +11,7 @@ tags: [seguranca, autorizacao]
 ---
 ## [Segurança] Regra de autorização que lê identidade de campo sobrescrevível prova as duas direções
 
-**Erro:** a segregação de funções da aprovação de Versão (PLAN-031) lia o "último editor"
+**Erro:** a segregação de funções da aprovação de Versão (PLAN-033) lia o "último editor"
 (`RawContent.lastEditedById`) ao vivo e dava a leitura como segura. `updateRawContent`
 carimba esse campo em todo PATCH, inclusive `{}`, só de campo não versionado ou re-save
 idêntico — nenhum deles acende o sinal de alteração —, então a identidade de quem editou

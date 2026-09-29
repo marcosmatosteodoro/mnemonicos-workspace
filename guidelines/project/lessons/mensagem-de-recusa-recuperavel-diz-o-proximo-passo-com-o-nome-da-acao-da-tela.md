@@ -10,7 +10,7 @@ tags: [copy, erro]
 ---
 ## [Design] Mensagem de recusa recuperável diz o próximo passo com o nome da ação da tela
 
-**Erro:** na aprovação de Versão (PLAN-031), "Falta fonte normativa registrada nesta
+**Erro:** na aprovação de Versão (PLAN-033), "Falta fonte normativa registrada nesta
 Versão." prendia o ADMIN num ciclo: ele registrava a fonte e recebia a mesma recusa, porque
 a guarda lê o snapshot congelado da Versão — a única saída é fechar uma nova versão, e
 nenhuma mensagem dizia isso. "O número informado não é mais o da Versão vigente." citava

@@ -1,10 +1,10 @@
-# TASK-031-004: Leitura do estado de aprovação no histórico de Versões
+# TASK-033-004: Leitura do estado de aprovação no histórico de Versões
 
 **Slug**: producao-material
-**Pertence a**: PLAN-031
-**Realiza (FRs)**: FR-030-006, FR-030-007
-**Funcionalidade**: FEAT-030-001 (primária)
-**Componente**: COMP-031-005, COMP-031-009, COMP-031-013
+**Pertence a**: PLAN-033
+**Realiza (FRs)**: FR-032-006, FR-032-007
+**Funcionalidade**: FEAT-032-001 (primária)
+**Componente**: COMP-033-005, COMP-033-009, COMP-033-013
 **Wave**: 3
 **Tamanho estimado**: small
 **Tipo**: feature
@@ -12,8 +12,8 @@
 
 ## Dependências
 
-- **Depende de**: TASK-031-003
-- **Bloqueia**: TASK-031-006
+- **Depende de**: TASK-033-003
+- **Bloqueia**: TASK-033-006
 
 ## Contexto
 
@@ -21,13 +21,13 @@ Estende `listContentVersions` (F8, já existente) para expor, junto de cada Vers
 histórico, se ela foi aprovada (e por quem/quando) e um campo COMPUTADO —
 `validApprovalForExport` — que reflete se a PRÓXIMA Exportação sairia com o carimbo
 "Versão aprovada" ou "Rascunho" (considerando o sinal de alteração combinado,
-TASK-031-002), sem alterar o fato histórico da aprovação em si (FR-030-005). Sequenciada
-depois de TASK-031-003 por **colisão de escrita no MESMO arquivo**
+TASK-033-002), sem alterar o fato histórico da aprovação em si (FR-032-005). Sequenciada
+depois de TASK-033-003 por **colisão de escrita no MESMO arquivo**
 (`content-versions.service.ts`) — princípio 2, nunca por dependência funcional real (esta
 TASK só precisa das colunas da Wave 1 + `resolveAlterationSignal` da Wave 1, mas o arquivo
-já foi editado por TASK-031-003 na Wave 2; sequenciar evita o risco de 2 diffs paralelos no
-mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLAN-031 §1,
-§3 (COMP-031-005), §4 Fluxo 4.
+já foi editado por TASK-033-003 na Wave 2; sequenciar evita o risco de 2 diffs paralelos no
+mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLAN-033 §1,
+§3 (COMP-033-005), §4 Fluxo 4.
 
 ## Escopo
 
@@ -47,10 +47,10 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
     `RULE_BREAKDOWN_VERSIONED_SELECT`), monta `current` via `toVersionedContentFields`, e
     chama `resolveAlterationSignal(rawContentId, current, vigente, db)` — `true` (alterado)
     ⇒ `validApprovalForExport: false`; `false` ⇒ `true`. Toda entrada QUE NÃO é a vigente
-    recebe `validApprovalForExport: false` incondicionalmente (FR-030-006 — a aprovação
+    recebe `validApprovalForExport: false` incondicionalmente (FR-032-006 — a aprovação
     nunca se propaga, e uma Versão superada nunca é a que sai impressa), mesmo que ela
     própria tenha sido aprovada no passado.
-  - `approveContentVersion` (TASK-031-003, mesmo arquivo): o objeto retornado em caso de
+  - `approveContentVersion` (TASK-033-003, mesmo arquivo): o objeto retornado em caso de
     sucesso ganha `validApprovalForExport: true` — sem recomputar
     `resolveAlterationSignal` (o passo 10 da própria função já confirmou o sinal
     `false` na mesma transação; recomputar seria uma 2ª leitura redundante do mesmo
@@ -61,20 +61,20 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
     linha tocada nessa função.
 - `mnemonicos-backend/tests/integration/content-versions.service.integration.test.ts`
   (estende): novos blocos:
-  - AC-030-001 (parte LEITURA): após uma aprovação bem-sucedida (fixture com
+  - AC-032-001 (parte LEITURA): após uma aprovação bem-sucedida (fixture com
     `sourceType`/`sourceCitation` setados, ADMIN elegível), `listContentVersions` devolve
     a entrada com `approvedById`/`approvedAt` idênticos aos gravados e
     `validApprovalForExport: true`.
-  - AC-030-006 (FR-030-006): Versão 1 aprovada, EDITOR fecha a Versão 2 (sem aprová-la) →
+  - AC-032-006 (FR-032-006): Versão 1 aprovada, EDITOR fecha a Versão 2 (sem aprová-la) →
     `listContentVersions` devolve as 2: Versão 1 com `approvedById` preenchido MAS
     `validApprovalForExport: false` (não é mais a vigente); Versão 2 com `approvedById:
     null` e `validApprovalForExport: false`.
-  - AC-030-020 (FR-030-007): Versão vigente aprovada, depois um campo versionado do
+  - AC-032-020 (FR-032-007): Versão vigente aprovada, depois um campo versionado do
     `RawContent` é alterado (`updateRawContent`, importado de `contents.service.ts`) →
     `listContentVersions` continua devolvendo `approvedById`/`approvedAt` preenchidos
     (fato histórico intacto), mas `validApprovalForExport: false` (a PRÓXIMA Exportação
     sairia como Rascunho).
-  - **NFR-030-003/AC-030-013 — custo CONSTANTE, independente de N** (estende o `describe`
+  - **NFR-032-003/AC-032-013 — custo CONSTANTE, independente de N** (estende o `describe`
     já existente no arquivo, `'listContentVersions — custo fixo de round-trips...'`, sem
     duplicar o caso já coberto — Versão vigente NÃO aprovada continua em exatamente 2
     statements, regressão confirmada pelo mesmo teste já existente, sem alteração): 2 casos
@@ -85,7 +85,7 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
     `resolveAlterationSignal`); (b) MESMO cenário com 8 Versões fechadas → EXATAMENTE 5
     statements também (nunca 10, nunca proporcional a N) — os 2 casos, lado a lado,
     provam que o custo NÃO cresce com N. 3º caso: Versão vigente aprovada mas com sinal de
-    alteração de CONTEÚDO aceso (short-circuit de `resolveAlterationSignal`, TASK-031-002)
+    alteração de CONTEÚDO aceso (short-circuit de `resolveAlterationSignal`, TASK-033-002)
     → EXATAMENTE 4 statements (pula a leitura de `productionStageEvent`).
 - **Herdado do gate 8 da Wave 1 (security-engineer, notas N1/N2/N6 — decisão 4.140)**,
   mesma suíte `content-versions.service.integration.test.ts`:
@@ -100,10 +100,10 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
     `validApprovalForExport: true` nem cai para um default silencioso.
   - (N6) O estado de aprovação exposto usa `select` explícito de `approvedById`/`approvedAt`
     — nunca `include: { approver: true }` (User carrega `passwordHash`).
-  - Fixture: usar o builder de `VersionedContentFields` que TASK-031-003 cria em
+  - Fixture: usar o builder de `VersionedContentFields` que TASK-033-003 cria em
     `tests/support/` (nunca uma 3ª cópia local).
 - **Espelho de `validApprovalForExport` no mesmo diff** (refino pós-furo no plano de
-  TASK-031-003, 2026-09-27 — quem cria o campo no payload HTTP espelha, regra do
+  TASK-033-003, 2026-09-27 — quem cria o campo no payload HTTP espelha, regra do
   CLAUDE.md do workspace): `mnemonicos-backend/src/domain/types.ts` e
   `mnemonicos-frontend/src/types/domain.ts` — `interface ContentVersion` ganha
   `validApprovalForExport: boolean`; o `describe` de paridade `ContentVersion` de
@@ -113,29 +113,29 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
 
 ### Não inclui
 
-- Extensão de `publication.service.ts`/`pdf-composer.ts` — TASK-031-005 (embora leia o
+- Extensão de `publication.service.ts`/`pdf-composer.ts` — TASK-033-005 (embora leia o
   MESMO sinal combinado via `resolveAlterationSignal`, o consumidor do carimbo do PDF é
   uma função à parte, `resolveVersionStampForPdf`).
-- Rota/schema/segregação de funções de aprovação — já entregues por TASK-031-003, da qual
+- Rota/schema/segregação de funções de aprovação — já entregues por TASK-033-003, da qual
   esta TASK só consome `resolveAlterationSignal`/as colunas novas.
-- `store/api.ts` (mutation de aprovação) e painel de aprovação — TASK-031-006/007.
+- `store/api.ts` (mutation de aprovação) e painel de aprovação — TASK-033-006/007.
 
 ## Critérios de pronto
 
-- [ ] Testes cobrem AC-030-001 (parte leitura — o DADO devolvido pelo service; a faceta de
-      RENDERIZAÇÃO na tela é do gate 1 da TASK-031-007), AC-030-006, AC-030-020 (parte
-      leitura — mesma régua; renderização é TASK-031-007), AC-030-013 — verificação
+- [ ] Testes cobrem AC-032-001 (parte leitura — o DADO devolvido pelo service; a faceta de
+      RENDERIZAÇÃO na tela é do gate 1 da TASK-033-007), AC-032-006, AC-032-020 (parte
+      leitura — mesma régua; renderização é TASK-033-007), AC-032-013 — verificação
       executável: `npm --prefix mnemonicos-backend run test:integration --
       --testPathPatterns=content-versions.service.integration.test.ts` → `OK (N tests)`.
 - [ ] `approveContentVersion` devolve `validApprovalForExport: true` em toda aprovação
-      bem-sucedida — coberto pelo mesmo teste de AC-030-001 (parte escrita, TASK-031-003)
+      bem-sucedida — coberto pelo mesmo teste de AC-032-001 (parte escrita, TASK-033-003)
       reexecutado após esta extensão, sem regressão: mesmo comando acima → `OK (N tests)`.
 - [ ] `closeContentVersion` devolve `validApprovalForExport: false` em toda Versão recém-
       fechada — teste de regressão sobre o cenário já existente de AC-028-001 (TASK-029-002):
       mesmo comando acima → `OK (N tests)`.
 - [ ] **Comparação com o molde canônico** (decisão 4.307): o `select` estendido
       (`{ ...CONTENT_VERSION_DETAIL_SELECT, contentSnapshot: true }`) segue EXATAMENTE o
-      padrão já usado por `approveContentVersion` (TASK-031-003, mesmo arquivo) para a
+      padrão já usado por `approveContentVersion` (TASK-033-003, mesmo arquivo) para a
       leitura da Versão vigente — nunca uma 2ª forma de compor o `select`.
 - [ ] Heranças N1/N2 do gate 8 W1 (ver Inclui): caso "sinal não vaza entre Conteúdos
       brutos" e caso "`findFirst` rejeitando → chamada rejeita" — mesmo comando da suíte
@@ -158,13 +158,13 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
 
 ## Riscos específicos
 
-- TRISK-031-002 (PLAN §8) — esta TASK é quem MEDE o custo real (critério NFR-030-003
+- TRISK-033-002 (PLAN §8) — esta TASK é quem MEDE o custo real (critério NFR-032-003
   acima); se a medição real mostrar impacto perceptível em volume alto, revisitar
-  DEC-031-007 (índice composto).
+  DEC-033-007 (índice composto).
 - Gate 8 (security-engineer): **n/a** — leitura estendida de rota já revisada
   (`GET /contents/:id/versions`, TASK-029-002), sem superfície de autorização nova; a
   única escrita tocada (`approveContentVersion`/`closeContentVersion`, 1 campo literal
-  cada) já foi revisada em TASK-031-003/TASK-029-002.
+  cada) já foi revisada em TASK-033-003/TASK-029-002.
 
 ---
 

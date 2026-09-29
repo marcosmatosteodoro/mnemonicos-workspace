@@ -1,9 +1,9 @@
-# TASK-031-006: Tipos espelhados e mutation de aprovação (`ContentVersion` estendida)
+# TASK-033-006: Tipos espelhados e mutation de aprovação (`ContentVersion` estendida)
 
 **Slug**: producao-material
-**Pertence a**: PLAN-031
+**Pertence a**: PLAN-033
 **Realiza (FRs)**: nenhuma
-**Componente**: COMP-031-009 (principal), COMP-031-010, COMP-031-013
+**Componente**: COMP-033-009 (principal), COMP-033-010, COMP-033-013
 **Wave**: 4
 **Tamanho estimado**: small
 **Tipo**: chore
@@ -11,23 +11,23 @@
 
 ## Dependências
 
-- **Depende de**: TASK-031-003, TASK-031-004
-- **Bloqueia**: TASK-031-007
+- **Depende de**: TASK-033-003, TASK-033-004
+- **Bloqueia**: TASK-033-007
 
 ## Contexto
 
 Acrescenta a mutation RTK Query de aprovação (o espelho dos 3 campos novos de
 `ContentVersion` — `approvedById`, `approvedAt`, `validApprovalForExport` — foi
-entregue junto do backend que os cria, TASK-031-003/004, refino de 2026-09-27) — plumbing puro,
-sem comportamento observável próprio (o painel que o consome é TASK-031-007). Depende das
+entregue junto do backend que os cria, TASK-033-003/004, refino de 2026-09-27) — plumbing puro,
+sem comportamento observável próprio (o painel que o consome é TASK-033-007). Depende das
 2 TASKs de backend anteriores porque o formato de resposta real (`ContentVersionDetail`)
 só está congelado depois delas (princípio 2 — costura só em contrato congelado).
 Território e precedentes: `docs/producao-material/MAP.md`,
 `mnemonicos-backend/src/domain/types.ts:203-210`,
 `mnemonicos-frontend/src/types/domain.ts:318-325`,
 `mnemonicos-frontend/src/store/api.ts:645-659` (padrão de
-`listContentVersions`/`closeContentVersion` já existentes), e PLAN-031 §3
-(COMP-031-009/010/013).
+`listContentVersions`/`closeContentVersion` já existentes), e PLAN-033 §3
+(COMP-033-009/010/013).
 
 ## Escopo
 
@@ -49,18 +49,18 @@ Território e precedentes: `docs/producao-material/MAP.md`,
 - Espelho dos 3 campos (`approvedById`/`approvedAt`/`validApprovalForExport`) nos 2
   `domain.ts` e a paridade de `contents-frontend-contract.test.ts` **já chegam feitos**
   (refino pós-furo no plano, 2026-09-27: quem cria o campo no payload espelha no mesmo
-  diff — TASK-031-003 para os 2 primeiros, TASK-031-004 para o computado). Esta TASK
+  diff — TASK-033-003 para os 2 primeiros, TASK-033-004 para o computado). Esta TASK
   só CONFERE que o espelho está completo antes de acrescentar a mutation — ver critério.
 
 ### Não inclui
 
-- Componente de painel de aprovação (`content-version-history.tsx`) — TASK-031-007.
+- Componente de painel de aprovação (`content-version-history.tsx`) — TASK-033-007.
 - Qualquer mudança em `content-versions.service.ts`/`.routes.ts` — já entregues por
-  TASK-031-003/004, das quais esta TASK só espelha o formato de resposta.
+  TASK-033-003/004, das quais esta TASK só espelha o formato de resposta.
 
 ## Critérios de pronto
 
-- [ ] **Paridade cross-repo `ContentVersion` já completa** (entregue por TASK-031-003/004,
+- [ ] **Paridade cross-repo `ContentVersion` já completa** (entregue por TASK-033-003/004,
       conferida aqui antes da mutation): `contents-frontend-contract.test.ts` confirma os
       3 campos nos DOIS lados e o mesmo conjunto em `ContentVersionDetail`. Verificação
       executável: `npm --prefix mnemonicos-backend test -- contents-frontend-contract.test.ts`
@@ -78,14 +78,14 @@ Território e precedentes: `docs/producao-material/MAP.md`,
       npm --prefix mnemonicos-frontend run lint` → exit 0 nos 2.
 - [ ] Aderência à stack/padrões da ficha e do perfil `next-16.md`/`node-22.md` —
       identificadores em inglês, `invalidatesTags` mínimo e correto (sem invalidar
-      `'RawContent'`, A-030-011 análogo a A-028-001).
+      `'RawContent'`, A-032-011 análogo a A-028-001).
 - [ ] Code review aprovado.
 
 ## Riscos específicos
 
 - Gate 8 (security-engineer): **n/a** — plumbing de tipos/mutation sem lógica própria,
   sem superfície de autorização nova (a autorização real é a rota do backend, já
-  revisada em TASK-031-003).
+  revisada em TASK-033-003).
 - Gate 9 (`gates.screenVerify`): **n/a** — nenhum componente de tela nesta TASK.
 
 ---

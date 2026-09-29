@@ -809,7 +809,7 @@ está no comportamento a adicionar, não no vocabulário a reusar.
 a expressão que o define — e no fecho de um achado de DRY, varrer o **próprio delta** pela
 mesma condição antes de despachar/commitar. Exemplar: `src/lib/prisma.ts` importa
 `{ env, isProduction }` de `../config/env` em vez de recalcular.
-**Reincidência (PLAN-031, Wave 2 — 7ª):** vale também para helper/fixture de teste. As 2
+**Reincidência (PLAN-033, Wave 2 — 7ª):** vale também para helper/fixture de teste. As 2
 TASKs da wave re-derivaram `BREAKDOWN_FIELDS`/defaults num builder novo, duplicaram
 `stripComments` e o proxy de falha do `productionStageEvent`, e o retry de uma criou uma 2ª
 cópia de `seedApprovableRawContent`. Antes de commitar helper de teste novo:
@@ -1109,7 +1109,7 @@ família da lição ativa "[Testes] Árvore de decisão com precedência: um cas
 ramos que coincide" (que trata precedência entre ramos); esta é o eixo irmão para conjunção
 sem precedência. Referência: `mnemonicos-backend/src/modules/tira/tira.service.ts:266-279`
 (`isExactFrameSet`).
-**Extensão (PLAN-031, Wave 2, 2 reincidências):** vale para qualquer guarda composta, não
+**Extensão (PLAN-033, Wave 2, 2 reincidências):** vale para qualquer guarda composta, não
 só predicado de conjunto. A guarda `a !== null && a > b` de `approveContentVersion`
 (`mnemonicos-backend/src/modules/content-versions/content-versions.service.ts`) nasceu com
 casos só nos ramos `null` e `>`; o ramo `≤` (caso legítimo) ficou sem prova e o mutante
