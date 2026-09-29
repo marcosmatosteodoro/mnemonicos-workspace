@@ -51,7 +51,7 @@ fora do MVP).
 | 6 | Pipeline de publicação — PDF (rascunho) | producao-material | **entregue e mergeada** (BRIEF-024 · SPEC-024 · PLAN-025 Done 17/17; PR #7 backend (`5d6b4df`) e PR #13 frontend (`b54b6ef`) mergeados em `main` 2026-09-15; gate 9 VERIFICADO de verdade em ambiente real; **RISK-025-007 ainda aberto** — risco real de produção não resolvido: Tira grande com imagens pode exceder o limite de corpo de resposta de function serverless da Vercel; recomendado resolver antes do deploy em produção, decisão do Diretor) |
 | 7 | Contrastes, pegadinhas, flashcards e protocolos impressos | producao-material | **entregue e mergeada** (BRIEF-026 · SPEC-026 · PLAN-027 Done 8/8 — 6 previstas + 2 furos achados na convergência de fecho; PR #8 backend `9b87acc`/PR #14 frontend `2ceaa6f` mergeados em `main` 2026-09-26; gate 9 VERIFICADO em browser real, login EDITOR seed dev; 6 Histórias KAN-122/123/124/125/126/129 e Épico KAN-121 fechados no Jira pelo Diretor, 7/7 filhos confirmados por JQL; RISK-027-010/011 e TRISK-027-006/007 seguem abertos, não-bloqueantes — ver INDEX) |
 | 8 | Versionamento editorial e fechamento legislativo | producao-material | **entregue e mergeada** (BRIEF-028 · SPEC-028 · PLAN-029 Done 4/4; convergência de fecho CONVERGIU; ambas FEATs VERIFICADAS por execução real; PR #9 backend/PR #15 frontend mergeados em `main` 2026-09-27; DEC-029-003 irreversível confirmada pelo Diretor; Histórias KAN-137/138 fechadas, Épico KAN-136 pendente de fechamento manual — classificador de permissão recusou a transição) |
-| 9 | Controle de qualidade e gate de versão aprovada | producao-material | pendente |
+| 9 | Controle de qualidade e gate de versão aprovada | producao-material | em ciclo (BRIEF-032.md) |
 | 10 | Painel estratégico e tempo por página | producao-material | pendente |
 | 11 | Fila de produção e calendário editorial *(fora do MVP — confirmado pelo Diretor)* | producao-material | pendente |
 
@@ -271,3 +271,4 @@ fora do MVP).
   permissão liberada, não contornada. Próxima elegível: **F9** (depende de F1 e F8,
   ambas agora entregues e mergeadas — decisão 4.190 satisfeita) ou F10 (depende de F3
   — entregue — mais F8/F9 parcial, sem dependência mútua com F9).
+- retomada: 2026-09-27T01:04:18-0300 · sessão b1505f46@auto-avaliar-Latitude-3550 · parado desde 2026-09-27T01:01:11-0300 (piso: último commit e46ee3c) · 0h03min

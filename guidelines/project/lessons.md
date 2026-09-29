@@ -809,9 +809,17 @@ está no comportamento a adicionar, não no vocabulário a reusar.
 a expressão que o define — e no fecho de um achado de DRY, varrer o **próprio delta** pela
 mesma condição antes de despachar/commitar. Exemplar: `src/lib/prisma.ts` importa
 `{ env, isProduction }` de `../config/env` em vez de recalcular.
-**Validade:** geral (qualquer predicado derivado de configuração/env).
+**Reincidência (PLAN-033, Wave 2 — 7ª):** vale também para helper/fixture de teste. As 2
+TASKs da wave re-derivaram `BREAKDOWN_FIELDS`/defaults num builder novo, duplicaram
+`stripComments` e o proxy de falha do `productionStageEvent`, e o retry de uma criou uma 2ª
+cópia de `seedApprovableRawContent`. Antes de commitar helper de teste novo:
+`git diff --name-status --diff-filter=A <base>..HEAD` + grep do nome/forma em `tests/` —
+uma definição só, em `tests/support/` (ex.: `tests/support/approvable-raw-content-fixtures.ts`,
+`tests/support/failing-tira-signal.ts`).
+**Validade:** geral (qualquer predicado derivado de configuração/env, e helper/fixture de
+teste).
 **Estado:** ativa
-**Contadores:** confirmada 6 · contestada 0
+**Contadores:** confirmada 7 · contestada 0
 **Reincidência (2026-09-13, PLAN-023/TASK-023-008, Wave 3)**: o retry que consolidou 3
 fixtures duplicadas de `VisualAssociation` em `tests/support/visual-association-fixtures.ts`
 (achado de gate 7) re-derivou, no MESMO diff, **duas** ocorrências de bloco
@@ -1101,10 +1109,18 @@ família da lição ativa "[Testes] Árvore de decisão com precedência: um cas
 ramos que coincide" (que trata precedência entre ramos); esta é o eixo irmão para conjunção
 sem precedência. Referência: `mnemonicos-backend/src/modules/tira/tira.service.ts:266-279`
 (`isExactFrameSet`).
+**Extensão (PLAN-033, Wave 2, 2 reincidências):** vale para qualquer guarda composta, não
+só predicado de conjunto. A guarda `a !== null && a > b` de `approveContentVersion`
+(`mnemonicos-backend/src/modules/content-versions/content-versions.service.ts`) nasceu com
+casos só nos ramos `null` e `>`; o ramo `≤` (caso legítimo) ficou sem prova e o mutante
+`a !== null` sobreviveu. Na forma "existe X depois da referência R", a ESCOLHA de R é um
+eixo próprio — exige caso com ≥ 2 candidatos a R e evento entre eles (o mutante que pegou
+o 1º fechamento em vez do último sobreviveu até um caso V1 → edição → V2 existir). Fixture
+que não emite eventos nunca exercita esse eixo.
 **Validade:** toda TASK cujo critério de pronto recusa um valor composto (conjunto, faixa,
-combinação de campos validados em conjunto), neste projeto.
+combinação de campos validados em conjunto) ou decide por guarda composta, neste projeto.
 **Estado:** ativa
-**Contadores:** confirmada 2 · contestada 0
+**Contadores:** confirmada 4 · contestada 0
 
 **Reincidência (Wave 4 de PLAN-027, TASK-027-005, gate 7):** o `where` composto de
 `removePegadinhaText`/`savePegadinhaText` (`ACTIVE_RAW_CONTENT_WHERE` + `scopeWhere(actor)`)

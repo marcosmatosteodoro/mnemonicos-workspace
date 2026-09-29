@@ -4,9 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-29 (Convergência de fecho de PLAN-031 concluída — 2
-rodadas de retry real, PO ACEITA_COM_RESSALVAS; pronta para o commit/push final da
-Entrega)
+**Última atualização**: 2026-09-29 (SPEC-030/PLAN-031 — redesenho visual da tela de login — entregue por sessão paralela; F9 renumerada para SPEC-032/PLAN-033, pausada no meio da Wave 2)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -17,6 +15,9 @@ legislação e checklist de revisão jurídica. O estudante não é usuário des
 compra é o PDF. A régua de valor é tempo de produção por página, instrumentado por etapa.
 
 ## Capacidades
+
+### Em desenvolvimento
+- Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica (SPEC-032/**PLAN-033**, F9 do épico MNEMORA STUDIO, 🟡 0/? tasks Done — TASKs ainda não decompostas). Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate.
 
 ### Implementadas
 - Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, ✅ 2026-08-30) — módulo `users/` (criar/listar/desativar/resetar senha) + seed; gate 9 APROVADO. Montagem das rotas em `apiRoutes` fica com TASK-003-011 (Wave 6).
@@ -90,6 +91,7 @@ fechado._
 | SPEC-026 | Contrastes, pegadinhas, flashcards e protocolos impressos | Approved | 2026-09-16 |
 | SPEC-028 | Versionamento editorial e fechamento legislativo | Approved | 2026-09-26 |
 | SPEC-030 | Redesenho visual da tela de login | Approved | 2026-09-28 |
+| SPEC-032 | Controle de qualidade e gate de versão aprovada | Approved | 2026-09-27 |
 
 ## PLANs
 
@@ -108,6 +110,7 @@ fechado._
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
+| PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 2/7 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -182,6 +185,10 @@ fechado._
 | Painel ilustrado | Metade superior do card de `/login`, com ilustração autoral decorativa (motivo noturno: montanhas/dunas em camadas, lua cheia, estrelas, estrelas cadentes, céu em degradê), sem função interativa nem conteúdo lido por tecnologia assistiva | SPEC-030 |
 | Fundo em tela cheia (do login) | Camada de fundo da página `/login`, atrás do card, que estende a mesma atmosfera visual do painel ilustrado em escala maior e com profundidade/desfoque | SPEC-030 |
 | Campo em pílula | Estilo visual de campo de formulário com bordas totalmente arredondadas e um indicador visual (ícone) à esquerda do valor digitado | SPEC-030 |
+| Checagem jurídica (confirmação) | Atestação, feita pelo ADMIN no ato de aprovação, de que o texto normativo e a fonte normativa da Versão vigente estão corretos e correspondem entre si | SPEC-032 |
+| Checagem pedagógica (confirmação) | Atestação, feita pelo ADMIN no ato de aprovação, de que o material — incluindo a Tira mnemônica vinculada — cumpre a função de recuperação | SPEC-032 |
+| Segregação de funções (do ato de aprovação) | Regra aplicada pelo sistema (fail-secure, não disciplina operacional): o aprovador não pode ser nenhuma identidade produtora do conteúdo normativo da Versão (quem a fechou, autor original do Conteúdo bruto, ou último editor antes do fechamento) | SPEC-032 |
+| Conteúdo normativo (escopo da aprovação) | O recorte avaliado pela aprovação: texto normativo, Classe do radar de prova, fonte normativa, blocos/síntese da Quebra da regra (já versionados por F8) mais a Tira mnemônica vinculada; exclui Contraste, Pegadinha elaborada, Flashcard e Associação visual | SPEC-032 |
 
 ## Decisões irreversíveis
 
@@ -240,7 +247,7 @@ fechado._
 | RISK-006-006 | Contrato cross-repo por leitura de texto (`domain-types-parity.test.ts`, `contents-frontend-contract.test.ts`) prova DECLARAÇÃO×DECLARAÇÃO, não `select`×declaração — uma chave nova no `select` do Prisma sem a mesma chave na interface do frontend passa pelo typecheck (extra property em valor não-literal) e pelos dois testes. Achado do code-reviewer (re-review Wave 3), declarado como "próximo degrau da rede, não gap desta rodada" | disciplina de mesmo-diff continua sendo a defesa; revisitar se doer (campo novo no backend some silenciosamente do frontend) | code-reviewer, re-review Wave 3 |
 | RISK-006-007 | **Causa raiz identificada** (code-reviewer, BRIEF-007) — não é acúmulo de conexão do `withQueryProbe` (hipótese original): é `TRUNCATE ... CASCADE` concorrente sobre o mesmo `mnemonicos_test` quando 2+ runners de integração rodam em paralelo (gates/worktrees da mesma wave). `maxWorkers: 1` do Jest só serializa DENTRO do processo — nada impede runners de processos distintos se truncarem mutuamente, produzindo violação de FK / deadlock que imita bug de produto. Reproduzido 2× com processos `node` alheios ativos; 213/213 em janelas ociosas | todo harness que roda DDL/TRUNCATE em schema compartilhado precisa de exclusividade REAL — banco por execução (nome derivado de PID/worker em `db-url.ts`) ou `pg_advisory_lock` no `globalSetup`/`globalTeardown`; gate que observar vermelho de integração não-determinístico confirma ausência de runner concorrente antes de emitir veredito | code-reviewer, BRIEF-007 (reforça achado do security-engineer, re-review Wave 3) |
 | RISK-006-009 | Nenhum dos dois repos (`mnemonicos-backend`, `mnemonicos-frontend`) tem pipeline de CI configurado (sem `.github/workflows` nem equivalente) — condição de projeto pré-existente, achada na Etapa 4 (DoD) de PLAN-006 ao validar a cláusula "verde no CI" da métrica §1.3/SPEC-005 (item (a): tripwire `route-authz-matrix` 19/19, mas só localmente). Toda suíte (unit/integração dos 2 repos) só roda sob comando manual | decisão de infra do Diretor: configurar CI (ao menos lint+test+build nos 2 repos) antes do próximo PLAN, ou aceitar o gap conscientemente por mais um ciclo | Tech Lead, Etapa 4/Entrega de PLAN-006 |
-| RISK-002-001 | "Revisor jurídico ≠ autor" (A-010) inexequível com operação de 1 pessoa; com o papel de revisão acumulado no ADMIN, com 1 pessoa o gate de "Versão aprovada" de F9 fica só em disciplina operacional | 2 ADMINs distintos no piloto (A-002-017); F9 decide se separa o papel de revisor | SPEC-002 §9 |
+| ~~RISK-002-001~~ | **RESOLVIDO 2026-09-27 por SPEC-032** — segregação de funções aplicada pelo sistema (fail-secure): aprovador ≠ nenhuma identidade produtora do conteúdo (quem fechou, autor original, último editor). Residual aceito: com 1 ADMIN só, a métrica de adoção fica em 0% por construção (RISK-032-001), e a segregação compara CONTA, não pessoa (RISK-032-005, conta-fantoche) | Ver RISK-032-001/RISK-032-005 | SPEC-002 §9 → SPEC-032 |
 | RISK-002-002 | Token de renovação persistido é superfície de dado sensível — vazamento do repositório permitiria continuar sessões | guardar só o necessário, valores não reversíveis onde viável, revogar família em reuso, expiração absoluta curta (7 dias) | SPEC-002 §9 |
 | RISK-002-003 | Dependências novas de criptografia/sessão (derivação de senha, geração de token, leitura de cookie) entram na árvore — superfície de cadeia de suprimento | gate de auditoria de dependências sobre o diff de F1 (/keelson:audit); fixar versão e revisar | SPEC-002 §9 |
 | TRISK-003-001 | `trust proxy: 1` pode ser o nº errado de proxies no deploy — erra `req.ip` e recoloca o bypass do freio de login; contador do rate-limit é por instância em serverless | verificar no ambiente real; store compartilhado para proteção multi-instância (fora do escopo de F1) | PLAN-003 §8 |
@@ -310,7 +317,10 @@ fechado._
 | RISK-028-001 | Decisão entre snapshot imutável e referência mutável (A-028-004) ainda não tomada — muda a forma como o histórico de Versões preserva (ou não) o texto de Versões anteriores | Decisão arquitetural irreversível, cabe ao PLAN-028 com alternativas explícitas | SPEC-028 §9 |
 | RISK-028-002 | `Mnemonic` legado dormente (RISK-011-001/RISK-005-004) segue sem solução — SPEC-028 não o expurga nem migra | Aceito nesta fatia; revisitar em limpeza de schema dedicada | SPEC-028 §9 |
 | RISK-028-003 | Sem teto de cadência entre fechamentos de Versão (A-028-011) — histórico pode acumular Versões sem mudança real de texto | Aceito nesta fatia; revisitar se o piloto (PIL-001) reportar ruído real | SPEC-028 §9 |
-| RISK-028-004 | A "Versão aprovada" que F9 vai avaliar recai sobre um PDF que também imprime material de reforço (Contraste/Pegadinha/Flashcard/Tira/Associação visual) não coberto pelo versionamento desta fatia (recorte por campo, A-028-002) | Decidir se o gate de F9 cobre ou não esse material é assunto de F9, não desta SPEC | SPEC-028 §9 |
+| ~~RISK-028-004~~ | **RESOLVIDO 2026-09-27 por SPEC-032** — o gate de "Versão aprovada" cobre conteúdo normativo + Tira mnemônica (decisão do PO em nome do Diretor, pendente de confirmação explícita na Entrega); Contraste/Pegadinha elaborada/Flashcard/Associação visual ficam fora, com o carimbo do PDF declarando esse alcance explicitamente (RISK-032-002) | Ver RISK-032-002 | SPEC-028 §9 → SPEC-032 |
+| RISK-032-001 | Operação com 1 único ADMIN bloqueia toda aprovação por construção (segregação de funções recusa autoaprovação) — a métrica de adoção de SPEC-032 §1.3 fica estruturalmente em 0% até existirem 2+ ADMINs distintos; não é falha de adoção | Dotação de equipe é decisão do Diretor (A-002-017); métrica-guarda invariante (SPEC-032 §1.3) não depende dessa condição | SPEC-032 §9 |
+| RISK-032-002 | Contraste/Pegadinha elaborada/Flashcard/Associação visual ficam fora do gate de aprovação; a Tira mnemônica ENTRA (decisão em nome do Diretor, degrau 2 — pendente de confirmação explícita na Entrega, já que o BRIEF-032 a listava no checklist original) | Aceito nesta fatia; carimbo do PDF declara o próprio alcance | SPEC-032 §9 |
+| RISK-032-005 | Segregação de funções compara CONTA, não pessoa — com operação de 1 pessoa, o contorno natural é criar uma 2ª conta ADMIN e aprovar consigo mesma através dela | Nenhum controle técnico detecta isso nesta fatia; controle detectivo fica para fatia futura, se o piloto reportar o padrão | SPEC-032 §9 |
 | RISK-028-005 | Um expurgo físico futuro de Conteúdo bruto, em cascata, apagaria as Versões editoriais dele — contradiz o requisito append-only (FR-028-004) | A fatia que definir expurgo (fora de F8, ver §4.2 de SPEC-028) precisa resolver o destino das Versões antes de agir; nenhum mecanismo futuro pode remover uma Versão, direta ou indiretamente | SPEC-028 §9 |
 | TRISK-029-006 | Sem teto de retenção, o armazenamento de `ContentVersion.contentSnapshot` cresce sem limite com fechamentos sucessivos (A-028-011 não exige mudança real de texto entre eles) | Aceito nesta fatia; revisitar via PIL-001 ou medição real de armazenamento em produção — poda é decisão reversível (ver `Reabrir se` de DEC-029-003) | PLAN-029 §8 |
 | RISK-030-001 | Contraste AA de placeholder/rótulo sobre o fundo preenchido da pílula (NFR-030-001) é o ponto mais provável de retrabalho no gate de design | Medir contraste nos dois temas antes de fechar a wave que toca os campos; margem para 1 rodada extra do `product-designer` | SPEC-030 §9 |
@@ -321,6 +331,40 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-29 19:11: **Colisão de IDs resolvida no merge com `origin/main`.** Uma sessão paralela
+  entregou o redesenho visual da tela de login como BRIEF-030/SPEC-030/PLAN-031/TASK-031-*,
+  alocados ao mesmo tempo que a F9 (controle de qualidade e gate de versão aprovada). A `main`
+  manteve os seus IDs; a F9 foi renumerada antes do merge: BRIEF/SPEC-030 → 032, PLAN-031 → 033,
+  TASK-031-* → TASK-033-*, e as lições de processo LRN-038..041 → LRN-041..044. As entradas
+  abaixo que citam SPEC-032/PLAN-033/TASK-033 foram reescritas pela renumeração. Pendente: os
+  comentários/nomes de teste do código da F9 (branch `feat/producao-material-mnemora-studio`)
+  ainda citam os IDs antigos (FR-030-*, AC-030-*, DEC-031-*, TASK-031-*) — atualizar antes do
+  PR, senão as âncoras apontam para o PLAN do login.
+- 2026-09-29 18:24: **PLAN-033 pausado a pedido do Diretor, no meio da Wave 2.** Estado
+  exato para retomar (`/keelson:continue producao-material`):
+  - **Wave 1 fechada** (TASK-033-001/002 Done, closure `723805a`).
+  - **Wave 2 com código pronto e aprovado, closure ainda NÃO feita.** TASK-033-003 (backend
+    `2e9998c` → retries `e9a1360`, `563f350`, `49489c9`; frontend `053a6ab`) e TASK-033-005
+    (`8160cd1` → `8d01262`, `08e6452`): gates 1-7, 8, 10 e 11 APROVADOS na última rodada.
+    DEC-033-006 recebeu 2 emendas no PLAN (guarda de edição pós-fechamento, agora ordenada
+    por `ProductionStageEvent.sequence` — bypass sequencial e concorrente de segregação de
+    funções, achados do gate 8, ambos fechados). TASKs 003/004/006 editadas (espelho de tipos
+    movido para quem cria o campo; heranças do gate 8 da Wave 1 como critérios).
+  - **Falta na Wave 2**: (1) gate 9 da FEAT-032-002 (carimbo no PDF) — o `qa` foi
+    interrompido pelo limite de uso no meio da execução; ele já tinha criado uma 2ª conta
+    ADMIN no banco de **dev** (`01a0e589-e5fe-73b9-a0cd-47f0b6768d6b`, "admin2", ativa —
+    reusar no gate 9 ou desativar via `POST /users/:id/disable`); redespachar o `qa` do zero;
+    (2) closure de TASK-033-003/005 (Histórico de execução, TASK-INDEX, célula Tasks 2/7 →
+    4/7); (3) rotear ao `agile-coach` a lição de processo "DEC cuja segurança depende de 'o
+    campo X só muda quando Y' enumera os escritores de X" (code-reviewer, W2) — as 5 lições
+    de projeto da Wave 2 já estão em `guidelines/project/lessons/` e 2 reincidências
+    atualizadas no `lessons.md`.
+  - Depois: Waves 3-5 (TASK-033-004, 006, 007) e a Entrega.
+  - Pendências para o Diretor já acumuladas (ledger da sessão `b1505f46`): E-1 (Tira no
+    escopo do gate — default aplicado), N5 (troca de imagem de Associação visual não acende o
+    sinal), sufixo "(não cobre o material de reforço)" na marca do PDF, lacuna de SPEC
+    (`saveRuleBreakdown` não carimba identidade), 4 propostas ao mantenedor do plugin
+    (LRN-041..041).
 - 2026-09-29: **Convergência de fecho de PLAN-031** (revisão da branch inteira,
   `code-reviewer`, Entrega do `/keelson:auto`) — achou um GAP real: o texto de
   `SiteHeader`/footer (fora do card, herdado do root layout) perdia contraste AA no tema
@@ -448,6 +492,74 @@ fechado._
   `spec-nfr-sem-numero` por leitura de 1 linha só em bloco multi-linha — roteados ao
   `agile-coach` na Etapa 4.5). Demanda avulsa fora do épico MNEMORA STUDIO — Jira Story
   KAN-73 (issuetype 10009, standalone, projeção compacta — sem Epic).
+- 2026-09-27 19:50: furo no plano em TASK-033-003 — estender `ContentVersionDetail` com
+  `approvedById`/`approvedAt` quebra a paridade cross-repo (`contents-frontend-contract.test.ts`),
+  e o espelho dos tipos estava alocado a TASK-033-006 — destino: ajuste localizado (Tech
+  Lead) — quem cria o campo no payload espelha no mesmo diff (regra do CLAUDE.md):
+  TASK-033-003 espelha os 2 campos, TASK-033-004 espelha `validApprovalForExport`,
+  TASK-033-006 fica só com a mutation RTK Query. Baseline vermelho pré-existente
+  (`publication.service.integration.test.ts`, teto de duração CPU-bound — já sancionado
+  em PLAN-029) sancionado de novo, gate 2 mede contra ele.
+- 2026-09-27 19:15: **Wave 1 de PLAN-033 fechada — TASK-033-001/002 Done.** Migração
+  aditiva `20260927135234_add_content_version_approval` (2 colunas nullable
+  `approvedById`/`approvedAt` + FK `ON DELETE RESTRICT` + valor `APROVACAO_VERSAO`)
+  aplicada em dev e `mnemonicos_test` com autorização do Diretor — a aplicação foi feita
+  por ele no terminal: o classificador de permissão do harness recusou `prisma migrate
+  dev` e `test:integration` para os agents até ele liberar a regra de permissão.
+  `resolveAlterationSignal` (sinal de alteração de conteúdo OU Tira, via
+  `ProductionStageEvent`). Gates: 8 APROVADO (0 achados; notas de herança N1/N2/N3/N6
+  viraram critérios de TASK-033-003/004/005 antes do despacho, 4.140; N5 — troca de
+  imagem de Associação visual não acende o sinal — vai ao Diretor na Entrega, junto de
+  E-1); 10 APROVADO (EXPLAIN real confirma DEC-033-007: sem índice composto); 1-7
+  TASK-033-001 APROVADO, TASK-033-002 1 retry + degrau 1 da escada (docblocks maiores
+  que o código — só-texto). Critério C1 de TASK-033-001 contava "3 ocorrências" num
+  universo com 2 pré-existentes (devolve 5; condição verificada pelo delta). Fora de
+  escopo: COMP-033-003 do PLAN cita tipo inexistente `ContentVersionRecord`; fixture de
+  `VersionedContentFields` duplicada → builder em `tests/support` entrou como critério
+  de TASK-033-003.
+- 2026-09-27: **PLAN-033 criado e aprovado para SPEC-032 (F9).** Cobertura derivada
+  (`graph.sh --format=tables`): 18/18 FRs + 3/3 NFRs, gap 0. 13 COMPs — migração
+  aditiva (2 colunas nullable `approvedById`/`approvedAt` + FK + valor
+  `APROVACAO_VERSAO`); `approveContentVersion` no mesmo padrão transacional/lock de
+  F8 (DEC-029-004 herdada), idempotência por `updateMany` condicionado a
+  `approvedById: null` (2ª camada de defesa, DEC-033-009); segregação de funções por
+  3 identidades produtoras lidas ao vivo (`ContentVersion.authorId`,
+  `RawContent.authorId`/`lastEditedById` — seguro por construção, já que
+  FR-032-015 bloqueia aprovação sempre que há edição pós-fechamento, DEC-033-006);
+  `resolveAlterationSignal` estende o sinal de F8 (`hasVersionedContentChanged`)
+  com um sinal novo para a Tira mnemônica, reusando o `ProductionStageEvent` que
+  `tira.service.ts` já emite — zero mudança naquele módulo (DEC-033-007); carimbo
+  de aprovação no PDF (`pdf-composer.ts`) substitui "Rascunho" só quando aprovada e
+  sem sinal de alteração aceso. 9 DECs (3 herdadas + 6 novas, todas reversíveis).
+  `artifact-lint`: 0 ERROR (5 WARNING `plan-dec-alternativa-unica`, mesmo padrão
+  aceito de PLAN-029). `graph.sh --check --stage=plan`: 0 ERROR após 2 correções
+  mecânicas (campo `**Realiza**` de COMP-033-004 quebrado em 3 linhas escondia
+  FR-032-013/017/018 do parser; `**Dependências**` de COMP-033-003 com anotação
+  extra quebrava o parse) — aplicadas diretamente pelo Tech Lead. Próximo:
+  `/keelson:tasks`.
+- 2026-09-27: **SPEC-032 criada e aprovada via `/keelson:continue` → `/keelson:auto`
+  (BRIEF-032, F9 do épico MNEMORA STUDIO).** `spec-validator`: 0 ERROR, 4 WARNING
+  não-bloqueantes (`spec-must-ratio`, `spec-nfr-sem-numero` ×2, `spec-sem-should-may`
+  — aceitos: gate de segurança/correção, MUST é o padrão correto). `product-analyst`:
+  REVISAR_ANTES_DE_APROVAR, 3 achados ancorados (escopo do checklist 7×2 contra o
+  próprio BRIEF; identidade da segregação de funções divergindo de A-010 dado
+  `RawContent.authorId`/`lastEditedById`; atribuição da exclusão de material de
+  reforço ao Diretor sem rastro) + vários de reforço (ACs de negação faltantes,
+  métrica zerada por construção, selos de evidência incorretos). `po` (modo
+  aprovação): **ESCALAR**, 1 escalação não-bloqueante (E-1 — o carimbo deve cobrir
+  também a Tira mnemônica? default do PO aplicado: sim), demais achados resolvidos
+  como decisões em nome do Diretor — segregação endurecida para o piso de 3
+  identidades produtoras (não só quem fechou a Versão), fonte normativa obrigatória
+  como pré-condição (herda A-005-008/SPEC-005), duplo travamento anti-corrida (número
+  revisado + sinal de alteração pós-fechamento), 6 ACs de negação novos, métrica
+  condicionada a 2+ ADMINs + métrica-guarda invariante (0 autoaprovações, 0 carimbos
+  indevidos), selos de evidência corrigidos. Pacote de correção aplicado pelo `scribe`
+  em modo reescrita (v0.1→v0.2): 18 FRs (2 FEATs), 24 ACs, 11 premissas, 5 riscos.
+  RISK-002-001 e RISK-028-004 **resolvidos** por esta SPEC (ver Riscos ativos).
+  Pendência para a Entrega: confirmação explícita do Diretor sobre a inclusão da
+  Tira mnemônica no escopo do gate (RISK-032-002, default do PO já aplicado). Branch
+  do épico `feat/producao-material-mnemora-studio` sincronizada com `origin/main` nos
+  2 repos (fast-forward, F8 já mergeado) na largada.
 - 2026-09-27: **PRs de F8 mergeados pelo Diretor** — backend
   [#9](https://github.com/marcosmatosteodoro/mnemonicos-backend/pull/9), frontend
   [#15](https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/15). Trilho
