@@ -4,7 +4,7 @@
 **Pertence a**: PLAN-031
 **Realiza (FRs)**: FR-030-001, FR-030-002, FR-030-003, FR-030-004, FR-030-005, FR-030-009, FR-030-013, FR-030-014, FR-030-015, FR-030-016, FR-030-017, FR-030-018
 **Funcionalidade**: FEAT-030-001 (primária)
-**Componente**: COMP-031-002 (principal), COMP-031-004, COMP-031-006, COMP-031-012
+**Componente**: COMP-031-002 (principal), COMP-031-004, COMP-031-006, COMP-031-012, COMP-031-009, COMP-031-013
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
@@ -345,6 +345,32 @@ TASK de wiring posterior (princípio 4).
     lição ativa sobre espionar o client Prisma errado numa transação).
   - (N6) Todo `select` que expõe o estado de aprovação lista `approvedById`/`approvedAt`
     explicitamente — nunca `include: { approver: true }` (User carrega `passwordHash`).
+- **Guarda de edição pós-fechamento** (furo no plano do gate 8 da Wave 2, DEC-031-006
+  emendada, 2026-09-27): `updateRawContent` carimba `lastEditedById`/`lastEditedAt` mesmo
+  sem mudar campo versionado, apagando o último editor de antes do fechamento. No passo
+  8, logo depois da comparação de identidades: `rawContent.lastEditedAt !== null &&
+  rawContent.lastEditedAt > vigente.closedAt` ⇒ recusa (fail-secure — o último editor
+  pré-fechamento deixou de ser conhecido), `ConflictError` com texto acionável que NÃO
+  revela identidade: "O conteúdo foi editado depois do fechamento desta versão. É
+  preciso fechar uma nova versão para aprovar." (`lastEditedAt` já é visível ao ADMIN
+  pelo carimbo de última alteração, SPEC-005 — não é vazamento). `lastEditedAt` entra no
+  `select` do passo 3.
+  **Emenda 2 (re-verificação do gate 8 W2, vetor concorrente — DEC-031-006 emenda 2)**: a
+  guarda ordena pelo BANCO, não por relógio — recusa (mesma mensagem) quando existe
+  `ProductionStageEvent` `CONTEUDO_BRUTO` do `rawContentId` com `sequence` maior que a do
+  último `VERSAO_EDITORIAL` dele; a comparação por `lastEditedAt`/`closedAt` sai.
+  Nenhuma mudança em `contents.service.ts`.
+- **Espelho de tipos no mesmo diff** (furo no plano achado nesta TASK, 2026-09-27 —
+  ajuste localizado do Tech Lead: estender `ContentVersionDetail` com `approvedById`/
+  `approvedAt` quebra `tests/unit/contents-frontend-contract.test.ts`, que compara o
+  payload HTTP real com o tipo espelhado; o CLAUDE.md do workspace exige os 2 lados no
+  mesmo diff): `mnemonicos-backend/src/domain/types.ts` e
+  `mnemonicos-frontend/src/types/domain.ts` — `interface ContentVersion` ganha
+  `approvedById: string | null` e `approvedAt` (`Date | null` no backend, `string |
+  null` no frontend, mesma convenção de `closedAt`); o `describe` de paridade
+  `ContentVersion` de `contents-frontend-contract.test.ts` passa a listar os 2 campos
+  nos 2 lados. SEM `validApprovalForExport` (é de TASK-031-004). Frontend: qualquer
+  fixture/objeto `ContentVersion` que o typecheck acusar ganha os 2 campos com `null`.
 - **Fixture compartilhada** (fora de escopo do gate 7 da Wave 1 — a fixture de 11 campos de
   `VersionedContentFields` já existe duplicada em 2 testes e as TASK-031-003/004/005 vão
   precisar dela): criar um builder em `tests/support/` (siga o padrão de nomenclatura dos
@@ -360,8 +386,9 @@ TASK de wiring posterior (princípio 4).
   TASK-031-004, que também acrescenta esse campo ao retorno desta função — ver Escopo de
   TASK-031-004).
 - Extensão de `publication.service.ts`/`pdf-composer.ts` — TASK-031-005.
-- Tipos TS `ContentVersion` espelhados (backend/frontend), `store/api.ts`, painel de
-  aprovação — TASK-031-006/007.
+- O campo computado `validApprovalForExport` e seu espelho nos 2 `domain.ts` —
+  TASK-031-004 (quem o cria no payload espelha, no mesmo diff).
+- `store/api.ts` (mutation de aprovação) e painel de aprovação — TASK-031-006/007.
 - Qualquer rota `PATCH`/`PUT`/`DELETE` sobre Versão ou aprovação — proibido por
   FR-030-005 em toda a fatia (a ausência é o que a prova de AC-030-005 confirma).
 
@@ -413,6 +440,27 @@ TASK de wiring posterior (princípio 4).
 - [ ] Herança N6 do gate 8 W1: `grep -rn "approver" mnemonicos-backend/src | grep -vE
       ':\s*(//|\*)' | grep -v generated` (raiz do workspace) → 0 ocorrências de
       `include: { approver` em código de produção.
+- [ ] Guarda de edição pós-fechamento (ver Inclui): caso de regressão do vetor do gate 8
+      W2 — ADMIN W edita o texto normativo, ADMIN X fecha a Versão, um 3º ator faz
+      `updateRawContent(id, {})` → W tenta aprovar → `ConflictError` com a mensagem
+      acima, `approvedById` permanece `null` (motor real, suíte
+      `content-versions.service.integration.test.ts` → `OK (N tests)`, caso nomeado).
+      Vermelho antes da correção. Precedência (um caso por PAR adjacente que pode
+      coincidir): identidade (8) ∧ edição pós-fechamento (8b) → vence 8 (403 genérico);
+      8b ∧ fonte ausente (9) → vence 8b.
+- [ ] Guarda 8b — vetor CONCORRENTE (emenda 2): interleaving forçado — `jest.spyOn` com
+      espera (~400 ms) numa chamada DENTRO da transação de `closeContentVersion` (depois do
+      lock), enquanto um 3º ator dispara `updateRawContent(id, {})` que fica bloqueado e
+      commita depois do fechamento → W tenta aprovar → recusa, `approvedById` null (motor
+      real, caso nomeado na suíte `content-versions.service.integration.test.ts`). Par:
+      mutante que volta à comparação `lastEditedAt > closedAt` (em `git worktree add`) →
+      este caso vermelho; o caso sequencial e o legítimo (fechada sem edição posterior →
+      200) seguem verdes.
+- [ ] Espelho de tipos (furo no plano, ver Inclui): `npm --prefix mnemonicos-backend test
+      -- contents-frontend-contract.test.ts` → verde (hoje vermelho 8/9 com o diff desta
+      TASK sem o espelho — é o vermelho que este item fecha); `npm --prefix
+      mnemonicos-frontend run typecheck && npm --prefix mnemonicos-frontend test` → exit 0
+      / sem vermelho novo contra a baseline do frontend.
 - [ ] Fixture compartilhada: o builder de `VersionedContentFields` existe em
       `mnemonicos-backend/tests/support/` e é importado pelos testes novos desta TASK —
       `grep -rln "<nome do builder>" mnemonicos-backend/tests` → ≥ 1 arquivo de teste

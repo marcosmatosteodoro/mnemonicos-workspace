@@ -291,6 +291,39 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-29 18:24: **PLAN-031 pausado a pedido do Diretor, no meio da Wave 2.** Estado
+  exato para retomar (`/keelson:continue producao-material`):
+  - **Wave 1 fechada** (TASK-031-001/002 Done, closure `723805a`).
+  - **Wave 2 com código pronto e aprovado, closure ainda NÃO feita.** TASK-031-003 (backend
+    `2e9998c` → retries `e9a1360`, `563f350`, `49489c9`; frontend `053a6ab`) e TASK-031-005
+    (`8160cd1` → `8d01262`, `08e6452`): gates 1-7, 8, 10 e 11 APROVADOS na última rodada.
+    DEC-031-006 recebeu 2 emendas no PLAN (guarda de edição pós-fechamento, agora ordenada
+    por `ProductionStageEvent.sequence` — bypass sequencial e concorrente de segregação de
+    funções, achados do gate 8, ambos fechados). TASKs 003/004/006 editadas (espelho de tipos
+    movido para quem cria o campo; heranças do gate 8 da Wave 1 como critérios).
+  - **Falta na Wave 2**: (1) gate 9 da FEAT-030-002 (carimbo no PDF) — o `qa` foi
+    interrompido pelo limite de uso no meio da execução; ele já tinha criado uma 2ª conta
+    ADMIN no banco de **dev** (`01a0e589-e5fe-73b9-a0cd-47f0b6768d6b`, "admin2", ativa —
+    reusar no gate 9 ou desativar via `POST /users/:id/disable`); redespachar o `qa` do zero;
+    (2) closure de TASK-031-003/005 (Histórico de execução, TASK-INDEX, célula Tasks 2/7 →
+    4/7); (3) rotear ao `agile-coach` a lição de processo "DEC cuja segurança depende de 'o
+    campo X só muda quando Y' enumera os escritores de X" (code-reviewer, W2) — as 5 lições
+    de projeto da Wave 2 já estão em `guidelines/project/lessons/` e 2 reincidências
+    atualizadas no `lessons.md`.
+  - Depois: Waves 3-5 (TASK-031-004, 006, 007) e a Entrega.
+  - Pendências para o Diretor já acumuladas (ledger da sessão `b1505f46`): E-1 (Tira no
+    escopo do gate — default aplicado), N5 (troca de imagem de Associação visual não acende o
+    sinal), sufixo "(não cobre o material de reforço)" na marca do PDF, lacuna de SPEC
+    (`saveRuleBreakdown` não carimba identidade), 4 propostas ao mantenedor do plugin
+    (LRN-038..041).
+- 2026-09-27 19:50: furo no plano em TASK-031-003 — estender `ContentVersionDetail` com
+  `approvedById`/`approvedAt` quebra a paridade cross-repo (`contents-frontend-contract.test.ts`),
+  e o espelho dos tipos estava alocado a TASK-031-006 — destino: ajuste localizado (Tech
+  Lead) — quem cria o campo no payload espelha no mesmo diff (regra do CLAUDE.md):
+  TASK-031-003 espelha os 2 campos, TASK-031-004 espelha `validApprovalForExport`,
+  TASK-031-006 fica só com a mutation RTK Query. Baseline vermelho pré-existente
+  (`publication.service.integration.test.ts`, teto de duração CPU-bound — já sancionado
+  em PLAN-029) sancionado de novo, gate 2 mede contra ele.
 - 2026-09-27 19:15: **Wave 1 de PLAN-031 fechada — TASK-031-001/002 Done.** Migração
   aditiva `20260927135234_add_content_version_approval` (2 colunas nullable
   `approvedById`/`approvedAt` + FK `ON DELETE RESTRICT` + valor `APROVACAO_VERSAO`)

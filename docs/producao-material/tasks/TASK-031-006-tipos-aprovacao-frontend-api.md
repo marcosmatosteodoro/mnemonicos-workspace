@@ -16,9 +16,9 @@
 
 ## Contexto
 
-Espelha os 3 campos novos que `listContentVersions`/`closeContentVersion`/
-`approveContentVersion` agora devolvem em toda resposta (`approvedById`, `approvedAt`,
-`validApprovalForExport`) e acrescenta a mutation RTK Query de aprovação — plumbing puro,
+Acrescenta a mutation RTK Query de aprovação (o espelho dos 3 campos novos de
+`ContentVersion` — `approvedById`, `approvedAt`, `validApprovalForExport` — foi
+entregue junto do backend que os cria, TASK-031-003/004, refino de 2026-09-27) — plumbing puro,
 sem comportamento observável próprio (o painel que o consome é TASK-031-007). Depende das
 2 TASKs de backend anteriores porque o formato de resposta real (`ContentVersionDetail`)
 só está congelado depois delas (princípio 2 — costura só em contrato congelado).
@@ -33,14 +33,6 @@ Território e precedentes: `docs/producao-material/MAP.md`,
 
 ### Inclui
 
-- `mnemonicos-backend/src/domain/types.ts`: `interface ContentVersion` ganha
-  `approvedById: string | null`, `approvedAt: Date | null`,
-  `validApprovalForExport: boolean`. `APROVACAO_VERSAO` (valor do enum
-  `ProductionStageType`) fica backend-only, sem espelho (mesmo padrão de
-  `VERSAO_EDITORIAL`/DEC-010-006 — nenhuma tela consome o enum de etapa diretamente).
-- `mnemonicos-frontend/src/types/domain.ts`: `interface ContentVersion` ganha os MESMOS 3
-  campos, com `approvedAt: string | null` (string no frontend, mesma convenção já usada
-  por `closedAt`/`legislativeClosureDate` nesse arquivo).
 - `mnemonicos-frontend/src/store/api.ts`:
   - `export interface ApproveContentVersionArgs { rawContentId: string; number: number;
     legalCheckConfirmed: boolean; pedagogicalCheckConfirmed: boolean }` (ao lado de
@@ -54,12 +46,11 @@ Território e precedentes: `docs/producao-material/MAP.md`,
     este ato).
   - Export do hook: `useApproveContentVersionMutation` (bloco de exports já existente ao
     lado de `useCloseContentVersionMutation`).
-- `mnemonicos-backend/tests/unit/contents-frontend-contract.test.ts` (estende — molde
-  `describe('paridade cross-repo — ContentVersion (TASK-029-004)')`, linhas 242-277):
-  os 2 `it` existentes passam a listar os 3 campos novos no array esperado
-  (`['id', 'rawContentId', 'number', 'legislativeClosureDate', 'authorId', 'closedAt',
-  'approvedById', 'approvedAt', 'validApprovalForExport']`), nos 2 lados da comparação —
-  mesmo mecanismo já existente (`extractInterfaceFields`), nenhuma função nova.
+- Espelho dos 3 campos (`approvedById`/`approvedAt`/`validApprovalForExport`) nos 2
+  `domain.ts` e a paridade de `contents-frontend-contract.test.ts` **já chegam feitos**
+  (refino pós-furo no plano, 2026-09-27: quem cria o campo no payload espelha no mesmo
+  diff — TASK-031-003 para os 2 primeiros, TASK-031-004 para o computado). Esta TASK
+  só CONFERE que o espelho está completo antes de acrescentar a mutation — ver critério.
 
 ### Não inclui
 
@@ -69,12 +60,12 @@ Território e precedentes: `docs/producao-material/MAP.md`,
 
 ## Critérios de pronto
 
-- [ ] **Paridade cross-repo `ContentVersion` estendida**: `contents-frontend-contract.test.ts`
-      confirma que os 3 campos novos aparecem nos DOIS lados (backend `domain/types.ts` ×
-      frontend `types/domain.ts`) e que `ContentVersionDetail`
-      (`content-versions.service.ts`) tem o MESMO conjunto de campos que `ContentVersion`
-      do frontend, incluindo os 3 novos. Verificação executável: `npm --prefix
-      mnemonicos-backend test -- contents-frontend-contract.test.ts` → `OK (N tests)`.
+- [ ] **Paridade cross-repo `ContentVersion` já completa** (entregue por TASK-031-003/004,
+      conferida aqui antes da mutation): `contents-frontend-contract.test.ts` confirma os
+      3 campos nos DOIS lados e o mesmo conjunto em `ContentVersionDetail`. Verificação
+      executável: `npm --prefix mnemonicos-backend test -- contents-frontend-contract.test.ts`
+      → `OK (N tests)`; divergência encontrada aqui é furo das TASKs anteriores (reportar,
+      não corrigir em silêncio).
 - [ ] `TAG_TYPES` (`mnemonicos-frontend/src/store/api.ts`) já contém `'ContentVersion'`
       desde TASK-029-004 — sem alteração; item do Inclui sem AC isolado (mutation nova,
       oráculo é o contrato do próprio item): typecheck confirma que

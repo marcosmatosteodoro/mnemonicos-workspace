@@ -514,6 +514,36 @@ regra mudar, esta DEC precisa ser reavaliada junto.
 **Reabrir se**: FR-030-015 for relaxado a ponto de permitir aprovação com sinal de
 alteração aceso.
 
+**Emenda (2026-09-27, furo no plano achado pelo gate 8 da Wave 2 — premissa refutada)**:
+a premissa "qualquer edição do `RawContent` depois do fechamento liga o sinal" é falsa.
+`updateRawContent` carimba `lastEditedById`/`lastEditedAt` em todo PATCH, inclusive `{}`,
+só de campo não versionado (`topicId`) ou re-save com os mesmos valores — nenhum deles
+acende `hasVersionedContentChanged`, e a identidade do último editor de antes do
+fechamento é sobrescrita (bypass provado contra Postgres real). A leitura ao vivo
+continua, mas com uma guarda adicional fail-secure, conforme o desempate que o próprio
+FR-030-004 prescreve ("na dúvida sobre qual identidade se aplica, recusa"):
+`approveContentVersion` recusa quando `rawContent.lastEditedAt !== null &&
+rawContent.lastEditedAt > vigente.closedAt` — o último editor pré-fechamento deixou de
+ser conhecido, e a saída é fechar uma nova Versão. Alternativa descartada agora: congelar
+`lastEditedById` do instante do fechamento numa coluna própria de `ContentVersion` — exige
+migração e aval do Diretor; é a condição de reabertura abaixo.
+**Reabrir se (emenda)**: o bloqueio por edição sem mudança versionada depois do
+fechamento virar atrito real no piloto — aí congelar a identidade no fechamento (coluna
+nova, migração aditiva).
+
+**Emenda 2 (2026-09-27, re-verificação do gate 8 da Wave 2 — vetor concorrente)**: a
+comparação `lastEditedAt > closedAt` ordena por relógio de aplicação, e o `now` de
+`updateRawContent` é calculado ANTES de o UPDATE esperar o `FOR UPDATE` do fechamento —
+uma edição concorrente commita depois do fechamento com `lastEditedAt < closedAt`
+(provado com interleaving forçado). A guarda passa a ordenar pelo banco: recusa quando
+existe `ProductionStageEvent` `stageType: 'CONTEUDO_BRUTO'` do `rawContentId` com
+`sequence` maior que a do último `VERSAO_EDITORIAL` dele (`sequence` é autoincrement
+atribuído no INSERT, depois do lock; `updateRawContent` emite `CONTEUDO_BRUTO` em toda
+chamada, inclusive PATCH `{}`, e `closeContentVersion` emite `VERSAO_EDITORIAL` antes do
+commit). Sem relógio, sem migração, sem tocar `contents.service.ts`. Alternativa
+descartada: tomar o lock em `updateRawContent` antes de calcular `now` — mexe no módulo
+de F2 e deixa resíduo de diferença de relógio entre instâncias serverless.
+
 **Irreversível**: não
 **Aderência à ficha/perfil**: nova
 

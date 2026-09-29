@@ -4,7 +4,7 @@
 **Pertence a**: PLAN-031
 **Realiza (FRs)**: FR-030-006, FR-030-007
 **Funcionalidade**: FEAT-030-001 (primária)
-**Componente**: COMP-031-005
+**Componente**: COMP-031-005, COMP-031-009, COMP-031-013
 **Wave**: 3
 **Tamanho estimado**: small
 **Tipo**: feature
@@ -102,8 +102,14 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
     — nunca `include: { approver: true }` (User carrega `passwordHash`).
   - Fixture: usar o builder de `VersionedContentFields` que TASK-031-003 cria em
     `tests/support/` (nunca uma 3ª cópia local).
-- `mnemonicos-frontend`/`mnemonicos-backend`: nenhum arquivo de tipos/frontend tocado
-  nesta TASK (TASK-031-006 é quem espelha `validApprovalForExport`).
+- **Espelho de `validApprovalForExport` no mesmo diff** (refino pós-furo no plano de
+  TASK-031-003, 2026-09-27 — quem cria o campo no payload HTTP espelha, regra do
+  CLAUDE.md do workspace): `mnemonicos-backend/src/domain/types.ts` e
+  `mnemonicos-frontend/src/types/domain.ts` — `interface ContentVersion` ganha
+  `validApprovalForExport: boolean`; o `describe` de paridade `ContentVersion` de
+  `tests/unit/contents-frontend-contract.test.ts` passa a listar o campo nos 2 lados.
+  Frontend: fixture/objeto `ContentVersion` que o typecheck acusar ganha o campo
+  (`false`).
 
 ### Não inclui
 
@@ -112,7 +118,7 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
   uma função à parte, `resolveVersionStampForPdf`).
 - Rota/schema/segregação de funções de aprovação — já entregues por TASK-031-003, da qual
   esta TASK só consome `resolveAlterationSignal`/as colunas novas.
-- Tipos TS espelhados, `store/api.ts`, painel de aprovação — TASK-031-006/007.
+- `store/api.ts` (mutation de aprovação) e painel de aprovação — TASK-031-006/007.
 
 ## Critérios de pronto
 
@@ -138,6 +144,10 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
       `.catch(() => false)` → o caso N2 fica vermelho.
 - [ ] Herança N6: `grep -rn "include: { approver" mnemonicos-backend/src | grep -vE
       ':\s*(//|\*)' | grep -v generated` (raiz do workspace) → 0 ocorrências.
+- [ ] Espelho de `validApprovalForExport` (ver Inclui): `npm --prefix mnemonicos-backend
+      test -- contents-frontend-contract.test.ts` → verde; `npm --prefix
+      mnemonicos-frontend run typecheck && npm --prefix mnemonicos-frontend test` → exit 0
+      / sem vermelho novo contra a baseline do frontend.
 - [ ] Fixture: `grep -rln "BASE_FIELDS\|const BASE = " mnemonicos-backend/tests` não
       ganha nenhum arquivo novo desta TASK (a fixture vem do builder de `tests/support/`).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (`git diff --name-only
