@@ -269,8 +269,28 @@ origem: ciclo `/keelson:auto` de F5 (slug producao-material), ambiente Windows �
 causa_raiz: verificador_furado — o script exporta `LC_ALL=C` (l.28, comentário l.25: "Bash 3.2 + awk POSIX, sem dependências novas") e depois, em 2 checks, chama `tolower()` sobre texto pt-BR ANTES de comparar contra um literal UTF-8 embutido no próprio script: (1) `spec-ac-fora-gwt` monta `acbuf = tolower(line)` (bloco SPEC, l.173/176) e o `flushac()` (l.254) busca `"ent\303\243o"` — bytes intactos — dentro de `acbuf` já corrompido; (2) `plan-dec-irreversivel-enum` (bloco PLAN, l.338) faz `lv = tolower(v); gsub(/\303\243/, "a", lv)` — a ORDEM inverte o que o comentário `# ã→a` promete: o gsub normalizador roda DEPOIS do tolower já ter corrompido o byte, nunca casa. Neste ambiente (gawk + Windows, build cujo `tolower()` corrompe byte ≥0x80 sob locale C), os dois checks reprovam qualquer SPEC/PLAN com "então"/"não"/"ação" nas seções verificadas — nenhuma instrução ao gerador (SPEC/PLAN bem formados) preveniria; o defeito é do parser. Varredura adicional (pedida pelo relato) achou o MESMO padrão em mais 2 sítios do bloco TASK, ainda não sintomáticos porque o texto de teste não bateu neles ainda: os 2 checks da família 4.215 ("--group" sem negação / com negação, l.539 e l.558) fazem `lline = tolower(line)` e depois checam `index(lline, "não")` — mesmo padrão tolower-antes-do-literal-UTF-8, mesma corrupção esperada em texto pt-BR com "não" acentuado. Mesma classe de LRN-014/016/017 (verificador_furado em script do plugin — `graph.sh`/`probe-env.sh`), causa distinta: aqui é corrupção de byte por `tolower()` sob `LC_ALL=C`, não tokenização ingênua nem exceção de encoding não distinguida
 artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) — `scripts/artifact-lint.sh`, blocos awk SPEC (l.173, l.176 — check `spec-ac-fora-gwt`/`flushac`), PLAN (l.338 — check `plan-dec-irreversivel-enum`) e TASK (l.539, l.558 — checks 4.215 "--group")
 patch: proposta de função `lc_safe(s)` (lowercase ASCII-only — só rebaixa byte no intervalo 'A'-'Z', nunca toca byte ≥0x80, então nunca corrompe sequência UTF-8 multibyte) duplicada nos 3 blocos awk logo após cada `function trim(s) {...}` (mesmo padrão de duplicação que o arquivo já usa para `trim`/`emit` — os 3 blocos são programas awk independentes); os 5 call-sites (l.173, l.176, l.338, l.539, l.558) trocam `tolower(...)` por `lc_safe(...)`, sem mais nenhuma mudança de lógica — saldo líquido ~+3 linhas (1 linha de função por bloco; as 5 substituições de token são saldo 0)
-reincidencia: 0
+reincidencia: 1
 estado: ativa
+
+**Atualização 2026-09-29 (reincidência 1, ciclo `/keelson:auto` de PLAN-031, slug
+producao-material)**: os DOIS mesmos checks nomeados nesta entrada dispararam de novo, no
+MESMO ambiente (Windows/Git-Bash, plugin instalado v0.173.0): `spec-ac-fora-gwt` reprovou
+(WARNING) 12/12 ACs de uma SPEC nova mesmo com todos genuinamente no formato Dado-Quando-Então;
+`plan-dec-irreversivel-enum` reprovou (**ERROR, bloqueante**) 3/3 DECs de um PLAN novo, todas
+escritas `Irreversível: não.` — releitura manual confirmou as 15 entradas corretas nos dois
+artefatos. Evidência adicional de cronicidade, achada nesta sessão: `git grep -h
+"Irreversível" docs/producao-material/plans/*.md` mostra 50 DECs já escritas `Irreversível: nao`
+(sem acento) contra só 3 com acento — sinal de que scribes de ciclos anteriores já aprenderam a
+EVITAR o acento por tentativa e erro, nunca porque a ferramenta foi corrigida; e os BRIEFs de
+produto BRIEF-019/BRIEF-020 (deste mesmo slug, anteriores à origem desta entrada) já citavam o
+mesmo falso-positivo de acentuação como precedente conhecido — o bug é mais antigo e mais
+frequente do que os 2 registros formais que chegaram a este ledger. Não pede reformular a causa
+nem o patch: a `proposta_plugin` (`lc_safe`) já É o check mecânico exigido pela escada de
+promoção (decisão 4.149) — permanece `não aplicado` no plugin instalado, e cada ciclo que roda
+sobre SPEC/PLAN com "então"/"não" acentuado paga de novo o mesmo custo (aqui: WARNING em 100%
+dos ACs de uma SPEC, ERROR bloqueante em 100% das DECs de um PLAN). Reforça a
+`mensagem_mantenedor` desta entrada com urgência: o mesmo bug, sem correção, atravessou 4
+execuções conhecidas (SPEC-022/PLAN-023 origem, BRIEF-019, BRIEF-020, agora SPEC/PLAN-031).
 
 ## LRN-022: despacho do retry (`commands/implement.md` §3.3) transcreve o COMANDO de varredura citado no achado original como ilustração, não como critério de pronto — só o endereço nomeado fecha
 data: 2026-09-13
@@ -708,5 +728,132 @@ tem mais de uma) — um cenário de teste por causa alcançável, nunca um únic
 5xx genérico) no lugar da condição; causa nomeada no AC/FR e ausente do grep é exclusão explícita
 no "Não inclui", nunca lacuna implícita. Saldo líquido estimado ~+7 linhas (mesmo parágrafo,
 dentro do orçamento ≤10; arquivo tem 247 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa
+
+## LRN-038: parser de campo multi-linha (formato de campo, decisão 4.156) lê só a linha do
+marcador em 2 sítios distintos — `scripts/graph.sh` (`**Realiza**` de COMP) e
+`scripts/artifact-lint.sh` (NFRs, secao 6) — mesma classe de bug, texto de continuação
+silenciosamente descartado
+data: 2026-09-29
+gatilho: validator_error
+origem: ciclo `/keelson:auto` de PLAN-031 (slug producao-material) — (1) `graph.sh --check`:
+o campo `**Realiza**:` de um COMP, quebrado em 2-3 linhas (formato de campo padrão do
+projeto — texto continua na linha seguinte, sem novo marcador), gerou `WARNING
+fr-sem-comp`/`comp-sem-fr` falsos para FRs corretamente listados, só que na 2ª/3ª linha do
+campo; reproduzido 2x na mesma sessão (um `Realiza` de 2 linhas, outro de 3). (2)
+`artifact-lint.sh`: suspeita levantada por analogia (mesma classe já vista no
+`spec-nfr-sem-numero`) e **confirmada por leitura do código-fonte** (não reproduzida por
+sintoma nesta sessão): a secao 6 (NFRs) nunca acumula linha de continuação — ao contrário das
+seções 5 (FRs, `frbuf`/`flushfr()`, comentário l.134-135: "bloco multi-linha no formato de
+campo (4.156)... acumula e checa o bloco") e 7 (ACs, `acbuf`/`flushac()`), a regra de NFR
+(l.156-168) roda os checks `spec-nfr-vago`/`spec-nfr-sem-numero` direto sobre `line` (só a
+linha do bullet), sem `nfrbuf` nem `flushnfr()` — NFR cujo valor numérico caia na 2ª linha do
+campo reprova `spec-nfr-sem-numero` mesmo correto
+causa_raiz: verificador_furado — os dois scripts implementam o mesmo formato de campo
+multi-linha (decisão 4.156) com fidelidade desigual: `artifact-lint.sh` já resolveu
+corretamente para FR (seção 5) e AC (seção 7) com o padrão acumula-e-flush, mas não estendeu o
+mesmo padrão à seção 6 (NFR) quando a implementou; `graph.sh` nunca implementou o padrão para
+nenhum campo de COMP (`**Realiza**`/`**Dependências**`, ambos lidos via `fieldrest(line)` —
+só a linha do próprio marcador). Nenhuma instrução ao gerador (SPEC/PLAN bem formados,
+seguindo o formato de campo que o próprio projeto instrui) preveniria isso — o defeito é do
+parser, não do texto gerado
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`scripts/graph.sh` (bloco `ftype == "P"`, regras de `### COMP-`/`### DEC-`/`### `/`**Realiza**`,
+l.284-298) + `scripts/artifact-lint.sh` (bloco awk SPEC, seção 6 "NFRs", l.155-169)
+patch: (1) `graph.sh` — introduz acumulador por COMP mirando o padrão `frbuf`/`flushfr()` já
+usado em `artifact-lint.sh`: função nova `flushrealiza()` (`if (realizafrom == "") return;
+listedges("comp-realiza", realizafrom, realizabuf, "^(FR|NFR)-[0-9]+-[0-9]+$", "Realiza");
+realizafrom = ""; realizabuf = ""`); as regras de heading (`### COMP-`, `### DEC-`, `### `)
+chamam `flushrealiza()` antes do próprio corpo; a regra de `**Realiza**:` passa a fazer
+`flushrealiza(); realizafrom = cur_comp; realizabuf = fieldrest(line); next` (em vez de
+chamar `listedges` direto); nova regra de continuação `ftype == "P" && realizafrom != "" &&
+line !~ /^\*\*/ && line !~ /^#/ { realizabuf = realizabuf " " trim(line); next }`; `FNR == 1`
+ganha `flushrealiza();` antes do reset de `cur_comp` (flush ao trocar de arquivo); e o `END{}`
+do mesmo programa awk (mantenedor localiza — o arquivo tem múltiplos `END{}`, um por
+subcomando) ganha `flushrealiza()` para o último arquivo processado. `**Dependências**:` do
+COMP tem o MESMO padrão de bug (`fieldrest(line)` direto) — fora do escopo deste patch
+(não reproduzido, só apontado), recomendado ao mantenedor estender a mesma correção por
+simetria. Saldo líquido ~+6 linhas. (2) `artifact-lint.sh` — mesma técnica, nova função
+`flushnfr()` espelhando `flushfr()`: acumula `nfrbuf` a partir da regra de bullet NFR (que
+passa a abrir com `flushnfr()` e fechar com `nfrbuf = line; next`, guardando o id em `nfrid`
+— nunca a variável genérica `id`, reusada por outras regras), nova regra de continuação
+`sect == "6" && nfrid != "" && line !~ /^[-#>]/ { nfrbuf = nfrbuf " " trim(line); next }`, e
+os dois call-sites de flush de seção (`^## `/`^### `, l.76 e l.93: `flushfr(); flushac()` →
+`flushfr(); flushnfr(); flushac()`). Saldo líquido ~+6 linhas. Total do patch: ~+12 linhas
+somando os dois arquivos (cada um dentro do orçamento ≤10 isoladamente)
+reincidencia: 0
+estado: ativa
+
+## LRN-039: "Cobertura parcial" de `commands/tasks.md` (Etapa 3, l.192) nomeia a partição
+"(parte — X)" por FACETA/GATE, mas não por ELEMENTO IRMÃO — FR repartido entre TASKs por
+elemento pode deixar uma célula sub-exigência×elemento sem TASK responsável, sem que nada
+mecânico acuse
+data: 2026-09-29
+gatilho: gate_reprovado
+origem: PLAN-031 (slug producao-material) — um FR MUST se aplicava a 2 elementos irmãos
+(ícone à esquerda nos campos de e-mail E senha de um formulário de login); a decomposição
+repartiu o FR "(parte — X)" entre 2 TASKs (uma por campo, mesma sintaxe do mecanismo de
+"Cobertura parcial" já existente) — a TASK do campo de senha listou só a sub-exigência de
+OUTRO FR (toggle mostrar/ocultar) e a TASK do campo de e-mail assumiu corretamente o ícone à
+esquerda, mas nenhuma TASK cobriu o ícone à esquerda DO CAMPO DE SENHA; achado pelo gate 11
+(`product-designer`) já na Wave 2, custando 1 retry
+causa_raiz: instrucao_ausente — o parágrafo "Cobertura parcial" (`commands/tasks.md`, Etapa 3,
+l.192) já formaliza a partição de um AC "(parte X — a faceta Y é do gate Z da TASK-MMM-ZZZ)",
+mas o exemplo e o mecanismo pensam a partição só pelo eixo FACETA/GATE (qual característica do
+mesmo AC, verificada por qual gate) — nada instrui montar a matriz quando a partição é por
+ELEMENTO IRMÃO (mesmo tipo de sub-exigência aplicada a 2+ campos/controles repetidos na
+mesma tela), e a mesma sintaxe "(parte — X)" foi reaproveedada pela decomposição real sem essa
+checagem. Prevenível no gerador (`/keelson:tasks`, antes do código) — nenhum gate isolado
+enxerga a célula ausente, porque cada TASK só prova a própria fatia
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`commands/tasks.md`, Etapa 3, parágrafo "Cobertura parcial" (l.192)
+patch: proposta de extensão in-line, logo após a frase "(AC-NNN-XXX (parte X — a faceta Y é do
+gate Z da TASK-MMM-ZZZ))": "Cobertura parcial por **elemento irmão** (mesma sub-exigência
+repetida no mesmo AC/FR sobre 2+ campos/controles do mesmo tipo — ex.: "ícone à esquerda" em
+campo de e-mail E campo de senha, repartido "(parte — email)"/"(parte — senha)" entre TASKs)
+monta, antes de fixar, a matriz sub-exigência × elemento: cada célula (uma sub-exigência
+aplicada a um elemento) nomeia a TASK responsável — célula sem TASK é furo de decomposição,
+nunca detectável pelo gate que só vê a fatia da própria TASK; célula deliberadamente fora
+desta wave entra no Não inclui com nota, nunca lacuna implícita." Saldo líquido ~+6 linhas
+(mesmo parágrafo, dentro do orçamento ≤10; arquivo tem 241 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa
+
+## LRN-040: catálogo "resistir a contorno" de `commands/tasks.md` (itens a-h) não cobre AC/
+critério de contraste cujo Inclui introduz uma camada de FUNDO que se estende além dos
+componentes tocados — inventário de pares de contraste derivado só do diff, cego a texto
+herdado de layout compartilhado pintado por cima
+data: 2026-09-29
+gatilho: gate_reprovado
+origem: PLAN-031 (slug producao-material) — um componente novo (fundo `position: fixed` em
+tela cheia) introduziu uma camada que pinta ATRÁS de outros componentes que o diff NÃO
+tocava (header e rodapé, herdados de um layout compartilhado). O inventário de pares de
+contraste da TASK foi derivado só dos componentes que o diff tocava (pílula, botão, painel
+do card) — nunca mediu o texto do header/rodapé contra o novo fundo efetivo. Achado só no
+fim do ciclo por um `code-reviewer` em modo convergência de fecho (revisão da branch inteira,
+não wave a wave) — 2 rodadas de retry (1ª correção reprovada pelo gate de design por criar
+aresta visual feia; 2ª corrigiu a forma)
+causa_raiz: instrucao_ausente — o catálogo "resistir a contorno" (Etapa 3, `commands/tasks.md`,
+itens a-h) não nomeia a classe "AC/critério de contraste cujo Escopo>Inclui introduz uma
+camada de FUNDO que se estende visualmente além dos próprios componentes" — nada instrui, ao
+fixar esse critério, enumerar o texto/controle herdado de um componente de LAYOUT que a TASK
+não toca (header/rodapé/navbar montados na mesma rota); o inventário nasceu escopado só ao
+que o diff tocava, leitura literal razoável do critério tal como hoje existe — prevenível no
+gerador (a TASK deveria ter nomeado a varredura antes do código), mais barato que achar na
+convergência de fecho
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) —
+`commands/tasks.md`, catálogo "resistir a contorno" (Etapa 3, mesmo parágrafo dos itens a-h,
+l.189)
+patch: proposta de item novo (letra a atribuir pelo mantenedor — mesma disputa de slot já
+registrada em LRN-012/015/030/033/037): AC/critério de contraste cujo Escopo>Inclui introduz
+uma camada de FUNDO que se estende além dos componentes tocados (`position: fixed`/`absolute`
+em tela cheia, ou pintura atrás de conteúdo herdado de layout compartilhado) enumera, antes do
+código, TODO texto/controle visível na rota afetada contra o fundo EFETIVO resultante — não só
+os componentes do próprio Inclui —, incluindo elemento herdado de componente de layout que
+esta TASK não toca; a varredura dos componentes montados na mesma rota (grep do import do
+layout, ou lista explícita) entra no critério, nunca presumida coberta pelo inventário
+automático do perfil, que enumera só o que o diff tocou. Saldo líquido ~+7 linhas (mesmo
+parágrafo, dentro do orçamento ≤10; arquivo tem 241 linhas, longe do teto de 500)
 reincidencia: 0
 estado: ativa
