@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Aberto
+**Status**: Concluído
 **Data**: 2026-09-29
 **Largada**: 2026-09-29T15:41:42-0300
 **Origem**: Diretor (pedido em sessão, feedback direto sobre a branch de PLAN-031 já entregue)
@@ -70,8 +70,35 @@ tela, não só quando o conteúdo é curto o bastante para "sobrar" no topo.
 <nenhuma — o brief é a unidade de execução>
 
 ## Execução
-- **Implementado por**: developer
-- **Revisado por**: code-reviewer (régua avulsa) · product-designer (gate 11 — diff toca
-  markup/layout de `/login` e do root layout) · qa (screen-verify — confirmação visual
-  nas 3 larguras/2 temas + não-regressão do header nas outras rotas)
+- **Implementado por**: developer — `SiteHeaderGate` novo (`src/components/site-header-gate.tsx`,
+  client, `usePathname()`, oculta `SiteHeader` só em `/login`) montado sempre por
+  `RootLayout`; wrapper do card em `login/page.tsx` migrado para
+  `fixed inset-0 flex items-center-safe justify-center overflow-y-auto` (reaproveita a
+  técnica de `position: fixed` de DEC-031-001, sem z-index negativo).
+- **Revisado por**:
+  - code-reviewer (régua avulsa): APROVADO — 3 achados não-bloqueantes (parêntese falso
+    sobre exceção de teste, mutante sobrevivente em `layout.test.tsx`, prosa
+    desatualizada em `login-night-backdrop.tsx`), todos aplicados na mesma rodada
+    (decisão 4.249).
+  - product-designer (gate 11): 1ª rodada REPROVOU — achado real (`items-center` cortava
+    o topo do card em janela baixa, ~740×360, sem scroll alcançável). Corrigido com
+    `items-center-safe`. Re-review do delta: APROVADO — medição real confirma o topo em
+    coordenada ≥0 nas mesmas janelas, sem regressão nas demais. 1 sugestão não-bloqueante
+    (comentário de `SCRIM_GRADIENT_TOP` citando `site-header.tsx` como fonte de medida)
+    aplicada inline.
+  - qa (screen-verify): VERIFICADO — header ausente em `/login` (5 larguras × 2 temas,
+    `getByRole('banner')` = 0), header presente em `/` e `/studio` autenticado (= 1, sem
+    regressão), card centralizado com delta 0px nas larguras canônicas, topo alcançável
+    em janela baixa, sem scroll horizontal, login real (sucesso e falha) exercitado
+    ponta a ponta contra o backend real sem regressão. Nenhum achado, nenhum handoff.
+  - Achado 2 do product-designer (rodapé sobreposto pelo card em janelas muito baixas,
+    <~575-580px de altura) — fora do pedido literal ("a parte de cima"), levado ao
+    Diretor (`AskUserQuestion`): decidiu **manter o rodapé e aceitar a sobreposição
+    rara**. Registrado, não é achado pendente.
+  - Testes: 634/634 → 635/635 (baseline PLAN-031 627 + 1 teste novo líquido desta
+    demanda, contando os que a rodada de retry adicionou/consolidou). Lint/typecheck
+    limpos.
+  - Lição nova roteada (`alvo: projeto`, verificada presente): `guidelines/project/lessons.md`
+    — "Centralizar com `items-center` num container `fixed`/tela cheia corta o topo do
+    conteúdo que transborda, sem scroll alcançável".
 - **Commit**: pendente — commit é ato do Diretor
