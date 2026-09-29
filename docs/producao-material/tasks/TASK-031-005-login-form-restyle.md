@@ -7,7 +7,7 @@
 **Wave**: 3
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: In Progress
 
 ## Dependências
 
@@ -33,13 +33,26 @@ real (NFR-030-002).
   (lembrar-me, esqueci a senha, criar conta) está presente no card redesenhado.
 - Preservação do `PasswordField` (COMP-031-006, já reestilizado em TASK-031-006) como
   consumidor sem alteração de props/contrato.
+- **Escopo ampliado pelo Tech Lead (decisão registrada, gate 7 do `code-reviewer` —
+  degrau 1, reversível)**: extrair a cadeia de classes do invólucro em pílula (hoje
+  copiada literalmente entre `login-form.tsx` e `password-field.tsx`) para um
+  `@utility` compartilhado em `globals.css` (README do frontend §Estilo — "utilitário
+  próprio recorrente → `@utility`"), e aplicar em AMBOS os arquivos — só troca de
+  `className`, pixel-idêntico, `NFR-030-004` intacto (nenhuma prop/comportamento do
+  `PasswordField` muda). Extrair `findMeasuredPair`/`canonicalSuffix` (hoje
+  reimplementados byte-a-byte em `login-form.test.tsx` e `password-field.test.tsx`) para
+  um módulo de apoio único — sugestão: exportar junto de `NIGHT_PALETTE_CONTRAST_PAIRS`
+  em `night-palette-tokens.ts` — e migrar os dois arquivos de teste para importar dele
+  (só import, sem mudar asserção).
 
 ### Não inclui
 - Alteração de `method="post"`, do gate de hidratação (`useSyncExternalStore`), da
   mensagem genérica de erro `role="alert"`, do status "Entrando…", do redirecionamento
   para `next`/`INTERNAL_HOME`, de `aria-busy` ou da ausência de `aria-invalid` — NFR-030-002.
 - Montagem do formulário dentro de `page.tsx` (COMP-031-004, TASK-031-004).
-- Restyle do próprio `PasswordField` (COMP-031-006, TASK-031-006 — já concluído).
+- Restyle do próprio `PasswordField` (COMP-031-006, TASK-031-006 — já concluído) **além**
+  da extração de utilitário/helper compartilhado acima (que é só className/import, não
+  restyle novo).
 
 ## Critérios de pronto
 
