@@ -334,6 +334,8 @@ regra**, **Bloco da quebra** (SPEC-005); **Publicação**, **Variante do PDF**,
 
 ### FEAT-032-002: Carimbo de Versão aprovada no PDF exportado
 
+**Verificação (gate 9)**: 2026-09-29 — `qa`, execução real ponta a ponta contra o backend local (HEAD `5984073`, Postgres de dev): 6/6 ACs (AC-032-009/010/011/012/021/024) exercitados por HTTP, com aprovação por um 2º ADMIN e alteração da Tira pela rota real de Quadros; texto de cada PDF inspecionado por `pdftotext` nas 2 Variantes (a marca substitui "RASCUNHO" em toda página; 4ª linha de Versão/Data preservada).
+
 > Do ponto de vista do QA: exportar o PDF de um Conteúdo bruto cuja Versão vigente
 > está aprovada mostra a marca de alcance explícito ("Conteúdo normativo e Tira
 > mnemônica — Versão N aprovada", ou equivalente) em vez de "Rascunho"; exportar quando

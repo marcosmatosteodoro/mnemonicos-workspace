@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -499,17 +499,17 @@ TASK de wiring posterior (princípio 4).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
-**Jira**:
+**Data início**: 2026-09-27T19:24:02-0300
+**Data conclusão**: 2026-09-27T21:58:16-0300
+**Commit SHA**: 2e9998c (+ e9a1360, 563f350, 49489c9 — retries dos gates 1/7/8/11; frontend 053a6ab; âncoras renumeradas 5984073/94711c9)
+**Jira**: — (sem acesso ao conector; ver `tracker-local-F9.md`)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 2, após 2 retries: CWE-284 e CWE-367 fechados) — security-engineer
+- [x] Comportamento (gate 9): consolidado FEAT-032-001 — carregador: Roteiro do gate 9 de TASK-033-007 (Wave 5), que exercita aprovação, recusa de autoaprovação e estados da UI ponta a ponta

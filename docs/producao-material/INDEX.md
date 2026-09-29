@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-29 (SPEC-030/PLAN-031 — redesenho visual da tela de login — entregue por sessão paralela; F9 renumerada para SPEC-032/PLAN-033, pausada no meio da Wave 2)
+**Última atualização**: 2026-09-29 (PLAN-033/F9 — Wave 2 fechada: TASK-033-003/005 Done, FEAT-032-002 implementada e VERIFICADA; próximo: Wave 3. SPEC-030/PLAN-031 — redesenho da tela de login — entregue por sessão paralela)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -17,9 +17,10 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ## Capacidades
 
 ### Em desenvolvimento
-- Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica (SPEC-032/**PLAN-033**, F9 do épico MNEMORA STUDIO, 🟡 0/? tasks Done — TASKs ainda não decompostas). Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate.
+- Aprovação da Versão vigente com checklist de qualidade e segregação de funções (SPEC-032/FEAT-032-001, PLAN-033, 🟡 — backend entregue e aprovado na Wave 2; faltam a leitura do estado de aprovação, a mutation e o painel na tela, Waves 3-5). Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica (SPEC-032/**PLAN-033**, F9 do épico MNEMORA STUDIO, 🟡 4/7 TASKs Done). Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate.
 
 ### Implementadas
+- Carimbo de Versão aprovada no PDF exportado (SPEC-032/FEAT-032-002, ✅ 2026-09-29) — a 1ª linha do cabeçalho de toda página troca "RASCUNHO" por "Conteúdo normativo e Tira mnemônica — Versão N aprovada" só quando a Versão vigente está aprovada e sem alteração posterior (conteúdo ou Tira); gate 9 VERIFICADO por execução real (6/6 ACs, pdftotext nas 2 Variantes).
 - Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, ✅ 2026-08-30) — módulo `users/` (criar/listar/desativar/resetar senha) + seed; gate 9 APROVADO. Montagem das rotas em `apiRoutes` fica com TASK-003-011 (Wave 6).
 - Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, ✅ 2026-08-31) — login com três estados observáveis + mensagem genérica pt-BR + sessão expirada; rotação de família, freio de login, cookies `httpOnly`. Gate 9 **pendente_handoff** (trânsito real à área interna no sucesso — causa: credencial; seed em HANDOFF-PLAN-003.md).
 - Autorização por papel deny-by-default no servidor (SPEC-002/FEAT-002-002, PLAN-003, ✅ 2026-08-31) — `assertDenyByDefault` no boot + suíte `route-authz-matrix` (28/28) + store do frontend com re-auth + shell da área interna (`InternalShell` com 3 estados, logout com 3 estados, `config.matcher` derivado do grupo `(interno)`). Gate 9 **pendente_handoff** (caminhada e2e de AC-002-013/AC-002-027 — causa: credencial).
@@ -105,7 +106,7 @@ fechado._
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
-| PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 2/7 🟡 | Approved |
+| PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 4/7 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -326,6 +327,14 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-29 20:46: **Wave 2 de PLAN-033 fechada — TASK-033-003/005 Done; FEAT-032-002 VERIFICADA.**
+  Retomada via `/keelson:continue` (parado 2h06min). Âncoras de ID do código da F9
+  renumeradas (backend `5984073`, 101 ocorrências; frontend `94711c9`, 3) — verificação
+  mecânica (word-diff só do mapeamento) + integração completa 555/555. Docker Desktop e
+  `mnemonicos-db` estavam parados (ECONNREFUSED) e foram religados. Gate 9 da FEAT-032-002:
+  `qa` exercitou os 6 ACs contra o backend real, PDFs inspecionados por `pdftotext`.
+  Tracker: sem acesso ao Jira nesta sessão — operações acumuladas em
+  `tracker-local-F9.md` (instrução do Diretor). Próximo: Wave 3 (TASK-033-004).
 - 2026-09-29 19:11: **Colisão de IDs resolvida no merge com `origin/main`.** Uma sessão paralela
   entregou o redesenho visual da tela de login como BRIEF-030/SPEC-030/PLAN-031/TASK-031-*,
   alocados ao mesmo tempo que a F9 (controle de qualidade e gate de versão aprovada). A `main`

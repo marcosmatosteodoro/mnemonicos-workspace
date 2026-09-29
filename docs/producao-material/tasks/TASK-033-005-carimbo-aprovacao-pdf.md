@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -183,17 +183,17 @@ PLAN-033 §1, §3 (COMP-033-007/008), §4 Fluxo 5.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
-**Jira**:
+**Data início**: 2026-09-27T19:58:11-0300
+**Data conclusão**: 2026-09-27T21:06:53-0300
+**Commit SHA**: 8160cd1 (+ 8d01262, 08e6452 — retry dos gates 1/7; âncoras renumeradas 5984073)
+**Jira**: — (sem acesso ao conector; ver `tracker-local-F9.md`)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 2) — security-engineer
+- [x] Comportamento (gate 9): verificado (FEAT-032-002) — qa, 2026-09-29, 6/6 ACs por execução real + pdftotext (linha na SPEC-032)

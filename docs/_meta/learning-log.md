@@ -886,6 +886,42 @@ patch: proposta de comentário `<!-- -->` novo, logo abaixo do heading "## 5. Mo
 reincidencia: 0
 estado: ativa
 
+## LRN-045: `commands/plan.md` (Etapa 4, item 3 — Trade-offs documentados) não exige confirmar por grep premissa comportamental sobre campo/mecanismo existente antes de a DEC assumi-la como fato
+data: 2026-09-29
+gatilho: gate_reprovado
+origem: PLAN-033 (slug producao-material), Wave 2 — o `code-reviewer` (gate 8) achou que a
+premissa de segurança da DEC-033-006 ("qualquer edição pós-fechamento acende o sinal de
+alteração") era falsa: `updateRawContent` carimba `lastEditedById`/`lastEditedAt` em
+QUALQUER save, inclusive PATCH `{}` sem mudança de campo versionado (só `topicId`) — a
+segregação de funções que a DEC prometia era contornável; achado custou 2 rodadas de
+retry e 2 emendas na própria DEC até fechar
+causa_raiz: instrucao_ausente — o item 3 da Etapa 4 (`commands/plan.md`, "Trade-offs
+documentados") já obriga listar alternativas e declarar `Reabrir se:`, mas não obriga
+confirmar, ANTES de escrever a DEC, uma premissa comportamental sobre um campo/mecanismo
+já existente no código ("campo X só muda quando Y") contra TODOS os pontos que hoje
+escrevem nesse campo; a instrução genérica de Etapa 2 ("confira as âncoras que virarem
+decisão DEC", decisão 4.75) é ampla demais para nomear esta classe especificamente — o
+scribe assumiu a premissa como fato sem grep dos escritores, e nada no gerador cobrava
+essa varredura antes do código. Família do catálogo "resistir a contorno" de
+`commands/tasks.md` (mesma disciplina de "inventário de todos os produtores/escritores"),
+mas aqui o dono é o PLAN (DEC), não a TASK — ponto mais cedo de prevenção; dedup conferido
+contra o ledger inteiro, nenhuma entrada equivalente (LRN-035 é família próxima —
+enumeração por LEITURA no mapeamento FR→COMP — mas causa-raiz distinta: aqui é premissa de
+segurança sobre mutação de campo, não cobertura de mecanismo transversal)
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor)
+— `commands/plan.md`, Etapa 4, item 3 ("Trade-offs documentados")
+patch: proposta de extensão in-line no item 3, logo após "...sem refazer a análise (decisão
+4.136).": "DEC cuja segurança/decisão depende de uma premissa sobre COMPORTAMENTO de um
+campo/mecanismo já existente no código (\"campo X só muda quando Y\", \"só o caminho Z
+escreve nele\") confirma a premissa por grep de TODOS os pontos que escrevem/alteram esse
+campo antes de a assumir como fato — a lista de escritores (arquivo:linha) entra no
+Contexto da DEC; premissa não confirmada é suposição, não decisão (ex.: `updateRawContent`
+carimbava `lastEditedById` em qualquer save, PATCH vazio incluso, contornando a segregação
+de funções da DEC-033-006 — achado só no gate 8, 2 rodadas de retry)." Saldo líquido ~+6
+linhas (mesmo item, dentro do orçamento ≤10; arquivo tem 142 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa
+
 ## LRN-044: `guidelines/core/CODE-REVIEW.md`, bullet "Comentários (Art. 7)" — achado nasce por INSTÂNCIA (o bloco mais evidente), não por CONDIÇÃO, e a 2ª instância da mesma classe sobrevive ao retry
 data: 2026-09-27
 gatilho: gate_reprovado

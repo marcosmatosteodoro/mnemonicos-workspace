@@ -25,6 +25,11 @@ depois do merge.
 
 ## Log de operações pendentes (mais recente no topo)
 
+- 2026-09-29 20:50: Wave 2 fechada — TASK-033-003/005 → `41` Concluído. FEAT-032-002
+  (carimbo no PDF) completa e com gate 9 verificado → comentar o marco "Funcionalidade pronta
+  p/ QA" na História; a História segue no teto (`21`, depois `31` no finish-dev), nunca `41`
+  pelo ciclo.
+
 - 2026-09-29 20:31: retomada da Wave 2 — TASK-033-003/005 seguem em `21`; Histórias em `21`.
 - 2026-09-27: Wave 1 fechada — TASK-033-001/002 → `41` Concluído (closure `723805a`).
 - 2026-09-27: largada da F9 sem raiz no tracker — conector MCP Atlassian sem autenticação
