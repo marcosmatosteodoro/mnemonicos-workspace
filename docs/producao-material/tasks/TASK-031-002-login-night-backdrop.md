@@ -86,7 +86,9 @@ noturno do painel ilustrado (TASK-031-003).
 
 **Data início**: 2026-09-28T16:53:05-0300
 **Data conclusão**: 2026-09-28T20:42:30-0300
-**Commit SHA**: `ab1e32a` (retry gate 11 sobre `3ea00ea`)
+**Commit SHA**: `f328321` (retries da convergência de fecho da Entrega — scrim de
+contraste do header/footer `e32a23c` + forma em gradiente `f328321` — sobre `ab1e32a`,
+fechamento original da Wave 2)
 **Jira**: KAN-144
 
 **Quality gates**:
