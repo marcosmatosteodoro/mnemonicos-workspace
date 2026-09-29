@@ -4,9 +4,9 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-28 (TASK-031-002/003/006 Done — Wave 2/4 de PLAN-031,
-fundo em tela cheia + painel ilustrado + PasswordField reestilizado; demanda avulsa fora
-do épico MNEMORA STUDIO)
+**Última atualização**: 2026-09-29 (TASK-031-005 Done — Wave 3/4 de PLAN-031, LoginForm
+reestilizado, restam só TASK-031-004 para fechar o PLAN; demanda avulsa fora do épico
+MNEMORA STUDIO)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -91,7 +91,7 @@ fechado._
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
-| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 4/6 🟡 | Approved |
+| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 5/6 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -302,6 +302,24 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-29: **TASK-031-005 Done** (Wave 3/4 de PLAN-031) — `LoginForm` reestilizado:
+  campo de e-mail em pílula com `MailIcon` (mesma soma de larguras do `LockIcon` da
+  senha, achado ALTA da Wave 2 já respeitado), botão largura total em tom escuro,
+  comportamento 100% preservado. 3 rodadas de retry: (1) `product-designer` REPROVOU —
+  botão sem `cursor-pointer`/`hover` (média, corrigido); (2) `code-reviewer` REPROVOU 2x
+  — gate 1 (rótulo "E-mail" sem par de contraste rastreado; placeholder ligado ao par
+  errado, piso 3:1 em vez de 4,5:1) e gate 7 (DRY real: helpers de teste e cadeia de
+  classes duplicados entre `login-form.tsx`/`password-field.tsx`) — escopo ampliado pelo
+  Tech Lead (degrau 1) para extrair `@utility`/helper compartilhado, migrando
+  `password-field.tsx` só por className (NFR-030-004 intacto); (3) `code-reviewer`
+  REPROVOU de novo — o `@utility` novo dependia de `var(--tw-border-style)`/
+  `var(--tw-outline-style)`, custom properties do Tailwind 4 que só existem quando um
+  utilitário NATIVO as registra no scan de produção; sem os testes na árvore, o anel de
+  foco sumiria de verdade (regressão de a11y) — corrigido com valor literal `solid`,
+  verificado com `next build` real excluindo `.test.tsx`. Lição de processo nova
+  registrada (`@utility` nunca referencia `--tw-*`). 611/611 testes verdes (+3 todo
+  rastreáveis, aguardando o token do painel em TASK-031-004). Jira: KAN-147 movido para
+  Concluído.
 - 2026-09-28: **TASK-031-002/003/006 Done** (Wave 2/4 de PLAN-031) —
   `LoginNightBackdrop`/`LoginIllustratedPanel` (SVG decorativo, `aria-hidden`,
   `prefers-reduced-motion`, sem cor literal) e `PasswordField` reestilizado em pílula

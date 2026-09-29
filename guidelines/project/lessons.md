@@ -2168,3 +2168,36 @@ coberto.
 ao usuário, neste frontend ou backend).
 **Estado:** ativa
 **Contadores:** confirmada 0 · contestada 0
+
+## [Config] `@utility` escrito à mão no Tailwind 4 nunca referencia `var(--tw-*)` — a custom property só existe quando um utilitário NATIVO a registra
+
+**Erro:** o `@utility night-pill`/`night-pill-input` novo (extração de DRY, Wave 3 de
+PLAN-031, TASK-031-005) copiou do CSS gerado `border-style: var(--tw-border-style)` e
+`outline-style: var(--tw-outline-style)` — propriedades internas do Tailwind 4 que só
+ganham `@property` (e o fallback que dá a elas um valor inicial) quando o SCANNER de
+conteúdo encontra, nos arquivos de PRODUÇÃO, algum utilitário nativo que as usa
+(`border-*`, `outline-*`). Compilando só com os fontes de produção (sem `.test.tsx`),
+`@property --tw-outline-style` não era emitida — `outline-style` ficava `var(--tw-outline-style)`
+sem valor, e o anel de foco visível das duas pílulas (e-mail e senha) sumiria de verdade
+em produção (WCAG 2.4.7, NFR-030-004). Em desenvolvimento e nos testes "funcionava" só
+porque a palavra solta "outline" aparecia dentro de um título de teste — acoplamento
+acidental entre um `@utility` e um arquivo que nada tem a ver com ele.
+**Causa:** um `@utility` escrito à mão não é um utilitário nativo — copiar literalmente o
+CSS que o Tailwind GERA para uma combinação de classes (`border` + `has-[...]:outline-2`)
+não copia o registro do `@property` que sustenta aquele CSS. A dependência fica invisível
+até compilar com o conjunto exato de arquivos de produção (sem testes, sem código morto)
+e ler o CSS resultante.
+**Solução:** dentro de qualquer `@utility` do `globals.css`, nunca referenciar `--tw-*` —
+(a) escrever o valor final LITERAL (`border-style: solid`, `outline-style: solid`), no
+mesmo padrão que `surface-card` (`globals.css:124`, `border: 1px solid ...`) já usa; ou
+(b) compor com `@apply` das classes nativas (`@apply border ... has-[input:focus-visible]:outline-2 ...`),
+que registra o `@property` sozinho. Validar SEMPRE compilando com o build real do
+framework (aqui, `next build`/Turbopack — não uma CLI standalone do Tailwind, que pode ter
+o scanner de conteúdo não-funcional em ambiente sandboxed) usando só os arquivos de
+produção (mover `.test.ts(x)` para fora da árvore antes de compilar, restaurar depois) e
+conferir se o `@property` necessário aparece no CSS gerado — nunca inferir pela leitura do
+CSS-fonte do `@utility`.
+**Validade:** geral (qualquer `@utility` de Tailwind 4 escrito à mão neste frontend que
+referencie uma custom property `--tw-*`).
+**Estado:** ativa
+**Contadores:** confirmada 1 · contestada 0
