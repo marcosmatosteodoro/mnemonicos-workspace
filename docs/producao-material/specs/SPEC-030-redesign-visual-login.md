@@ -45,6 +45,8 @@ SPEC + verificação de tela (gate 9, `screen-verify`) no fecho do ciclo; dono: 
 Lead/QA/product-designer. O aceite estético das capturas (acima) tem dono próprio: o
 Diretor, exercido no merge.
 
+**Verificação (gate 9)**: 2026-09-29 — qa, roteiro fixado em TASK-031-004 (§"Roteiro do gate 9"), consolidado contra o DoD do PLAN-031 (SPEC-030 sem FEATs). 11 passos executados por execução real no navegador (branch `feat/producao-material-login-redesign`, HEAD `55dbf61`, frontend :3000 + backend :3333); 6 capturas (claro/escuro × 360/768/1280px) anexadas à Entrega. AC-030-012 (login real) parcial — ver report do QA.
+
 ## 2. Personas e jobs-to-be-done
 - **Colaborador interno** (papel EDITOR ou ADMIN) que acessa `/login` em qualquer
   dispositivo (desktop ou mobile) para retomar a sessão de trabalho na fábrica de produção

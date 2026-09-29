@@ -329,19 +329,26 @@ brief próprio (condição já registrada em A-030-003 da SPEC).
 
 ## 9. Definition of Done deste PLAN
 
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs
-- [ ] Todos os NFRs cobertos têm verificação
-- [ ] Decisões DEC refletidas no código
-- [ ] Aderência à ficha/perfil validada
-- [ ] Todos os ACs cobertos por teste (gate 1 dos quality gates)
-- [ ] Métrica da SPEC operacional (SPEC-030 §1.3, `Fonte de medição: instrumentação`): suíte
+- [x] Todos os FRs cobertos têm implementação satisfazendo os ACs
+- [x] Todos os NFRs cobertos têm verificação
+- [x] Decisões DEC refletidas no código
+- [x] Aderência à ficha/perfil validada
+- [x] Todos os ACs cobertos por teste (gate 1 dos quality gates)
+- [~] Métrica da SPEC operacional (SPEC-030 §1.3, `Fonte de medição: instrumentação`): suíte
       de teste automatizado cobrindo os ACs desta SPEC + verificação de tela real (gate 9,
       `screen-verify`) executadas e aprovadas — infraestrutura já existe, nenhum componente
-      novo necessário para instrumentar.
-- [ ] Processo (não-código, ato do Tech Lead na Entrega, sem COMP correspondente): anexar 6
+      novo necessário para instrumentar. **Parcial**: 10/11 passos do roteiro VERIFICADO por
+      navegador real; AC-030-012 (clique físico de login) ficou sem prova direta — sandbox
+      do subagent `qa` bloqueou digitação de credencial real (política de segurança, não
+      indisponibilidade do app). Evidência de rede equivalente obtida (POST real ao mesmo
+      endpoint que `LoginForm` chama, 200 + cookies `HttpOnly` + role correta, direto e via
+      proxy) + guard automatizado sem regressão. Ver `**Verificação (gate 9)**:` em
+      SPEC-030 §1.3 e o risco ativo correspondente no INDEX.
+- [x] Processo (não-código, ato do Tech Lead na Entrega, sem COMP correspondente): anexar 6
       capturas de `/login` (tema claro e escuro × 360px/768px/1280px) ao relatório de Entrega,
       para o aceite binário do Diretor sobre o "Juiz do outcome estético" (SPEC-030 §1.3) —
-      não bloqueia o ciclo, é exercido no merge.
+      não bloqueia o ciclo, é exercido no merge. 6 capturas salvas em
+      `thoughts/screen-verify/login-<claro|escuro>-<360|768|1280>.png`.
 
 ## 10. Não coberto por este PLAN
 

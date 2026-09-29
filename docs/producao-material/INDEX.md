@@ -4,9 +4,9 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-29 (PLAN-031 implementado — 6/6 TASKs Done, redesenho
-visual de `/login`, KAN-73; capacidade movida para Implementadas; demanda avulsa fora do
-épico MNEMORA STUDIO)
+**Última atualização**: 2026-09-29 (Gate 9 consolidado de PLAN-031 — 10/11 passos
+VERIFICADO, AC-030-012 PARCIAL por restrição de sandbox — não de código; pronto para
+Entrega)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -195,6 +195,8 @@ fechado._
 
 | ID | Risco | Mitigação | Origem |
 |----|-------|-----------|--------|
+| — | AC-030-012 (login real, clique físico) PARCIAL no gate 9 de PLAN-031 — sandbox do subagent `qa` bloqueou digitação de credencial real em UI (política de segurança, não indisponibilidade); evidência composta forte já obtida (POST real ao endpoint que `LoginForm` chama, direto e via proxy, 200 + cookies `HttpOnly` + role correta nos dois caminhos; guard `isSafeRelativePath`/`INTERNAL_HOME` coberto por teste automatizado sem regressão) | 1 clique real de login (com `next` e sem `next`) por alguém sem a mesma restrição de sandbox — Diretor ou sessão local, 2 min | SPEC-030 §1.3 (gate 9), PLAN-031 |
+| — | Ausência de regra CSS `:-webkit-autofill`/`:autofill` nos campos de `/login` (`login-form.tsx`/`password-field.tsx`/`globals.css`) — risco plausível para o autofill do navegador sobrescrever o estilo em pílula, não confirmado empiricamente (Chromium headless não expõe o password manager nativo) | Verificar com navegador real + credencial salva; se confirmado, adicionar regra de override usando os tokens `night-pill-*` | qa, gate 9 de PLAN-031 (achado fora de escopo) |
 | — | Verificação de tela pendente — HANDOFF-PLAN-013 (`docs/producao-material/handoffs/HANDOFF-PLAN-013.md`) — V1/V2 (instalação nativa, UI fora do alcance de Playwright headless) e V3/V4 (ciclo login/logout com SW ativo, bloqueado por `CORS_ORIGINS` de origem única do backend) | roteiro completo no handoff; exercitar em navegador real com backend aceitando a origem do frontend | HANDOFF-PLAN-013 |
 | ~~TRISK-021-001/002~~ | **RESOLVIDO 2026-09-08** — verificação manual pós-deploy executada em produção real (`https://mnemonicos-frontend.vercel.app`): login legítimo grava os 2 `Set-Cookie` distintos (`mnemo_access`/`mnemo_refresh`, `httpOnly`/`Secure`/`SameSite=Lax`) sob o domínio do frontend; sessão reconhecida (`GET /api/v1/auth/me` → 200, redirect para `/studio`); requisição forjada de outra origem contra `POST /api/v1/auth/login` recusada (403, `verifyOrigin` intacto através do rewrite). | — nenhuma | Tech Lead, verificação direta em produção (curl + Playwright) |
 | ~~TRISK-021-003~~ | **RESOLVIDO 2026-09-08** — Diretor confirmou `BACKEND_API_URL` configurada no painel Vercel do `mnemonicos-frontend` e redeploy feito. Causa raiz confirmada por evidência direta antes da correção: `X-Vercel-Error: DNS_HOSTNAME_RESOLVED_PRIVATE` no rewrite (fallback de dev local `http://localhost:3333` resolvendo para endereço de loopback, bloqueado pela proteção anti-SSRF da Vercel) — exatamente o modo de falha visível previsto na TASK. | — nenhuma | Diretor (config Vercel) + Tech Lead (diagnóstico e revalidação) |
@@ -313,6 +315,18 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-29: **Gate 9 consolidado de PLAN-031** (DoD, Etapa 4 do implement — SPEC-030
+  sem FEATs) — `qa` executou os 11 passos do roteiro fixado em TASK-031-004 via navegador
+  real (branch `feat/producao-material-login-redesign`, HEAD `55dbf61`). 10/11
+  VERIFICADO: card em duas metades sem vazamento de stacking context (TRISK-031-003
+  refutado empiricamente), sem rolagem horizontal em 360/768/1280px, `reduced-motion`
+  suprime toda animação, ordem de foco correta, ilustração degradando sem quebrar o
+  formulário, `forced-colors` funcional, aviso de sessão expirada visível em 360px.
+  AC-030-012 (clique real de login) PARCIAL — sandbox do subagent bloqueou digitação de
+  credencial real (política de segurança, não app indisponível); evidência de rede
+  equivalente obtida via `curl` real no endpoint que `LoginForm` chama (200 + cookies
+  `HttpOnly` + role correta, direto e via proxy). 6 capturas salvas para o aceite estético
+  do Diretor. Achado não-bloqueante: falta regra CSS de autofill nos campos.
 - 2026-09-29: **TASK-031-004 Done — PLAN-031 implementado (6/6 TASKs)** (Wave 4/4, final)
   — `page.tsx` monta `LoginNightBackdrop` + card em duas metades (`LoginIllustratedPanel`
   + `LoginForm`) por inteiro pela 1ª vez. Token `--color-night-panel-bg` definido; os 3
