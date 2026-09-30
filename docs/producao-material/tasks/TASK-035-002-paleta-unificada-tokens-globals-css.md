@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -131,17 +131,18 @@ COMP-035-005, §6 DEC-035-002/003/004).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T01:22:00-0300
+**Data conclusão**: 2026-09-30T02:09:23-0300
+**Commit SHA**: 53587b3
 **Jira**: KAN-160
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (44/44 no arquivo; 658/658 na suíte)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 1 — 1 retry, re-review do delta aprovado)
+- [x] ACs verificados (AC-034-012, AC-034-018)
+- [x] Segurança (gate 8): aprovado (wave 1) — security-engineer
+- [ ] Comportamento (gate 9): n/a — FEAT-034-002 ainda não completou (aguarda TASK-035-003/004)
+- [x] Design (gate 11): aprovado (wave 1) — product-designer, 1 retry (regressão real em technique-card.tsx corrigida)

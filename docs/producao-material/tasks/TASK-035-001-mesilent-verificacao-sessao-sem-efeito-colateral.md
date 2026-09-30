@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -82,17 +82,17 @@ nunca side-effect (DEC-035-005; memo — PLAN-035 §1 e §6/DEC-035-005).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T00:05:05-0300
+**Data conclusão**: 2026-09-30T01:19:41-0300
+**Commit SHA**: ca5d00d
 **Jira**: KAN-159
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (69/69)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 1)
+- [x] ACs verificados (AC-034-015)
+- [x] Segurança (gate 8): aprovado (wave 1) — security-engineer
+- [ ] Comportamento (gate 9): n/a — FEAT-034-001 ainda não completou (aguarda TASK-035-005)
