@@ -15,6 +15,14 @@ artefatos SDD ficam com a linha `Jira:` pendente até lá.
 
 ## Log de operações pendentes (mais recente no topo)
 
+- 2026-09-30 (Etapa 3, gancho `tasks`): **criar 5 sub-tarefas** (`10007`) sob KAN-178, uma por TASK, e gravar a key no campo `Jira:` da closure de cada uma:
+  - TASK-046-001 — Container de largura único (PageContainer) · wave 1
+  - TASK-046-002 — Logo do header por sessão · wave 1
+  - TASK-046-003 — Volta ao conteúdo na Tira · wave 1
+  - TASK-046-004 — Sidebar fixa com seção atual · wave 2
+  - TASK-046-005 — Menu recolhível abaixo de xl · wave 3
+  Estado inicial: `11` Tarefas pendentes. As transições de despacho (`21`) e de fecho (`41`) entram nesta lista conforme o implement andar.
+
 - 2026-09-30 17:45: corte do acesso ao Jira. Nenhuma operação pendente até aqui: o gancho
   `specify` rodou antes do corte, vinculou a SPEC-044 ao KAN-178 e não criou issue nem
   moveu status.

@@ -165,4 +165,6 @@ Reutilizada do `estimator` rodado nesta sessão (2026-09-30, antes da largada), 
 
 ## Cronologia
 - Etapa 1 (SPEC) concluída: 2026-09-30T17:43:22-0300 · correções: 1 · classes: termo-fr-fora-glossario(1) · spec-fr-palavras(4) · spec-glossario-nao-usado(4) · spec-nfr-sem-numero(2) · spec-ears-nao-casa(1) · spec-must-ratio(1) · spec-sem-should-may(1) · janelas: redação 1min/363l
-- Etapa 2 (PLAN) concluída: 2026-09-30T17:52:53-0300 · correções: 0 · classes: comp-muitos-frs(1) · 
+- Etapa 2 (PLAN) concluída: 2026-09-30T17:52:53-0300 · correções: 0 · classes: comp-muitos-frs(1)
+- Etapa 3 (TASKs) concluída: 2026-09-30T18:27:58-0300 · correções: 0 · classes: task-criterio-grep-nao-ancorado(5) · task-wave-overlap-arquivo(1) · task-overlap-fr(5) · janelas: redação 24min/561l
+- Etapa 3.5 (verificabilidade pré-código, qa + task-validator) concluída: 2026-09-30T18:27:58-0300 · correções: 1 · classes: contagem-estatica-divergente(5) · metrica-mede-elemento-errado(1) · prova-contraste-por-token-nao-por-par(1) · criterio-inexequivel-largura(1) · faceta-real-ausente(1) · titulo-nao-prova(1) · ramo-condicional-sem-fato(1) · licao-omitida-do-recorte(3) · plan-desatualizado(3)
