@@ -1769,7 +1769,7 @@ fechamento cruza o resultado contra o AST real (`ts.createSourceFile` + `node.bo
 **Validade:** geral (qualquer teste que prove estrutura de código por extração textual
 sem parser — grep/indexOf de código-fonte).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0 (reincidência 2026-09-30: PLAN-035 TASK-035-006 — extrator de corpo de `contents.map` por balanceamento de chaves sem controle positivo; trocado por prova comportamental com contador de acesso)
 
 ## [Performance] Teto de duração via `Promise.race`+`setTimeout` não corta trabalho CPU-bound síncrono — e teste que prova o teto com dublê `setTimeout` não falsifica nada
 

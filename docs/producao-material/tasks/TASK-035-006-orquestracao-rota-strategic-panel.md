@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -268,17 +268,17 @@ constante — sem esperar TASK de wiring posterior.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T05:31:31-0300
+**Data conclusão**: 2026-09-30T07:09:46-0300
+**Commit SHA**: 0e5e926 (impl) · f343e3a (retry gates 4/1/6) · 775172a (retry 2 gate 1) · de50bac (retry gate 10) · b769ffe (retry gate 1 prova comportamental)
 **Jira**: KAN-173
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer (wave 3 + delta do retry)
+- [x] Comportamento (gate 9): consolidado FEAT-034-001 (VERIFICADO pelo qa em 2026-09-30, linha na SPEC) + FEAT-034-002 — carregador: roteiro do gate 9 da TASK-035-008

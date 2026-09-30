@@ -20,7 +20,7 @@ depende só de TASK-035-002 [`isVersionAltered`]; TASK-035-005 depende só de TA
 
 ### Wave 3 (depende de TASK-035-004 E TASK-035-005 — `buildStrategicPanel` soma as 2 leituras
 em lote ao cálculo puro; a rota HTTP e a prova de custo constante só existem depois das duas)
-- [ ] TASK-035-006 ⏸ Todo
+- [x] TASK-035-006 ✅ Done
 
 ### Wave 4 (depende de TASK-035-006 — o formato de `StrategicPanelResponse` só está
 congelado depois da allowlist + prova HTTP da TASK-035-006, princípio 2)

@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-035/F10 — Wave 2 fechada: TASK-035-004/005 Done)
+**Última atualização**: 2026-09-30 (PLAN-035/F10 — Wave 3 fechada: TASK-035-006 Done; FEAT-034-001 completa e VERIFICADA)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -20,6 +20,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 - Painel estratégico e tempo por página (SPEC-034 → **PLAN-035**, F10 do épico MNEMORA STUDIO, 2026-09-30) — registro de páginas na Exportação (`PublicationEvent.pageCount`, migração aditiva autorizada em dev/teste) + Painel estratégico como página inicial da área interna (tempo por página/etapa, agregados com cobertura, conclusão por Módulo, correções após revisão por etapa, backlog ativos − concluídos). Jira: Épico KAN-165.
 
 ### Implementadas
+- Registro de páginas na Exportação (SPEC-034/FEAT-034-001, PLAN-035, ✅ 2026-09-30) — `PublicationEvent.pageCount` (migração aditiva `20260930062551_add_publication_event_page_count`, aplicada em dev/teste; produção pelo deploy), contagem fail-safe na composição (falha → `null`, Exportação segue), leitura no Painel pela 1ª Exportação Tira após o 1º fechamento de Versão. Gate 9 VERIFICADO (HTTP + banco reais).
 - Aprovação da Versão vigente com checklist de qualidade e segregação de funções (SPEC-032/FEAT-032-001, PLAN-033, ✅ 2026-09-29) — `POST /contents/:id/versions/:number/approve` (ADMIN, 2 confirmações, segregação de funções por 3 identidades produtoras, fonte normativa obrigatória, guarda de edição pós-fechamento ordenada por `sequence`, duplo travamento anti-corrida); leitura do estado de aprovação e de `validApprovalForExport` no histórico; painel na tela com cada linha do histórico mostrando a própria aprovação. Gate 9 VERIFICADO (tela real + integração). Resolve RISK-002-001/RISK-028-004. Pendências ao Diretor na Entrega: Tira no escopo do gate (E-1) e linha de validade para EDITOR (FR-032-007(b)).
 - Carimbo de Versão aprovada no PDF exportado (SPEC-032/FEAT-032-002, ✅ 2026-09-29) — a 1ª linha do cabeçalho de toda página troca "RASCUNHO" por "Conteúdo normativo e Tira mnemônica — Versão N aprovada" só quando a Versão vigente está aprovada e sem alteração posterior (conteúdo ou Tira); gate 9 VERIFICADO por execução real (6/6 ACs, pdftotext nas 2 Variantes).
 - Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, ✅ 2026-08-30) — módulo `users/` (criar/listar/desativar/resetar senha) + seed; gate 9 APROVADO. Montagem das rotas em `apiRoutes` fica com TASK-003-011 (Wave 6).
@@ -114,7 +115,7 @@ fechado._
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
 | PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 7/7 ✅ | Approved |
-| PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 5/8 🟡 | Approved |
+| PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 6/8 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -351,6 +352,8 @@ fechado._
 | RISK-034-006 | O Painel fornece o número, não o critério de escala; o limiar segue em PIL-001 | — | SPEC-034 §9 |
 
 ## Histórico recente
+
+- 2026-09-30 07:20: **Wave 3 de PLAN-035 fechada** — TASK-035-006 (`GET /strategic-panel`, EDITOR/ADMIN, allowlist por ramo, `contents[]` por Conteúdo, 7 statements fixos, agrupamento O(N+E)). Gates: code-reviewer reprovou (bloco por Conteúdo ausente — furo no plano; ramo medido sem prova; estado entre `it`), retry; 2ª reprovação no critério `res.json(payload)` → teto 4.88 resolvido pela escada com "aplicar e fechar"; extrator textual novo reprovado e trocado por prova comportamental; security-engineer APROVADO (wave + delta); performance-engineer reprovou O(N·E) e aprovou após `Map` — **NFR-034-002 medido: p95 176 ms em 200×50 (alvo 1.500), 572 ms em 1000×50, corpo 193 KiB**. FEAT-034-001 completa: gate 9 VERIFICADO pelo `qa` (linha na SPEC).
 
 - 2026-09-30 06:50: gate 10 da Wave 3 de PLAN-035 reprovou TASK-035-006 por agrupamento O(N·E) (`.filter` por Conteúdo): NFR-034-002 medido passa no volume de referência (p95 216 ms, 200×50, corpo 193 KiB) mas estoura a 5× (p95 1.611 ms); variante `Map` medida em 594 ms. Critério novo na TASK-035-006; DEC-035-018 ganha o teto medido no `Reabrir se` (~2.500 Conteúdos p/ o alvo, ~4.700 p/ corpo Vercel, RISK-025-007).
 

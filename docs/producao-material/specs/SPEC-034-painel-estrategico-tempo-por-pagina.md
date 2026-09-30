@@ -125,6 +125,7 @@ requisito só faz sentido para ele, está no slug ou na SPEC errada.
 
 ### FEAT-034-001: Registro de páginas na Exportação
 **Jira**: KAN-166
+**Verificação (gate 9)**: 2026-09-30 — VERIFICADO pelo `qa`: AC-034-001/002/003/019/022/024 provados via HTTP real + banco de DEV real (backend `b769ffe`, login EDITOR), 3 Conteúdos descartáveis criados e removidos pelas rotas; `pageCount` gravado = páginas do PDF baixado; referência = 1ª Exportação Tira após o fechamento (3 exportações, as 2 não-referência deliberadamente iguais); Resumo nunca substitui a Tira.
 
 > A Exportação de um Conteúdo (qualquer Variante) passa a registrar o número de páginas
 > do documento PDF emitido — dado que o Painel (FEAT-034-002) consome para calcular
