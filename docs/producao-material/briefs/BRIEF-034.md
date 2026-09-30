@@ -91,3 +91,4 @@ seed para gerar eventos históricos.
 ## Cronologia
 - largada: 2026-09-30T01:35:37-0300
 - specify: 2026-09-30T02:19:38-0300 · correções: 1 · classes: spec-ears-nao-casa(1) · spec-porte-epico(1, WARNING aceito) · spec-tecnologia-julgamento(1, identificadores de código) · mérito: product-analyst REVISAR_ANTES_DE_APROVAR (13 riscos) · po APROVAR (R0–R13, 0 escalações) · pacote do po aplicado pelo scribe em modo reescrita (v0.1→v0.2) · janelas: redação 8min/495l
+- plan: 2026-09-30T02:37:25-0300 · correções: 1 · classes: fr-sem-comp(5, campo Realiza multilinha) · comp-realiza-fora-cobertura(33, bullets de FRs cobertos multilinha) · plan-reabrir-nunca-sem-motivo(2) · cobertura 34/34 FRs + 4/4 NFRs, gap 0 · 4 WARNING plan-dec-alternativa-unica aceitos · 
