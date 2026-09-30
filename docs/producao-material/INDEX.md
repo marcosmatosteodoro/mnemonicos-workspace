@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-29 (SPEC-034 criada e Approved — KAN-77, botão único de sessão + tema dark/light unificado no header; próximo: `/keelson:plan`. PLAN-033/F9 — Wave 4 fechada: TASK-033-006 Done; próximo: Wave 5, painel de aprovação)
+**Última atualização**: 2026-09-29 (PLAN-035 criado e Approved, cobre 100% de SPEC-034 — KAN-77, botão único de sessão + tema dark/light unificado no header; próximo: `/keelson:tasks`. PLAN-033/F9 — Wave 4 fechada: TASK-033-006 Done; próximo: Wave 5, painel de aprovação)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -17,6 +17,13 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ## Capacidades
 
 ### Em desenvolvimento
+- Controle único de sessão (Entrar/Sair/neutro) e alternador de tema claro/escuro no header
+  do app, presentes em toda rota (pública e interna, inclusive produção), consolidando o
+  logout hoje próprio da área interna num único ponto de acionamento; paleta unificada
+  roxo/rosa/mauve herdada de `/login` (SPEC-030) estendida ao app inteiro, com o mesmo piso
+  de contraste AA e sem a ilustração decorativa; persistência de tema por
+  dispositivo/navegador, independente de conta (SPEC-034/**PLAN-035**, Jira Story KAN-77,
+  BRIEF-034, 0/? TASKs — aguarda `/keelson:tasks`).
 - Aprovação da Versão vigente com checklist de qualidade e segregação de funções (SPEC-032/FEAT-032-001, PLAN-033, 🟡 — backend (aprovação + leitura do estado de aprovação) entregue e aprovado nas Waves 2-3, mutation na Wave 4; falta o painel na tela, Wave 5). Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica (SPEC-032/**PLAN-033**, F9 do épico MNEMORA STUDIO, 🟡 6/7 TASKs Done). Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate.
 
 ### Implementadas
@@ -64,12 +71,6 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   novo fundo em tela cheia. PO: ACEITA_COM_RESSALVAS (5 ressalvas — ver Entrega).
 
 ### Especificadas, ainda não planejadas
-- Controle único de sessão (Entrar/Sair/neutro) e alternador de tema claro/escuro no header
-  do app, presentes em toda rota (pública e interna, inclusive produção), consolidando o
-  logout hoje próprio da área interna num único ponto de acionamento; paleta unificada
-  roxo/rosa/mauve herdada de `/login` (SPEC-030) estendida ao app inteiro, com o mesmo piso
-  de contraste AA e sem a ilustração decorativa; persistência de tema por
-  dispositivo/navegador, independente de conta (SPEC-034, Jira Story KAN-77, BRIEF-034).
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
 
@@ -119,6 +120,7 @@ fechado._
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
 | PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 6/7 🟡 | Approved |
+| PLAN-035 | SPEC-034 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 0/? ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -345,9 +347,24 @@ fechado._
 | RISK-034-002 | Paleta noturna só tem contraste AA medido para os papéis de UI de `/login` (fundo, pílula, botão, texto) — estendê-la ao app pode expor papéis novos (erro/sucesso/link/foco/hover) sem token equivalente já validado | Mapeamento e prova de contraste dos papéis novos ficam com o PLAN; NFR-034-005 exige distinguibilidade mínima | SPEC-034 §9 |
 | RISK-034-003 | O mecanismo de detecção de sessão do controle de autenticação precisa conviver com `baseQueryWithReauth` (`mnemonicos-frontend/src/store/api.ts`) sem disparar sua rota de expulsão (`resetApiState`+redirect `/login?sessao=expirada`) para visitante anônimo em rota pública | FR-034-015 trava o requisito observável; mecanismo exato de adaptação é decisão técnica do PLAN | SPEC-034 §9 |
 | — | PO (aprovação de SPEC-034) ESCALOU, degrau 2, default aplicado: confirmar a remoção do botão "Sair" próprio da área interna (`InternalShell`/`LogoutControl`) em favor do controle único do header (FR-034-014) — pergunta vai em lote na Entrega desta demanda | Default seguido: remoção mantida (FR-034-014/AC-034-014 já na SPEC Approved) | po, aprovação de SPEC-034 |
+| TRISK-035-004 | `data-theme` setado pelo script de bootstrap (fora do React) pode divergir do estado interno de `ThemeToggle` se o componente assumir um tema default fixo no 1º render em vez de ler o atributo já aplicado no `<html>`/a escolha salva — risco de hidratação ou de o alternador "nascer" com rótulo/estado errado | `ThemeToggle` deve ler `document.documentElement.dataset.theme`, nunca assumir default hardcoded — item de verificação da TASK/gate 1 | PLAN-035 §8 |
 
 ## Histórico recente
 
+- 2026-09-29 23:20: **PLAN-035 criado via `/keelson:auto` (cobre 100% de SPEC-034) e
+  promovido a Approved.** 100% frontend, sem tocar backend. 6 DECs novas (todas
+  reversíveis): script de bootstrap de tema sem dependência nova (`data-theme` +
+  localStorage); CSS em 3 camadas (`:root` claro / `@media prefers-color-scheme:
+  dark):not([data-theme=light])` / `:root[data-theme=dark]`); mapeamento de
+  `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna (mantendo
+  `--text-strong`/`--text-muted`/`--danger`/`--link` como estão, já provados ou
+  deliberadamente não remapeados); extensão de `night-palette-tokens.ts`; endpoint
+  `meSilent` (`queryFn` contornando `baseQueryWithReauth`) para checar sessão sem efeito
+  colateral em rota pública; consolidação do logout em `AuthControl` (remove
+  `LogoutControl` de `internal-shell.tsx`). 7 COMPs, 4 TRISKs (3 herdados dos RISK-034-00X
+  da SPEC, 1 novo — TRISK-035-004, hidratação do tema). `artifact-lint`/`graph.sh`: 0
+  ERROR (2 achados mecânicos corrigidos — enum `Irreversível: nao`, `**Realiza**` quebrado
+  em 2 linhas invisível ao parser).
 - 2026-09-29 22:59: **SPEC-034 criada via `/keelson:auto` (KAN-77, BRIEF-034) e promovida a
   Approved.** Botão único de sessão (Entrar/Sair/neutro) + alternador de tema claro/escuro no
   header, em toda rota inclusive produção, consolidando o logout hoje próprio da área

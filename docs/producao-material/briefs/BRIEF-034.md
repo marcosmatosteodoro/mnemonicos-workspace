@@ -9,6 +9,7 @@
 
 ## Cronologia
 - Etapa 1 (SPEC) concluída: 2026-09-29T22:59:36-0300 — correções: 1, janelas: redação 1min/327l
+- Etapa 2 (PLAN) concluída: 2026-09-29T23:21:17-0300 — correções: 1 (2 achados mecânicos do plan-validator corrigidos inline pelo Tech Lead, sem re-despacho ao scribe)
 
 ## Pedido como dito
 "/keelson:auto KAN-77 — Botão Entrar/Sair + troca de tema dark/light usando a paleta do login (mnemonicos-frontend)
