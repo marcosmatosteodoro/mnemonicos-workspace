@@ -863,6 +863,12 @@ desenhado (itens acima) é a resposta certa; falta só aplicá-lo no plugin. Ref
 `mensagem_mantenedor`: 2ª ocorrência conhecida do mesmo bug, custando falso-positivo em massa
 (38 achados espúrios) num ciclo inteiro.
 
+**Atualização 2026-09-30 (3ª ocorrência, KAN-185/PLAN-031, rota emenda)**: `**Realiza**:` de COMP
+com o FR-030-017 na 2ª linha -> `fr-sem-comp` falso (ERROR no fecho da emenda), corrigido inline
+juntando numa linha. Grep no plugin 0.192.0 (`graph.sh` l.295-296): ainda `fieldrest(line)` direto,
+sem `flushrealiza` — proposta não aplicada, reincidencia mantida em 1 (4.444). Mitigação local
+imediata até o mantenedor aplicar: o pacote ao scribe manda `**Realiza**:` em linha única.
+
 ## LRN-039: "Cobertura parcial" de `commands/tasks.md` (Etapa 3, l.192) nomeia a partição
 "(parte — X)" por FACETA/GATE, mas não por ELEMENTO IRMÃO — FR repartido entre TASKs por
 elemento pode deixar uma célula sub-exigência×elemento sem TASK responsável, sem que nada
@@ -1402,6 +1408,21 @@ patch: acrescentar no fecho da rota emenda: AC sobre FR coberta por PLAN ativo a
 reincidencia: 0 (Grep `ac-sem-task` no plugin 0.192.0: só em tasks.md l.236, não em auto.md)
 estado: ativa
 
+**Atualização 2026-09-30 (KAN-185, emenda 1b, SPEC-030 v0.3 -> TASK-031-008)**: a mesma lacuna
+(rota emenda sem forma de TASK de registro) custou mais 2 achados do `graph.sh --check`, ambos no
+fecho da emenda. (a) Pacote do Tech Lead pediu `**Pertence a**: PLAN-031` citando BRIEF-043 sem dizer
+"só em prosa"; o scribe gravou também `**Brief**:` -> ERROR `task-ancora-dupla` + `ref-quebrada` +
+`pertence-vs-arquivo`. (b) A emenda criou FR-030-017 que o PLAN-031 não cobria -> `realiza-fora-cobertura`;
+o pacote seguinte acrescentou cobertura+COMP, mas o `**Realiza**:` multilinha caiu na armadilha de
+LRN-038 -> `fr-sem-comp` falso, corrigido inline. Autoria: pacote do orquestrador ambíguo + scribe
+obedeceu literal. Grep no plugin 0.192.0 (`auto.md` l.33): nenhuma menção a "TASK de registro",
+`Pertence a`/`Brief` exclusivos nem a FR novo exigir cobertura no PLAN — proposta segue não aplicada
+(4.444), não reincide como proposta. **Proposta reformulada (mesma linha, mesmo dono)** — ver
+mensagem_mantenedor entregue: a frase do fecho da rota emenda passa a cobrir os 3 achados
+(`ac-sem-task`/`realiza-fora-cobertura`; `**Pertence a**` nunca com `**Brief**`; FR novo entra no
+PLAN no mesmo pacote, `**Realiza**` em linha única). Os 3 achados já são pegos mecanicamente pelo
+`graph.sh --check` (o gate funcionou; o custo foi o retrabalho).
+
 ## LRN-057: `index-contract.md` não nomeia convenção de brief para demanda que só emenda SPEC
 data: 2026-09-30
 gatilho: correcao_humana
@@ -1450,4 +1471,14 @@ causa_raiz: instrucao_ausente — o parágrafo "verificação executável" cobre
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, parágrafo "verificação executável" (Etapa 3, l.193 e vizinhas)
 patch: frase: N de testes em critério vem de execução (`--listTests`/reporter), nunca de Grep de `it(`/`test(`; scribe não roda — a main session mede e entrega o N no briefing. Saldo +2 linhas (tasks.md: 283 linhas)
 reincidencia: 0 (família de LRN-041, causa distinta)
+estado: ativa
+
+## LRN-062: `agents/scribe.md` (sem shell) não diz o que fazer com valor que só comando produz — deixou `HH:MM` literal no INDEX
+data: 2026-09-30
+gatilho: correcao_humana
+origem: KAN-185 (emenda 1b, slug producao-material) — o pacote do Tech Lead pediu ao scribe "rodar `date`" para a linha do `## Histórico recente`; sem shell, o scribe gravou `HH:MM` literal e não devolveu `duvidas`; o Tech Lead substituiu. Autoria: orquestrador (pediu comando a agent sem shell) + scribe (placeholder em vez de `duvidas`)
+causa_raiz: instrucao_ausente — `scribe.md` l.61 diz "não roda scripts" e l.31 manda exigência dependente de ferramenta voltar em `duvidas`, mas só para pacote de correção e "rode o grafo"; nada cobre valor medido (hora, contagem, N de testes) na redação/INDEX. Mesma família de LRN-061 (N de testes), dono distinto e mais geral: o corolário do "sem shell"
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `agents/scribe.md` l.61
+patch: frase no corolário do sem-shell: valor que só comando produz chega medido no pacote; ausente -> `duvidas`, nunca placeholder literal. Saldo +0 linha (mesma linha; scribe.md: 61 linhas)
+reincidencia: 0 (Grep `HH:MM`/`medido` em scribe.md 0.192.0: ausente; LRN-061 é causa em outro artefato)
 estado: ativa
