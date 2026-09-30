@@ -40,6 +40,10 @@ do dispositivo a partir da escolha (FR-034-011; memo — PLAN-035 §3 COMP-035-0
   `document.documentElement.dataset.theme = <novo tema>`; notifica os subscribers do
   próprio módulo (para o próprio componente re-renderizar no mesmo tick — sem esperar
   evento externo).
+- A escrita em `localStorage` no clique é envolvida em `try/catch` — se lançar (mesmas
+  causas acima: modo privado, `SecurityError`, bloqueio de storage), o `dataset.theme`/
+  estado em memória do componente ainda muda (a troca visual funciona nesta sessão), só a
+  PERSISTÊNCIA entre reloads é que fica comprometida; sem propagar erro ao usuário.
 - `aria-label` reflete a AÇÃO disponível no estado atual (NFR-034-001) — ex. tema claro
   ativo → `"Mudar para tema escuro"`; tema escuro ativo → `"Mudar para tema claro"`.
 
@@ -72,6 +76,11 @@ do dispositivo a partir da escolha (FR-034-011; memo — PLAN-035 §3 COMP-035-0
       FR-034-008, em conjunto com o CSS de TASK-035-002) — contrato do próprio item, sem AC
       próprio isolado (a aplicação visual final depende do CSS; este critério prova só a
       leitura do componente). Mesmo arquivo, `matchMedia` mockado com `matches: false`.
+- [ ] `localStorage.setItem` lançando ao clicar → o clique NÃO lança exceção não capturada e
+      `document.documentElement.dataset.theme` ainda muda (troca visual funciona mesmo sem
+      conseguir persistir) — mesmo arquivo, mock de `localStorage.setItem` lançando.
+      Mutante: propagar a exceção sem capturar faz o teste (que espera o clique completar
+      sem throw) reprovar.
 - [ ] Sem warnings/lints novos sobre todos os arquivos do diff.
 
 ## Riscos específicos
@@ -96,7 +105,7 @@ do dispositivo a partir da escolha (FR-034-011; memo — PLAN-035 §3 COMP-035-0
 **Data início**:
 **Data conclusão**:
 **Commit SHA**:
-**Jira**:
+**Jira**: KAN-162
 
 **Quality gates**:
 - [ ] Implementação completa

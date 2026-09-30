@@ -31,7 +31,10 @@ fecha essa janela antes da hidratação (DEC-035-001; memo — PLAN-035 §1, §6
   `localStorage[THEME_STORAGE_KEY]` (constante de `night-palette-tokens.ts`, TASK-035-002);
   se presente e for `'light'` ou `'dark'` (`ThemeName`), aplica
   `document.documentElement.dataset.theme = <valor>` de imediato; se ausente (ou valor
-  inesperado), não seta o atributo — o CSS de `prefers-color-scheme` decide sozinho.
+  inesperado), não seta o atributo — o CSS de `prefers-color-scheme` decide sozinho. Toda
+  leitura de `localStorage` é envolvida em `try/catch` — qualquer exceção (modo privado,
+  `SecurityError`, bloqueio de storage) é tratada exatamente como "ausente" (não seta
+  `dataset.theme`, sem propagar erro, sem quebrar o restante do `<head>`).
 - Wiring em `mnemonicos-frontend/src/app/layout.tsx`: `<script
   dangerouslySetInnerHTML={{ __html: getThemeBootstrapScript() }} />` como primeiro filho de
   um `<head>` explícito, antes do `<body>` (`layout.tsx:31-44`; `RootLayout` continua Server
@@ -87,6 +90,10 @@ fecha essa janela antes da hidratação (DEC-035-001; memo — PLAN-035 §1, §6
       })` procurando um elemento `type === 'script'` com
       `props.dangerouslySetInnerHTML.__html === getThemeBootstrapScript()`. Mutante: remover
       o `<script>` do `<head>` (ou alterar seu conteúdo) reprova.
+- [ ] `localStorage.getItem` lançando (mock que lança `SecurityError`) → script não propaga
+      exceção, `dataset.theme` permanece não setado — mesmo arquivo de teste, caso com o
+      mock de `localStorage` lançando no `getItem`. Mutante: remover o `try/catch` faz o
+      teste estourar a exceção não capturada.
 - [ ] Sem warnings/lints novos sobre todos os arquivos do diff.
 
 ## Roteiro do gate 9 (fixado ANTES do código)
@@ -119,7 +126,7 @@ fim.
 **Data início**:
 **Data conclusão**:
 **Commit SHA**:
-**Jira**:
+**Jira**: KAN-161
 
 **Quality gates**:
 - [ ] Implementação completa

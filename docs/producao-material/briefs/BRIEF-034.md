@@ -11,6 +11,7 @@
 - Etapa 1 (SPEC) concluída: 2026-09-29T22:59:36-0300 — correções: 1, janelas: redação 1min/327l
 - Etapa 2 (PLAN) concluída: 2026-09-29T23:21:17-0300 — correções: 1 (2 achados mecânicos do plan-validator corrigidos inline pelo Tech Lead, sem re-despacho ao scribe)
 - Etapa 3 (TASKs) concluída: 2026-09-29T23:54:26-0300 — correções: 1 (3 achados mecânicos do task-validator corrigidos inline pelo Tech Lead: campo Realiza(FRs) com NFR misturado, shorthand de AC invisível ao parser, gap de teste de wiring em layout.tsx)
+- Etapa 3.5 (verificabilidade pré-código, qa) concluída: 2026-09-30T00:02:16-0300 — correções: 1 (4 achados reais do qa: AC-034-017 2ª cláusula sem exercício, NFR-034-005/AC-034-018 não-falseável, robustez de localStorage sem especificação, pré-condição implícita no roteiro do gate 9)
 
 ## Pedido como dito
 "/keelson:auto KAN-77 — Botão Entrar/Sair + troca de tema dark/light usando a paleta do login (mnemonicos-frontend)

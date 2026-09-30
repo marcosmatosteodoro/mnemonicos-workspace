@@ -129,7 +129,7 @@ um clique sem sessão (DEC-035-006; memo — PLAN-035 §3 COMP-035-001/006, §6 
 **Data início**:
 **Data conclusão**:
 **Commit SHA**:
-**Jira**:
+**Jira**: KAN-163
 
 **Quality gates**:
 - [ ] Implementação completa

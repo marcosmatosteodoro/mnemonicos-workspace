@@ -82,27 +82,37 @@ não deve vazar para outra verificação).
 2. (AC-034-005, AC-034-007) Ainda em `/` (realm `app`, sem sessão) → confirmar "Entrar" e o
    alternador de tema visíveis no header.
 3. (AC-034-001, AC-034-003) Clicar "Entrar" → navega para `/login`.
-4. (AC-034-002, AC-034-004, AC-034-014) Logar com a credencial do realm `editor`, navegar para uma rota
+4. (AC-034-002, AC-034-004, AC-034-014, AC-034-017 — parte, 2ª cláusula, verificada em
+   conjunto com o passo 5 abaixo) Logar com a credencial do realm `editor`, navegar para uma rota
    interna (ex. `(interno)/content`) → confirmar "Sair" único visível no header (sem
    duplicata do antigo botão da área interna), clicar → os 3 estados observados (em
    andamento/sucesso/falha simulada via rede lenta, se aplicável — falha real exigiria
    derrubar o backend, fora do escopo deste roteiro; registrar como observação se não
    exercitável), volta a `/login` no sucesso.
-5. (AC-034-017) Antes de logar (ainda em `/`), escolher tema escuro pelo alternador; logar
-   (passo 4); confirmar que o tema continua escuro na área interna após o login.
-6. (AC-034-010, AC-034-011, AC-034-012) Alternar tema numa rota pública e numa rota interna; recarregar a
-   página em cada uma; confirmar persistência e a paleta roxo/rosa/mauve (TASK-035-002)
-   aplicada nos dois temas, sem a ilustração decorativa de `/login` (comparar com `/login`
-   só para confirmar a AUSÊNCIA da ilustração fora dela).
+5. (AC-034-017 — 1ª e 2ª cláusulas) Antes de logar (ainda em `/`, com o SO emulando claro ou
+   sem preferência, para garantir que a escolha manual é o que está prevalecendo, não
+   coincidência de sinais), escolher tema escuro pelo alternador; logar (passo 4); confirmar
+   que o tema continua escuro na área interna após o login; em seguida, com a mesma sessão
+   ainda ativa, clicar em 'Sair' (repetindo a ação do passo 4) e confirmar que o tema
+   continua escuro na página pública para a qual o logout redireciona — fecha a 2ª cláusula
+   de AC-034-017 (sobrevive ao logout, não só ao login).
+6. (AC-034-010, AC-034-011, AC-034-012) Com o SO/navegador emulando um esquema de cores
+   OPOSTO ao tema que será escolhido manualmente neste passo (não dependa do estado
+   remanescente do passo 1) — alternar tema numa rota pública e numa rota interna;
+   recarregar a página em cada uma; confirmar persistência e a paleta roxo/rosa/mauve
+   (TASK-035-002) aplicada nos dois temas, sem a ilustração decorativa de `/login` (comparar
+   com `/login` só para confirmar a AUSÊNCIA da ilustração fora dela).
 7. (AC-034-019) Redimensionar a janela para 360px de largura com os controles presentes
    (incluindo `ApiStatus`, se em ambiente de dev) → confirmar ausência de rolagem
    horizontal.
 8. (AC-034-013, AC-034-018) Inspecionar os rótulos acessíveis dos 2 controles nos 2 temas (leitor
    de acessibilidade ou painel de acessibilidade do DevTools); confirmar que uma mensagem
    de erro e um link, quando visíveis lado a lado com o acento roxo/rosa da paleta,
-   permanecem distinguíveis entre si — se a inspeção encontrar problema, registrar como
-   achado do gate 11 (design), não falha desta TASK per se (NFR-034-005 é MUST, mas a
-   medição fina de contraste é do gate 11).
+   permanecem distinguíveis entre si — a fração NUMÉRICA de NFR-034-005 (contraste
+   `--link`/`--danger` vs `--surface`) já foi provada em gate 1 por TASK-035-002; este passo
+   cobre só a fração qualitativa (distinguibilidade visual do acento decorativo, sem piso
+   numérico na SPEC); se a inspeção encontrar problema aqui, registrar como achado do gate
+   11 (design).
 
 ## Riscos específicos
 
@@ -118,7 +128,7 @@ não deve vazar para outra verificação).
 **Data início**:
 **Data conclusão**:
 **Commit SHA**:
-**Jira**:
+**Jira**: KAN-164
 
 **Quality gates**:
 - [ ] Implementação completa

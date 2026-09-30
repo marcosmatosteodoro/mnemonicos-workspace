@@ -65,8 +65,11 @@ COMP-035-005, §6 DEC-035-002/003/004).
 
 ### Não inclui
 - Script de bootstrap (TASK-035-003); `ThemeToggle` (TASK-035-004).
-- Medição de `--link`/`--danger` contra o novo `--surface` (RISK-034-002/TRISK-035-002) —
-  fica para gate 11/TASK futura, não é AC desta SPEC.
+- Medição de `--link`/`--danger`/acento da paleta como *distinguibilidade decorativa* entre
+  si (sem piso numérico declarado na SPEC) — fica para o gate 9/11, é a parte qualitativa de
+  NFR-034-005/AC-034-018. O contraste AA NUMÉRICO de `--link`/`--danger` contra o novo
+  `--surface` (NFR-034-003, que já se aplica a qualquer texto, incluindo esses dois) ENTRA
+  nesta TASK (ver Critérios de pronto).
 - Qualquer alteração de VALOR de `--text-strong`/`--text-muted`/`--danger`/`--link`
   (DEC-035-003).
 
@@ -103,12 +106,24 @@ COMP-035-005, §6 DEC-035-002/003/004).
       cobertura, `commands/tasks.md` Etapa 3): mesmo arquivo de teste, caso que importa os
       dois símbolos e afirma `typeof THEME_STORAGE_KEY === 'string' && THEME_STORAGE_KEY.length
       > 0`.
+- [ ] `--link` e `--danger` (valores atuais, intocados por DEC-035-003) mantêm ≥4,5:1 contra
+      o novo `--surface` (`--color-night-panel-bg`) nos dois temas — cobre a fração numérica
+      de AC-034-018/NFR-034-005 que NFR-034-003 já exige para qualquer texto. Verificação
+      executável: mesmo arquivo `globals-theme-contrast.test.ts`, 2 novos pares (`--link` vs
+      `--surface`, `--danger` vs `--surface`) no mesmo `describe.each` dos demais. Fixe o
+      valor esperado calculando com a mesma fórmula de `theme-css-parser.ts:97-153` contra os
+      hex REAIS de `--color-brand-400`/`--color-brand-600`/`--color-red-400`/
+      `--color-red-700` (já declarados em `globals.css`) vs `--color-night-panel-bg` nos dois
+      temas, ANTES de escrever o teste — se algum par não fechar 4,5:1, registre como achado
+      real (não invente o número, meça e relate ao Tech Lead antes de prosseguir).
 - [ ] Sem warnings/lints novos sobre todos os arquivos do diff.
 
 ## Riscos específicos
 
-- TRISK-035-002 (contraste de `--link`/`--danger` contra o novo `--surface`) permanece não
-  medido nesta TASK, por decisão explícita de DEC-035-003 — não é AC desta SPEC.
+- TRISK-035-002 (contraste de `--link`/`--danger` contra o novo `--surface`): a fração
+  NUMÉRICA (NFR-034-003) passa a ser medida nesta TASK (ver Critérios de pronto); a fração
+  qualitativa de distinguibilidade do acento (NFR-034-005) permanece para o gate 9/11, por
+  decisão explícita de DEC-035-003.
 
 ---
 
@@ -119,7 +134,7 @@ COMP-035-005, §6 DEC-035-002/003/004).
 **Data início**:
 **Data conclusão**:
 **Commit SHA**:
-**Jira**:
+**Jira**: KAN-160
 
 **Quality gates**:
 - [ ] Implementação completa

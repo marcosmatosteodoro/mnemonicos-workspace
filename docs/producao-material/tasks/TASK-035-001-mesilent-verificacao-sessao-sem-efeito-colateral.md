@@ -85,7 +85,7 @@ nunca side-effect (DEC-035-005; memo — PLAN-035 §1 e §6/DEC-035-005).
 **Data início**:
 **Data conclusão**:
 **Commit SHA**:
-**Jira**:
+**Jira**: KAN-159
 
 **Quality gates**:
 - [ ] Implementação completa
