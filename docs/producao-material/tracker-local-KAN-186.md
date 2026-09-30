@@ -1,14 +1,14 @@
 # Tracker local — KAN-186 (BRIEF-045 avulso · logout "Saindo" com spinner)
 
-**PENDENTE DE RECONCILIAÇÃO.** O Diretor retirou o acesso ao Jira em 2026-09-30 17:43 e pediu
-as atualizações locais, para passar ao Jira depois. Desde então nenhuma chamada ao conector foi
-feita.
+**RECONCILIADO em 2026-09-30 19:35** (o Diretor devolveu o acesso ao Jira e avisou o merge do PR #25).
+O KAN-186 está em `41` Concluído (status `10007`), medido no retorno da transição. Este arquivo fica
+como registro histórico do período sem conector.
 
 ## Estado conhecido do card
 
 | Key | Tipo | Pai | Último estado MEDIDO | Quando / como |
 |---|---|---|---|---|
-| **KAN-186** | Tarefa (`10008`) | nenhum (sem épico) | `21` Em andamento (status `10005`) | 2026-09-30 17:28, retorno de `transitionJiraIssue` |
+| **KAN-186** | História (`10009`), criado como Tarefa (`10008`) e com o tipo trocado fora do conector durante o período sem acesso | nenhum (sem épico) | `41` Concluído (status `10007`) | 2026-09-30 19:35, retorno de `transitionJiraIssue` (antes: `21` medido por `getJiraIssue` na reconciliação) |
 
 O card foi criado nesta demanda (17:27), com o link `Relates` para o KAN-185. É o único card do
 BRIEF-045: não há subtask.
@@ -42,6 +42,7 @@ BRIEF-045: não há subtask.
 
 ## Log (mais recente no topo)
 
+- 2026-09-30 19:35: **Reconciliado.** O PR #25 foi mergeado pelo Diretor (merge `8633200`, 2026-09-30T22:34:45Z). A medição inicial deu `21` Em andamento, sem `parent` nem subtasks. Comentário `10260` (fim de dev, PR #25 mergeado e gates). Transição `41` direta, porque o `31` foi pulado: a conexão caiu antes do finish-dev e o merge já tinha sido avisado. O retorno confirmou `Concluído` e mostrou o tipo agora como História (`10009`). Não há épico a consultar.
 - 2026-09-30 17:43: acesso ao Jira retirado pelo Diretor. Ficaram pendentes o `finish-dev`
   (KAN-186 → `31`) e o comentário de branch/PR #25.
 - 2026-09-30 17:28: KAN-186 `11` → `21` Em andamento (medido no retorno do conector).

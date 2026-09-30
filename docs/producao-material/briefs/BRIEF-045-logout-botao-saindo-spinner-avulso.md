@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso (decisão 4.86)
-**Status**: Aceito (ACEITA, 2026-09-30; PR #25 aberto, aguardando revisão e merge do Diretor)
+**Status**: Concluído (PR #25 mergeado pelo Diretor, `8633200`, 2026-09-30)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T17:27:52-0300
 **Origem**: Diretor, em sessão ("Crie outro jira e implemente, deve ser feito o mesmo para sair"), logo após o merge do KAN-185
@@ -75,8 +75,6 @@ nenhuma — o brief é a unidade de execução (um executor, um diff no mnemonic
 **ACEITA** (2026-09-30), sem ressalvas que conflitem com o brief. P-045-001..005 foram entregues, com evidência por teste e pelos gates 9 e 11 em app real. Limite da prova: o logout real contra o backend não foi exercido (`auth/me` e logout interceptados). O brief exige `handleLogout` intacto, e o código confirma que ele não mudou.
 
 ## Pendências do Diretor
-- Revisar e mergear o PR #25 (`feat/producao-material-logout-botao-saindo`, `0edec2a`).
-- Jira sem acesso: a fila para reconciliar está em `docs/producao-material/tracker-local-KAN-186.md` (finish-dev → `31` e comentário do PR).
 - Sugestões fora de escopo, para card futuro se quiser: "Entrar" sem `min-w` (larguras diferentes entre páginas); foco cai no `body` ao desabilitar (já acontecia antes, vale também para o login); duplo clique síncrono antes do re-render (já acontecia antes, revogação idempotente).
 
 ## Cronologia
