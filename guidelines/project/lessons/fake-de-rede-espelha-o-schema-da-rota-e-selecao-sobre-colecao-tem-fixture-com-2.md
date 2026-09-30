@@ -2,7 +2,7 @@
 area: Testes
 estado: ativa
 validade: indeterminada
-confirmada: 0
+confirmada: 1
 contestada: 0
 paths:
   - mnemonicos-frontend/src/components/**/*.test.tsx
@@ -21,3 +21,10 @@ eixos não se distinguem.
 **Solução:** o fake de endpoint num teste de componente devolve 422 quando o corpo viola o
 schema Zod real da rota. Um predicado de seleção sobre coleção (`at(-1)`, `find`, "vigente")
 ganha ao menos 1 fixture com 2 ou mais itens, em que o alvo difere do 1º elemento.
+
+**Reincidência (retry R-1 da Entrega da F9, 2026-09-29):** a linha de validade saiu de um bloco
+que lia `currentVersion` (restrição estrutural) para dentro do `versions.map`, filtrada por
+`version.id === currentVersion?.id`. Nenhum teste montava uma Versão NÃO vigente aprovada, e o
+mutante que troca o filtro por `true` sobreviveu. Todo refactor que troca "renderizar a partir do
+sujeito" por "renderizar por item com filtro" ganha 1 caso com ≥2 itens, em que o não-alvo satisfaz
+as outras condições do ramo, com contagem exata ou ausência.

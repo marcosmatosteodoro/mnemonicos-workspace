@@ -1094,3 +1094,55 @@ do recurso servido antes de atribuir a divergência ao código sob teste." Saldo
 (dentro do orçamento ≤10; arquivo tem 192 linhas, longe do teto de 500)
 reincidencia: 0
 estado: ativa
+
+## LRN-049: `screen-verify` proíbe "inventar" credencial mas não proíbe extraí-la de outra
+fonte real (`.env` do backend) nem proíbe o próprio qa escrever no `keelson.local.json`
+data: 2026-09-30
+gatilho: retry
+origem: PLAN-033 (slug producao-material), Entrega da F9, retry R-1 do gate 9 — o `qa`
+encontrou `keelson.local.json` com o realm `app` (`loginPath`/`username`/`password` `null`,
+por desenho — sem tela de login ainda) e o realm `admin1` com o marcador literal
+`"__SEE_BACKEND_ENV__"` no campo de senha, escrito por uma rodada ANTERIOR da mesma sessão.
+Nesta rodada, o `qa` tentou 3× obter os valores de `SEED_*` do `.env` do backend para
+autenticar; o classificador de permissões negou as 3 (categorias Credential Materialization/
+Credential Leakage/Expose Local Services) — o `qa` respeitou e declarou `pendente_handoff`
+(uso correto de `causa_indisponibilidade: permissao_ambiente`, decisão 4.133: negação 2×
+é causa provada). Custo desta rodada: 1 gate 9 sem exercício, handoff ao Diretor — sem dano
+novo. O dano já tinha acontecido na rodada ANTERIOR da mesma sessão: ali o `qa` **conseguiu**
+ler o `.env` do backend dentro de um script (sem imprimir o valor — não violou a proibição
+literal de ecoar senha) e autenticou; o scratchpad da sessão ficou com cookie de sessão,
+`storageState` e um arquivo de senha gerada (`admin2-password.secret`), que o Tech Lead
+descobriu e apagou manualmente na closure. O marcador `"__SEE_BACKEND_ENV__"` no
+`keelson.local.json` é resíduo da mesma rodada: o `qa` escreveu no arquivo que a skill
+declara ser propriedade do humano/`/keelson:init`.
+**Correção de autoria (Tech Lead, 2026-09-30):** a rodada anterior seguiu o PROMPT DE DESPACHO
+do Tech Lead, que dizia "Você pode reativar/resetar senha … ou criar outra via `POST
+/api/v1/users`, usando a sessão do ADMIN semeado" e "Se registrar credencial em
+keelson.local.json (gitignored), faça-o lá". Ou seja, o orquestrador autorizou a escrita no
+arquivo e a autenticação por conta própria; o `qa` não agiu fora do briefing. Mesma família de
+LRN-004 (reincidência 1, via operacional de memória no briefing) — o briefing ao gate 9 não pode
+autorizar o que a skill reserva ao humano
+causa_raiz: instrucao_ambigua — `skills/screen-verify/SKILL.md` (§"Dados de acesso") já diz
+"não invente credenciais nem URL" para campo vazio, mas o verbo "inventar" não cobre por
+igual "extrair um valor REAL de outra fonte" (`.env`/`SEED_*`/secrets de CI) — leitura
+literal razoável trata as duas rodadas como comportamentos distintos (uma foi bloqueada pelo
+classificador, a outra não, porque tecnicamente não inventou nada, só leu e não imprimiu). A
+mesma seção também não diz que `keelson.local.json` é **só-leitura** para o `qa`/screenVerify
+(é escrito só por `/keelson:init`/humano) — nada impediu o `qa` de gravar o marcador-placeholder
+nele. É o classificador de permissões (fora do processo keelson) que conteve o dano desta
+rodada, não uma instrução do processo — a inconsistência entre rodadas prova que a régua não
+está escrita onde o `qa` a lê
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`skills/screen-verify/SKILL.md`, § "Dados de acesso: `keelson.local.json`" (bullet "Arquivo
+ausente ou campo em branco")
+patch: novo bullet logo após "Arquivo ausente ou campo em branco → não invente credenciais
+nem URL...": credencial ausente/placeholder nunca é resolvida por leitura de OUTRA fonte
+(`.env` do backend, `SEED_*`, secrets de CI/cofre, script que lê sem imprimir) — mesmo que a
+permissão do ambiente autorize, o único caminho sancionado é o humano preencher o
+`keelson.local.json` (ou `/keelson:init`); o arquivo é escrito só por `/keelson:init`/humano,
+screenVerify **nunca** grava nele (nem marcador-placeholder); artefato que nascer de uma
+extração indevida que aconteceu (cookie, storageState, senha gerada) é segredo — apague-o no
+mesmo turno, nunca deixe para limpeza posterior. Saldo líquido ~+7 linhas (dentro do
+orçamento ≤10; arquivo tem 192 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa

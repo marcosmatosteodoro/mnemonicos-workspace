@@ -208,6 +208,9 @@ fechado._
 
 | ID | Risco | Mitigação | Origem |
 |----|-------|-----------|--------|
+| — | Verificação de tela pendente — HANDOFF-PLAN-033 (`docs/producao-material/handoffs/HANDOFF-PLAN-033.md`) — V1–V3: leitura "Válida para a próxima exportação" para EDITOR e ADMIN após o R-1 da aceitação (FR-032-007(b)); `qa` sem credencial utilizável (realms `app`/`admin1` do `keelson.local.json` com placeholder) — comportamento coberto por teste de componente com mutante; 2 rodadas anteriores de browser real verificadas | Diretor preenche os 2 realms e exercita V1–V3 (≈5 min) ou roda `/keelson:verify-handoff` | HANDOFF-PLAN-033 |
+| RISK-032-006 | `saveRuleBreakdown` não registra a identidade de quem salva a Quebra da regra: com 2+ contas, quem montou a estrutura pedagógica pode aprovar a própria checagem pedagógica — fora das 3 identidades produtoras de FR-032-004 (lacuna de SPEC) | Q1 ao Diretor na Entrega. Default: brief avulso logo após o merge, obrigatório antes de um 2º ADMIN real operar; exposição nula com 1 ADMIN | PO, aceitação da F9 |
+| TRISK-033-004 | Sinal de alteração da Tira compara `occurredAt` do último evento `TIRA_MNEMONICA` com `closedAt` (relógio de aplicação × relógio do banco), a mesma classe que a Emenda 2 da DEC-033-006 trocou por `sequence` para `CONTEUDO_BRUTO`; sem prova de interleaving. Sustenta a métrica-guarda (b) da SPEC-032 §1.3 | Risco prático baixo (exige skew maior que o intervalo fechamento→edição); próxima mudança em `resolveAlterationSignal` traz a comparação por `sequence` + teste de interleaving | code-reviewer (convergência de fecho) e PO |
 | — | Verificação de tela pendente — HANDOFF-PLAN-031 (`docs/producao-material/handoffs/HANDOFF-PLAN-031.md`) — V1 (AC-030-012, login real por clique físico com e sem `next`): sandbox do subagent `qa` bloqueou digitação de credencial real em UI (causa `permissao_ambiente`, não indisponibilidade); evidência composta forte já obtida (POST real ao endpoint que `LoginForm` chama, direto e via proxy, 200 + cookies `HttpOnly` + role correta nos dois caminhos; guard `isSafeRelativePath`/`INTERNAL_HOME` coberto por teste automatizado sem regressão) | roteiro completo no handoff; 1 clique real de login (com `next` e sem `next`) por alguém sem a mesma restrição de sandbox — Diretor ou sessão local, 2 min | HANDOFF-PLAN-031 |
 | — | Borda de 1px do `SiteHeader` cruza a ilustração da lua em `/login` (achado do `product-designer`, verificado por captura real + medição de luminância) — comportamento pré-existente de TODAS as rotas (não é regressão nem parte deste diff), só fica mais visível sobre a ilustração noturna | Nenhuma — registrado a critério do Diretor, se quiser tratar em outra rodada | product-designer, convergência de fecho de PLAN-031 |
 | — | Ausência de regra CSS `:-webkit-autofill`/`:autofill` nos campos de `/login` (`login-form.tsx`/`password-field.tsx`/`globals.css`) — risco plausível para o autofill do navegador sobrescrever o estilo em pílula, não confirmado empiricamente (Chromium headless não expõe o password manager nativo) | Verificar com navegador real + credencial salva; se confirmado, adicionar regra de override usando os tokens `night-pill-*` | qa, gate 9 de PLAN-031 (achado fora de escopo) |
@@ -332,6 +335,15 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-30 00:20: **Entrega da F9 — convergência de fecho e aceitação do PO.** Convergência
+  (code-reviewer): merge APROVADO, 1 gap parcial FR-032-007(b); o PO aceitou com ressalvas e pediu
+  a mesma correção (R-1). Retry R-1 (frontend `3043b46`): a leitura "Válida para a próxima
+  exportação" sai do bloco de ação ADMIN e passa a aparecer na linha da Versão vigente para
+  qualquer papel; `caf6ea6` troca a copy do "não" por uma frase neutra (a do ADMIN mandava um
+  passo que a segregação recusa) e prova o filtro da Versão vigente. Backend `c76dbc1`: só
+  comentário no schema. Gate 9 do R-1 `pendente_handoff` (credencial com placeholder no
+  `keelson.local.json`) → HANDOFF-PLAN-033. Riscos novos: RISK-032-006 (Q1) e TRISK-033-004.
+  Frontend 656/656. Os dois repos contêm `origin/main`, sem conflito.
 - 2026-09-29 23:35: **Wave 5 de PLAN-033 fechada — TASK-033-007 Done; PLAN-033 7/7; FEAT-032-001
   VERIFICADA.** Painel de aprovação em `content-version-history.tsx`. Antes do retry, merge de
   `origin/main` no frontend (`e4c8461`, sem conflito). Retry 1 fechou B1-B3 (prova: ordem das

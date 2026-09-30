@@ -252,7 +252,7 @@ para este roteiro num ambiente compartilhado, desativá-lo via `POST
 
 **Data início**: 2026-09-29T21:58:00-0300 (despacho)
 **Data conclusão**: 2026-09-29T23:30:00-0300
-**Commit SHA**: frontend a4e828f (+ e68553d — retry 1 dos gates 1/7/11; 43d49dc — retry do achado novo B4; merge de origin/main e4c8461 antes do retry)
+**Commit SHA**: frontend a4e828f (+ e68553d — retry 1 dos gates 1/7/11; 43d49dc — retry do achado novo B4; merge de origin/main e4c8461 antes do retry; Entrega: 3043b46 — R-1 da aceitação do PO, validade visível a qualquer papel; caf6ea6 — copy neutra do "não" e prova do filtro da Versão vigente)
 **Jira**: KAN-158
 
 **Quality gates**:
@@ -263,4 +263,4 @@ para este roteiro num ambiente compartilhado, desativá-lo via `POST
 - [x] Code review aprovado (wave 5: retry 1 fechou B1-B3; B4 — achado novo nascido no retry — com retry próprio, decisão do Tech Lead de não escalar; gate 11 aprovado após retry: A1-A4) — code-reviewer, product-designer
 - [x] ACs verificados
 - [x] Segurança (gate 8): aprovado (wave 5, 0 vulnerabilidade; delta do retry n/a — só endurece o bloqueio de UX) — security-engineer · Performance (gate 10): aprovado 2× (a4e828f e delta com a invalidação nova em `updateRawContent`) — performance-engineer
-- [x] Comportamento (gate 9): verificado (qa, execução real com browser em a4e828f e no delta e68553d) — carregador do gate 9 consolidado de FEAT-032-001
+- [x] Comportamento (gate 9): verificado (qa, execução real com browser em a4e828f e no delta e68553d) — carregador do gate 9 consolidado de FEAT-032-001; delta do R-1 da Entrega (3043b46/caf6ea6): pendente_handoff — HANDOFF-PLAN-033 (credencial com placeholder)
