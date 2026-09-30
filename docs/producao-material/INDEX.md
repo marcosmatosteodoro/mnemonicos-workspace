@@ -90,6 +90,10 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   de fecho (revisão da branch inteira, fora do escopo de qualquer wave/TASK isolada)
   achou e fechou 1 gap real: contraste do header/footer herdado do root layout contra o
   novo fundo em tela cheia. PO: ACEITA_COM_RESSALVAS (5 ressalvas — ver Entrega).
+  **Emenda v0.2 (2026-09-30, BRIEF-039/KAN-177, TASK-031-007):** a moldura já não é preservada
+  em `/login`. O cabeçalho saiu no BRIEF-032 e o rodapé saiu agora, pela lista única
+  `CHROME_HIDDEN_ROUTES` (`app-chrome-gate.tsx`). O cartão ganhou o link "Voltar para o início"
+  → `/`, fora do `<form>` e sublinhado em repouso (FR-030-015/016, AC-030-015).
 
 ### Especificadas, ainda não planejadas
 - Sessão reconhecida abre a área logada (SPEC-040, BRIEF-040, Jira KAN-180 — modo link) — quem tem sessão reconhecida (aceita agora ou renovável sem nova senha) e papel EDITOR/ADMIN abre a página inicial e chega direto à página inicial da área interna, sem ver a Home pública; anônimo, falha da conferência, papel sem acesso, navegador sem script ou estouro do teto de 3 s ficam na Home pública, sem ir ao login e sem aviso; ida tardia à área interna quando a conferência conclui depois do teto. Login, logout e guarda das rotas internas inalterados.
@@ -120,7 +124,7 @@ fechado._
 | SPEC-024 | Pipeline de publicação — PDF (rascunho) | Approved | 2026-09-14 |
 | SPEC-026 | Contrastes, pegadinhas, flashcards e protocolos impressos | Approved | 2026-09-16 |
 | SPEC-028 | Versionamento editorial e fechamento legislativo | Approved | 2026-09-26 |
-| SPEC-030 | Redesenho visual da tela de login | Approved | 2026-09-28 |
+| SPEC-030 | Redesenho visual da tela de login (v0.2: emenda BRIEF-039/KAN-177, `/login` sem moldura + link de volta ao início) | Approved | 2026-09-30 |
 | SPEC-032 | Controle de qualidade e gate de versão aprovada | Approved | 2026-09-27 |
 | SPEC-034 | Painel estratégico e tempo por página | Approved | 2026-09-30 |
 | SPEC-036 | Botão de sessão e tema dark/light no header do app (renumerada de SPEC-034 por colisão de ID entre sessões paralelas) | Done | 2026-09-29 |
@@ -142,7 +146,7 @@ fechado._
 | PLAN-025 | SPEC-024 | 17/17 FRs + 4/4 NFRs (módulo `publication` — motor `pdf-lib`, 2 Variantes tira/resumo, supressão de evento de abertura na auto-geração de Tira, teto de duração interno, evento `PUBLICACAO_PDF` + tabela `publication_events`; FR-024-017 emendada na Entrega — recusa de Tira com 0 Quadros) | 14/14 🟢 | Approved — **mergeado em `main`** (PR #7 backend `5d6b4df`/PR #13 frontend `b54b6ef`, 2026-09-15) |
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
-| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
+| PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento; emenda v0.2: TASK-031-007 realiza FR-030-013 reescrito + FR-030-015/016 novos, fora do "FRs cobertos" do PLAN v0.1) | 7/7 ✅ | Approved |
 | PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 7/7 ✅ | Approved |
 | PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 8/8 ✅ | Done — **mergeado em `main`** (PR #11 backend, PR #19 frontend, 2026-09-30) |
 | PLAN-036 | SPEC-036 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 6/6 ✅ | Done — **mergeado em `main`** (PR #18, `e254bd1`, 2026-09-30) |
@@ -409,6 +413,20 @@ fechado._
 > (KAN-77) foi renumerado para `SPEC-036`/`PLAN-036`/`TASK-036-00X`/`BRIEF-036` na
 > reconciliação do pull — nenhum dos dois lados foi descartado.
 
+- 2026-09-30 13:44: **Emenda v0.2 da SPEC-030 entregue (BRIEF-039/KAN-177, rota emenda do `/keelson:auto`).**
+  - **Emenda:** o PO APROVOU a emenda sem escalação. A promessa de "cabeçalho e rodapé em `/login`" vinha de uma resolução do PO no BRIEF-030. Ela revoga a decisão do BRIEF-032 de manter o rodapé.
+  - **SPEC-030 v0.1 → v0.2:** FR-030-013 reescrito; FR-030-015/016 e AC-030-015 novos; AC-030-001/005/011 ajustados; gate 9 datado de novo.
+  - **Implementação:** inline, registrada como TASK-031-007 (Done) para fechar o `ac-sem-task`. Commit `f35c4f3` no frontend, branch `feat/producao-material-login-sem-rodape-voltar`.
+  - **Gates:**
+    - 1–7: REPROVADO por prova (inventário do cartão, Enter, espião cego) → retry → APROVADO.
+    - 8: APROVADO.
+    - 9: VERIFICADO com login real.
+    - 10: n/a.
+    - 11: REPROVADO (link sem sublinhado em repouso) → retry → APROVADO.
+  - **Aceitação do PO:** ACEITA_COM_RESSALVAS; as 3 ressalvas foram fechadas nos artefatos.
+  - **Lições:** 3 lições novas (link discreto, inventário que sobe de contêiner, espião de `useRouter`), `next-16.md` §7 atualizado e 3 propostas ao plugin (LRN-056..058).
+  - **Pendência do Diretor:** destino do scrim do `LoginNightBackdrop`, agora que nenhum texto senta sobre ele em `/login`.
+  - **Jira:** acesso retirado temporariamente pelo Diretor. KAN-177 medido em `21`; o `finish-dev` (→ `31`) e o comentário de branch/PR ficam para a reconexão.
 - 2026-09-30 13:44: **SPEC-040 criada e Approved** via `/keelson:auto --from=KAN-180` (BRIEF-040, Jira KAN-180 em modo link). 16 FRs, 6 NFRs, 24 ACs, sem FEATs. spec-validator 0 ERROR (1 auto-fix). product-analyst REVISAR_ANTES_DE_APROVAR (11 riscos) → po APROVAR com 14 resoluções: termo "Sessão reconhecida" (sem emenda à SPEC-036), emenda do glossário "Home pública" (SPEC-019), teto de 3 s + ida tardia, conferência atual a cada abertura e nunca por pré-carregamento, página pública sem script, ACs de execução real nomeados. Jira: acesso retirado temporariamente pelo Diretor; sync pendente de reconciliação.
 - 2026-09-30 13:20: /keelson:triage (re-triagem, `--from=KAN-180`) confirmou a classificação de 12:52 para "usuário com sessão que entra na aplicação vai direto à área logada" como **categoria 1**. A demanda muda a promessa de guarda de rota da SPEC-002 (DEC-003-011 / COMP-003-022, `proxy.ts:97` só cobre rotas internas) e exige DECs, então não cabe como emenda 1b: presença × validade do cookie (`proxy.ts:68` só confere se existe), `/login` com sessão, papel `STUDENT`, e o destino `/` da 404 (SPEC-019). Duas coisas mudaram desde as 12:52. (a) O KAN-176 foi mergeado (`b729a76`) e hoje quem tem sessão e abre `/` fica sem link para `/studio`. (b) O KAN-178 foi triado com a DEC "destino do logo × KAN-180", e o redirecionamento de `/` resolveria o logo sem mudar o link (`site-header.tsx:13`). Recomendação: rodar o KAN-180 antes do KAN-178. Ação: `/keelson:auto --from=KAN-180` (SPEC em modo `link`, sem card novo), aguardando confirmação do Diretor.
 - 2026-09-30 13:10: **PR #20 mergeado pelo Diretor** (`mnemonicos-frontend`, merge `b729a76`), BRIEF-038 → Concluído. KAN-176 → Concluído (41) no Jira. Ele não tem épico-pai, então não há filhos a consultar. Até o KAN-180 entrar, quem tem sessão e cai em `/` fica sem link para `/studio`.

@@ -669,10 +669,13 @@ HTTP (MSW) e exercitar a store real, em vez de mockar o hook gerado — mockar
 envolva com `<Provider store={makeStore()}>` num helper (`renderWithProviders`), **uma store
 nova por teste**. O que **não** mockar: o componente sob teste, o reducer, o Immer, o `Intl`.
 
-**Componente servidor `async` não renderiza em jsdom.** A cobertura de um Server Component
-se faz (a) extraindo a lógica para função pura testável e (b) pelo gate `screenVerify`
-(README) / E2E. Se a versão atual da Testing Library já renderiza RSC de forma suportada,
-isso precisa ser confirmado antes de virar padrão da casa. ⚠️ não confirmado
+**Componente servidor `async`: renderize o JSX resolvido, não o componente.** `render(<Page />)`
+de um Server Component `async` não funciona em jsdom. A casa resolve a promessa primeiro:
+`render(await LoginPage({ searchParams: Promise.resolve({}) }))`, como fazem
+`src/app/login/page.test.tsx` e `src/app/login/page-back-link.test.tsx` (confirmado em
+2026-09-30, BRIEF-039). Isso cobre páginas cuja árvore só tem filhos síncronos ou client.
+Filho `async` aninhado, `cookies()`/`headers()` e streaming continuam fora do alcance e vão
+para (a) função pura testável ou (b) o gate `screenVerify` (README) / E2E.
 
 **Oráculo tem de poder falhar (Art. 1):** teste que continua verde com o corpo do componente
 trocado por `return null` não é teste. Ao escrever, quebre o código de propósito e confirme o

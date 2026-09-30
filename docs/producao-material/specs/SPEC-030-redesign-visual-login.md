@@ -2,11 +2,12 @@
 
 **Slug**: producao-material
 **Status**: Approved
-**Versão**: 0.1
+**Versão**: 0.2
 **Autor**: scribe
-**Data**: 2026-09-28
+**Data**: 2026-09-30
 **Jira Story**: KAN-73
 **Brief**: BRIEF-030
+**Emenda v0.2**: BRIEF-039 (Jira KAN-177) — `/login` sem cabeçalho nem rodapé do app e com link discreto "Voltar para o início"
 
 ## 1. Contexto e objetivo
 
@@ -45,7 +46,7 @@ SPEC + verificação de tela (gate 9, `screen-verify`) no fecho do ciclo; dono: 
 Lead/QA/product-designer. O aceite estético das capturas (acima) tem dono próprio: o
 Diretor, exercido no merge.
 
-**Verificação (gate 9)**: 2026-09-29 — qa, roteiro fixado em TASK-031-004 (§"Roteiro do gate 9"), consolidado contra o DoD do PLAN-031 (SPEC-030 sem FEATs). 11 passos executados por execução real no navegador (branch `feat/producao-material-login-redesign`, HEAD `55dbf61`, frontend :3000 + backend :3333); 6 capturas (claro/escuro × 360/768/1280px) anexadas à Entrega. AC-030-012 (login real) parcial — ver report do QA.
+**Verificação (gate 9)**: 2026-09-30 (v0.2, BRIEF-039) — qa, roteiro fixado em TASK-031-007, execução real no navegador (worktree `wt-login-voltar`, branch `feat/producao-material-login-sem-rodape-voltar`, frontend :3000 + backend :3333, login real de ADMIN): AC-030-001 (`/login`, `?next=/studio`, `?sessao=expirada` sem cabeçalho e rodapé, claro/escuro × 360/768/1280), AC-030-006 (`/` e `/studio` com cabeçalho e rodapé), AC-030-015 (link sublinhado, Tab botão → link com foco visível, Enter envia, clique durante "Entrando…" vai a `/` e o sucesso leva a `/studio`, sem pageerror) VERIFICADOS; AC-030-005 por teste (inventário fechado do cartão). Capturas em `thoughts/screen-verify/gate9-login-voltar-r2/` (360/1280 da versão final; 768px na rodada 1, `gate9-login-voltar/`, antes do sublinhado em repouso). Registro anterior (v0.1): 2026-09-29 — qa, roteiro fixado em TASK-031-004 (§"Roteiro do gate 9"), consolidado contra o DoD do PLAN-031 (SPEC-030 sem FEATs). 11 passos executados por execução real no navegador (branch `feat/producao-material-login-redesign`, HEAD `55dbf61`, frontend :3000 + backend :3333); 6 capturas (claro/escuro × 360/768/1280px) anexadas à Entrega. AC-030-012 (login real) parcial — ver report do QA.
 
 ## 2. Personas e jobs-to-be-done
 - **Colaborador interno** (papel EDITOR ou ADMIN) que acessa `/login` em qualquer
@@ -70,6 +71,7 @@ do PDF.
 | Painel ilustrado | Metade superior do card, com ilustração autoral decorativa (motivo noturno: montanhas/dunas em camadas, lua cheia, estrelas, estrelas cadentes, céu em degradê), sem função interativa nem conteúdo lido por tecnologia assistiva | BRIEF-030 |
 | Fundo em tela cheia (do login) | Camada de fundo da página `/login`, atrás do card, que estende a mesma atmosfera visual do painel ilustrado em escala maior e com profundidade/desfoque | BRIEF-030 |
 | Campo em pílula | Estilo visual de campo de formulário com bordas totalmente arredondadas e um indicador visual (ícone) à esquerda do valor digitado | BRIEF-030 |
+| Link de volta ao início | Link discreto "Voltar para o início" que leva a `/`, posicionado no cartão de `/login` fora do `<form>`, após o botão de envio; não é controle do formulário | BRIEF-039 |
 
 ## 4. Escopo
 
@@ -83,8 +85,10 @@ do PDF.
 - Estilo de campo em pílula com ícone indicador à esquerda, nos campos de e-mail e senha.
 - Botão de envio de largura total/larga.
 - Rótulo "E-mail" (não "Username"); texto de interface em pt-BR (já vigente).
-- Ausência de qualquer controle sem função real no backend atual (lembrar-me, esqueci a
-  senha, criar conta).
+- Ausência de qualquer controle sem função real (no backend ou de navegação) — lembrar-me,
+  esqueci a senha, criar conta.
+- `/login` sem cabeçalho e sem rodapé do aplicativo, com link discreto "Voltar para o
+  início" (→ `/`) fora do `<form>`, abaixo do botão de envio (emenda v0.2, BRIEF-039).
 - Paleta nova (tons da referência) com contraste AA (4,5:1 texto; 3:1 borda/ícone) nos
   temas claro e escuro, incluindo placeholder/rótulo sobre o fundo preenchido da pílula.
 - Responsividade sem rolagem horizontal em 360px, 768px e 1280px; no menor breakpoint, o
@@ -136,8 +140,8 @@ do PDF.
   "Username" ou outro termo em inglês.
 - **FR-030-007** [MUST] O sistema deve exibir, em `/login`, somente controles com função
   real já implementada no backend (campo de e-mail, campo de senha com alternância de
-  visibilidade, submissão) — nenhum controle de "lembrar-me", "esqueci a senha" ou "criar
-  conta" aparece.
+  visibilidade, submissão) e o link de volta ao início (FR-030-015, navegação, fora do
+  formulário) — nenhum controle de "lembrar-me", "esqueci a senha" ou "criar conta" aparece.
 - **FR-030-008** [MUST] Se o redesenho de `/login` for aplicado, então as demais rotas do
   aplicativo devem manter cabeçalho, rodapé e contêiner sem nenhuma mudança visual
   observável em relação ao estado anterior.
@@ -151,10 +155,16 @@ do PDF.
   puramente visual/decorativo, sem efeito funcional sobre o formulário.
 - **FR-030-012** [MUST] Enquanto o usuário tiver a preferência `prefers-reduced-motion:
   reduce` ativa, o sistema deve suprimir toda animação decorativa da tela de login.
-- **FR-030-013** [MUST] O sistema deve manter, em `/login`, o cabeçalho e o rodapé do
-  aplicativo presentes e funcionais (navegação preservada).
+- **FR-030-013** [MUST] O sistema deve apresentar `/login`, com qualquer query string
+  (ex.: `?next=…`, `?sessao=expirada`), sem o cabeçalho e sem o rodapé do aplicativo.
 - **FR-030-014** [MUST] O painel de formulário deve abrir com um título curto e de
   destaque, alinhado à esquerda.
+- **FR-030-015** [MUST] O sistema deve apresentar, em `/login`, um link "Voltar para o
+  início" que leva a `/`, com texto pequeno em cor secundária, sem fundo nem borda de
+  botão, posicionado após o botão de envio (fora do formulário) e depois dele na ordem de
+  foco, sem interferir no envio do formulário.
+- **FR-030-016** [MUST] Enquanto o login estiver em andamento, o link de volta ao início
+  deve permanecer acionável.
 
 ## 6. Requisitos não-funcionais
 - **NFR-030-001** [MUST] O sistema deve manter, nos temas claro e escuro, contraste mínimo
@@ -191,8 +201,8 @@ do PDF.
   Dado um visitante acessando `/login`, quando a página carrega, então ele observa um card
   central dividido em duas metades (painel ilustrado no topo, painel de formulário na
   base) sobre um fundo de página em tela cheia que estende a mesma atmosfera visual, com o
-  card percebido flutuando (sombra), nos temas claro e escuro, com o cabeçalho e o rodapé
-  do aplicativo presentes e navegáveis.
+  card percebido flutuando (sombra), nos temas claro e escuro, sem cabeçalho e sem rodapé
+  do aplicativo — inclusive em `/login?next=…` e `/login?sessao=expirada`.
 - **AC-030-002** (cobre FR-030-003)
   Dado o painel ilustrado carregado, quando a página é percorrida por tecnologia
   assistiva, então nenhum elemento do painel ilustrado ou do fundo em tela cheia é
@@ -208,7 +218,9 @@ do PDF.
 - **AC-030-005** (cobre FR-030-007)
   Dado o card redesenhado, quando ele é inspecionado por completo, então não há nenhum
   controle de "lembrar-me", "esqueci a senha", "criar conta" ou qualquer outro controle
-  sem função real correspondente no backend.
+  sem função real (no backend ou de navegação). Inventário: o `<form>` contém exatamente 4
+  controles (e-mail, senha, toggle de visibilidade, botão de envio) e o cartão contém
+  esses 4 mais o link de volta ao início, fora do `<form>`.
 - **AC-030-006** (cobre FR-030-008)
   Dado o redesenho de `/login` aplicado, quando outra rota do aplicativo é acessada (ex.:
   home pública ou uma tela da área interna), então cabeçalho, rodapé e contêiner
@@ -235,7 +247,11 @@ do PDF.
   `mnemonicos-frontend/src/components/login-form.test.tsx` e
   `mnemonicos-frontend/src/components/password-field.test.tsx` são executados, então todos
   passam sem alteração de asserção, incluindo `aria-busy` durante o envio e a ausência de
-  `aria-invalid` nos campos em erro.
+  `aria-invalid` nos campos em erro. Na emenda v0.2, `layout.test.tsx`,
+  `app-chrome-gate.test.tsx` e o arquivo novo `login/page-back-link.test.tsx` (com o form real,
+  que `page.test.tsx` mocka) ganham asserções (ausência de cabeçalho/rodapé em `/login`,
+  presença nas demais rotas, link e seu destino) e nenhuma asserção existente é
+  afrouxada; a prova do link é do AC-030-015.
 - **AC-030-012** (cobre NFR-030-002)
   Dado um colaborador interno com credencial válida na tela de login redesenhada, quando
   ele submete e-mail e senha corretos (com `next` seguro presente, e também sem `next`),
@@ -247,6 +263,17 @@ do PDF.
 - **AC-030-014** (cobre NFR-030-006)
   Dado o código de `/login` (componentes e estilos), quando inspecionado, então nenhuma
   cor literal (hex/rgb/hsl) aparece fora dos tokens `@theme`.
+- **AC-030-015** (cobre FR-030-013, FR-030-015, FR-030-016, NFR-030-001, NFR-030-006)
+  Dado `/login` (com e sem query string, ex.: `?next=…`), quando a página carrega, então
+  não há cabeçalho nem rodapé do aplicativo, e abaixo do botão "Entrar" há um link com o
+  texto "Voltar para o início" cujo destino é `/`; o link é discreto (texto pequeno, cor
+  secundária, sem fundo nem borda de botão), tem contraste AA nos temas claro e escuro e
+  foco de teclado visível, vem depois do botão na ordem de tabulação, e Enter nos campos
+  continua enviando o formulário. Quando o login está em andamento ("Entrando…") e o
+  usuário clica no link, então o navegador vai para `/` sem erro e sem travar (não se
+  afirma que permanece em `/` após a resposta: no sucesso, o `LoginForm` leva à área
+  interna — P-039-004). O cartão não desalinha em 360px, 768px e 1280px, e a cor do link
+  vem de token do `@theme`.
 
 ## 8. Premissas e decisões prévias
 - **A-030-001** [assumido] [evidência: crença] A ilustração do painel ilustrado e do
@@ -304,7 +331,7 @@ do PDF.
   condição já prevista em A-030-002.
 - **RISK-030-003** Cobertura por roteiro de verificação (gates 9/11), não por AC: trânsito
   guard → `/login?next=` → login → `next`; foco de teclado visível (ordem e-mail → senha →
-  toggle → botão, indicador ≥3:1, nenhum elemento decorativo focável); robustez da
+  toggle → botão → link "Voltar para o início", indicador ≥3:1, nenhum elemento decorativo focável); robustez da
   ilustração (SVG ausente/degradado não quebra o formulário); autofill do navegador sobre
   o campo em pílula; `forced-colors`; aviso de sessão expirada visível acima da dobra em
   360px. Decisão do PO: cobertos pelo roteiro de implementação, não por AC formal nesta

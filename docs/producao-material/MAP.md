@@ -36,6 +36,14 @@
   rotas soltas de `src/app/` para um grupo irmão). Paleta noturna nova em 15+ tokens
   `--color-night-*` aditivos no `@theme`. Comportamento de `LoginForm`/`page.tsx`/
   `PasswordField` (SPEC-002/SPEC-016) 100% preservado — mnemonicos-frontend/src/app/login/page.tsx:1-90
+- [2026-09-30 · BRIEF-039] **Corrige entrada acima (moldura)**: `/login` não renderiza
+  cabeçalho nem rodapé. A fonte única de "rotas sem moldura do app" é `CHROME_HIDDEN_ROUTES`,
+  lida por `SiteHeaderGate` e `SiteFooterGate` (clients, `usePathname`). O `<footer>` saiu
+  do `RootLayout`, que continua Server Component. Substitui `site-header-gate.tsx` (BRIEF-032) —
+  mnemonicos-frontend/src/components/app-chrome-gate.tsx:1-42
+- [2026-09-30 · BRIEF-039] Link "Voltar para o início" → `/` no cartão de `/login`, fora do
+  `<form>` (o inventário do form segue em 4 controles; o do cartão tem 5). Sublinhado em
+  repouso, `text-muted`, e nunca é desabilitado durante "Entrando…" — mnemonicos-frontend/src/app/login/page.tsx:73-83
 
 ## Revisão espaçada (dormente por A-005)
 

@@ -229,6 +229,11 @@ componente extra); nenhuma outra rota é tocada (FR-030-008); nenhum import de t
 caminho. Em contrapartida, a implementação precisa confirmar visualmente (gate 9/11) que
 nenhum ancestral do backdrop introduz um novo contexto de empilhamento que quebraria o
 `position: fixed` relativo ao viewport (TRISK-031-003).
+**Emenda (2026-09-30)**: por BRIEF-032 (KAN-73) e BRIEF-039 (KAN-177, SPEC-030 v0.2), cabeçalho e
+rodapé não são renderizados em `/login` — o trecho acima sobre `SiteHeader` e footer
+permanecerem presentes deixou de valer. A decisão (sem route group, `position: fixed`)
+continua válida; a lista única de rotas sem moldura é `CHROME_HIDDEN_ROUTES`
+(`mnemonicos-frontend/src/components/app-chrome-gate.tsx`).
 **Reabrir se**: o Diretor pedir a mesma atmosfera visual (fundo em tela cheia com moldura
 própria) em outras rotas — aí o custo da reestruturação de root layouts passaria a se
 justificar por servir mais de uma tela.
