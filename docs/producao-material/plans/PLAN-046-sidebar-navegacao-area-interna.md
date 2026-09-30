@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Status**: Approved
-**Versão**: 0.2
+**Versão**: 0.3
 **Autor**: scribe (redação delegada pelo Tech Lead; triagem técnica do Tech Lead)
 **Data**: 2026-09-30
 
@@ -226,11 +226,12 @@ Menor largura com sidebar fixa = 1280px: a conta exige viewport ≥ 928 + 248 + 
 
 ### DEC-046-006: Fechamento por estado derivado da rota e listeners só enquanto aberto
 **Contexto**: FR-009/021/022 pedem fechar por item, Esc, toque fora, troca de rota "por qualquer meio" (voltar/avançar incluídos) e cruzamento do breakpoint, com foco no botão; o CSS sozinho não fecha o estado ao cruzar `xl` (o menu reapareceria aberto ao voltar abaixo, contra AC-044-022).
-**Decisão**: estado `openPath: string | null` + `prevPathname`; quando `pathname` difere de `prevPathname` durante o render, zera `openPath` e atualiza `prevPathname` (padrão de ajuste de estado na mudança de prop, sem `useEffect`, cobrindo voltar/avançar/link) — A→B→A permanece fechado; aberto ⇔ `openPath === pathname`. Listeners de `keydown` (Escape), `pointerdown` (alvo fora do painel e do botão) e `matchMedia('(min-width: 80rem)').change` são registrados por `useEffect` **apenas enquanto aberto** e removidos no cleanup; item clicado chama o mesmo fechamento. Todo fechamento por item, Esc ou toque fora (os 3 meios de FR-044-009) chama `buttonRef.current?.focus()`; o fechamento por cruzar o breakpoint não move foco (o botão é `xl:hidden`, foco nele é no-op).
+**Decisão**: estado `openPath: string | null` + `prevPathname`; quando `pathname` difere de `prevPathname` durante o render, zera `openPath` e atualiza `prevPathname` (padrão de ajuste de estado na mudança de prop, sem `useEffect`, cobrindo voltar/avançar/link) — A→B→A permanece fechado; aberto ⇔ `openPath === pathname`. Listeners de `keydown` (Escape), `click` no document (alvo fora do painel e do botão — nunca `pointerdown`: com o painel no fluxo, fechar no down desloca o conteúdo antes do click e o toque se perde ou cai noutro alvo; ajuste pós-gate 11 da Wave 3) e `matchMedia('(min-width: 80rem)').change` são registrados por `useEffect` **apenas enquanto aberto** e removidos no cleanup; item clicado chama o mesmo fechamento. Todo fechamento por item, Esc ou toque fora (os 3 meios de FR-044-009) chama `buttonRef.current?.focus()`; o fechamento por cruzar o breakpoint não move foco (o botão é `xl:hidden`, foco nele é no-op).
 **Alternativas consideradas**:
 - `useEffect` que faz `setOpen(false)` ao mudar `pathname`, descartada porque: renderiza mais uma vez com o menu ainda aberto após a troca de rota (piscada) e deixa o estado "aberto" sobreviver a um render, o que o derivado evita de graça.
 - Listeners permanentes (mesmo fechado), descartada porque: um listener global de `keydown`/`pointerdown` por aba sem função na maior parte do tempo (desktop nunca abre o menu) — e cada um precisa de guarda de "aberto" no handler.
 - `<details>/<summary>` nativo (a mais simples), descartada porque: não fecha por Esc, toque fora nem troca de rota sem JS equivalente, e `aria-expanded` é controlado pelo navegador — sem o controle de foco de volta ao botão que FR-009 exige.
+**Ajuste (2026-09-30, gate 11 da Wave 3 — furo no plano, Tech Lead)**: o foco volta ao botão só quando `document.activeElement` é `body`/nulo ou está no próprio componente (painel ou botão), nos 3 fechamentos (item, Esc, toque fora); se o usuário já levou o foco a outro controle (campo, link do conteúdo), o menu só fecha.
 **Consequências**: `pointerdown` fora devolve o foco ao botão mesmo quando o toque foi em outro controle da página (o navegador então move o foco ao alvo tocado; aceito). Cruzar `xl` fecha via `change` do `matchMedia` (só enquanto aberto); o teste usa o `matchMedia` controlável do COMP-046-007. A troca de rota "por qualquer meio" fecha mesmo sem clique no menu (link na página, voltar), e o reset por `prevPathname` garante que voltar à rota em que o menu foi aberto (A→B→A) o mantém fechado.
 **Reabrir se**: o App Router deixar de renderizar `usePathname` de forma síncrona com a troca de rota, ou o teste de foco em navegador real (gate 11) apontar foco perdido.
 **Irreversível**: não

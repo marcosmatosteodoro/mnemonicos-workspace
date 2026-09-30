@@ -103,7 +103,7 @@ Topo: o elemento medido é o próprio container, cujo topo coincide com o fundo 
 **Data início**: 2026-09-30T18:29:02-0300
 **Data conclusão**: 2026-09-30T18:49:46-03:00
 **Commit SHA**: 9b60fc2, 1915183 (remoção de comentário, gate 7 Art. 7) (mnemonicos-frontend, branch feat/producao-material-sidebar-navegacao)
-**Jira**: pendente — acesso ao Jira desligado pelo Diretor; sub-tarefa a criar sob KAN-178 (docs/producao-material/tracker-local-KAN-178.md)
+**Jira**: KAN-187
 
 **Quality gates**:
 - [x] Implementação completa

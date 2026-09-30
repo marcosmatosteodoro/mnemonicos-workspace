@@ -90,7 +90,7 @@ Convenção dos comandos: executados na raiz do repositório `mnemonicos-fronten
 **Data início**: 2026-09-30T18:31:24-0300
 **Data conclusão**: 2026-09-30T18:48:26-03:00
 **Commit SHA**: 7b26119, 8c60101 (retry gate 1) (mnemonicos-frontend, branch feat/producao-material-sidebar-navegacao)
-**Jira**: pendente — acesso ao Jira desligado pelo Diretor; sub-tarefa a criar sob KAN-178 (docs/producao-material/tracker-local-KAN-178.md)
+**Jira**: KAN-188
 
 **Quality gates**:
 - [x] Implementação completa

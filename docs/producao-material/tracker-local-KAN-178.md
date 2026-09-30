@@ -1,13 +1,23 @@
 # Tracker local — KAN-178 (SPEC-044 / BRIEF-044)
 
-**PENDENTE DE RECONCILIAÇÃO.** Em 2026-09-30, por volta de 17:45, o Diretor retirou o acesso
-ao conector Atlassian por um tempo: "faça todas as atualizações locais, depois a gente passa
-para o jira". A partir desse momento, os ganchos do ciclo não chamam o Jira. Cada operação
-que o protocolo faria fica registrada abaixo, e o `tracker-sync` aplica tudo no gancho de
-reconciliação (§12) quando o acesso voltar. Keys de sub-tarefa ainda não existem: os
-artefatos SDD ficam com a linha `Jira:` pendente até lá.
+**RECONCILIADO em 2026-09-30 19:36** (acesso ao conector Atlassian restabelecido, aviso do
+Diretor) — todas as estruturas abaixo foram criadas/transicionadas no quadro `KAN` pelo
+gancho de reconciliação (§12) do `tracker-sync`. Este arquivo fica como registro histórico
+do período sem conector (corte às 17:45); as keys gravadas nos artefatos SDD (`**Jira**:`
+da SPEC, campo `Jira:` da closure das TASKs) são agora a fonte viva — não este arquivo.
 
-## Estado medido antes do corte
+## Estruturas criadas — estado aplicado
+
+| Artefato | Tipo Jira | Key | Pai | Estado aplicado |
+|---|---|---|---|---|
+| SPEC-044 — Sidebar de navegação da área interna | História (`10009`) | **KAN-178** | — (sem épico) | `11` → `21` Em andamento (teto do §9) + comentário de reconciliação |
+| TASK-046-001 — Container de largura único (PageContainer) | Subtask (`10007`) | **KAN-187** | KAN-178 | `41` Concluído |
+| TASK-046-002 — Logo do header por sessão | Subtask (`10007`) | **KAN-188** | KAN-178 | `41` Concluído |
+| TASK-046-003 — Volta ao conteúdo na Tira | Subtask (`10007`) | **KAN-189** | KAN-178 | `41` Concluído |
+| TASK-046-004 — Sidebar fixa com seção atual | Subtask (`10007`) | **KAN-190** | KAN-178 | `41` Concluído |
+| TASK-046-005 — Menu recolhível abaixo de xl | Subtask (`10007`) | **KAN-191** | KAN-178 | `21` Em andamento (em re-review; closure vem depois) |
+
+## Estado medido antes do corte (histórico)
 
 | Artefato | Tipo Jira | Key | Pai | Estado |
 |---|---|---|---|---|
