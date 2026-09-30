@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -100,19 +100,19 @@ Topo: o elemento medido é o próprio container, cujo topo coincide com o fundo 
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-09-30T18:29:02-0300
+**Data conclusão**: 2026-09-30T18:49:46-03:00
+**Commit SHA**: 9b60fc2, 1915183 (remoção de comentário, gate 7 Art. 7) (mnemonicos-frontend, branch feat/producao-material-sidebar-navegacao)
+**Jira**: pendente — acesso ao Jira desligado pelo Diretor; sub-tarefa a criar sob KAN-178 (docs/producao-material/tracker-local-KAN-178.md)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1) — security-engineer
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-044 sem FEATs; o Roteiro do gate 9 desta TASK é carregado pelo `qa` na Etapa 4 do PLAN-046
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
