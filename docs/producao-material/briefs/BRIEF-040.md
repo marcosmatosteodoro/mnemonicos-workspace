@@ -1,7 +1,7 @@
 # BRIEF-040: Quem tem sessão e abre `/` vai direto para a área logada
 
 **Slug**: producao-material
-**Status**: Aceito (ACEITA_COM_RESSALVAS — gate 9 parcial em HANDOFF-PLAN-041; RISK-040-006)
+**Status**: Concluído (mergeado em `main`, PR #23, `12a0a25`; KAN-180 fechado no Jira — verificação com login segue em HANDOFF-PLAN-041.md)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T13:27:10-0300
 **SPEC**: SPEC-040
