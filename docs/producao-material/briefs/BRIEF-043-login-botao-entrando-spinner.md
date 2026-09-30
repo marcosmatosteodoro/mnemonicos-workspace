@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: emenda (SPEC-030, rota emenda do `/keelson:auto` — decisão 4.398)
-**Status**: Aceito (ACEITA_COM_RESSALVAS, 2026-09-30; branch `feat/producao-material-login-botao-entrando` pushada, aguardando revisão e merge do Diretor)
+**Status**: Concluído (PR #24 mergeado pelo Diretor, `f7760a2`, 2026-09-30)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T16:46:33-0300
 **Origem**: Diretor, card KAN-185 (rota pull `--from=KAN-185`); triagem 1b em 2026-09-30 16:40
