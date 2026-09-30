@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-033/F9 mergeada em `main` — PR #10 backend e #17 frontend; épico KAN-149 fechado; próxima fatia elegível: F10)
+**Última atualização**: 2026-09-30 (SPEC-034/F10 — Painel estratégico e tempo por página — criada e Approved; Jira KAN-165)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -66,6 +66,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
+- Painel estratégico interno (EDITOR/ADMIN) como página inicial da área interna: tempo de produção por página (lead time até a 1ª Exportação Tira pós-fechamento ÷ páginas do PDF, que a Exportação passa a registrar), tempo por etapa, conclusão por módulo com cobertura, correções após revisão por etapa e backlog de produção (ativos − concluídos) — SPEC-034, F10 do épico MNEMORA STUDIO, `Approved` 2026-09-30. Jira: Épico KAN-165 (Stories KAN-166/KAN-167).
 
 _Épico MNEMORA STUDIO decomposto em 11 fatias (BRIEF-2026-08-27-mnemora-studio-epic); F1 entregue e mergeada (BRIEF-002/SPEC-002/PLAN-003); F2 entregue e mergeada 2026-09-06 (BRIEF-005/SPEC-005/PLAN-006, PRs #2 backend/#3 frontend); F3 entregue e mergeada 2026-09-06 (BRIEF-009/SPEC-009/PLAN-010, 3/3 TASKs Done, PR #3 backend `6541d49`). F4 entregue e mergeada (BRIEF-011/SPEC-011/PLAN-012, 13/13 TASKs Done, DoD+Entrega ACEITA_COM_RESSALVAS 2026-09-07, PR #5 backend/#9 frontend). F5 entregue e mergeada 2026-09-14
 (BRIEF-022/SPEC-022/PLAN-023, 17/17 TASKs Done, 6 waves, DoD satisfeito, PR #6 backend
@@ -93,6 +94,7 @@ fechado._
 | SPEC-028 | Versionamento editorial e fechamento legislativo | Approved | 2026-09-26 |
 | SPEC-030 | Redesenho visual da tela de login | Approved | 2026-09-28 |
 | SPEC-032 | Controle de qualidade e gate de versão aprovada | Approved | 2026-09-27 |
+| SPEC-034 | Painel estratégico e tempo por página | Approved | 2026-09-30 |
 
 ## PLANs
 
@@ -190,6 +192,15 @@ fechado._
 | Checagem pedagógica (confirmação) | Atestação, feita pelo ADMIN no ato de aprovação, de que o material — incluindo a Tira mnemônica vinculada — cumpre a função de recuperação | SPEC-032 |
 | Segregação de funções (do ato de aprovação) | Regra aplicada pelo sistema (fail-secure, não disciplina operacional): o aprovador não pode ser nenhuma identidade produtora do conteúdo normativo da Versão (quem a fechou, autor original do Conteúdo bruto, ou último editor antes do fechamento) | SPEC-032 |
 | Conteúdo normativo (escopo da aprovação) | O recorte avaliado pela aprovação: texto normativo, Classe do radar de prova, fonte normativa, blocos/síntese da Quebra da regra (já versionados por F8) mais a Tira mnemônica vinculada; exclui Contraste, Pegadinha elaborada, Flashcard e Associação visual | SPEC-032 |
+| Painel estratégico | Tela de leitura agregada, interna a EDITOR/ADMIN, página inicial da área interna: tempo de produção por página, tempo por etapa, conclusão por módulo, correções após revisão e backlog de produção — só com o que a fábrica mede sozinha | SPEC-034 |
+| Página (da Exportação) | Número de páginas reais do PDF emitido por uma Exportação (Variante Tira inclui as suplementares), registrado no momento da Exportação, nunca recomputado | SPEC-034 |
+| Sem medida | Estado de dado numérico não capturado — nunca zero nem estimado | SPEC-034 |
+| Tempo de produção por página | Tempo do início registrado da produção (criação instrumentada) até a 1ª Exportação Tira após o 1º fechamento de Versão, dividido pelas Páginas dessa Exportação | SPEC-034 |
+| Tempo por etapa | Lead time de calendário do 1º ao último evento de uma etapa (retrabalho incluso), só com abertura e conclusão registradas; senão "em aberto", "não percorrida" ou "sem duração medida" | SPEC-034 |
+| Correções após revisão | Retrabalho de etapa de conteúdo ocorrido, por sequência, depois do 1º fechamento de Versão; contado por etapa, nunca somado entre etapas | SPEC-034 |
+| Módulo | Um Tema do acervo agrupado por Disciplina (a TAP chama de "módulo") | SPEC-034 |
+| Concluído | Conteúdo com Versão vigente aprovada e válida para exportação (regra única de F9) | SPEC-034 |
+| Backlog de produção | Conteúdos ativos não concluídos (ativos − concluídos), com etapa mais avançada (Conteúdo bruto → … → Aprovação), prioridade de apresentação e idade | SPEC-034 |
 
 ## Decisões irreversíveis
 
@@ -332,8 +343,15 @@ fechado._
 | RISK-030-003 | Cenários de cenário/robustez sem AC formal (trânsito guard→`/login?next=`→login→`next`, foco de teclado, robustez da ilustração/autofill/`forced-colors`, aviso de sessão expirada acima da dobra em 360px) — decisão do PO: cobertos pelo roteiro de verificação dos gates 9/11, não por AC | Roteiro do `qa`/`product-designer` na implementação deve exercitar os itens listados em SPEC-030 §9 | SPEC-030 §9 (veredito PO) |
 | ~~Q-030-001~~ | **RESOLVIDO 2026-09-28 (PLAN-031)** — route group dedicado rejeitado: `code-scout` achou que este projeto só tem um root layout, e um `layout.tsx` de route group aninha DENTRO dele, não o substitui; promover um 2º root exigiria mover todas as rotas soltas de `src/app/` para um grupo irmão. DEC-031-001: fundo em tela cheia via `position: fixed; inset: 0` dentro da árvore normal da página (sem route group) — preserva header/footer de graça (FR-030-013). | — nenhuma | SPEC-030 §9 → PLAN-031 DEC-031-001 |
 | TRISK-031-003 | `position: fixed` do fundo em tela cheia (COMP-031-002) depende de nenhum ancestral (`Providers`/`SiteHeader`/`<main>`) declarar `transform`/`filter`/`perspective`/`contain` — se algum declarar, o backdrop deixa de posicionar relativo ao viewport | Verificação visual na implementação, item de roteiro do gate 9/11 — não bloqueante | PLAN-031 §8 |
+| RISK-034-001 | Lead time de calendário não é esforço: Conteúdo parado infla tempo por etapa/página | Rótulo e leitura como lead time; nunca métrica por pessoa (NFR-034-004) | SPEC-034 §9 |
+| RISK-034-003 | Conteúdos cuja 1ª Exportação Tira pós-fechamento é anterior a F10 ficam "sem medida" para sempre; cobertura nasce baixa | Cobertura (medidos/ativos) exibida no Painel | SPEC-034 §9 |
+| RISK-034-004 | Ambiente semeado direto (sem eventos) mostra Painel vazio/"sem medida" — reflexo fiel do dado | Gate 9 gera dado exercitando rotas | SPEC-034 §9 |
+| RISK-034-005 | 1º consumidor real da leitura de eventos de etapa, sem paginação (herdado de TRISK-010-002) | PLAN/gate 10 decidem | SPEC-034 §9 |
+| RISK-034-006 | O Painel fornece o número, não o critério de escala; o limiar segue em PIL-001 | — | SPEC-034 §9 |
 
 ## Histórico recente
+
+- 2026-09-30 02:20: **SPEC-034 criada e Approved (F10, via `/keelson:auto`, BRIEF-034).** Última chamada: Diretor decidiu página = páginas do PDF (coluna nova na Exportação), "erros na revisão" = correções pós-fechamento, migração aditiva autorizada em dev/teste. `scribe` redigiu v0.1 (2 FEATs/18 FRs); spec-validator PASS (0 ERROR); `product-analyst` REVISAR_ANTES_DE_APROVAR (13 riscos); `po` APROVAR com pacote R0–R13, 0 escalações, 10 decisões em nome do Diretor (a mais sensível: janela até a 1ª Exportação Tira pós-fechamento). Reescrita v0.2: 2 FEATs, 34 FRs, 4 NFRs, 24 ACs, 14 premissas, 6 riscos; revalidação 0 ERROR (spec-porte-epico WARNING aceito — inflação por repartição EARS, decisão registrada). Responde Q-009-001/Q-009-002 (SPEC-009) e avalia o gatilho de A-005-001 (não disparou). Jira: Épico KAN-165 (Relates KAN-6), Stories KAN-166 (FEAT-034-001) e KAN-167 (FEAT-034-002).
 
 - 2026-09-30 00:25: **F9 mergeada pelo Diretor** — PR #10 backend (`3ba13b5`) e PR #17 frontend
   (`1728d78`) em `main`. Jira: KAN-150/KAN-151 → Concluído (trilho pós-merge); `parent = KAN-149`
