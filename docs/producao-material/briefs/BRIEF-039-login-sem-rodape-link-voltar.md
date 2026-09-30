@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: emenda (SPEC-030, rota emenda do `/keelson:auto` — decisão 4.398)
-**Status**: Aceito
+**Status**: Concluído (PR #21 mergeado pelo Diretor, `539575a`, 2026-09-30)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T13:11:16-0300
 **Origem**: Diretor, card KAN-177 (rota pull `--from=KAN-177`); triagem 1b em 2026-09-30 12:58

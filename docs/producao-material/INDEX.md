@@ -415,6 +415,7 @@ fechado._
 > (KAN-77) foi renumerado para `SPEC-036`/`PLAN-036`/`TASK-036-00X`/`BRIEF-036` na
 > reconciliação do pull — nenhum dos dois lados foi descartado.
 
+- 2026-09-30 14:12: **PRs #21 e #22 mergeados pelo Diretor** (`mnemonicos-frontend`, merges `539575a` e `05cc3e1`). BRIEF-039 e BRIEF-042 → Concluído. O Jira segue sem acesso por ordem do Diretor, e a fila de reconciliação do KAN-177 (comentário de fim de dev, `41` Concluído, comentário de merge; sem épico) fica em `docs/producao-material/tracker-local-KAN-177.md`, para aplicar quando o acesso voltar.
 - 2026-09-30 14:08: **BRIEF-042 (avulso, KAN-177): link "Voltar para o início" centralizado e sem sublinhado**, por decisão do Diretor depois do merge do PR #21 (`539575a`). Ela substitui o sublinhado que o gate 11 do BRIEF-039 tinha pedido. Commit `9b2e920`, PR #22. Gates: code-reviewer APROVADO, product-designer APROVADO (risco aceito: folga de 14px em 360px até o "Entrando…"), qa VERIFICADO, segurança n/a. Lição `link-discreto…` contestada e reformulada. Jira sem acesso: pendentes KAN-177 → `41` (merge do #21) e o comentário do PR #22.
 - 2026-09-30 13:44: **Emenda v0.2 da SPEC-030 entregue (BRIEF-039/KAN-177, rota emenda do `/keelson:auto`).**
   - **Emenda:** o PO APROVOU a emenda sem escalação. A promessa de "cabeçalho e rodapé em `/login`" vinha de uma resolução do PO no BRIEF-030. Ela revoga a decisão do BRIEF-032 de manter o rodapé.

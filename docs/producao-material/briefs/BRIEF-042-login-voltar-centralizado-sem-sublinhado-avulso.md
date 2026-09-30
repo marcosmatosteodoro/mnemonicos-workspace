@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Em revisão (PR #22)
+**Status**: Concluído (PR #22 mergeado pelo Diretor, `05cc3e1`, 2026-09-30)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T13:56:36-0300
 **Origem**: Diretor, em sessão, depois de mergear o PR #21 (BRIEF-039)
