@@ -1787,7 +1787,8 @@ fechamento cruza o resultado contra o AST real (`ts.createSourceFile` + `node.bo
 **Validade:** geral (qualquer teste que prove estrutura de código por extração textual
 sem parser — grep/indexOf de código-fonte).
 **Estado:** ativa
-**Contadores:** confirmada 1 · contestada 0 (reincidência 2026-09-30: PLAN-035 TASK-035-006 — extrator de corpo de `contents.map` por balanceamento de chaves sem controle positivo; trocado por prova comportamental com contador de acesso)
+**Extensão (2026-09-30, PLAN-046/TASK-046-004, gate 1 da Wave 2 — 2 rodadas):** extrator textual de **classes Tailwind** (prova de paleta por fonte, `mnemonicos-frontend/src/components/internal-sidebar.source.test.ts`) precisa cobrir a **gramática do token**, não só as instâncias que quebraram: (1) as 3 vias de cor do Tailwind 4 — `-(--x)`/`[var(--x)]`, nome de `@utility` resolvido em `globals.css`, e `<util>-<nome>` do namespace `@theme` (reprova); (2) variantes separadas só nos `:` fora de `[]`/`()` (type hint `[color:…]`/`(color:…)` tem `:` dentro do valor); (3) `!` inicial/final normalizado antes de classificar. O que não casa nenhuma via cai em `unclassified` e reprova. Controle positivo por forma da gramática (variante, type hint, important, opacidade) e ao menos 1 mutante por via não óbvia (ex.: `text-link`→`text-brand-400`, `text-[color:#ff0000]`, `!text-ink-400`).
+**Contadores:** confirmada 2 · contestada 0 (reincidência 2026-09-30: PLAN-035 TASK-035-006 — extrator de corpo de `contents.map` por balanceamento de chaves sem controle positivo; trocado por prova comportamental com contador de acesso · reincidência 2026-09-30: PLAN-046 TASK-046-004 — extrator de classe Tailwind cego a `@utility`, `@theme`, type hint e `!`)
 
 ## [Performance] Teto de duração via `Promise.race`+`setTimeout` não corta trabalho CPU-bound síncrono — e teste que prova o teto com dublê `setTimeout` não falsifica nada
 
