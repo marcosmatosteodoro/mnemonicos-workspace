@@ -1,7 +1,7 @@
 # BRIEF-034: Botão Entrar/Sair e troca de tema dark/light no topo da tela
 
 **Slug**: producao-material
-**Status**: Aceito (com ressalvas — gate 9 parcial, ver HANDOFF-PLAN-035.md; escalação da remoção do "Sair" da área interna em lote na Entrega)
+**Status**: Aceito (com ressalvas — gate 9 parcial, ver HANDOFF-PLAN-035.md; escalação da remoção do "Sair" da área interna CONFIRMADA pelo Diretor na Entrega)
 **Data**: 2026-09-29
 **Largada**: 2026-09-29T22:34:23-0300
 **SPEC**: SPEC-034
@@ -13,6 +13,7 @@
 - Etapa 3 (TASKs) concluída: 2026-09-29T23:54:26-0300 — correções: 1 (3 achados mecânicos do task-validator corrigidos inline pelo Tech Lead: campo Realiza(FRs) com NFR misturado, shorthand de AC invisível ao parser, gap de teste de wiring em layout.tsx)
 - Etapa 3.5 (verificabilidade pré-código, qa) concluída: 2026-09-30T00:02:16-0300 — correções: 1 (4 achados reais do qa: AC-034-017 2ª cláusula sem exercício, NFR-034-005/AC-034-018 não-falseável, robustez de localStorage sem especificação, pré-condição implícita no roteiro do gate 9)
 - Etapa 4 (implement) concluída: 2026-09-30T07:44:41-0300 — 3 waves, 6/6 TASKs Done, convergência de fecho CONVERGIU, PO aceitação ACEITA_COM_RESSALVAS
+- Entrega concluída: 2026-09-30T07:58:48-0300 — branch pushada, Diretor confirmou a escalação pendente (remoção do "Sair" duplicado mantida)
 
 ## Pedido como dito
 "/keelson:auto KAN-77 — Botão Entrar/Sair + troca de tema dark/light usando a paleta do login (mnemonicos-frontend)
