@@ -8,7 +8,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -128,17 +128,17 @@ Query já usado por `getRawContent`/etc.), e PLAN-035 §3 (COMP-035-017/018), §
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T07:23:13-0300
+**Data conclusão**: 2026-09-30T08:05:58-0300
+**Commit SHA**: backend 51c46bc (impl) · 1fd4550 (retry gates 1/7) · frontend 789cd92 (impl) · 81a8acd (retry gates 1/7)
 **Jira**: KAN-174
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer (wave 4)
+- [x] Comportamento (gate 9): consolidado FEAT-034-002 — carregador: roteiro do gate 9 da TASK-035-008 (renderização dos 3 estados e dos dados)

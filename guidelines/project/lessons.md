@@ -685,7 +685,13 @@ do mesmo repo (inclusive fronteira de runtime — script servido sem bundler × 
 compilado) que um comentário declara "idênticos"/"espelhados"/"mesma estrutura" — inclusive
 quando o comentário está sendo SUAVIZADO para deixar de afirmar paridade.
 **Estado:** ativa
-**Contadores:** confirmada 5 · contestada 0
+**Extensão (2026-09-30, PLAN-035 gate 1 da Wave 4 — eixo TIPO×NOME):** a rede de paridade do Painel
+comparava só NOMES de campo (molde `extractInterfaceFields`); tipo mais largo (`reworkCountByStage` com
+`ProductionStageType` × `ContentStageType`), tipo trocado (`timePerPage` string) e literal discriminante
+divergente ficavam verdes, com o docblock afirmando "NOMES e a FORMA". Quando o critério afirma TIPO ou o
+consumidor ramifica por literal de união, a paridade compara o texto de tipo normalizado por campo, com
+mapa explícito de nomes de tipo e os conjuntos de literais; mutante de tipo e mutante de literal vermelhos.
+**Contadores:** confirmada 6 · contestada 0
 
 ## [Segurança] Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos
 

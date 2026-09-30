@@ -24,7 +24,7 @@ em lote ao cálculo puro; a rota HTTP e a prova de custo constante só existem d
 
 ### Wave 4 (depende de TASK-035-006 — o formato de `StrategicPanelResponse` só está
 congelado depois da allowlist + prova HTTP da TASK-035-006, princípio 2)
-- [ ] TASK-035-007 ⏸ Todo
+- [x] TASK-035-007 ✅ Done
 
 ### Wave 5 (depende de TASK-035-007 E TASK-035-003 — a tela consome o endpoint RTK Query
 e o util de duração; única TASK de tela do PLAN, decisão deliberada de não fatiar por

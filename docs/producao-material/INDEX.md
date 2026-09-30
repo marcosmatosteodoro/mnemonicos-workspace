@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-035/F10 — Wave 3 fechada: TASK-035-006 Done; FEAT-034-001 completa e VERIFICADA)
+**Última atualização**: 2026-09-30 (PLAN-035/F10 — Wave 4 fechada: TASK-035-007 Done)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -115,7 +115,7 @@ fechado._
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
 | PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 7/7 ✅ | Approved |
-| PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 6/8 🟡 | Approved |
+| PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 7/8 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -352,6 +352,8 @@ fechado._
 | RISK-034-006 | O Painel fornece o número, não o critério de escala; o limiar segue em PIL-001 | — | SPEC-034 §9 |
 
 ## Histórico recente
+
+- 2026-09-30 08:12: **Wave 4 de PLAN-035 fechada** — TASK-035-007 (espelho de `PRODUCTION_STAGE_TYPES`/`CONTENT_STAGE_TYPES`/`PresentationPriority` e dos tipos `*Response` do Painel no frontend; contrato cross-repo por nome+tipo; endpoint `getStrategicPanel` com `forceRefetch` — `refetchOnMountOrArgChange` não é opção de endpoint no RTK Query, DEC-035-019/COMP-035-018 corrigidos no PLAN). Gates: code-reviewer reprovou (paridade só por nomes; Record de retrabalho mais largo; docblock), retry APROVADO; security-engineer APROVADO; performance-engineer APROVADO com regra de 1 subscriber (critério herdado na TASK-035-008).
 
 - 2026-09-30 07:20: **Wave 3 de PLAN-035 fechada** — TASK-035-006 (`GET /strategic-panel`, EDITOR/ADMIN, allowlist por ramo, `contents[]` por Conteúdo, 7 statements fixos, agrupamento O(N+E)). Gates: code-reviewer reprovou (bloco por Conteúdo ausente — furo no plano; ramo medido sem prova; estado entre `it`), retry; 2ª reprovação no critério `res.json(payload)` → teto 4.88 resolvido pela escada com "aplicar e fechar"; extrator textual novo reprovado e trocado por prova comportamental; security-engineer APROVADO (wave + delta); performance-engineer reprovou O(N·E) e aprovou após `Map` — **NFR-034-002 medido: p95 176 ms em 200×50 (alvo 1.500), 572 ms em 1000×50, corpo 193 KiB**. FEAT-034-001 completa: gate 9 VERIFICADO pelo `qa` (linha na SPEC).
 
