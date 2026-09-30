@@ -94,7 +94,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   **Emenda v0.2 (2026-09-30, BRIEF-039/KAN-177, TASK-031-007):** a moldura já não é preservada
   em `/login`. O cabeçalho saiu no BRIEF-032 e o rodapé saiu agora, pela lista única
   `CHROME_HIDDEN_ROUTES` (`app-chrome-gate.tsx`). O cartão ganhou o link "Voltar para o início"
-  → `/`, fora do `<form>` e sublinhado em repouso (FR-030-015/016, AC-030-015).
+  → `/`, fora do `<form>` (FR-030-015/016, AC-030-015). O ajuste BRIEF-042 deixou o link centralizado e sem sublinhado, por decisão do Diretor.
 
 ### Especificadas, ainda não planejadas
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
@@ -415,6 +415,7 @@ fechado._
 > (KAN-77) foi renumerado para `SPEC-036`/`PLAN-036`/`TASK-036-00X`/`BRIEF-036` na
 > reconciliação do pull — nenhum dos dois lados foi descartado.
 
+- 2026-09-30 14:08: **BRIEF-042 (avulso, KAN-177): link "Voltar para o início" centralizado e sem sublinhado**, por decisão do Diretor depois do merge do PR #21 (`539575a`). Ela substitui o sublinhado que o gate 11 do BRIEF-039 tinha pedido. Commit `9b2e920`, PR #22. Gates: code-reviewer APROVADO, product-designer APROVADO (risco aceito: folga de 14px em 360px até o "Entrando…"), qa VERIFICADO, segurança n/a. Lição `link-discreto…` contestada e reformulada. Jira sem acesso: pendentes KAN-177 → `41` (merge do #21) e o comentário do PR #22.
 - 2026-09-30 13:44: **Emenda v0.2 da SPEC-030 entregue (BRIEF-039/KAN-177, rota emenda do `/keelson:auto`).**
   - **Emenda:** o PO APROVOU a emenda sem escalação. A promessa de "cabeçalho e rodapé em `/login`" vinha de uma resolução do PO no BRIEF-030. Ela revoga a decisão do BRIEF-032 de manter o rodapé.
   - **SPEC-030 v0.1 → v0.2:** FR-030-013 reescrito; FR-030-015/016 e AC-030-015 novos; AC-030-001/005/011 ajustados; gate 9 datado de novo.

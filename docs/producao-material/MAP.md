@@ -42,8 +42,8 @@
   do `RootLayout`, que continua Server Component. Substitui `site-header-gate.tsx` (BRIEF-032) —
   mnemonicos-frontend/src/components/app-chrome-gate.tsx:1-42
 - [2026-09-30 · BRIEF-039] Link "Voltar para o início" → `/` no cartão de `/login`, fora do
-  `<form>` (o inventário do form segue em 4 controles; o do cartão tem 5). Sublinhado em
-  repouso, `text-muted`, e nunca é desabilitado durante "Entrando…" — mnemonicos-frontend/src/app/login/page.tsx:73-83
+  `<form>` (o inventário do form segue em 4 controles; o do cartão tem 5). Centralizado
+  (`self-center`), sem sublinhado (BRIEF-042), `text-muted`, e nunca é desabilitado durante "Entrando…" — mnemonicos-frontend/src/app/login/page.tsx:73-83
 
 ## Revisão espaçada (dormente por A-005)
 
