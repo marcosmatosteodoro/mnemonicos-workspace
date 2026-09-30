@@ -165,3 +165,4 @@ Reutilizada do `estimator` rodado nesta sessão (2026-09-30, antes da largada), 
 
 ## Cronologia
 - Etapa 1 (SPEC) concluída: 2026-09-30T17:43:22-0300 · correções: 1 · classes: termo-fr-fora-glossario(1) · spec-fr-palavras(4) · spec-glossario-nao-usado(4) · spec-nfr-sem-numero(2) · spec-ears-nao-casa(1) · spec-must-ratio(1) · spec-sem-should-may(1) · janelas: redação 1min/363l
+- Etapa 2 (PLAN) concluída: 2026-09-30T17:52:53-0300 · correções: 0 · classes: comp-muitos-frs(1) · 
