@@ -363,6 +363,13 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-30: convergência de fecho verde em `92542c5` (dedup: aplicada) — PLAN-035/
+  SPEC-034, 0 gaps, 9 DECs confirmadas no código final. 3 achados não-bloqueantes fora de
+  escopo: `layout.test.tsx` tem helper duplicado (`findElementByType`/
+  `containsComponentType`); `viewport.themeColor` (`layout.tsx:24-28`) continua preso à
+  paleta antiga (ink) e a `prefers-color-scheme`, ignorando a escolha manual de tema —
+  candidato a diff de limpeza futuro; nota de coesão (`THEME_STORAGE_KEY`/`ThemeName` em
+  `night-palette-tokens.ts`, importados por `theme-bootstrap.ts`, lib dependendo de app).
 - 2026-09-30: **PLAN-035 implementado (6 tasks), aguardando promoção manual de Status.**
   Header unificado de sessão (`AuthControl`) e tema (`ThemeToggle`) com paleta noturna
   estendida ao app inteiro. 3 waves, 6/6 TASKs Done — 5 rodadas de retry reais (cobertura
