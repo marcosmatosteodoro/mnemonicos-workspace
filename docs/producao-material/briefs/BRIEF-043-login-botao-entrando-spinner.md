@@ -170,3 +170,4 @@ Os critérios do card (transcritos em "Pedido como dito"), com as premissas P-04
 - 2026-09-30T16:46:33-0300 — largada (rota emenda).
 - 2026-09-30T16:58:43-0300 — emenda SPEC-030 v0.3 (PO APROVAR sem escalação; scribe `modo: edits`; TASK-031-008 registrada) · correções: 2 · classes: task-ancora-dupla(1) · ref-quebrada(1) · pertence-vs-arquivo(1) · realiza-fora-cobertura(1) · fr-sem-comp(1)
 - 2026-09-30T17:13:31-0300 — implementação e gates (gates 1–7, 8 e 11 aprovados; gate 9 parcial com handoff V2; 1 comentário corrigido e re-gateado, sem retry de código); commit `f8e8709`.
+- 2026-09-30T17:17:16-0300 — entrega (aceitação ACEITA_COM_RESSALVAS; push da branch do frontend; KAN-185 em Em análise).
