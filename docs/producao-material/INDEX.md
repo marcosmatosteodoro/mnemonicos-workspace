@@ -354,6 +354,8 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-30 10:58: **PRs da F10 abertos a pedido do Diretor** — backend PR #11 e frontend PR #19 (`feat/producao-material-mnemora-studio` → `main`), ambos com a ordem de deploy DEPLOY-035-001 destacada (backend + migração antes do frontend). Merge é do Diretor; KAN-166/167 seguem em "Em análise" até o aviso de merge.
+
 - 2026-09-30 10:50: **Perguntas estacionadas da Entrega de F10 respondidas pelo Diretor** — (1) `stash@{0}` do mnemonicos-frontend (WIP TASK-035-008 retry 2) descartado após conferência: todo o código contido no HEAD `4673869` (só um comentário reescrito depois pela revisão); (2) índice `PublicationEvent(rawContentId, variant)` **não criado agora** — volta com pergunta ao Diretor quando o volume se aproximar do teto medido em DEC-035-018 (~2.500 Conteúdos); (3) A-034-006 (abertura órfã conta como etapa alcançada no backlog) **mantida** — olhar no uso real, ajuste reversível em fatia futura; (4) `max-w-5xl` duplicado (InternalShell × `<main>` do root layout) → brief avulso BRIEF-036, aberto, sem código nem card até o Diretor autorizar.
 
 - 2026-09-30 10:43: **Entrega da F10 — aceitação do PO: ACEITA_COM_RESSALVAS, 0 escalações** (BRIEF-034 → Aceito). Pedidos (1)–(4) e premissas A-034-001..005 conferidos; nada do fora de escopo vazou. Ressalvas: V8(b) — etapa mais avançada conta a abertura órfã de "Quebra da regra" do Conteúdo recém-criado (A-034-006, selo crença; reversível, olhar no 1º uso real); AC-034-015 (vazio global) só por teste de componente; deploy na ordem de DEPLOY-035-001 (backend + `migrate deploy` antes do frontend). Fila do épico: F10 entregue.
