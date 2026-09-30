@@ -1,7 +1,7 @@
 # BRIEF-040: Quem tem sessão e abre `/` vai direto para a área logada
 
 **Slug**: producao-material
-**Status**: Emitido
+**Status**: Aceito (ACEITA_COM_RESSALVAS — gate 9 parcial em HANDOFF-PLAN-041; RISK-040-006)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T13:27:10-0300
 **SPEC**: SPEC-040
@@ -93,3 +93,10 @@ Reutilizada do `estimator` rodado nesta sessão (2026-09-30, antes da largada):
 - Etapa 2 (PLAN) concluída: 2026-09-30T13:50:13-0300 · correções: 1 · classes: plan-dec-alternativa-unica(1)
 - Etapa 3 (TASKs) concluída: 2026-09-30T14:09:44-0300 · correções: 0 · classes: task-criterio-grep-nao-ancorado(4) · task-wave-overlap-arquivo(1) · task-nome-tipo(1)
 - Etapa 3.5 (verificabilidade pré-código, qa + task-validator + po) concluída: 2026-09-30T14:49:03-0300 · correções: 2 · classes: criterio-contagem-divergente(2) · criterio-contradiz-inclui(2) · task-wave-overlap-arquivo(1) · roteiro-sujeito-inexistente(1) · criterio-contradiz-plan(1) · plan-desatualizado(1) · contagem-dependente-de-ordem(1) · contagem-base-ambigua(1) · regra-ambigua(1) · caso-precondicao-inalcancavel(1) · criterio-inexequivel-ambiente(1)
+- Etapa 4 (implement) concluída: 2026-09-30T16:58:56-0300 — 4 waves, 4/4 TASKs Done, gate 9 PARCIAL (handoff por credencial)
+- Entrega (aceitação do PO) concluída: 2026-09-30T17:08:52-0300 — ACEITA_COM_RESSALVAS; convergência de fecho com 1 gap parcial resolvido por emenda SPEC-040 v0.4 (decisão do PO em nome do Diretor)
+
+## Relatório de aceitação (PO)
+**Aceitação**: ACEITA_COM_RESSALVAS — nada entregue contraria o BRIEF; os 4 critérios do card e as 5 premissas estão implementados. O núcleo do pedido (com sessão, `/` leva ao estúdio) ainda não foi visto em navegador real: a aceitação dele depende do HANDOFF-PLAN-041 (V1–V8), como exige a §1.3 da SPEC-040; se algum V* falhar, a aceitação cai e o item volta ao Tech Lead.
+**Ressalvas**: (1) gate 9 PARCIAL (ACs com sessão pendentes por credencial dos realms); (2) RISK-040-006 — 1ª abertura de `/` após o deploy mostra a home pública a quem já tinha sessão, até passar pela área interna ou pelo login; storage bloqueado nunca redireciona; (3) aba parada em `/` não reage a login em outra aba; (4) incidente de ambiente — o `qa` leu credenciais de seed do `.env` do backend (rotação recomendada).
+**Decisão nova nesta aceitação**: SPEC-040 v0.4 — clicar no logo estando já em `/` não é nova abertura; recuperação pela recarga (FR-040-013, RISK-040-005, §4.2).

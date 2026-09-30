@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Status**: Approved
-**Versão**: 0.3
+**Versão**: 0.4
 **Autor**: scribe (redação delegada pelo Tech Lead; contrato Diretor–PO, BRIEF-040)
 **Data**: 2026-09-30
 **Jira**: KAN-180
@@ -66,6 +66,7 @@ Termos herdados do glossário consolidado do INDEX: Sessão autenticada, Credenc
 - **Observabilidade de produto** (contagem de visitas redirecionadas): não há instrumentação nova; a métrica é verificada por teste (§1.3).
 - **Redirecionar sessão reconhecida em navegador sem pista de sessão**: fora — vê a página pública nessa abertura e se corrige na próxima passagem pela área interna ou pelo login (A-040-014). Resposta a "e na primeira vez depois do deploy?": página pública uma vez.
 - **Ver a página inicial pública estando com sessão reconhecida** (ex.: ADMIN conferindo a vitrine): sem caminho; para vê-la, sair ou usar janela anônima. Resposta a "e se eu quiser ver a home logado?": fora (card KAN-180).
+- **Nova conferência ao clicar no logo estando já na página inicial**: não é nova abertura da página e não confere a sessão de novo; quem ficou na página pública com sessão reconhecida (falha da conferência, login em outra aba) recupera pela recarga (RISK-040-005). Resposta a "e se eu clicar no logo depois de uma falha?": recarregue a página; o logo por estado de sessão é do KAN-178.
 
 ## 5. Requisitos funcionais (EARS)
 - **FR-040-001** [MUST] Quando alguém abre a página inicial num navegador que guarda pista de sessão, o sistema deve conferir se há sessão reconhecida e qual o papel da conta antes de decidir o que mostrar.
@@ -80,7 +81,7 @@ Termos herdados do glossário consolidado do INDEX: Sessão autenticada, Credenc
 - **FR-040-010** [MUST] O sistema deve manter inalterados o login e o logout.
 - **FR-040-011** [MUST] Se a conferência não conclui dentro do teto da conferência, então o sistema deve encerrar o estado neutro e exibir a página inicial pública, sem tela de login nem aviso.
 - **FR-040-012** [MUST] Quando a conferência conclui após o teto com sessão reconhecida e papel com acesso, e a pessoa segue na página inicial, o sistema deve levá-la à área interna (FR-040-008).
-- **FR-040-013** [MUST] Quando a página inicial é aberta num navegador com pista de sessão (endereço, recarga, logo, link da 404, "voltar" ou "avançar"), o sistema deve fazer conferência atual da sessão, sem decidir por resultado guardado antes na aba.
+- **FR-040-013** [MUST] Quando a página inicial é aberta num navegador com pista de sessão (endereço, recarga, "voltar", "avançar", ou logo e link da 404 acionados a partir de outra página), o sistema deve fazer conferência atual da sessão, sem decidir por resultado guardado antes na aba.
 - **FR-040-014** [MUST] Se o navegador não executa script, então o sistema deve exibir a página inicial pública; a visita é tratada como anônima.
 - **FR-040-015** [MUST] O sistema deve manter inalterada a guarda das rotas internas: anônimo em rota interna vai à tela de login com retorno.
 - **FR-040-016** [MUST] O sistema deve manter inalterados o conteúdo, o título e a descrição da página inicial pública exibidos ao anônimo.
@@ -169,7 +170,7 @@ Três estados (princípio 4.67), da visita à página inicial: *em andamento* �
 - **RISK-040-002** Reabre a promessa de guarda de rota da SPEC-002 (DEC-003-011 / COMP-003-022: a guarda só roda onde a sessão é pressuposta) e testes que a protegem, pois a página inicial pública passa a consultar a sessão. FR-040-015 exige a guarda intacta; o PLAN deve dizer se preserva a promessa ou a reabre explicitamente.
 - **RISK-040-003** Percepção de piscada: o anônimo vê um instante de estado neutro antes da página pública (A-040-007) e quem tem sessão pode perceber o intervalo até a área interna. Mitigação: NFR-040-004, teto de FR-040-011; pessoa com sessão sob serviço frio vê a página pública por um instante antes da ida tardia (FR-040-012).
 - **RISK-040-004** Papel sem acesso preso na página pública: se o papel de estudante voltar a ter conta ativa, ele permanece na página pública sem mensagem (fora de escopo, §4.2); outras rotas continuam com o comportamento atual. Com pista, cada abertura da página inicial por esse papel gera um `authz.denied` a mais (o cabeçalho já gera um por página hoje); a pista é preservada em `no-access` (resolução pré-código). Reabrir junto com Q-040-002.
-- **RISK-040-005** Pessoa com sessão reconhecida sob falha da conferência cai na página pública, possivelmente com "Entrar" no cabeçalho, e pode digitar a senha sem necessidade. Recuperação: nova abertura da página inicial (logo ou recarga, FR-040-013); lentidão tem a ida tardia (FR-040-012). Sem nova tentativa automática.
+- **RISK-040-005** Pessoa com sessão reconhecida sob falha da conferência cai na página pública, possivelmente com "Entrar" no cabeçalho, e pode digitar a senha sem necessidade. Recuperação: recarga da página inicial (FR-040-013); clicar no logo estando já na página inicial não confere de novo (§4.2); lentidão tem a ida tardia (FR-040-012). Sem nova tentativa automática.
 - **RISK-040-006** Exceção da pista (A-040-014): (i) na primeira abertura de `/` após o deploy, toda sessão existente vê a página pública até passar pela área interna; (ii) navegador com armazenamento local bloqueado nunca é redirecionado (a área interna segue alcançável por endereço e login). Mitigação: regravação da pista na área interna e no login; declarado no relatório de aceitação. Reabrir DEC-041-002 se observado como problema real.
 - **Q-040-001** Fora de escopo, para card próprio: `/login` e futuras páginas públicas com sessão reconhecida devem também levar à área interna?
 - **Q-040-002** Fora de escopo, para card próprio: o papel sem acesso à área interna deve receber alguma mensagem ou caminho quando voltar a ter conta ativa?
