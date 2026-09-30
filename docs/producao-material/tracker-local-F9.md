@@ -27,6 +27,13 @@ para `--phase finish-dev` e para o ato do Diretor pós-merge, respectivamente. E
 
 ## Log de operações pendentes (mais recente no topo)
 
+- 2026-09-30: **Epic KAN-149 fechado** (passo 3 do trilho pós-merge, confirmação explícita
+  do Diretor — "Fechar KAN-149") — JQL `parent = KAN-149` relido: 2/2 filhos (KAN-150,
+  KAN-151) em `41` Concluído. KAN-149 transicionado `21` Em andamento → `41` Concluído
+  (transição direta id `41`, sem walker) + comentário "Fatia F9 entregue e mergeada —
+  backend PR #10 (3ba13b5), frontend PR #17 (1728d78). Fechado por confirmação do
+  Diretor." `getJiraIssue` pós-transição confirma status `Concluído` (id `10007`).
+
 - 2026-09-30: **Trilho pós-merge aplicado** (aviso do Diretor — backend PR #10 `3ba13b5`,
   2026-09-30T03:21:54Z; frontend PR #17 `1728d78`, 2026-09-30T03:22:02Z) — KAN-150
   (FEAT-032-001) e KAN-151 (FEAT-032-002) transicionadas `31` Em análise → `41` Concluído
