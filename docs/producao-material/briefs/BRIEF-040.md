@@ -91,3 +91,5 @@ Reutilizada do `estimator` rodado nesta sessão (2026-09-30, antes da largada):
 ## Cronologia
 - Etapa 1 (SPEC) concluída: 2026-09-30T13:44:08-0300 · correções: 1 · classes: spec-fr-palavras(8) · spec-nfr-sem-numero(3) · spec-glossario-nao-usado(3) · spec-must-ratio(1) · spec-sem-should-may(1) · spec-ears-nao-casa(1) · janelas: redação 1min/173l
 - Etapa 2 (PLAN) concluída: 2026-09-30T13:50:13-0300 · correções: 1 · classes: plan-dec-alternativa-unica(1)
+- Etapa 3 (TASKs) concluída: 2026-09-30T14:09:44-0300 · correções: 0 · classes: task-criterio-grep-nao-ancorado(4) · task-wave-overlap-arquivo(1) · task-nome-tipo(1)
+- Etapa 3.5 (verificabilidade pré-código, qa + task-validator + po) concluída: 2026-09-30T14:49:03-0300 · correções: 2 · classes: criterio-contagem-divergente(2) · criterio-contradiz-inclui(2) · task-wave-overlap-arquivo(1) · roteiro-sujeito-inexistente(1) · criterio-contradiz-plan(1) · plan-desatualizado(1) · contagem-dependente-de-ordem(1) · contagem-base-ambigua(1) · regra-ambigua(1) · caso-precondicao-inalcancavel(1) · criterio-inexequivel-ambiente(1)
