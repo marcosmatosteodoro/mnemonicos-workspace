@@ -23,4 +23,4 @@
 - [x] TASK-031-007 ✅ Done
 
 ### Wave 6 (depende de Wave 5 — emenda v0.3, BRIEF-043/KAN-185)
-- [ ] TASK-031-008 ⏳ Todo
+- [x] TASK-031-008 ✅ Done

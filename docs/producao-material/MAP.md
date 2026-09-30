@@ -43,7 +43,7 @@
   mnemonicos-frontend/src/components/app-chrome-gate.tsx:1-42
 - [2026-09-30 · BRIEF-039] Link "Voltar para o início" → `/` no cartão de `/login`, fora do
   `<form>` (o inventário do form segue em 4 controles; o do cartão tem 5). Centralizado
-  (`self-center`), sem sublinhado (BRIEF-042), `text-muted`, e nunca é desabilitado durante "Entrando…" — mnemonicos-frontend/src/app/login/page.tsx:73-83
+  (`self-center`), sem sublinhado (BRIEF-042), `text-muted`, e nunca é desabilitado durante o envio (o botão em "Entrando" com spinner — `Spinner` em mnemonicos-frontend/src/components/spinner.tsx, região viva `sr-only` irmã do `<form>` em login-form.tsx; SPEC-030 v0.3, KAN-185) — mnemonicos-frontend/src/app/login/page.tsx:73-83
 
 ## Revisão espaçada (dormente por A-005)
 

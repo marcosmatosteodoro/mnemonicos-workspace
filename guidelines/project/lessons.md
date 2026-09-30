@@ -1918,7 +1918,7 @@ pela leitura. Exemplares corretos no mesmo arquivo: `contents-frontend-contract.
 (blocos que comparam `RawContentSummary`/`RuleBreakdownDetail`/`RawContentDetail`).
 **Validade:** geral (qualquer comentário `// Mutante: ...` no acervo de testes do projeto).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0 (confirmada 2026-09-30, KAN-185/TASK-031-008: comentário de prova falso em night-palette-tokens.ts, pego pelo code-reviewer por mutante executado)
 
 ## [Testes] Critério com efeito repartido entre 2 componentes irmãos (formulário + lista) prova só os efeitos que vivem no componente sob teste — o efeito do irmão evapora sem prova
 

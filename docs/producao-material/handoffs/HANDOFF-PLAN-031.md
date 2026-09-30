@@ -86,6 +86,29 @@ subagent bloqueou: o clique físico de login com credencial real (AC-030-012).
   (login é o único ponto de entrada autenticado).
 - **Evidência**: _(preencher na verificação)_
 
+### V2 — Login de sucesso com o botão em "Entrando" (TASK-031-008, emenda v0.3, KAN-185)
+- **Branch**: `feat/producao-material-login-botao-entrando` (`mnemonicos-frontend`; rode o
+  frontend a partir dela). É outra branch, não a do V1.
+- **Sonda** (2026-09-30, gate 9 do `qa`): mesma classe `permissao_ambiente` do V1. O
+  classificador do harness negou ao subagent a leitura de `SEED_ADMIN_*` no `.env` do backend
+  ("Credential Exploration"), e o qa não contornou. Os passos 1–7 do roteiro da TASK-031-008
+  foram VERIFICADOS em app real com credencial fictícia: estado "Entrando", dimensões, AA,
+  movimento reduzido, falhas 401 e de rede, anúncio acessível e link durante o envio. As
+  capturas estão em `thoughts/screen-verify/gate9-login-entrando/`. Só o ramo de sucesso
+  ficou sem exercício. O `handleSubmit` é idêntico ao do commit-pai (conferido pelo gate 8).
+- **Tela/rota**: `http://localhost:3000/login` e `http://localhost:3000/login?next=%2Fstudio`
+- **Realm**: `app` (ADMIN semeado)
+- **Passos**:
+  1. Abrir `/login`, entrar com o ADMIN semeado e observar o botão: "Entrando" com o spinner
+     antes do redirecionamento (se a resposta vier rápido demais, segure o POST pelo DevTools).
+  2. Confirmar o redirecionamento para `INTERNAL_HOME` e fazer logout.
+  3. Repetir partindo de `/login?next=%2Fstudio` e confirmar a chegada em `/studio`.
+- **Esperado**: o login de sucesso leva à rota esperada nos dois casos. Durante o envio, o
+  botão fica em "Entrando" com spinner, e não aparece texto "Entrando…" abaixo dele.
+- **Risco se falhar**: o fragmento novo do `LoginForm` (região viva irmã do `<form>`)
+  quebrou o fluxo de sucesso sem que os testes nem os passos 1–7 do gate 9 acusassem.
+- **Evidência**: _(preencher na verificação)_
+
 ## 5. Riscos e pontos de atenção
 
 - **Autofill do navegador** (achado `fora_de_escopo` do `qa`, já registrado no INDEX):

@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: emenda (SPEC-030, rota emenda do `/keelson:auto` — decisão 4.398)
-**Status**: Emitido
+**Status**: Aceito (ACEITA_COM_RESSALVAS, 2026-09-30; branch `feat/producao-material-login-botao-entrando` pushada, aguardando revisão e merge do Diretor)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T16:46:33-0300
 **Origem**: Diretor, card KAN-185 (rota pull `--from=KAN-185`); triagem 1b em 2026-09-30 16:40
@@ -158,6 +158,15 @@ Os critérios do card (transcritos em "Pedido como dito"), com as premissas P-04
   retry e 2 rodadas do gate 9 · backend local disponível para o qa · PR, merge e card fora da faixa.
 - **Lacunas**: nenhuma
 
+## Aceitação (PO)
+**ACEITA_COM_RESSALVAS** (2026-09-30). Todos os itens do card e as premissas P-043-001..006 foram entregues, com evidência por teste e por gate. Ressalvas: (1) o gate 9 ficou parcial: o ramo de sucesso com ADMIN real não foi exercido em app real e está no V2 do `HANDOFF-PLAN-031`, antes do merge (o `handleSubmit` é idêntico ao do commit-pai e a navegação tem teste de unidade); (2) a linha `**Verificação (gate 9)**` da SPEC-030 foi datada de novo na closure, com o estado parcial; (3) as sugestões do gate 11 viraram pendências do Diretor, abaixo.
+
+## Pendências do Diretor
+- V2 do `HANDOFF-PLAN-031`: login de sucesso com ADMIN real, com e sem `next`, olhando o botão em "Entrando" (cerca de 2 min).
+- Sinal visual de pré-hidratação: sem a opacidade, o botão desabilitado antes do JS carregar fica igual a "Entrar" (é consequência de P-043-003). Card futuro, se quiser.
+- Foco depois do clique: quando o botão desabilita, o foco cai no `body`. Já acontecia antes desta entrega, então é candidato a card futuro.
+
 ## Cronologia
 - 2026-09-30T16:46:33-0300 — largada (rota emenda).
 - 2026-09-30T16:58:43-0300 — emenda SPEC-030 v0.3 (PO APROVAR sem escalação; scribe `modo: edits`; TASK-031-008 registrada) · correções: 2 · classes: task-ancora-dupla(1) · ref-quebrada(1) · pertence-vs-arquivo(1) · realiza-fora-cobertura(1) · fr-sem-comp(1)
+- 2026-09-30T17:13:31-0300 — implementação e gates (gates 1–7, 8 e 11 aprovados; gate 9 parcial com handoff V2; 1 comentário corrigido e re-gateado, sem retry de código); commit `f8e8709`.

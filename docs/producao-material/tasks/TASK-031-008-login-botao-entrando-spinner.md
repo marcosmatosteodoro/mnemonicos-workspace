@@ -7,7 +7,7 @@
 **Wave**: 6
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 **Jira**: KAN-185
 
 ## Dependências
@@ -75,7 +75,7 @@ PO).
 
 ## Critérios de pronto
 
-- [ ] Botão em envio (AC-030-016 — FR-030-017): com o login em andamento, o botão mostra
+- [x] Botão em envio (AC-030-016 — FR-030-017): com o login em andamento, o botão mostra
       "Entrando" e o spinner, está desabilitado, não reenvia por clique nem por Enter num
       campo; nenhum texto "Entrando…" existe fora do botão em nenhum estado; fora do envio o
       botão é "Entrar" sem spinner — Testes cobrem AC-030-016: verificação executável:
@@ -85,32 +85,32 @@ PO).
       Enter num campo com o botão desabilitado sem segunda chamada do trigger de
       `useLoginMutation`. Falsificação: reintroduzir o `<span role="status">Entrando…</span>`
       solto, ou manter o rótulo "Entrar" durante o envio, reprova.
-- [ ] Retorno a "Entrar" após falha (AC-030-016): falha de credencial e falha de rede devolvem
+- [x] Retorno a "Entrar" após falha (AC-030-016): falha de credencial e falha de rede devolvem
       o botão a "Entrar", sem spinner, com a mensagem de erro em `role="alert"` como hoje e a
       região viva vazia (sem anunciar "Entrar") — mesma verificação executável acima, com os
       dois ramos de falha. Falsificação: deixar o spinner após o erro reprova.
-- [ ] Anúncio acessível único e spinner decorativo (AC-030-016, NFR-030-002): região viva
+- [x] Anúncio acessível único e spinner decorativo (AC-030-016, NFR-030-002): região viva
       `sr-only` consultada pelo texto "Entrando", presente e vazia fora do envio, com o texto
       só durante o envio; `aria-busy` no `<form>` durante o envio; spinner com
       `aria-hidden="true"` e fora da ordem de foco — mesma verificação executável. Sem nenhum
       elemento novo no fluxo do form entre os estados (P-043-006).
-- [ ] Movimento reduzido (AC-030-009/AC-030-016, FR-030-012): com `prefers-reduced-motion:
+- [x] Movimento reduzido (AC-030-009/AC-030-016, FR-030-012): com `prefers-reduced-motion:
       reduce`, o spinner não gira (estático) e o rótulo "Entrando" continua — verificação
       executável: `npm --prefix mnemonicos-frontend test -- src/components/spinner`
       → OK (N tests, N > 0), com asserção de que a animação de giro é condicionada a
       `motion-safe`/equivalente (ou supressão na media query) e de que o spinner estático
       permanece renderizado.
-- [ ] Contraste AA do botão desabilitado nos dois temas (AC-030-010/AC-030-016, NFR-030-001):
+- [x] Contraste AA do botão desabilitado nos dois temas (AC-030-010/AC-030-016, NFR-030-001):
       sem `disabled:opacity-60` no botão de envio; par rótulo × fundo do botão desabilitado
       ≥ 4,5:1 e spinner ≥ 3:1 nos temas claro e escuro — verificação executável:
       `npm --prefix mnemonicos-frontend test -- src/app/globals-theme-contrast.test.ts`
       → OK (N tests, N > 0), incluindo o par do botão desabilitado (envio e pré-hidratação);
       e `grep -n "disabled:opacity-60" mnemonicos-frontend/src/components/login-form.tsx`
       → saída vazia (capturar também no commit-pai, para provar que a ausência não é herdada).
-- [ ] Sem cor literal nova (NFR-030-006): verificação executável:
+- [x] Sem cor literal nova (NFR-030-006): verificação executável:
       `grep -En "#[0-9a-fA-F]{3,8}|rgb\(|rgba\(|hsl\(" mnemonicos-frontend/src/components/login-form.tsx mnemonicos-frontend/src/components/spinner.tsx | grep -vE '^[^:]+:[0-9]+:\s*(//|/\*|\*)'`
       → saída vazia (e nenhum valor literal novo em `globals.css`, se tocado).
-- [ ] Testes existentes sem afrouxamento (AC-030-011, NFR-030-005): só as asserções do texto
+- [x] Testes existentes sem afrouxamento (AC-030-011, NFR-030-005): só as asserções do texto
       "Entrando…"/`role=status` e do botão desabilitado durante o envio são substituídas;
       `aria-busy`, ausência de `aria-invalid`, `method="post"`, hidratação, `role="alert"` e
       redirecionamento seguem afirmados — verificação executável:
@@ -119,17 +119,17 @@ PO).
       commit-pai); revisão do diff de teste confirma que nenhuma outra asserção foi removida
       ou enfraquecida. Suíte sob `testEnvironment` customizado
       (`<rootDir>/test/jsdom-fetch-env.js`), nunca `jest.mock('@/proxy', ...)`.
-- [ ] Dimensões e link parados (AC-030-016, AC-030-015, gate 9): largura e altura do botão
+- [x] Dimensões e link parados (AC-030-016, AC-030-015, gate 9): largura e altura do botão
       iguais em "Entrar" e "Entrando" e o link "Voltar para o início" sem deslocamento em
       360/768/1280px, nos dois temas — passos 2–3 do roteiro.
-- [ ] Composição, contraste visual e falhas em tela (AC-030-016, gate 9): estado "Entrando"
+- [x] Composição, contraste visual e falhas em tela (AC-030-016, gate 9): estado "Entrando"
       capturado nos dois temas; falha de credencial e de rede devolvem "Entrar" — roteiro
       abaixo.
-- [ ] Lint e typecheck limpos: `npm --prefix mnemonicos-frontend run lint` e
+- [x] Lint e typecheck limpos: `npm --prefix mnemonicos-frontend run lint` e
       `npm --prefix mnemonicos-frontend run typecheck` (nomes conforme scripts da ficha) →
       exit 0, sobre todos os arquivos do diff (`git diff --name-only main...HEAD`), produção
       e teste.
-- [ ] Sem warnings/lints novos.
+- [x] Sem warnings/lints novos.
 
 ## Arquivos previstos (mnemonicos-frontend)
 
@@ -196,21 +196,21 @@ passo; após login bem-sucedido, logout.
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
-**Jira**: KAN-185
+**Data início**: 2026-09-30T16:59:58-0300
+**Data conclusão**: 2026-09-30T17:13:31-0300
+**Commit SHA**: `f8e8709` (mnemonicos-frontend, branch `feat/producao-material-login-botao-entrando`; sem retry de código — 1 comentário com prova falsa reprovado pelo code-reviewer, corrigido inline pelo tech-lead e re-gateado antes do commit)
+**Jira**: KAN-185 (História, modo link; sem subtask)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8)
-- [ ] Comportamento (gate 9)
-- [ ] Design (gate 11)
-- [ ] Performance (gate 10)
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — code-reviewer, 14 mutantes executados numa worktree própria e mortos; re-gate do comentário corrigido aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer, 0 achados (auth/dados pessoais: `method="post"`, guarda de hidratação e `handleSubmit` idênticos ao commit-pai). gitleaks ausente: segredos só por inspeção
+- [x] Comportamento (gate 9): **parcial** — qa, passos 1–7 VERIFICADOS em app real (POST retido por interceptação, 401 real, falha de rede, dois temas, 360/768/1280, movimento reduzido, anúncio `['Entrando','']`); passo 8 no ramo de sucesso com ADMIN real → `pendente_handoff` (`permissao_ambiente`), item V2 de `handoffs/HANDOFF-PLAN-031.md`. Capturas em `thoughts/screen-verify/gate9-login-entrando/`
+- [x] Design (gate 11): aprovado — product-designer, medição em navegador (botão 280x40/384x40 igual nos dois estados, link parado, AA 14,16:1/5,06:1, spinner estático sob reduce); 2 sugestões não bloqueantes
+- [x] Performance (gate 10): n/a — SVG de poucos paths, sem consulta, laço, rede nem dependência nova
 
-**Baseline dos critérios**:
+**Baseline dos critérios** (medida pelo developer no commit-pai `05cc3e1`): `npm test -- src/app/login/page src/components/login-form src/components/password-field` 77/77 (5 suítes) → 86/86 no final (code-reviewer). Suíte inteira final: 59 suítes, 760/760; lint e typecheck exit 0. `disabled:opacity-60` em `login-form.tsx`: 1 ocorrência no commit-pai, 0 no final. Guarda em `handleSubmit` não adicionada: o teste com mutação pendente mostrou 1 chamada após Enter e clique repetidos.
