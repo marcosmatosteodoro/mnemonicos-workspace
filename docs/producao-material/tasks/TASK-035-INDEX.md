@@ -16,7 +16,7 @@ depende só de TASK-035-002 [`isVersionAltered`]; TASK-035-005 depende só de TA
 [coluna `pageCount`] — arquivos distintos, `strategic-panel-calculations.ts` vs.
 `strategic-panel.service.ts`, paralelizáveis)
 - [x] TASK-035-004 ✅ Done
-- [ ] TASK-035-005 ⏸ Todo
+- [x] TASK-035-005 ✅ Done
 
 ### Wave 3 (depende de TASK-035-004 E TASK-035-005 — `buildStrategicPanel` soma as 2 leituras
 em lote ao cálculo puro; a rota HTTP e a prova de custo constante só existem depois das duas)

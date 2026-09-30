@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-035/F10 — Wave 1 fechada: TASK-035-001/002/003 Done)
+**Última atualização**: 2026-09-30 (PLAN-035/F10 — Wave 2 fechada: TASK-035-004/005 Done)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -114,7 +114,7 @@ fechado._
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
 | PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 7/7 ✅ | Approved |
-| PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 4/8 🟡 | Approved |
+| PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 5/8 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -351,6 +351,8 @@ fechado._
 | RISK-034-006 | O Painel fornece o número, não o critério de escala; o limiar segue em PIL-001 | — | SPEC-034 §9 |
 
 ## Histórico recente
+
+- 2026-09-30 05:32: **Wave 2 de PLAN-035 fechada** — TASK-035-004 (cálculo puro por Conteúdo + agregação/backlog + prioridade derivada) e TASK-035-005 (6 leituras em lote, factory-wide, snapshot só das vigentes aprovadas). Gates: code-reviewer reprovou as duas no gate 1 (testes não discriminantes), retry consolidado; TASK-035-005 reprovada 2ª vez no gate 7 (sonda de query duplicada) → teto 4.88 resolvido pela escada (Diretor ausente) com o default "aplicar e fechar" — `withQueryEventProbe` em tests/support; performance-engineer reprovou o `contentSnapshot` do histórico → PLAN-035 v0.2, re-review APROVADO; security-engineer APROVADO (wave e delta; gitleaks ausente). Lições: 4 novas + 1 confirmada.
 
 - 2026-09-30 05:15: ajuste de PLAN pós-gates da Wave 2 de PLAN-035 — gate 10 (performance-engineer) reprovou a leitura de versões com `contentSnapshot` de todo o histórico append-only: PLAN-035 v0.2 (COMP-035-007 chave leve + `listApprovedVersionSnapshots`; DEC-035-014 passa a 7 statements fixos); TASK-035-005/006 ajustadas com critérios; gate 1 (code-reviewer) reprovou TASK-035-004/005 por testes não discriminantes (16/17 mutantes do produtor e eixo pertencimento) — retry consolidado.
 
