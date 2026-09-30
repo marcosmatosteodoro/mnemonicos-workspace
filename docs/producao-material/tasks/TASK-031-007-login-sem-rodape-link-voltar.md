@@ -12,7 +12,7 @@
 ## Dependências
 
 - **Depende de**: TASK-031-004, TASK-031-005
-- **Bloqueia**: nenhuma
+- **Bloqueia**: TASK-031-008
 
 ## Contexto
 

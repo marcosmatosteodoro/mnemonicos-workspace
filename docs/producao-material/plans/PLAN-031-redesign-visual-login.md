@@ -38,6 +38,9 @@ FR/NFR de SPEC-030).
 - FR-030-012
 - FR-030-013
 - FR-030-014
+- FR-030-017
+
+(emenda v0.3, BRIEF-043/KAN-185: FR-030-017 — botão em envio)
 
 **NFRs cobertos**:
 - NFR-030-001
@@ -145,7 +148,7 @@ redirecionamento para `next`/`INTERNAL_HOME`, `aria-busy` durante o envio e a au
 `aria-invalid` em erro — mesma lógica, só estilo (fato ancorado:
 `mnemonicos-frontend/src/components/login-form.tsx:1-113`). Confirma a ausência de qualquer
 controle sem função real (lembrar-me, esqueci a senha, criar conta não existem hoje).
-**Realiza**: FR-030-004 (parte — campo de e-mail), FR-030-005, FR-030-006, FR-030-007,
+**Realiza**: FR-030-004 (parte — campo de e-mail), FR-030-005, FR-030-006, FR-030-007, FR-030-017 (emenda v0.3 — botão em envio),
 NFR-030-002, NFR-030-005 (parte — `login-form.test.tsx`)
 **Interface pública**: `mnemonicos-frontend/src/components/login-form.tsx` (Client Component,
 mesmas props/contrato).

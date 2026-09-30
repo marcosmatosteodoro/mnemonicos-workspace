@@ -1,6 +1,6 @@
 # Índice de tarefas do PLAN-031
 
-**Total de tasks**: 7
+**Total de tasks**: 8
 **Tamanho dominante**: small
 
 ## Ordem de execução (waves)
@@ -21,3 +21,6 @@
 
 ### Wave 5 (depende de Wave 3 e Wave 4 — emenda v0.2, BRIEF-039)
 - [x] TASK-031-007 ✅ Done
+
+### Wave 6 (depende de Wave 5 — emenda v0.3, BRIEF-043/KAN-185)
+- [ ] TASK-031-008 ⏳ Todo

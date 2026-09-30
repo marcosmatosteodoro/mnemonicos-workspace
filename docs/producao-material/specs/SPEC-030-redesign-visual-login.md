@@ -2,12 +2,13 @@
 
 **Slug**: producao-material
 **Status**: Approved
-**Versão**: 0.2
+**Versão**: 0.3
 **Autor**: scribe
 **Data**: 2026-09-30
 **Jira Story**: KAN-73
 **Brief**: BRIEF-030
 **Emenda v0.2**: BRIEF-039 (Jira KAN-177) — `/login` sem cabeçalho nem rodapé do app e com link discreto "Voltar para o início"
+**Emenda v0.3**: BRIEF-043 (Jira KAN-185) — estado de envio no próprio botão ("Entrando" + spinner), sem o status solto "Entrando…"
 
 ## 1. Contexto e objetivo
 
@@ -31,7 +32,7 @@ visual, sem meta de negócio numérica associada — o BRIEF-030 não define uma
 sucesso é de conformidade comportamental e visual: todos os critérios de aceitação desta
 SPEC (composição do card, ausência de controles sem função, contraste AA nos dois temas,
 responsividade sem rolagem horizontal, `prefers-reduced-motion`, não-regressão de outras
-rotas e do contrato testado do login) verificados por teste automatizado e por execução
+rotas e do contrato testado do login, com a exceção nomeada do estado de envio — AC-030-011) verificados por teste automatizado e por execução
 real no navegador (gate 9) no fecho do ciclo. `Reabrir se:` o Diretor quiser associar esta
 entrega a uma métrica de produto (ex.: taxa de sucesso de login, tempo até autenticar) no
 futuro.
@@ -46,7 +47,7 @@ SPEC + verificação de tela (gate 9, `screen-verify`) no fecho do ciclo; dono: 
 Lead/QA/product-designer. O aceite estético das capturas (acima) tem dono próprio: o
 Diretor, exercido no merge.
 
-**Verificação (gate 9)**: 2026-09-30 (v0.2, BRIEF-039) — qa, roteiro fixado em TASK-031-007, execução real no navegador (worktree `wt-login-voltar`, branch `feat/producao-material-login-sem-rodape-voltar`, frontend :3000 + backend :3333, login real de ADMIN): AC-030-001 (`/login`, `?next=/studio`, `?sessao=expirada` sem cabeçalho e rodapé, claro/escuro × 360/768/1280), AC-030-006 (`/` e `/studio` com cabeçalho e rodapé), AC-030-015 (link sublinhado, Tab botão → link com foco visível, Enter envia, clique durante "Entrando…" vai a `/` e o sucesso leva a `/studio`, sem pageerror) VERIFICADOS; AC-030-005 por teste (inventário fechado do cartão). Capturas em `thoughts/screen-verify/gate9-login-voltar-r2/` (360/1280 da versão final; 768px na rodada 1, `gate9-login-voltar/`, antes do sublinhado em repouso). Ajuste BRIEF-042 (2026-09-30, decisão do Diretor, sem mudança de FR/AC): link centralizado e sem sublinhado em nenhum estado, verificado em tela pelo qa (centro do link = centro do painel nas 6 combinações; `text-decoration: none` em repouso e hover; foco visível; ativo durante "Entrando…"). Capturas em `thoughts/screen-verify/gate9-brief-042/`. Registro anterior (v0.1): 2026-09-29 — qa, roteiro fixado em TASK-031-004 (§"Roteiro do gate 9"), consolidado contra o DoD do PLAN-031 (SPEC-030 sem FEATs). 11 passos executados por execução real no navegador (branch `feat/producao-material-login-redesign`, HEAD `55dbf61`, frontend :3000 + backend :3333); 6 capturas (claro/escuro × 360/768/1280px) anexadas à Entrega. AC-030-012 (login real) parcial — ver report do QA.
+**Verificação (gate 9)**: v0.3 (BRIEF-043): reaberta — pendente da entrega (roteiro fixado em TASK-031-008). Registro anterior: 2026-09-30 (v0.2, BRIEF-039) — qa, roteiro fixado em TASK-031-007, execução real no navegador (worktree `wt-login-voltar`, branch `feat/producao-material-login-sem-rodape-voltar`, frontend :3000 + backend :3333, login real de ADMIN): AC-030-001 (`/login`, `?next=/studio`, `?sessao=expirada` sem cabeçalho e rodapé, claro/escuro × 360/768/1280), AC-030-006 (`/` e `/studio` com cabeçalho e rodapé), AC-030-015 (link sublinhado, Tab botão → link com foco visível, Enter envia, clique durante "Entrando…" vai a `/` e o sucesso leva a `/studio`, sem pageerror) VERIFICADOS; AC-030-005 por teste (inventário fechado do cartão). Capturas em `thoughts/screen-verify/gate9-login-voltar-r2/` (360/1280 da versão final; 768px na rodada 1, `gate9-login-voltar/`, antes do sublinhado em repouso). Ajuste BRIEF-042 (2026-09-30, decisão do Diretor, sem mudança de FR/AC): link centralizado e sem sublinhado em nenhum estado, verificado em tela pelo qa (centro do link = centro do painel nas 6 combinações; `text-decoration: none` em repouso e hover; foco visível; ativo durante "Entrando…"). Capturas em `thoughts/screen-verify/gate9-brief-042/`. Registro anterior (v0.1): 2026-09-29 — qa, roteiro fixado em TASK-031-004 (§"Roteiro do gate 9"), consolidado contra o DoD do PLAN-031 (SPEC-030 sem FEATs). 11 passos executados por execução real no navegador (branch `feat/producao-material-login-redesign`, HEAD `55dbf61`, frontend :3000 + backend :3333); 6 capturas (claro/escuro × 360/768/1280px) anexadas à Entrega. AC-030-012 (login real) parcial — ver report do QA.
 
 ## 2. Personas e jobs-to-be-done
 - **Colaborador interno** (papel EDITOR ou ADMIN) que acessa `/login` em qualquer
@@ -72,6 +73,7 @@ do PDF.
 | Fundo em tela cheia (do login) | Camada de fundo da página `/login`, atrás do card, que estende a mesma atmosfera visual do painel ilustrado em escala maior e com profundidade/desfoque | BRIEF-030 |
 | Campo em pílula | Estilo visual de campo de formulário com bordas totalmente arredondadas e um indicador visual (ícone) à esquerda do valor digitado | BRIEF-030 |
 | Link de volta ao início | Link discreto "Voltar para o início" que leva a `/`, posicionado no cartão de `/login` fora do `<form>`, após o botão de envio; não é controle do formulário | BRIEF-039 |
+| Botão em envio | Estado do botão de envio de `/login` enquanto o login está em andamento: rótulo "Entrando" com indicador de progresso decorativo, botão desabilitado e nenhum texto de status visível fora do botão | BRIEF-043 |
 
 ## 4. Escopo
 
@@ -89,14 +91,19 @@ do PDF.
   esqueci a senha, criar conta.
 - `/login` sem cabeçalho e sem rodapé do aplicativo, com link discreto "Voltar para o
   início" (→ `/`) fora do `<form>`, abaixo do botão de envio (emenda v0.2, BRIEF-039).
+- Estado de envio no próprio botão de envio: rótulo "Entrando" + spinner decorativo, botão
+  desabilitado, sem texto de status solto fora do botão, sem mudar as dimensões do botão nem
+  a posição do link de volta (emenda v0.3, BRIEF-043).
 - Paleta nova (tons da referência) com contraste AA (4,5:1 texto; 3:1 borda/ícone) nos
   temas claro e escuro, incluindo placeholder/rótulo sobre o fundo preenchido da pílula.
 - Responsividade sem rolagem horizontal em 360px, 768px e 1280px; no menor breakpoint, o
   painel ilustrado ocupa faixa baixa e o formulário fica acima da dobra.
 - Animação decorativa (se houver) puramente visual, suprimida sob `prefers-reduced-motion:
-  reduce`.
+  reduce`; o indicador de progresso do botão em envio fica estático sob a mesma preferência
+  (emenda v0.3).
 - Não-regressão: aparência das demais rotas (header, footer, contêiner) e comportamento já
-  testado de `LoginForm`/`page.tsx`/`PasswordField`.
+  testado de `LoginForm`/`page.tsx`/`PasswordField`, exceto o estado de envio do botão
+  (emenda v0.3; ver §4.2 e AC-030-011).
 - Verificação de login real no navegador após o redesenho (gate 9).
 
 ### 4.2 Out-of-scope
@@ -104,7 +111,10 @@ do PDF.
   simétrico do item "ausência de controle sem função" acima).
 - Qualquer mudança de comportamento/lógica do `LoginForm`, `page.tsx` ou `PasswordField`
   além de estilo/apresentação — o comportamento é o vizinho simétrico da não-regressão
-  in-scope.
+  in-scope. **Exceção nomeada** (emenda v0.3, P-043-005): uma guarda em `handleSubmit` que
+  ignora novo envio com envio em andamento, somente se o teste mostrar que o Enter num campo
+  reenvia com o botão desabilitado; a lógica do login (mutação, `next`, `INTERNAL_HOME`,
+  mensagem genérica) não muda.
 - Mudança visual de outras rotas (header, footer, contêiner `max-w-5xl`) — vizinho
   simétrico da não-regressão de outras rotas in-scope.
 - Upload/uso do arquivo de imagem de referência (Freepik) como asset final da aplicação —
@@ -154,7 +164,8 @@ do PDF.
   elemento animado (ex.: estrelas cadentes, brilho), o sistema deve garantir que ele seja
   puramente visual/decorativo, sem efeito funcional sobre o formulário.
 - **FR-030-012** [MUST] Enquanto o usuário tiver a preferência `prefers-reduced-motion:
-  reduce` ativa, o sistema deve suprimir toda animação decorativa da tela de login.
+  reduce` ativa, o sistema deve suprimir toda animação decorativa da tela de login e manter estático o indicador de
+  progresso do botão em envio (FR-030-017), com o rótulo "Entrando" mantido.
 - **FR-030-013** [MUST] O sistema deve apresentar `/login`, com qualquer query string
   (ex.: `?next=…`, `?sessao=expirada`), sem o cabeçalho e sem o rodapé do aplicativo.
 - **FR-030-014** [MUST] O painel de formulário deve abrir com um título curto e de
@@ -165,18 +176,25 @@ do PDF.
   foco, sem interferir no envio do formulário.
 - **FR-030-016** [MUST] Enquanto o login estiver em andamento, o link de volta ao início
   deve permanecer acionável.
+- **FR-030-017** [MUST] Enquanto o login estiver em andamento, o botão de envio deve
+  mostrar o rótulo "Entrando" com um indicador de progresso, ficar desabilitado e não
+  aceitar novo envio, sem nenhum texto de status visível fora do botão; quando o login
+  terminar com falha, o botão deve voltar a "Entrar", sem indicador; as dimensões do botão
+  e a posição do link de volta ao início não devem mudar entre os estados.
 
 ## 6. Requisitos não-funcionais
 - **NFR-030-001** [MUST] O sistema deve manter, nos temas claro e escuro, contraste mínimo
   de 4,5:1 entre texto e fundo e de 3:1 entre borda/ícone de campo e fundo adjacente em
   `/login` — incluindo o texto de placeholder e de rótulo sobre o fundo preenchido do
-  campo em pílula.
+  campo em pílula, e o rótulo e o indicador do botão de envio em qualquer estado
+  desabilitado (durante o envio e antes da hidratação).
 - **NFR-030-002** [MUST] Não-regressão do `LoginForm`: o sistema deve manter, após o
   redesenho, `method="post"` no formulário, o gate de hidratação que libera o envio só após
-  montagem no cliente, a mensagem genérica de erro em `role="alert"`, o status "Entrando…"
-  durante o envio, e o redirecionamento para `next` (quando presente e seguro) ou
-  `INTERNAL_HOME` no sucesso — sem alteração de lógica, só de estilo (fato ancorado:
-  `mnemonicos-frontend/src/components/login-form.tsx:1-113`), incluindo `aria-busy` no
+  montagem no cliente, a mensagem genérica de erro em `role="alert"`, o estado de envio
+  no próprio botão (rótulo "Entrando" + indicador de progresso decorativo, botão
+  desabilitado), anunciado a tecnologia assistiva, e o redirecionamento para `next` (quando presente e seguro) ou
+  `INTERNAL_HOME` no sucesso — sem alteração de lógica (salvo a guarda de reenvio nomeada na §4.2), só de estilo e do
+  estado de envio no botão (fato ancorado: `mnemonicos-frontend/src/components/login-form.tsx`), incluindo `aria-busy` no
   formulário durante o envio e a ausência de `aria-invalid` nos campos quando a mensagem
   genérica de erro está visível.
 - **NFR-030-003** [MUST] Não-regressão de `page.tsx`: o sistema deve manter, após o
@@ -188,7 +206,7 @@ do PDF.
   atual — o componente é reestilizado, nunca reescrito (fato ancorado:
   `mnemonicos-frontend/src/components/password-field.tsx:60-99`).
 - **NFR-030-005** [MUST] Os testes automatizados existentes devem continuar passando após
-  o redesenho, sem afrouxamento de asserção: `mnemonicos-frontend/src/app/login/page.test.tsx`,
+  o redesenho, sem afrouxamento de asserção (com a exceção nomeada de AC-030-011 para o estado de envio): `mnemonicos-frontend/src/app/login/page.test.tsx`,
   `mnemonicos-frontend/src/app/login/page.next-param.test.ts`,
   `mnemonicos-frontend/src/components/login-form.test.tsx` e
   `mnemonicos-frontend/src/components/password-field.test.tsx`.
@@ -235,10 +253,12 @@ do PDF.
 - **AC-030-009** (cobre FR-030-011, FR-030-012)
   Dado um usuário com `prefers-reduced-motion: reduce` ativo, quando a página `/login`
   carrega, então nenhuma animação decorativa (estrelas cadentes, brilho) ocorre, e o
-  formulário permanece funcional.
+  formulário permanece funcional; o indicador de progresso do botão em envio fica estático
+  e o rótulo "Entrando" continua (prova no AC-030-016).
 - **AC-030-010** (cobre NFR-030-001)
   Dado os temas claro e escuro de `/login`, quando o contraste de texto, bordas e ícones
-  de campo — incluindo placeholder e rótulo sobre o fundo preenchido da pílula — é medido,
+  de campo — incluindo placeholder e rótulo sobre o fundo preenchido da pílula, e o rótulo e o indicador do botão de envio desabilitado (envio e
+  pré-hidratação) — é medido,
   então todos atingem no mínimo 4,5:1 (texto) e 3:1 (borda/ícone).
 - **AC-030-011** (cobre NFR-030-002, NFR-030-003, NFR-030-004, NFR-030-005)
   Dado o redesenho aplicado, quando os testes automatizados
@@ -246,12 +266,15 @@ do PDF.
   `mnemonicos-frontend/src/app/login/page.next-param.test.ts`,
   `mnemonicos-frontend/src/components/login-form.test.tsx` e
   `mnemonicos-frontend/src/components/password-field.test.tsx` são executados, então todos
-  passam sem alteração de asserção, incluindo `aria-busy` durante o envio e a ausência de
+  passam sem alteração de asserção (salvo a exceção nomeada abaixo), incluindo `aria-busy` durante o envio e a ausência de
   `aria-invalid` nos campos em erro. Na emenda v0.2, `layout.test.tsx`,
   `app-chrome-gate.test.tsx` e o arquivo novo `login/page-back-link.test.tsx` (com o form real,
   que `page.test.tsx` mocka) ganham asserções (ausência de cabeçalho/rodapé em `/login`,
   presença nas demais rotas, link e seu destino) e nenhuma asserção existente é
-  afrouxada; a prova do link é do AC-030-015.
+  afrouxada; a prova do link é do AC-030-015. **Exceção nomeada** (emenda v0.3, BRIEF-043): as asserções
+  do texto "Entrando…"/`role=status` e do botão desabilitado durante o envio em
+  `login-form.test.tsx` e `login/page-back-link.test.tsx` são **substituídas** pelas do estado
+  de envio no botão (AC-030-016); nenhuma outra asserção é afrouxada.
 - **AC-030-012** (cobre NFR-030-002)
   Dado um colaborador interno com credencial válida na tela de login redesenhada, quando
   ele submete e-mail e senha corretos (com `next` seguro presente, e também sem `next`),
@@ -269,11 +292,23 @@ do PDF.
   texto "Voltar para o início" cujo destino é `/`; o link é discreto (texto pequeno, cor
   secundária, sem fundo nem borda de botão), tem contraste AA nos temas claro e escuro e
   foco de teclado visível, vem depois do botão na ordem de tabulação, e Enter nos campos
-  continua enviando o formulário. Quando o login está em andamento ("Entrando…") e o
+  continua enviando o formulário. Quando o login está em andamento (botão em "Entrando") e o
   usuário clica no link, então o navegador vai para `/` sem erro e sem travar (não se
   afirma que permanece em `/` após a resposta: no sucesso, o `LoginForm` leva à área
   interna — P-039-004). O cartão não desalinha em 360px, 768px e 1280px, e a cor do link
   vem de token do `@theme`.
+- **AC-030-016** (cobre FR-030-017, FR-030-012, NFR-030-001, NFR-030-002)
+  Dado `/login` com e-mail e senha preenchidos, quando o formulário é enviado e o login está
+  em andamento, então o botão de envio mostra o rótulo "Entrando" com um spinner decorativo
+  (`aria-hidden`, fora da ordem de foco), fica desabilitado e não reenvia por clique nem por
+  Enter num campo, o estado de envio é anunciado uma única vez a tecnologia assistiva (com
+  `aria-busy` no formulário), nenhum texto "Entrando…" aparece fora do botão em nenhum estado,
+  e as dimensões do botão e a posição do link "Voltar para o início" não mudam em 360px,
+  768px e 1280px. Quando o login termina com falha de credencial ou de rede, então o botão
+  volta a "Entrar", sem spinner, e a mensagem de erro aparece em `role="alert"` como antes,
+  sem anunciar "Entrar". Quando o usuário tem `prefers-reduced-motion: reduce` ativo, então o
+  spinner fica estático e o rótulo "Entrando" continua. Nos temas claro e escuro, o rótulo do
+  botão desabilitado atinge no mínimo 4,5:1 e o spinner 3:1, sem esmaecimento por opacidade.
 
 ## 8. Premissas e decisões prévias
 - **A-030-001** [assumido] [evidência: crença] A ilustração do painel ilustrado e do
