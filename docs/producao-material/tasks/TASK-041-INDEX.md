@@ -12,7 +12,7 @@
 - [x] TASK-041-002 ✅ Done
 
 ### Wave 3 (depende de Wave 2)
-- [ ] TASK-041-003 ⏸ Todo
+- [x] TASK-041-003 ✅ Done
 
 ### Wave 4 (depende de Wave 3)
 - [ ] TASK-041-004 ⏸ Todo
