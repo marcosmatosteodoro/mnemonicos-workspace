@@ -569,10 +569,21 @@ que faz a substituição parecer rigor.
   **sem dependência nova**.
 Referência: `mnemonicos-frontend/src/components/internal-shell.tsx` +
 `src/components/internal-shell.integration.test.tsx`.
+**Extensão (2026-09-30, PLAN-046/TASK-046-002, gate 1 da Wave 1):** montar o componente não basta
+quando o valor esperado **coincide com o da primeira pintura**. `site-logo.integration.test.tsx`
+esperava o `meSilent` assentar pela store (`api.endpoints.meSilent.select()`) e lia o `href` na
+hora: o esperado (`/`) é o da pintura inicial, então o mutante `Boolean(data)` sobreviveu em L3/L7
+e "papel desconhecido liberado" sobreviveu à suíte inteira. Esperar a store não prova que o
+componente já renderizou com o estado; `await act(async () => {})` também não. Regra: todo caso
+cujo valor esperado é igual ao da primeira pintura espera um sinal **no DOM** da renderização que
+consumiu os dados resolvidos (ex.: sonda no mesmo `<Provider>` que chama o mesmo hook e escreve o
+estado resolvido) antes de ler o valor; o caso só fecha quando o mutante que produz o outro valor
+depois de assentar morre nele. Referência: `mnemonicos-frontend/src/components/site-logo.integration.test.tsx`
+(`ResolvedProbe`, `settled`).
 **Validade:** enquanto o frontend usar RTK Query com componentes que ramificam em
 `isLoading`/`isError`/`data`.
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
 
 ## [Testes] Comentário que afirma paridade entre os dois repos só vale se o teste LER as duas fontes
 

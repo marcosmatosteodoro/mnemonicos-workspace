@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -51,6 +51,7 @@ Convenção dos comandos: executados na raiz do repositório `mnemonicos-fronten
 - [ ] **Matriz de destino do header com o módulo `@/store/api` mockado (complemento, não oráculo)** — `npm test -- --runTestsByPath src/components/site-header.test.tsx` → `Tests: 9 passed, 9 total` (5 + 4): **SH-A** `useMeSilentQuery` com EDITOR → `'/studio'` · **SH-B** ADMIN → `'/studio'` · **SH-C** STUDENT → `'/'` · **SH-D** `{ data: undefined, isLoading: true }` → `'/'`, cada um com `getByRole('link')` e `toHaveAttribute('href', <literal>)`. O teste existente `:87-93` (sem sessão → `'/'`) segue. A marca e o estilo: o `link` tem o texto `env.appName` e os tokens `text-lg font-semibold tracking-tight` (valor, não "contém"). Mutante **K14**: remover `font-semibold` do `SiteLogo` → o teste de estilo reprova. Lição `componente-novo-num-slot-j-ocupado-por-irm-os-can-nicos-herda-a-conven-o-deles-n-o-s-o-contrato-de-composi-o` (ativa): o `<Link>` do `SiteLogo` herda **literalmente** as classes do logo atual (`site-header.tsx:13`, `text-lg font-semibold tracking-tight`) e o texto `env.appName` — `git show f7760a2:src/components/site-header.tsx | grep -n "text-lg font-semibold tracking-tight"` → 1 linha e `grep -n "text-lg font-semibold tracking-tight" src/components/site-logo.tsx` → 1 linha (mesma string, por valor); `grep -n "env.appName" src/components/site-logo.tsx` → ao menos 1 linha.
 - [ ] **HTTP real: a marca segue no `<header>` do SSR (R4)** — `npm test -- --runTestsByPath src/app/not-found.integration.test.ts src/app/home.integration.test.ts` → `Tests: 14 passed, 14 total` (fixação executada: 3 `not-found` + 11 `home`; o `it.each(INTERNAL_ROUTE_PREFIXES)` do H7 expande em 3), sem editar os dois arquivos (`git diff --stat origin/main...HEAD -- src/app/not-found.integration.test.ts src/app/home.integration.test.ts` → vazio); `not-found.integration.test.ts:120` exige "Mnemônicos" dentro de `<header>` no HTML servido — `SiteLogo` renderiza o texto no SSR. Roda sob a trava `acquireNextBuildLock`; não em paralelo com `next dev`/`next build` do mesmo repo.
 - [ ] **`site-header.tsx` só troca o logo** — `git diff -U0 origin/main...HEAD -- src/components/site-header.tsx | grep -E '^[+-][^+-]' | grep -E "ApiStatus|ThemeToggle|AuthControl"` → saída vazia (ausência; vazia também no commit-pai); alvo não-vazio: o mesmo diff sem o segundo `grep` lista as linhas do `<Link>` removido e do `<SiteLogo />` novo. Mutante **K15** (worktree): remover `<AuthControl />` do header → o comando lista a linha **e** `site-header.test.tsx` reprova.
+- [ ] **L3–L7 esperam a renderização que consumiu o estado resolvido, não a store (herdado do gate 1, Wave 1 — pai: AC-044-013; lição ativa `predicado-de-decis-o-de-ui-a-partir-de-estado-de-rtk-query-s-se-prova-no-componente-montado`)** — condição: **todo** caso de `site-logo.integration.test.tsx` cujo `href` esperado coincide com o da primeira pintura (`/`) espera um sinal **no DOM** da renderização que consumiu o `meSilent` resolvido (sonda no mesmo `<Provider>` que chama `useMeSilentQuery()` e escreve o estado resolvido; `settled` espera o texto da sonda sair do estado inicial) antes de ler o `href` — nunca `api.endpoints.meSilent.select()(store.getState())`; `await act(async () => {})` não basta. `npm test -- --runTestsByPath src/components/site-logo.integration.test.tsx` → 0 failed, contagem igual à de antes. Par de provas (worktree): **K2** (`Boolean(data)` no lugar do predicado de papel) reprova em L3 **e** em L7, cada um por asserção própria; **KG** (`data && data.role !== 'STUDENT'` — papel desconhecido liberado) reprova em L7; **KN** (`data === null` tratado como sessão) reprova em L4, L5 e L6; controle negativo (código de hoje) segue verde em todos os casos. K4 original é equivalente (`api.ts:851`: todo erro vira `data: null`) — declarado e substituído por KN. O nome do L14 corrige a ordem real (no `SiteHeader` o `SiteLogo` vem **antes** do `AuthControl`).
 - [ ] **Arquivos fora do diff (contrato congelado do PLAN)** — `git diff --stat origin/main...HEAD -- src/components/auth-control.tsx src/store/api.ts src/proxy.ts src/lib/internal-routes.ts src/components/app-chrome-gate.tsx src/app/globals.css src/app/night-palette-tokens.ts` → saída vazia (ausência; vazia também no commit-pai `f7760a2`; alvo não-vazio: `git diff --stat origin/main...HEAD` lista os arquivos do Inclui). Mutante **K16** (worktree): acrescentar uma linha a `src/components/auth-control.tsx` → o comando lista o arquivo. `git diff --name-only origin/main...HEAD | grep -vE '^(src|tests)/'` → saída vazia (nenhum `package.json`/config). Após o merge do BRIEF-045 (TRISK-046-001): rebase/merge e reexecutar `site-header.test.tsx`, `auth-control.integration.test.tsx` e o arquivo de integração desta TASK; `git diff --stat` conferido antes do fecho.
 - [ ] **Suíte inteira** — baseline: `npm test` no commit-base, registrada antes do primeiro edit (`Test Suites: N passed`, `Tests: M passed`, 0 failed); fecho: `npm test` → 0 failed, `Tests: M + 4 + 22 passed` (4 de `site-header.test.tsx` + 22 do arquivo novo), mesmas suítes mais 1.
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (produção e teste) — `npx eslint --max-warnings=0 $(git diff --name-only --diff-filter=d origin/main...HEAD | grep -E '\.(ts|tsx)$')` → exit 0; `npm run typecheck` → exit 0; `npx prettier --check $(git diff --name-only --diff-filter=d origin/main...HEAD)` → exit 0; `npm run lint` → exit 0.
@@ -86,19 +87,19 @@ Convenção dos comandos: executados na raiz do repositório `mnemonicos-fronten
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-09-30T18:31:24-0300
+**Data conclusão**: 2026-09-30T18:48:26-03:00
+**Commit SHA**: 7b26119, 8c60101 (retry gate 1) (mnemonicos-frontend, branch feat/producao-material-sidebar-navegacao)
+**Jira**: pendente — acesso ao Jira desligado pelo Diretor; sub-tarefa a criar sob KAN-178 (docs/producao-material/tracker-local-KAN-178.md)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1) — security-engineer
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-044 sem FEATs; o Roteiro do gate 9 desta TASK é carregado pelo `qa` na Etapa 4 do PLAN-046
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
