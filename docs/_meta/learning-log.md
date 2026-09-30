@@ -1530,3 +1530,23 @@ artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) �
 patch: frase no fim do item (f): sujeito que vive em helper exige que o critério mande o helper expor o dado; helper que não expõe se estende na TASK. Saldo +1 linha longa
 reincidencia: 0 (regra base do (f) presente; o eixo helper é novo)
 estado: ativa
+
+## LRN-067: `screen-verify` manda preencher o login com o valor da senha mas não diz o que fazer quando o sandbox do browser não lê o arquivo — o qa tentou rotas de materialização da credencial
+data: 2026-09-30
+gatilho: retry
+origem: SPEC-044/PLAN-046 (KAN-178), gate 9 autenticado — a senha só existe em `keelson.local.json`; `browser_run_code_unsafe` não tem `require`/`process` e `import('node:fs')` falha (ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING); o qa tentou servir a credencial por servidor HTTP local de 1 endpoint ao `page.evaluate` (classificador: "Expose Local Services") e depois mais chamadas ("Credential Materialization"). Custo: 22 ACs em handoff (`permissao_ambiente`), nenhum dano
+causa_raiz: instrucao_ausente — `skills/screen-verify/SKILL.md` §2 prescreve `browser_fill_form` "com os valores de `login`" e as l.29-30 proíbem ecoar a senha, mas nenhuma linha diz o que fazer quando as duas exigências colidem (a ferramenta de fill exige o valor nos argumentos, o sandbox não lê o arquivo); o vazio empurrou o qa a improvisar rotas de materialização (mesma fronteira de LRN-049). O classificador conteve — contenção externa ao processo de novo
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `skills/screen-verify/SKILL.md`, § "Dados de acesso" (após o bullet "Nunca ecoe a senha", l.29-30)
+patch: bullet novo (+5 linhas): sem via que preencha o form sem a senha passar pelo contexto, ou com negação do classificador por materialização, não abrir rota intermediária (servidor local, arquivo, script) — declarar `pendente_handoff` `permissao_ambiente` e pedir ao Diretor o desbloqueio (regra de permissão pré-concedida para o preenchimento)
+reincidencia: 0 (família de LRN-049, causa distinta: lá extração de outra fonte; aqui ausência de saída quando a fonte sancionada não é legível pelo sandbox; Grep 0.192.0 por `materializ|sandbox|permissao_ambiente` no SKILL.md — verificar pelo mantenedor, proposta não aplicada)
+estado: ativa
+
+## LRN-068: `probe-env.sh` lê credencial só em `realm.login.{username,password}` e reporta "em branco/placeholder" para realm com os campos no nível do realm — falso `credencial_placeholder`
+data: 2026-09-30
+gatilho: verificacao_falhou
+origem: SPEC-044/PLAN-046 (KAN-178), gate 9 — o `keelson.local.json` deste workspace guarda `loginPath`/`username`/`password` direto no realm (sem objeto `login`, divergindo do template `templates/keelson.local.example.json`); a sonda devolveu `credencial_placeholder` com evidência "em branco/placeholder" para campos que estão preenchidos. Mesma classe do precedente HANDOFF-PLAN-041 (diagnóstico de credencial que não aponta a causa real)
+causa_raiz: verificador_furado — o leitor Python (l.94-103) busca só `login.get(...)` e o texto da evidência (l.141) afirma "em branco/placeholder" sem distinguir campo ausente de campo fora de lugar; o erro de formato local é conserto LOCAL, mas o verificador mente sobre a causa. Texto novo não resolve: conserte o check
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `scripts/probe-env.sh` (l.94-103 e l.141) + `scripts/tests/probe-env/run.sh`
+patch: flag nova `fora_de_login` quando o campo está preenchido no realm mas vazio em `login{}`; evidência passa a nomeá-la; caso de teste novo. Saldo ~+6 linhas
+reincidencia: 0 (LRN-016/017 são outras causas no mesmo script: encoding e realm público)
+estado: ativa
