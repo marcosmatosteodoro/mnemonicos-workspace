@@ -39,6 +39,11 @@ constante — sem esperar TASK de wiring posterior.
 
 ### Inclui
 
+- `mnemonicos-backend/src/modules/strategic-panel/strategic-panel-calculations.ts` — **ajuste por furo
+  no plano (Tech Lead, 2026-09-30, achado do gate 4 da Wave 3)**: `StrategicPanelPayload` ganha
+  `contents: ContentMetrics[]` (todo Conteúdo ativo, ordem determinística — ex.: disciplina, tema,
+  id), montado em `aggregateStrategicPanel` (função pura), com teste unitário próprio; nenhum outro
+  comportamento de TASK-035-004 muda.
 - `mnemonicos-backend/src/modules/strategic-panel/strategic-panel.service.ts` (estende —
   arquivo criado na TASK-035-005):
   ```ts
@@ -153,6 +158,26 @@ constante — sem esperar TASK de wiring posterior.
 
 ## Critérios de pronto
 
+- [ ] **Achado do gate 4 da Wave 3 — bloco por Conteúdo na fronteira HTTP** (FR-034-004/005/006/011/025):
+      `GET /strategic-panel` devolve `contents[]` com, por Conteúdo ativo: `contentId`,
+      `disciplineName`, `topicName`, `totalTime`, `timePerPage`, `perStage` (as 8 etapas),
+      `perStagePerPage` quando houver medida, `reworkCountByStage`, `concluded`,
+      `approvedButAltered`, `priority`, `mostAdvancedStage`, `ageMs` (nomes finais = os do tipo
+      real) — cada ramo de união serializado por allowlist campo a campo (nada de spread).
+      Verificação: teste de rota com chaves EXATAS por nível, incluindo os itens de `contents`.
+- [ ] **Achado do gate 1 da Wave 3 — um caso por ramo de toda união da resposta**: o fixture do
+      teste de forma produz, por rotas/serviços reais (nunca seed direto do Prisma — RISK-034-004),
+      ao menos 1 Conteúdo com tempo por página MEDIDO (criação instrumentada + fechamento + Exportação
+      Tira com pageCount) e 1 SEM medida; o teste afirma que cada ramo apareceu (ex.:
+      `expect(statuses).toContain('medido')` e `'sem-medida'`) em TimePerPageAggregate, `totalTime` e
+      `perStage`, e confere as chaves exatas de cada ramo. Mutante (em `git worktree add`) que
+      acrescenta uma chave ao ramo medido → o teste reprova.
+- [ ] **Achado do gate 1 da Wave 3 — allowlist prova-se sem depender do payload atual**: 1 teste
+      unitário de `toStrategicPanelResponse` recebe um payload com uma chave extra em CADA nível
+      (via cast) e afirma que nenhuma chega à saída; o mutante `res.json(payload)` direto reprova.
+- [ ] **Achado do gate 6 da Wave 3 — sem estado compartilhado entre `it`** em
+      `strategic-panel.query-count.integration.test.ts`: cada volume afirma a própria contagem (ou os
+      2 volumes num único `it`); rodar cada `it` isolado (`-t`) passa.
 - [ ] Testes cobrem AC-034-012, AC-034-013 — verificação executável: `npm --prefix
       mnemonicos-backend run test:integration --
       --testPathPatterns=strategic-panel.routes.integration.test.ts` → `OK (N tests)`.
