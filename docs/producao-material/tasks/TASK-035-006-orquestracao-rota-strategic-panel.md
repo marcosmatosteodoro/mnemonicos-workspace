@@ -77,9 +77,11 @@ constante — sem esperar TASK de wiring posterior.
     return aggregateStrategicPanel(now, metrics);
   }
   ```
-  5 consultas de contagem fixa por chamada (DEC-035-014): Conteúdos ativos; eventos de
-  etapa `IN`; publicações Tira `IN`; versões vigentes `IN`; dados atuais só dos aprovados
-  (2 `IN` adicionais dentro de `listCurrentVersionedFieldsForApprovedContents`) — todo o
+  Contagem fixa por chamada (DEC-035-014 v0.2, 7 statements): Conteúdos ativos; eventos de
+  etapa `IN`; publicações Tira `IN`; versões vigentes `IN` só com chaves leves; e, para as
+  vigentes APROVADAS, `listApprovedVersionSnapshots` (snapshot `id IN`) + 2 `IN` de dados
+  atuais, no mesmo `Promise.all` (ajuste pós-gate 10 da Wave 2 — o `contentSnapshot` chega
+  ao cálculo só para as vigentes aprovadas) — todo o
   cálculo roda em memória sobre o resultado, sem nova ida ao banco por Conteúdo. O
   agrupamento por `rawContentId` (`.filter`) é O(N²) no pior caso trivial deste volume de
   referência (200×50) — se o gate 10 medir custo de CPU relevante, a otimização (índice em
@@ -170,6 +172,13 @@ constante — sem esperar TASK de wiring posterior.
       calibrado contra `content-versions.service.ts` → ≥1). Mutante (em `git worktree add`)
       que chama `resolveAlterationSignal` por Conteúdo aprovado → contagem diverge entre os 2
       volumes e o teste de NFR-034-001 reprova.
+- [ ] **Pendência herdada (gate 8 da Wave 2, security-engineer) — contrato do input de F9**:
+      a orquestração só entrega `currentVersionedFields`/snapshot para Versão vigente com
+      `approvedById !== null`; 1 caso (unit ou integração) com Versão NÃO aprovada cujos
+      campos atuais coincidem com o snapshot → `concluded === false` (mutante que remove
+      `|| approvedById === null` em `strategic-panel-calculations.ts` reprova — em
+      `git worktree add`). E a lista recursiva de chaves PROIBIDAS do teste de payload
+      (NFR-034-004) inclui `approvedById` junto de `actorId`/`authorId`/`lastEditedById`.
 - [ ] Censo de rotas atualizado (47→48) — verificação executável: `npm --prefix
       mnemonicos-backend run test:integration --
       --testPathPatterns=route-authz-matrix.integration.test.ts` → `OK (N tests)`.

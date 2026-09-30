@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Status**: Approved
-**Versão**: 0.1
+**Versão**: 0.2
 **Autor**: keelson (scribe)
 **Data**: 2026-09-30
 
@@ -172,7 +172,12 @@ rawContentId, occurredAt, pageCount }`.
 ### COMP-035-007: Leitura em lote da Versão vigente e dados atuais para F9
 **Responsabilidade**: (a) `listLatestVersionsForPanel(rawContentIds, db)` — 1 `findMany` de
 `ContentVersion` `rawContentId: { in: ... }`, `orderBy: { number: 'asc' }`, agrupado em
-memória por `rawContentId` (última entrada = vigente) — nunca 1 `findFirst` por Conteúdo.
+memória por `rawContentId` (última entrada = vigente) — nunca 1 `findFirst` por Conteúdo;
+`select` só com chaves leves (`id`, `rawContentId`, `number`, `closedAt`, `approvedById`),
+**sem** `contentSnapshot` (ajuste pós-gate 10 da Wave 2: histórico append-only ilimitado não
+trafega). (a2) `listApprovedVersionSnapshots(versionIds, db)` — 1 `findMany` de
+`ContentVersion` `id: { in: <vigentes aprovadas> }`, `select: { id, contentSnapshot }`, no
+mesmo `Promise.all` do subconjunto aprovado.
 (b) `listCurrentVersionedFieldsForApprovedContents(rawContentIds, db)` — só para os
 Conteúdos cuja Versão vigente tem `approvedById !== null`: 2 `findMany` `IN (...)`
 (`RawContent`/`RuleBreakdown` com o `select` versionado de `versioned-content-diff.ts`),
@@ -248,7 +253,7 @@ o mais novo, com idade "sem medida" sempre depois de idade numérica na mesma pr
 
 ### COMP-035-012: Orquestração do Painel
 **Responsabilidade**: `buildStrategicPanel(now, db): Promise<StrategicPanelPayload>` — chama
-COMP-035-004/005/006/007 (5 consultas de contagem constante, ver DEC-035-014), monta os
+COMP-035-004/005/006/007 (número fixo de consultas, ver DEC-035-014), monta os
 `Map`s de correlação em memória e entrega a COMP-035-010/011. Único ponto que soma I/O ao
 cálculo puro.
 **Realiza**: FR-034-003, FR-034-020, NFR-034-002
@@ -379,7 +384,7 @@ fail-safe) → mesma `$transaction` grava `ProductionStageEvent{PUBLICACAO_PDF}`
 entregue ao cliente independente do resultado da contagem.
 
 **Fluxo 2 — Leitura do Painel** (FEAT-034-002): `GET /strategic-panel` (EDITOR/ADMIN) →
-`buildStrategicPanel(now)` dispara as 5 consultas de contagem fixa em paralelo onde
+`buildStrategicPanel(now)` dispara as consultas de contagem fixa (DEC-035-014) em paralelo onde
 independentes (Conteúdos ativos; eventos de etapa `IN`; publicações Tira `IN`; versões
 vigentes `IN`; dados atuais só dos aprovados `IN`) → `computeContentMetrics` por Conteúdo
 (em memória) → `aggregateStrategicPanel` (Módulo/fábrica/backlog) → rota serializa por
@@ -499,9 +504,11 @@ reforça isso pelo lado do `select`, não só pela ausência de filtro).
 ### DEC-035-014: Número fixo de consultas do módulo `strategic-panel`
 **Contexto**: NFR-034-001 exige contagem de consultas constante, independente do total de
 Conteúdos.
-**Decisão**: 5 consultas de contagem fixa por chamada de `buildStrategicPanel`
-(Conteúdos ativos; eventos de etapa `IN`; publicações Tira `IN`; versões vigentes `IN`;
-dados atuais só dos Conteúdos com Versão aprovada, 2 `IN` adicionais) — todo o cálculo
+**Decisão**: número fixo de consultas por chamada de `buildStrategicPanel` — 7 statements
+(Conteúdos ativos; eventos de etapa `IN`; publicações Tira `IN`; versões vigentes `IN` só com
+chaves leves; e, só para os Conteúdos com Versão vigente aprovada, snapshot `id IN` + 2 `IN`
+de dados atuais — ajuste pós-gate 10 da Wave 2: a coluna larga `contentSnapshot` sai da
+leitura do histórico) — todo o cálculo
 (tempo, agregados, backlog, prioridade, ordenação) roda em memória sobre o resultado, sem
 nova ida ao banco por Conteúdo.
 **Alternativas consideradas**:

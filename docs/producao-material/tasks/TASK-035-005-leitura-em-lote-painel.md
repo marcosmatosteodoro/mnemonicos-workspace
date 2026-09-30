@@ -120,6 +120,21 @@ não reabre a lógica de filtro/select, só as chama.
 
 ## Critérios de pronto
 
+- [ ] **Ajuste pós-gate 10 da Wave 2 (performance-engineer) — coluna larga fora do histórico**:
+      `listLatestVersionsForPanel` deixa de selecionar `contentSnapshot` (só `id`,
+      `rawContentId`, `number`, `closedAt`, `approvedById`); nova
+      `listApprovedVersionSnapshots(versionIds, db)` — 1 `findMany` `id: { in }`,
+      `select: { id, contentSnapshot }`. Prova: query-count por função atualizado (1 statement
+      para a nova) e 1 caso com Conteúdo de 3 Versões (a vigente NÃO aprovada) asserindo que a
+      leitura de versões não devolve `contentSnapshot` (chaves exatas) — verificação:
+      `npm --prefix mnemonicos-backend run test:integration --
+      --testPathPatterns=strategic-panel.service.integration.test.ts` → `OK (N tests)`.
+- [ ] **Achado do gate 1 da Wave 2 (code-reviewer) — eixo PERTENCIMENTO em toda leitura em lote**:
+      toda função que filtra por `IN (ids)` (6 leituras no Escopo, 6 provas; lista não
+      exaustiva: eventos de etapa, publicações Tira, versões, snapshots, RawContent e
+      RuleBreakdown dos aprovados) tem fixture com a linha correspondente de um Conteúdo
+      FORA do array de entrada e asserção de que ela não volta; mutante (em
+      `git worktree add`) que remove o `IN` de cada uma → o teste daquela função reprova.
 - [ ] **Ajuste por furo no plano — export das constantes de select versionado**: as 2
       declarações passam a `export const` sem outra mudança — verificação executável:
       `grep -nE '^export const (RAW_CONTENT_VERSIONED_SELECT|RULE_BREAKDOWN_VERSIONED_SELECT)'

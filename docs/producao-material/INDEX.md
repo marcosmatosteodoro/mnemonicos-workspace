@@ -352,6 +352,8 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-30 05:15: ajuste de PLAN pós-gates da Wave 2 de PLAN-035 — gate 10 (performance-engineer) reprovou a leitura de versões com `contentSnapshot` de todo o histórico append-only: PLAN-035 v0.2 (COMP-035-007 chave leve + `listApprovedVersionSnapshots`; DEC-035-014 passa a 7 statements fixos); TASK-035-005/006 ajustadas com critérios; gate 1 (code-reviewer) reprovou TASK-035-004/005 por testes não discriminantes (16/17 mutantes do produtor e eixo pertencimento) — retry consolidado.
+
 - 2026-09-30 04:33: furo no plano em TASK-035-005 — `RAW_CONTENT_VERSIONED_SELECT`/`RULE_BREAKDOWN_VERSIONED_SELECT` não eram exportadas por `content-versions.service.ts` (a TASK presumia que sim) — destino: ajuste localizado da TASK (Tech Lead): `content-versions.service.ts` entra no Escopo > Inclui só para acrescentar `export` às 2 constantes, com critério próprio; re-emitida.
 
 - 2026-09-30 04:10: **Wave 1 de PLAN-035 fechada** — TASK-035-001 (`PublicationEvent.pageCount`, migração aditiva `20260930062551_add_publication_event_page_count` aplicada em dev/teste; contagem fail-safe), TASK-035-002 (predicado de F9 extraído para `isVersionAltered`, comportamento idêntico, curto-circuito de I/O mantido), TASK-035-003 (`formatDurationPtBr`). Gates: code-reviewer reprovou 001 (gate 1: par de reexportações não discriminante) e 003 (gate 6: `!`), 1 retry cada, re-review APROVADO; security-engineer APROVADO (gitleaks ausente); performance-engineer APROVADO. Fora de escopo estacionado: predicado TIRA de F9 compara por relógio de aplicação (herdado). Lição de projeto nova: prova-de-escrita-que-nao-reescreve-registro-anterior-usa-valores-distintos.
