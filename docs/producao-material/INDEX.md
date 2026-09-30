@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-29 (PLAN-033/F9 — Wave 2 fechada: TASK-033-003/005 Done, FEAT-032-002 implementada e VERIFICADA; próximo: Wave 3. SPEC-030/PLAN-031 — redesenho da tela de login — entregue por sessão paralela)
+**Última atualização**: 2026-09-29 (PLAN-033/F9 — Wave 3 fechada: TASK-033-004 Done (leitura do estado de aprovação + `validApprovalForExport`); FEAT-032-002 implementada e VERIFICADA; próximo: Wave 4. SPEC-030/PLAN-031 — redesenho da tela de login — entregue por sessão paralela)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -17,7 +17,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ## Capacidades
 
 ### Em desenvolvimento
-- Aprovação da Versão vigente com checklist de qualidade e segregação de funções (SPEC-032/FEAT-032-001, PLAN-033, 🟡 — backend entregue e aprovado na Wave 2; faltam a leitura do estado de aprovação, a mutation e o painel na tela, Waves 3-5). Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica (SPEC-032/**PLAN-033**, F9 do épico MNEMORA STUDIO, 🟡 4/7 TASKs Done). Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate.
+- Aprovação da Versão vigente com checklist de qualidade e segregação de funções (SPEC-032/FEAT-032-001, PLAN-033, 🟡 — backend (aprovação + leitura do estado de aprovação) entregue e aprovado nas Waves 2-3; faltam a mutation e o painel na tela, Waves 4-5). Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica (SPEC-032/**PLAN-033**, F9 do épico MNEMORA STUDIO, 🟡 5/7 TASKs Done). Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate.
 
 ### Implementadas
 - Carimbo de Versão aprovada no PDF exportado (SPEC-032/FEAT-032-002, ✅ 2026-09-29) — a 1ª linha do cabeçalho de toda página troca "RASCUNHO" por "Conteúdo normativo e Tira mnemônica — Versão N aprovada" só quando a Versão vigente está aprovada e sem alteração posterior (conteúdo ou Tira); gate 9 VERIFICADO por execução real (6/6 ACs, pdftotext nas 2 Variantes).
@@ -111,7 +111,7 @@ fechado._
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
-| PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 4/7 🟡 | Approved |
+| PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 5/7 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -332,6 +332,16 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-29 21:45: **Wave 3 de PLAN-033 fechada — TASK-033-004 Done.** `listContentVersions`
+  expõe `approvedById`/`approvedAt` e o campo computado `validApprovalForExport` (só a vigente,
+  aprovada e sem sinal de alteração; mesmo predicado do carimbo do PDF), espelhado nos 2
+  `domain.ts`. Custo constante medido: 2/5/5/4 statements (N=3 e N=8 iguais). 1 retry nos gates
+  1/7: caso por par de ramos (mutantes de propagação e índice errado) e chaves exatas do payload
+  do GET (mutante spread) — este no teste HTTP de rotas, extensão só-de-teste declarada. Gate 8
+  aprovado (0 vulnerabilidade), gate 10 aprovado (2 sugestões à Entrega), gate 9 consolidado em
+  FEAT-032-001 (TASK-033-007). Backend `923f60e`/`e1d8426`/`eba5603`, frontend `d19ecfd`. Lições:
+  `select-exposto-que-le-campo-interno-prova-as-chaves-do-payload` (projeto) e LRN-046 (processo,
+  proposta ao plugin).
 - 2026-09-29 20:46: **Wave 2 de PLAN-033 fechada — TASK-033-003/005 Done; FEAT-032-002 VERIFICADA.**
   Retomada via `/keelson:continue` (parado 2h06min). Âncoras de ID do código da F9
   renumeradas (backend `5984073`, 101 ocorrências; frontend `94711c9`, 3) — verificação

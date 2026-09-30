@@ -14,9 +14,9 @@ tipo e transição medidos neste board: `CLAUDE.md` do workspace e `docs/_meta/j
 | FEAT-032-002 — Carimbo de Versão aprovada no PDF exportado | História (`10009`) | Epic da SPEC-032 | `21` Em andamento |
 | TASK-033-001 — Migração de aprovação de Versão | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
 | TASK-033-002 — Sinal de alteração da Tira mnemônica | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
-| TASK-033-003 — Aprovação de Versão (backend) | Subtask (`10007`) | FEAT-032-001 | `21` Em andamento |
-| TASK-033-004 — Leitura do estado de aprovação | Subtask (`10007`) | FEAT-032-001 | `11` Tarefas pendentes |
-| TASK-033-005 — Carimbo de aprovação no PDF | Subtask (`10007`) | FEAT-032-002 | `21` Em andamento |
+| TASK-033-003 — Aprovação de Versão (backend) | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
+| TASK-033-004 — Leitura do estado de aprovação | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
+| TASK-033-005 — Carimbo de aprovação no PDF | Subtask (`10007`) | FEAT-032-002 | `41` Concluído |
 | TASK-033-006 — Tipos e mutation de aprovação (frontend) | Subtask (`10007`) | FEAT-032-001 | `11` Tarefas pendentes |
 | TASK-033-007 — Painel de aprovação (frontend) | Subtask (`10007`) | FEAT-032-001 | `11` Tarefas pendentes |
 
@@ -24,6 +24,8 @@ Teto do §9: nenhuma História passa de `31` Em análise pelo ciclo. `41` é ato
 depois do merge.
 
 ## Log de operações pendentes (mais recente no topo)
+
+- 2026-09-29 21:45: Wave 3 fechada — TASK-033-004: despacho `21` e closure `41` Concluído.
 
 - 2026-09-29 20:50: Wave 2 fechada — TASK-033-003/005 → `41` Concluído. FEAT-032-002
   (carimbo no PDF) completa e com gate 9 verificado → comentar o marco "Funcionalidade pronta

@@ -17,7 +17,7 @@ paralelizáveis)
 
 ### Wave 3 (depende de TASK-033-003 — mesmo arquivo `content-versions.service.ts`,
 sequenciada por colisão de escrita, princípio 2, nunca por dependência funcional real)
-- [ ] TASK-033-004 ⏸ Todo
+- [x] TASK-033-004 ✅ Done
 
 ### Wave 4 (depende de TASK-033-003 E TASK-033-004 — o formato de resposta
 `ContentVersionDetail` só está congelado depois das duas)

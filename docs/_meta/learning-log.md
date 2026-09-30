@@ -931,3 +931,49 @@ artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) �
 patch: proposta de extensão in-line no bullet, logo após "...bloco maior que o código que explica.": "O achado de qualquer eixo do Art. 7 nomeia a CONDIÇÃO que reprova ('todo comentário/docblock introduzido ou alterado por esta TASK obedece X' — régua-mãe 4.321/4.173), nunca só a instância mais evidente — instância(s) citada(s) são ilustração NÃO-exaustiva; o inventário contável declara, no report do gate, quantos comentários/docblocks o diff introduz/altera NO TOTAL e o veredito de cada um nos 4 eixos, não só o(s) percebido(s) por inspeção. Achado assim redigido soma o comando de varredura ao despacho do retry (mecanismo da família LRN-022/`commands/implement.md` §3.3), fechando toda instância da mesma condição no MESMO retry." Saldo líquido ~+5 linhas (mesmo parágrafo, dentro do orçamento ≤10)
 reincidencia: 0
 estado: ativa
+
+## LRN-046: catálogo "resistir a contorno" de `commands/tasks.md` (itens a-h) cobre conjunção de
+predicados (item f) e comparativo de unicidade sobre valores literais (item g), mas não a classe
+"campo booleano computado POR ENTRADA de coleção, verdadeiro só para a entrada especial" — caso
+derivado do texto literal do AC coincide com o cenário em que os dois ramos do ternário dão o
+mesmo resultado, e o mutante de propagação/índice errado sobrevive
+data: 2026-09-29
+gatilho: gate_reprovado
+origem: PLAN-033 (slug producao-material), Wave 3, TASK-033-004 — o Critério de pronto para
+`validApprovalForExport true só para a Versão vigente, false para toda outra entrada`
+(`index === lastIndex ? currentIsValidForExport : false`) cobriu só o cenário do AC-032-006
+(vigente NÃO aprovada — os dois ramos do ternário coincidem em `false`); o único mutante listado
+era o de fail-secure (N2). Os mutantes "propaga o valor da vigente para todas as entradas" e
+"compara contra o índice errado" sobreviveram com a suíte inteira (50/50) verde; achado pelo
+`code-reviewer` no gate 1, custando 1 retry
+causa_raiz: instrucao_ausente — o catálogo "resistir a contorno" (Etapa 3, `commands/tasks.md`,
+decisão 4.107 + família, itens a-h, v0.192.0) cobre conjunção de 2+ predicados por mutante-por-
+parte (item f) e comparativo de unicidade/distinção sobre 2+ valores literais (item g), mas
+nenhum dos dois nomeia a classe irmã: campo booleano computado POR ENTRADA de uma coleção, com
+regra "verdadeiro só para a entrada especial (vigente/atual/dona), false incondicional para toda
+outra entrada" — quando o cenário do AC citado tem os dois ramos do ternário coincidindo (a
+entrada especial também não satisfaz a condição), o caso derivado do texto literal não discrimina
+o mutante que propaga o valor computado para todas as entradas nem o que usa índice/identidade
+errada; nada no gerador instrui, para esse padrão, fixar um cenário em que a entrada especial É
+verdadeira ao lado de não-especiais que TAMBÉM satisfariam a condição se fossem a especial. Ponto
+mais cedo de prevenção é o gerador (`/keelson:tasks`, via scribe), não o developer, que cumpriu o
+critério exatamente como fixado. Reincidência, no ponto de geração da TASK, da lição de projeto
+"Árvore de decisão com precedência: um caso por PAR de ramos que coincide"
+(`guidelines/project/lessons.md`) — mas dedupe conferido contra o ledger de PROCESSO inteiro
+(causa-raiz do gerador, não do developer): nenhuma entrada anterior nomeia esta classe para
+`/keelson:tasks`; o item mais próximo (g) cobre comparativo de unicidade sobre valores literais,
+dono distinto, sem sobreposição
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`,
+catálogo "resistir a contorno" (Etapa 3, mesmo parágrafo dos itens a-h, ~l.203-213 da v0.192.0)
+patch: proposta de item novo (letra a atribuir pelo mantenedor — mesma disputa de slot já
+registrada em LRN-012/015/030/033/037/039/040): campo computado POR ENTRADA de uma coleção com
+regra "verdadeiro só para a entrada X (vigente/atual/dona), false incondicional para as demais"
+nasce, no Critério de pronto, com (1) um caso onde X é verdadeiro E a coleção tem ≥2 entradas
+não-X, sendo ao menos uma delas uma entrada que SATISFARIA a condição da branch-verdadeira se
+fosse X — nunca só o cenário em que os dois ramos do ternário coincidem (X não-satisfaz ⇒ todas
+false) —, com asserção sobre o ARRAY INTEIRO, não só sobre a entrada X; e (2) os mutantes "propaga
+o valor computado de X para todas as entradas" e "compara contra índice/identidade errada" como
+aceite explícito do critério — cada um com asserção própria que morre. Saldo líquido ~+7 linhas
+(mesmo parágrafo, dentro do orçamento ≤10; arquivo tem 284 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa

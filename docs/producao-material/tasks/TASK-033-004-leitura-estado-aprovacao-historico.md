@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -172,17 +172,17 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
-**Jira**:
+**Data início**: 2026-09-29T20:55:00-0300 (despacho; developer não capturou o início — declarado)
+**Data conclusão**: 2026-09-29T21:40:00-0300
+**Commit SHA**: 923f60e (+ e1d8426 — retry 1 dos gates 1/7; eba5603 — aplicação de fim de wave; frontend d19ecfd)
+**Jira**: — (sem acesso ao conector; ver `tracker-local-F9.md`)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 3, após 1 retry: F1 caso por par de ramos + F2 chaves exatas do payload; F2 no teste HTTP de rotas, extensão só-de-teste declarada pelo Tech Lead) — code-reviewer
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 3, 0 vulnerabilidade; lacuna de prova do não-vazamento de `contentSnapshot` fechada no retry) — security-engineer · Performance (gate 10): aprovado, 2 sugestões não-bloqueantes (Entrega) — performance-engineer
+- [x] Comportamento (gate 9): consolidado FEAT-032-001 — carregador: Roteiro do gate 9 de TASK-033-007 (Wave 5), que renderiza o estado de aprovação e `validApprovalForExport` na tela
