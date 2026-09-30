@@ -1160,10 +1160,11 @@ mesma exigência de teste falsificável dos achados bloqueantes — nunca "é s�
 no repo (`tests/unit/db-url-guard.test.ts`, `tests/integration/route-authz-matrix.
 integration.test.ts:467`) prova esses throws com `.toThrow()`; primitiva com client
 injetável prova-se com stub em teste unitário, sem precisar de banco real.
+**Reincidência (2026-09-30, TASK-041-001, PLAN-041):** o Tech Lead ofereceu no despacho do retry um ajuste "opcional" (reordenar a guarda de forma do `classifyMe`, `src/store/api.ts:442`) sem exigir prova; o reorder tornou `|| result.data === null` o único termo que segura o corpo `null`, e o mutante que o remove sobreviveu (M24). Ajuste de carona oferecido como "opcional" herda a régua do mesmo jeito: ou vem com caso + mutante, ou não entra.
 **Validade:** todo retry que consolida mais de um achado ou pedido de correção no mesmo
 despacho, neste projeto.
-**Estado:** em-observacao
-**Contadores:** confirmada 0 · contestada 0
+**Estado:** ativa
+**Contadores:** confirmada 1 · contestada 0
 
 ## [Testes] Prova de ausência por leitura de texto-fonte precisa declarar o universo lido, derivado do quantificador do critério
 
