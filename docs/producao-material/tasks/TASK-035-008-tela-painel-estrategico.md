@@ -8,7 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -341,17 +341,17 @@ voltaram, registre na Evidência: não restaurado é pendência declarada, nunca
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T08:10:55-0300
+**Data conclusão**: 2026-09-30T10:04:38-0300
+**Commit SHA**: 530ee37 (impl) · 75f93dc · afb8798 (retry 1 gates 1/7/11) · 41b59a5 (retry 2) · ac107a6 (merge da main, nova identidade) · 90d7be6 (fim de wave) · d6d1940 (gate 11 contraste da barra na paleta nova) · 4673869 (comentários)
 **Jira**: KAN-175
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer (wave 5)
+- [x] Comportamento (gate 9): verificado — qa em tela real (Roteiro V1–V4, V6–V8 executados com deltas; V5 n/a por decisão registrada, prova substitutiva no teste de componente); linha na SPEC FEAT-034-002
