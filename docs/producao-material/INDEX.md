@@ -354,6 +354,8 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-30 11:49: **F10 mergeada pelo Diretor** — PR #11 backend (`39d033d`) e PR #19 frontend (`f975939`) em `main`. Jira: Histórias KAN-166 e KAN-167 → Concluído (41); filhos do épico consultados por JQL (`parent = KAN-165`: 2/2 em 41) e épico KAN-165 → Concluído com confirmação do Diretor (SPEC-034 entregue inteira); comentário de merge no épico. Pendente: deploy na ordem de DEPLOY-035-001.
+
 - 2026-09-30 10:58: **PRs da F10 abertos a pedido do Diretor** — backend PR #11 e frontend PR #19 (`feat/producao-material-mnemora-studio` → `main`), ambos com a ordem de deploy DEPLOY-035-001 destacada (backend + migração antes do frontend). Merge é do Diretor; KAN-166/167 seguem em "Em análise" até o aviso de merge.
 
 - 2026-09-30 10:50: **Perguntas estacionadas da Entrega de F10 respondidas pelo Diretor** — (1) `stash@{0}` do mnemonicos-frontend (WIP TASK-035-008 retry 2) descartado após conferência: todo o código contido no HEAD `4673869` (só um comentário reescrito depois pela revisão); (2) índice `PublicationEvent(rawContentId, variant)` **não criado agora** — volta com pergunta ao Diretor quando o volume se aproximar do teto medido em DEC-035-018 (~2.500 Conteúdos); (3) A-034-006 (abertura órfã conta como etapa alcançada no backlog) **mantida** — olhar no uso real, ajuste reversível em fatia futura; (4) `max-w-5xl` duplicado (InternalShell × `<main>` do root layout) → brief avulso BRIEF-036, aberto, sem código nem card até o Diretor autorizar.
