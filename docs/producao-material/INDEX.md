@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-29 (PLAN-033/F9 — Wave 5 fechada: 7/7 TASKs Done; FEAT-032-001 e FEAT-032-002 implementadas e VERIFICADAS; ciclo na Entrega. SPEC-030/PLAN-031 — redesenho da tela de login — entregue por sessão paralela)
+**Última atualização**: 2026-09-30 (PLAN-033/F9 mergeada em `main` — PR #10 backend e #17 frontend; épico KAN-149 aguarda confirmação do Diretor; próxima fatia elegível: F10)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -335,6 +335,11 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-30 00:25: **F9 mergeada pelo Diretor** — PR #10 backend (`3ba13b5`) e PR #17 frontend
+  (`1728d78`) em `main`. Jira: KAN-150/KAN-151 → Concluído (trilho pós-merge); `parent = KAN-149`
+  lido do quadro: 2/2 filhos em Concluído; épico KAN-149 aguarda confirmação do Diretor antes de
+  mover. A migração `20260927135234_add_content_version_approval` entra no próximo deploy do
+  backend. Pendentes: HANDOFF-PLAN-033, Q1 (RISK-032-006).
 - 2026-09-30 00:20: **Entrega da F9 — convergência de fecho e aceitação do PO.** Convergência
   (code-reviewer): merge APROVADO, 1 gap parcial FR-032-007(b); o PO aceitou com ressalvas e pediu
   a mesma correção (R-1). Retry R-1 (frontend `3043b46`): a leitura "Válida para a próxima

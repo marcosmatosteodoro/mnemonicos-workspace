@@ -27,6 +27,16 @@ para `--phase finish-dev` e para o ato do Diretor pós-merge, respectivamente. E
 
 ## Log de operações pendentes (mais recente no topo)
 
+- 2026-09-30: **Trilho pós-merge aplicado** (aviso do Diretor — backend PR #10 `3ba13b5`,
+  2026-09-30T03:21:54Z; frontend PR #17 `1728d78`, 2026-09-30T03:22:02Z) — KAN-150
+  (FEAT-032-001) e KAN-151 (FEAT-032-002) transicionadas `31` Em análise → `41` Concluído
+  (não-regressão OK, `getJiraIssue` confirmou `31` antes de mover) + comentário "Mergeado —
+  backend PR #10 (3ba13b5) e frontend PR #17 (1728d78)" em cada uma. JQL `parent = KAN-149`
+  lido do quadro após a transição: KAN-150 `41` Concluído, KAN-151 `41` Concluído — os dois
+  únicos filhos do épico. Epic KAN-149 **intocado** nesta execução por instrução explícita
+  (doutrina exige confirmar a intenção com o Diretor antes de mover épico com todos os
+  filhos em `41` — não é ato automático desta rodada).
+
 - 2026-09-29 23:35: Wave 5 fechada — KAN-158 (TASK-033-007) → `41`; finish-dev: KAN-150/KAN-151 → `31` Em análise (aplicado via conector, ver resumo do sync).
 
 - 2026-09-29 22:33: **Reconciliação aplicada** (gancho §12, conector restabelecido) — Epic
