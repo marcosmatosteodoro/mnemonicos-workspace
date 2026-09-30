@@ -2187,10 +2187,11 @@ DELIBERADAMENTE omite os elos anteriores (ex.: `details` sem o campo esperado; c
 `{}` sem `message` nem `details`) — nunca só o fixture "feliz" que já teria o 1º elo.
 Rodar o mutante (zerar cada fallback, um de cada vez) antes de declarar o critério
 coberto.
+**Reincidência (2026-09-30, TASK-041-004, PLAN-041):** vale também para **predicados de detecção** em infra de concorrência (vivo/morto, com/sem marcador): `test/next-build-lock.ts` nasceu com 3 ramos (lock sem pid antigo, sem pid recente, EPERM) sem caso, e os mutantes que invertem cada um passavam a suíte do helper.
 **Validade:** geral (qualquer extrator/cadeia de fallback usada para decidir texto exibido
 ao usuário, neste frontend ou backend).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0
 
 ## [Config] `@utility` escrito à mão no Tailwind 4 nunca referencia `var(--tw-*)` — a custom property só existe quando um utilitário NATIVO a registra
 

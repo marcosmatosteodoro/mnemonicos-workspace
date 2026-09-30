@@ -7,7 +7,7 @@
 **Wave**: 4
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -38,9 +38,9 @@ Convenção dos comandos: executados na raiz do repositório `mnemonicos-fronten
 - [ ] **A decisão é do cliente, não do servidor (DEC-041-001) — FR-040-015 e AC-040-011** — mesmo comando → **H6** `GET /` **com** cookie `mnemo_access=qualquer-valor` → 200 (nunca 307: o `proxy` não casa `/`, mesmo com cookie de sessão presente); H6 **discrimina a alternativa descartada de DEC-041-001** (o servidor decidir pela sessão e redirecionar quem tem cookie para fora de `/`), que H1 sozinho não pega; **H7** `GET` de cada rota interna sem cookie, um caso por prefixo de `INTERNAL_ROUTE_PREFIXES` (`studio`, `content`, `visual-library` — lista lida de `src/lib/internal-routes.ts:14`, nunca re-grafada; **os itens não têm barra inicial**, então a rota pedida é `/${prefixo}`) → status **307** e, sobre o `Location` **real capturado no commit-base antes de fixar** (amostra, não suposta — pode vir absoluto ou relativo), `new URL(location, base).pathname === '/login'` **e** `new URL(location, base).searchParams.get('next') === '/' + prefixo` (o esperado prefixa `/`: `INTERNAL_ROUTE_PREFIXES` não traz barra inicial) (comparação por URL parseada, nunca por string codificada literal) (3 casos; eixo = prefixo, um mutante que tira um prefixo do matcher reprova exatamente o seu caso). AC-040-011 fecha por H7 (anônimo em rota interna vai ao login com retorno) + H1–H4 (a home pública exibida a ele tem o mesmo conteúdo de antes).
 - [ ] **Manifesto — AC-040-023** — mesmo comando → **H8** `GET /manifest.webmanifest` → 200 e o JSON tem `start_url === '/'`; **H9** a resposta não declara `shortcuts` para rota interna (paridade com o que `manifest.test.ts` já fixa, agora contra o servidor real). `src/app/manifest.test.ts` segue verde **sem edição** (asserção existente `start_url` = `'/'` em `manifest.test.ts:55-58`, lida no eixo do predicado: compara o valor literal do objeto retornado, não o servidor — por isso o H8 existe).
 - [ ] **Guarda intacta, com diff vazio ancorado no commit-base** — `git diff --stat b729a76 HEAD -- src/proxy.ts src/proxy.test.ts src/app/manifest.ts src/app/manifest.test.ts` → saída **vazia** (ausência; no commit-pai também vazia — a âncora é o commit-base e não `main...HEAD`, que não enxerga o arquivo novo); `npm test -- src/proxy.test.ts` → `Tests: 55 passed, 55 total` (medido em b729a76; inclui `it.each`: `matches('/')` falso, matcher derivado dos prefixos, extrator AST do Next, "home pública não é guardada"). Lição `guard-de-navega-o-proxy-middleware-enumera-o-que-guarda-nunca-o-que-dispensa`: os **dois lados** ficam afirmados — rotas internas guardadas (H7, `proxy.test.ts`) **e** `/` livre (H1, H6, `proxy.test.ts`); lição `valor-de-configura-o-lido-por-analisador-de-build-s-provado-por-or-culo-que-passe-pelo-build`: o oráculo aqui é o build real (`next build` no `beforeAll`), não um modelo do matcher. Mutante **D1** (aplicado em worktree descartável): incluir `'/'` em `config.matcher` de `src/proxy.ts` → `npm test -- src/proxy.test.ts` reprova **e** `npm test -- src/app/home.integration.test.ts` reprova **H1** (307 em vez de 200, sem cookie); **H6 não reprova D1** (com cookie o proxy deixa passar) — por isso H6 é a prova da outra alternativa, acima.
-- [ ] **Mutantes do servidor** (cada um rodado pelo comando do critério correspondente — arquivo inteiro, nunca `-t` — com controle negativo, isto é, sem mutante o mesmo comando volta verde com o mesmo número de testes): **D2** `page.tsx` passa a render dinâmico (`cookies()` no corpo) → o servidor passa a responder `/` como dinâmica: a asserção de `Cache-Control` de **H1** reprova o mutante · **D3** o servidor marca `data-home-session="checking"` no `<html>` (SSR neutro, alternativa descartada na DEC-041-003) → H5 reprova · **D4** `page.tsx` some com o `<h1>` (conteúdo público removido) → H2 reprova · **D5** trocar o `<title>` default em `layout.tsx` → H3 reprova · **D6** trocar `description` → H4 reprova · **D7** `start_url` → `/studio` em `manifest.ts` → H8 e `manifest.test.ts` reprovam · **D8** remover `'/visual-library'` e `'/visual-library/:path*'` do `config.matcher` literal de `src/proxy.ts` (o matcher é literal à mão, `proxy.ts:97-104`) → o caso H7 de `/visual-library` reprova (200/404 em vez de 307) e `proxy.test.ts` também. **8 mutantes (D1–D8), 8 provas**; todos em `git worktree add ../wt-mut-041-004 HEAD` com `node_modules` ligado ao do worktree principal, nunca `npm install`/`npm ci`; ao fim `git worktree remove` e `git status --porcelain` da árvore da TASK **vazio** (o symlink `node_modules` do worktree está em `info/exclude`) (lição `sonda-de-investiga-o-n-o-nasce-em-tests-contagem-de-teste-declara-a-rvore`).
+- [ ] **Mutantes do servidor** (cada um rodado pelo comando do critério correspondente — arquivo inteiro, nunca `-t` — com controle negativo, isto é, sem mutante o mesmo comando volta verde com o mesmo número de testes): **D2** `page.tsx` passa a render dinâmico (`cookies()` no corpo) → o servidor passa a responder `/` como dinâmica: a asserção de `Cache-Control` de **H1** reprova o mutante · **D3** o servidor marca `data-home-session="checking"` no `<html>` (SSR neutro, alternativa descartada na DEC-041-003) → H5 reprova · **D4** `page.tsx` some com o `<h1>` (conteúdo público removido) → H2 reprova · **D5** trocar o `<title>` default em `layout.tsx` → H3 reprova · **D6** trocar `description` → H4 reprova · **D7** `start_url` → `/studio` em `manifest.ts` → H8 e `manifest.test.ts` reprovam · **D8** remover `'/visual-library'` e `'/visual-library/:path*'` do `config.matcher` literal de `src/proxy.ts` (o matcher é literal à mão, `proxy.ts:97-104`) → o caso H7 de `/visual-library` reprova (200/404 em vez de 307) e `proxy.test.ts` também. **8 mutantes (D1–D8), 8 provas** (+ D9/D10 do furo no plano e L3/L4/L5 do retry, no helper da trava — `test/next-build-lock.test.ts` 9 casos); todos em `git worktree add ../wt-mut-041-004 HEAD` com `node_modules` ligado ao do worktree principal, nunca `npm install`/`npm ci`; ao fim `git worktree remove` e `git status --porcelain` da árvore da TASK **vazio** (o symlink `node_modules` do worktree está em `info/exclude`) (lição `sonda-de-investiga-o-n-o-nasce-em-tests-contagem-de-teste-declara-a-rvore`).
 - [ ] **Servidor de teste sem exposição e processo limpo** — o `next start` sobe com `-p 0 -H 127.0.0.1` (o molde `not-found.integration.test.ts:77` tem o mesmo argumento — lido por inteiro na fixação) e o teste encerra o filho no `afterAll`; prova executável: `npm test -- src/app/home.integration.test.ts` → exit 0 **sem** a mensagem `Jest did not exit one second after the test run` na saída (filho órfão/handle aberto a acusaria) e `Tests: 11 passed`.
-- [ ] **Suíte completa verde no modo default da ficha, sem `--runInBand` (furo no plano sancionado)** — `npx jest` (workers paralelos default) rodado **3× seguidas** → 3× `Tests: N passed, N total`, 0 failed (N = 856 medido com o arquivo novo); e `npx jest src/app/home.integration.test.ts` e `npx jest src/app/not-found.integration.test.ts` isolados → verdes. PAR DE PROVAS: mutante **D9** (remover o acquire/release da trava num dos dois arquivos) → `npx jest src/app/home.integration.test.ts src/app/not-found.integration.test.ts` (paralelo) volta a falhar em ao menos 1 de 3 rodadas; e **D10** (lock órfão: diretório de lock criado por PID inexistente antes da execução) → a suíte ainda conclui verde (recuperação do órfão). Contrato do helper (sem AC): teste unitário próprio `test/next-build-lock.test.ts` com acquire exclusivo (2ª aquisição espera até a 1ª liberar), release idempotente e recuperação de órfão.
+- [ ] **Suíte completa verde no modo default da ficha, sem `--runInBand` (furo no plano sancionado)** — `npx jest` (workers paralelos default) rodado **3× seguidas** → 3× `Tests: N passed, N total`, 0 failed (N = 856 antes do helper; medido no fecho: 65 suítes / 865 testes, 3× verdes medido com o arquivo novo); e `npx jest src/app/home.integration.test.ts` e `npx jest src/app/not-found.integration.test.ts` isolados → verdes. PAR DE PROVAS: mutante **D9** (remover o acquire/release da trava num dos dois arquivos) → `npx jest src/app/home.integration.test.ts src/app/not-found.integration.test.ts` (paralelo) volta a falhar em ao menos 1 de 3 rodadas; e **D10** (lock órfão: diretório de lock criado por PID inexistente antes da execução) → a suíte ainda conclui verde (recuperação do órfão). Contrato do helper (sem AC): teste unitário próprio `test/next-build-lock.test.ts` com acquire exclusivo (2ª aquisição espera até a 1ª liberar), release idempotente e recuperação de órfão.
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (produção e teste) — `npx eslint --max-warnings=0 $(git diff --name-only --diff-filter=d b729a76...HEAD | grep -E '\.(ts|tsx)$')` → exit 0; `npm run typecheck` → exit 0; `npx prettier --check $(git diff --name-only --diff-filter=d b729a76...HEAD)` → exit 0; `npm run lint` → exit 0; `npm run build` → exit 0.
 
 ## Riscos específicos
@@ -55,19 +55,19 @@ Convenção dos comandos: executados na raiz do repositório `mnemonicos-fronten
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-09-30T16:25:05-0300
+**Data conclusão**: 2026-09-30T16:48:11-0300
+**Commit SHA**: da7f529
+**Jira**: KAN-184
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — só teste/infra de teste local, sem superfície sensível (confirmado pelo code-reviewer)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — os ACs desta TASK (011/021/022/023) fecham por teste HTTP real (`next build` + `next start`) no gate 1
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

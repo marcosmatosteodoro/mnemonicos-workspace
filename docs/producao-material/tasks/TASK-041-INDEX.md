@@ -15,4 +15,4 @@
 - [x] TASK-041-003 ✅ Done
 
 ### Wave 4 (depende de Wave 3)
-- [ ] TASK-041-004 ⏸ Todo
+- [x] TASK-041-004 ✅ Done
