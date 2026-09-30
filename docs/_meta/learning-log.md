@@ -1377,3 +1377,33 @@ developer nunca inferir restrição por omissão. Saldo líquido ~+4 linhas (den
 ≤10)
 reincidencia: 0
 estado: ativa
+
+## LRN-056: rota emenda (`commands/auto.md` Etapa 0, 4.398) não fecha `ac-sem-task` quando o AC emendado cai em FR coberto por PLAN Approved
+data: 2026-09-30
+gatilho: verificacao_falhou
+origem: BRIEF-039/KAN-177 — emenda SPEC-030 (AC-030-015 sobre FR-030-013, coberta pelo PLAN-031); `graph.sh --check` deu ERROR ac-sem-task
+causa_raiz: instrucao_ausente — o fecho mecânico da rota emenda cita só `ref-quebrada`/`fr-sem-ac`; a rota manda implementar inline sem TASK e não diz o que fazer com `ac-sem-task`. Tech Lead improvisou TASK-031-007 ancorada no PLAN
+artefato_patchado: proposta_plugin (modo consumidor) — `commands/auto.md` l.33
+patch: acrescentar no fecho da rota emenda: AC sobre FR coberta por PLAN ativo acusa também `ac-sem-task` → registrar como TASK ancorada no PLAN. Saldo ~+1 linha longa
+reincidencia: 0 (Grep `ac-sem-task` no plugin 0.192.0: só em tasks.md l.236, não em auto.md)
+estado: ativa
+
+## LRN-057: `index-contract.md` não nomeia convenção de brief para demanda que só emenda SPEC
+data: 2026-09-30
+gatilho: correcao_humana
+origem: BRIEF-039/KAN-177 — Tech Lead criou `BRIEF-039-…md` com `**Tipo**: emenda` e `**SPEC emendada**:` sem contrato
+causa_raiz: instrucao_ausente — o esqueleto só conhece `**Tipo**: avulso` (l.178); rota emenda (4.398) não tem forma de brief
+artefato_patchado: proposta_plugin (modo consumidor) — `docs/_meta/conventions/index-contract.md`, "Variação avulsa"
+patch: acrescentar 2-3 linhas: brief de emenda = mesmo esqueleto, `**Tipo**: emenda` + `**SPEC emendada**: <SPEC-NNN>`, sem seção TASKs própria salvo TASK do PLAN
+reincidencia: 0
+estado: ativa
+
+## LRN-058: `agents/qa.md`/`screen-verify` não restringem a limpeza do gate 9 ao processo próprio
+data: 2026-09-30
+gatilho: correcao_humana
+origem: BRIEF-039/KAN-177 — QA encerrou com `pkill -f "next dev"` havendo sessão paralela (KAN-180) na mesma máquina
+causa_raiz: instrucao_ausente — a única regra de processo de pé em `qa.md` (Identidade, 4.30) trata de conferir o servidor, não de derrubá-lo; nada limita o kill ao pid subido pelo próprio gate
+artefato_patchado: proposta_plugin (modo consumidor) — `agents/qa.md` (gate 9) e/ou `skills/screen-verify/SKILL.md`
+patch: limpeza derruba só o pid que o gate subiu (pid guardado na subida; cwd do pid confere), nunca `pkill -f` por nome. Saldo ~+2 linhas
+reincidencia: 0
+estado: ativa
