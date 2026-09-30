@@ -15,7 +15,7 @@ schema, refactor de F9 e util de frontend tocam arquivos distintos)
 depende só de TASK-035-002 [`isVersionAltered`]; TASK-035-005 depende só de TASK-035-001
 [coluna `pageCount`] — arquivos distintos, `strategic-panel-calculations.ts` vs.
 `strategic-panel.service.ts`, paralelizáveis)
-- [ ] TASK-035-004 ⏸ Todo
+- [x] TASK-035-004 ✅ Done
 - [ ] TASK-035-005 ⏸ Todo
 
 ### Wave 3 (depende de TASK-035-004 E TASK-035-005 — `buildStrategicPanel` soma as 2 leituras
