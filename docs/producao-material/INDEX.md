@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-29 (PLAN-033/F9 — Wave 4 fechada: TASK-033-006 Done (mutation de aprovação no RTK Query); FEAT-032-002 implementada e VERIFICADA; próximo: Wave 5, painel de aprovação. SPEC-030/PLAN-031 — redesenho da tela de login — entregue por sessão paralela)
+**Última atualização**: 2026-09-29 (SPEC-034 criada e Approved — KAN-77, botão único de sessão + tema dark/light unificado no header; próximo: `/keelson:plan`. PLAN-033/F9 — Wave 4 fechada: TASK-033-006 Done; próximo: Wave 5, painel de aprovação)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -64,6 +64,12 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   novo fundo em tela cheia. PO: ACEITA_COM_RESSALVAS (5 ressalvas — ver Entrega).
 
 ### Especificadas, ainda não planejadas
+- Controle único de sessão (Entrar/Sair/neutro) e alternador de tema claro/escuro no header
+  do app, presentes em toda rota (pública e interna, inclusive produção), consolidando o
+  logout hoje próprio da área interna num único ponto de acionamento; paleta unificada
+  roxo/rosa/mauve herdada de `/login` (SPEC-030) estendida ao app inteiro, com o mesmo piso
+  de contraste AA e sem a ilustração decorativa; persistência de tema por
+  dispositivo/navegador, independente de conta (SPEC-034, Jira Story KAN-77, BRIEF-034).
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
 
@@ -93,6 +99,7 @@ fechado._
 | SPEC-028 | Versionamento editorial e fechamento legislativo | Approved | 2026-09-26 |
 | SPEC-030 | Redesenho visual da tela de login | Approved | 2026-09-28 |
 | SPEC-032 | Controle de qualidade e gate de versão aprovada | Approved | 2026-09-27 |
+| SPEC-034 | Botão de sessão e tema dark/light no header do app | Approved | 2026-09-29 |
 
 ## PLANs
 
@@ -190,6 +197,11 @@ fechado._
 | Checagem pedagógica (confirmação) | Atestação, feita pelo ADMIN no ato de aprovação, de que o material — incluindo a Tira mnemônica vinculada — cumpre a função de recuperação | SPEC-032 |
 | Segregação de funções (do ato de aprovação) | Regra aplicada pelo sistema (fail-secure, não disciplina operacional): o aprovador não pode ser nenhuma identidade produtora do conteúdo normativo da Versão (quem a fechou, autor original do Conteúdo bruto, ou último editor antes do fechamento) | SPEC-032 |
 | Conteúdo normativo (escopo da aprovação) | O recorte avaliado pela aprovação: texto normativo, Classe do radar de prova, fonte normativa, blocos/síntese da Quebra da regra (já versionados por F8) mais a Tira mnemônica vinculada; exclui Contraste, Pegadinha elaborada, Flashcard e Associação visual | SPEC-032 |
+| Controle de autenticação (do header) | Botão sempre visível no header que alterna entre "Entrar" (sem sessão) e "Sair" (com sessão), consumindo o estado de sessão já existente — não redefine login/logout; é o único ponto de acionamento de logout do app | SPEC-034 |
+| Alternador de tema | Controle sempre visível no header que permite ao usuário trocar manualmente entre tema claro e escuro | SPEC-034 |
+| Escolha de tema salva | Preferência de tema definida manualmente pelo usuário, por dispositivo/navegador (independente de conta), que passa a prevalecer sobre a preferência do dispositivo | SPEC-034 |
+| Preferência de esquema de cores do dispositivo | Sinal do sistema operacional/navegador indicando se o ambiente do usuário está configurado para tema claro ou escuro (equivalente a `prefers-color-scheme`) | SPEC-034 |
+| Paleta unificada (do app) | Família de cores (roxo/rosa/mauve) e piso de contraste AA já validados em `/login` (SPEC-030), estendidos aos dois temas do restante do app, sem a ilustração decorativa daquela tela | SPEC-034 |
 
 ## Decisões irreversíveis
 
@@ -329,9 +341,23 @@ fechado._
 | RISK-030-003 | Cenários de cenário/robustez sem AC formal (trânsito guard→`/login?next=`→login→`next`, foco de teclado, robustez da ilustração/autofill/`forced-colors`, aviso de sessão expirada acima da dobra em 360px) — decisão do PO: cobertos pelo roteiro de verificação dos gates 9/11, não por AC | Roteiro do `qa`/`product-designer` na implementação deve exercitar os itens listados em SPEC-030 §9 | SPEC-030 §9 (veredito PO) |
 | ~~Q-030-001~~ | **RESOLVIDO 2026-09-28 (PLAN-031)** — route group dedicado rejeitado: `code-scout` achou que este projeto só tem um root layout, e um `layout.tsx` de route group aninha DENTRO dele, não o substitui; promover um 2º root exigiria mover todas as rotas soltas de `src/app/` para um grupo irmão. DEC-031-001: fundo em tela cheia via `position: fixed; inset: 0` dentro da árvore normal da página (sem route group) — preserva header/footer de graça (FR-030-013). | — nenhuma | SPEC-030 §9 → PLAN-031 DEC-031-001 |
 | TRISK-031-003 | `position: fixed` do fundo em tela cheia (COMP-031-002) depende de nenhum ancestral (`Providers`/`SiteHeader`/`<main>`) declarar `transform`/`filter`/`perspective`/`contain` — se algum declarar, o backdrop deixa de posicionar relativo ao viewport | Verificação visual na implementação, item de roteiro do gate 9/11 — não bloqueante | PLAN-031 §8 |
+| RISK-034-001 | Sem mecanismo de persistência de tema definido na SPEC (decisão do PLAN), a estratégia escolhida pode causar troca visível do tema errado na 1ª pintura (FOUC) se a leitura da escolha salva depender só do cliente | NFR-034-004 declara o comportamento esperado (SHOULD); técnica cabe ao PLAN | SPEC-034 §9 |
+| RISK-034-002 | Paleta noturna só tem contraste AA medido para os papéis de UI de `/login` (fundo, pílula, botão, texto) — estendê-la ao app pode expor papéis novos (erro/sucesso/link/foco/hover) sem token equivalente já validado | Mapeamento e prova de contraste dos papéis novos ficam com o PLAN; NFR-034-005 exige distinguibilidade mínima | SPEC-034 §9 |
+| RISK-034-003 | O mecanismo de detecção de sessão do controle de autenticação precisa conviver com `baseQueryWithReauth` (`mnemonicos-frontend/src/store/api.ts`) sem disparar sua rota de expulsão (`resetApiState`+redirect `/login?sessao=expirada`) para visitante anônimo em rota pública | FR-034-015 trava o requisito observável; mecanismo exato de adaptação é decisão técnica do PLAN | SPEC-034 §9 |
+| — | PO (aprovação de SPEC-034) ESCALOU, degrau 2, default aplicado: confirmar a remoção do botão "Sair" próprio da área interna (`InternalShell`/`LogoutControl`) em favor do controle único do header (FR-034-014) — pergunta vai em lote na Entrega desta demanda | Default seguido: remoção mantida (FR-034-014/AC-034-014 já na SPEC Approved) | po, aprovação de SPEC-034 |
 
 ## Histórico recente
 
+- 2026-09-29 22:59: **SPEC-034 criada via `/keelson:auto` (KAN-77, BRIEF-034) e promovida a
+  Approved.** Botão único de sessão (Entrar/Sair/neutro) + alternador de tema claro/escuro no
+  header, em toda rota inclusive produção, consolidando o logout hoje próprio da área
+  interna; paleta unificada roxo/rosa/mauve de `/login` (SPEC-030) estendida ao app inteiro
+  com o mesmo piso AA, sem a ilustração decorativa; tema por dispositivo, sobrevive a
+  login/logout. `product-analyst` achou 7 riscos reais (verificados contra o código: header
+  ausente em `/login` confirmado correto; "Sair" duplicado na área interna; `useMeQuery` em
+  rota pública dispararia expulsão indevida por `baseQueryWithReauth`) — 1 rodada de
+  correção fechou 6/7; PO (modo aprovação) ESCALOU o 7º (remoção do "Sair" da área interna)
+  com default aplicado (mantida), pergunta em lote na Entrega. `spec-validator`: 0 ERROR.
 - 2026-09-29 21:56: **Wave 4 de PLAN-033 fechada — TASK-033-006 Done.** `approveContentVersion`
   (RTK Query, `POST /contents/:id/versions/:number/approve`, invalida só `ContentVersion`) e o hook
   `useApproveContentVersionMutation`; paridade de `ContentVersion` conferida nos 2 lados (entregue
