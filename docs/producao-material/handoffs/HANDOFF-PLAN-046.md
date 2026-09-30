@@ -118,8 +118,18 @@ Os Roteiros completos, fixados antes do código, estão nas TASKs
 - **Risco se falhar**: vazamento de interface para papel sem acesso.
 - **Evidência**: _(preencher na verificação)_
 
-## 5. Pontos frágeis
+## 5. Riscos e pontos de atenção
 - Tema escuro: `--surface-raised` sobre `--surface` mede ~1,1:1 — o hover do item na coluna xl deve ser confirmado a olho; o destaque do ativo não depende só de fundo.
 - Estado vazio e lista longa em `/content`.
 - Faixa 1040–1100px: header/footer "quase alinhados" com a área interna.
 - `ApiStatus` só aparece em `next dev` — a verificação de 360px no header vale nos dois modos.
+
+## 6. Protocolo de conclusão
+1. Exercitar cada item V* e preencher a Evidência (✅/❌ + o que foi observado).
+2. Divergência → corrigir na própria branch (protocolo inline: escopo restrito + testes +
+   gates) e re-exercitar o item.
+3. Tudo ✅ → `status: Concluído` no front-matter; atualizar o INDEX do slug (remover o
+   risco ativo "Verificação de tela pendente — HANDOFF-PLAN-046" + linha no Histórico recente;
+   atualizar a linha `**Verificação (gate 9)**` da SPEC-044); commit
+   `chore(producao-material): close verification handoff HANDOFF-PLAN-046`; push.
+4. Merge e deploy continuam decisão humana.
