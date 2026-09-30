@@ -422,7 +422,7 @@ manter os dois controles — reverteria esta DEC.
 
 ## 9. Definition of Done deste PLAN
 
-- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs — 16/16 FRs, 20/20 ACs
+- [ ] Todos os FRs cobertos têm implementação satisfazendo os ACs — 16/16 FRs, 19/19 ACs
 - [ ] Todos os NFRs cobertos têm verificação — 5/5 NFRs
 - [ ] Decisões DEC-035-001..009 refletidas no código
 - [ ] Aderência à ficha/perfil validada (frontend `next-16.md`; CLAUDE.md do workspace)
