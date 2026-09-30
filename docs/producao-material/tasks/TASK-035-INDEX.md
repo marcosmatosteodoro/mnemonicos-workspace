@@ -15,4 +15,4 @@
 - [x] TASK-035-005 ✅ Done
 
 ### Wave 3 (depende de Wave 2)
-- [ ] TASK-035-006 ⏸ Todo
+- [x] TASK-035-006 ✅ Done

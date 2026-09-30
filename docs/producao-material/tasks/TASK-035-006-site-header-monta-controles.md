@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -125,17 +125,18 @@ não deve vazar para outra verificação).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T06:55:44-0300
+**Data conclusão**: 2026-09-30T07:20:08-0300
+**Commit SHA**: 92542c5
 **Jira**: KAN-164
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (676/676 na suíte)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 3 — 1 retry, mock de matchMedia duplicado 3x sem extrair para tests/support/)
+- [x] ACs verificados (AC-034-005; 11/19 ACs da SPEC verificadas por execução real nesta wave)
+- [ ] Segurança (gate 8): n/a — sem superfície de sessão/dado sensível nesta TASK (só wiring)
+- [x] Comportamento (gate 9): pendente_handoff — qa, PARCIAL: 11/19 ACs verificados por execução real (Playwright, sem sessão); 8 ACs (login real) em HANDOFF-PLAN-035.md — backend indisponível neste ambiente (Docker Desktop fora do ar)
+- [x] Design (gate 11): aprovado (wave 3 — sem achado bloqueante novo na composição; 4 itens de dívida não-bloqueante registrados no INDEX)

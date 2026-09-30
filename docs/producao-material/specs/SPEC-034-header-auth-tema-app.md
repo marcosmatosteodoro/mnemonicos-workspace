@@ -120,6 +120,11 @@ visual do app, não no contrato HTTP.
 ### FEAT-034-001: Controle de sessão no header
 
 **Jira**: KAN-77
+**Verificação (gate 9)**: PARCIAL (2026-09-30, qa) — AC-034-001/003/005/007/013 (rótulo
+"Entrar") verificados por execução real via Playwright em `http://localhost:3000`.
+AC-034-002/004/006/014/015/016 pendentes de exercício — backend (Docker/Postgres)
+indisponível neste ambiente ("Docker Desktop is unable to start"; `localhost:3333`
+connection refused) — roteiro completo em `docs/producao-material/handoffs/HANDOFF-PLAN-035.md`.
 
 > Do ponto de vista do QA: um visitante sem sessão vê "Entrar" e, ao clicar, é levado à
 > tela de entrada; um colaborador autenticado vê "Sair" e, ao clicar, dispara o logout já
@@ -157,6 +162,10 @@ visual do app, não no contrato HTTP.
 ### FEAT-034-002: Tema dark/light com paleta unificada
 
 **Jira**: KAN-77
+**Verificação (gate 9)**: PARCIAL (2026-09-30, qa) — AC-034-008/009/010/011/012 (rota
+pública)/019 verificados por execução real via Playwright em `http://localhost:3000`.
+AC-034-017/018 pendentes de exercício — backend (Docker/Postgres) indisponível neste
+ambiente — roteiro completo em `docs/producao-material/handoffs/HANDOFF-PLAN-035.md`.
 
 > Do ponto de vista do QA: sem escolha salva, o tema segue o dispositivo (ou cai em claro,
 > sem preferência detectável); ao clicar no alternador, o tema muda na hora; a escolha
