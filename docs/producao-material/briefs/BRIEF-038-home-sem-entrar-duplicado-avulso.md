@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Aberto
+**Status**: Concluído
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T12:52:10-0300
 **Origem**: key do tracker (rota pull, KAN-176)
@@ -88,4 +88,4 @@ do Diretor foi seguir com o KAN-176 mesmo assim. A ordem de merge fica com ele.
   - gate 11 (`product-designer`): APROVADO, sem achado.
 - **Lição**: `guidelines/project/lessons/assercao-de-ausencia-em-render-carrega-controle-positivo-no-mesmo-it.md`
   (em observação).
-- **Commit**: `6ff6519` (mnemonicos-frontend, a pedido do Diretor), PR #20 → `main`, aberto em 2026-09-30. Merge é ato do Diretor.
+- **Commit**: `6ff6519` (mnemonicos-frontend, a pedido do Diretor), PR #20 → `main`, **mergeado pelo Diretor** em 2026-09-30 (merge `b729a76`).
