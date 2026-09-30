@@ -401,6 +401,11 @@ fechado._
 > (KAN-77) foi renumerado para `SPEC-036`/`PLAN-036`/`TASK-036-00X`/`BRIEF-036` na
 > reconciliação do pull — nenhum dos dois lados foi descartado.
 
+- 2026-09-30 13:05: **BRIEF-038 (KAN-176) implementado e revisado.** Gates 1–7 aprovados depois de 1 retry, e gates 8 e 11 aprovados. O gate 9 foi VERIFICADO em tela e o gate 10 é n/a. Commit `6ff6519` no frontend e PR #20 aberto, com KAN-176 em Em análise. Falta o merge do Diretor, lembrando da ordem em relação ao KAN-180.
+- 2026-09-30 12:52: /keelson:triage classificou demanda "remover o 'Entrar' duplicado do corpo da home pública" (KAN-176) como brief avulso (categoria 5 recusada: o link é a entrega do KAN-74 e o único caminho de `/` até `/studio` com sessão), ação: `briefs/BRIEF-038-home-sem-entrar-duplicado-avulso.md` (`**Jira**: KAN-176`). O Diretor decidiu que usuário com sessão não vê a área não logada, o que substitui o AC do KAN-74 na home.
+- 2026-09-30 12:52: /keelson:triage classificou demanda "usuário com sessão que entra na aplicação vai direto à área logada" (KAN-180, card criado a pedido do Diretor e ligado ao KAN-176 por `Relates`) como categoria 1 (muda a guarda de rota da SPEC-002 / DEC-003-011 e exige DEC: presença × validade do cookie, `/login` com sessão, papel `STUDENT`), ação: `/keelson:auto` com `--from=KAN-180`, ainda não disparado.
+- 2026-09-30 12:58: /keelson:triage classificou demanda "tela de login sem rodapé e com link discreto 'Voltar' para `/` abaixo do Entrar" (KAN-177) como categoria 1b (emenda da SPEC-030: FR-030-013 [MUST] ainda promete cabeçalho e rodapé em `/login`; o cabeçalho já saiu pelo BRIEF-032 sem a SPEC ser emendada, e a emenda corrige as duas coisas; técnica já dada pelo card, estender o gate de `HIDDEN_ROUTES`, sem DEC), ação: rota emenda do `/keelson:auto` com `--from=KAN-177` (modo `link`, sem card novo), aguardando confirmação do Diretor.
+
 - 2026-09-30: **PLAN-036 mergeado em `main`** (`mnemonicos-frontend`, PR #18, `e254bd1`) e
   KAN-77 fechado no Jira (Concluído) — ato do Diretor. Sem épico-pai (projeção compacta,
   como KAN-73): trilho do card para nesse passo, sem filho de épico a consultar. Handoff
