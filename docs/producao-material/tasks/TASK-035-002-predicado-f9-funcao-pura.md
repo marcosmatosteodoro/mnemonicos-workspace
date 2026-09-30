@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: refactor
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -168,17 +168,17 @@ relógio de aplicação. O critério abaixo confirma que a extração preserva e
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T03:36:39-0300
+**Data conclusão**: 2026-09-30T03:45:01-0300
+**Commit SHA**: b0bc835 (impl) · 6b9d0ba (remoção de comentário, gate 7)
 **Jira**: KAN-169
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer (wave 1)
+- [x] Comportamento (gate 9): n/a — refactor sem efeito observável (suíte F9 idêntica antes/depois)
