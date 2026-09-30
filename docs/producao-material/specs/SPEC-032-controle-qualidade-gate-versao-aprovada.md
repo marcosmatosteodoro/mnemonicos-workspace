@@ -6,6 +6,7 @@
 **Autor**: scribe
 **Data**: 2026-09-27
 **Brief**: BRIEF-032
+**Jira**: KAN-149
 
 ## 1. Contexto e objetivo
 
@@ -259,6 +260,8 @@ regra**, **Bloco da quebra** (SPEC-005); **Publicação**, **Variante do PDF**,
 
 ### FEAT-032-001: Aprovação da Versão vigente com checklist de qualidade e segregação de funções
 
+**Jira**: KAN-150
+
 > Do ponto de vista do QA: um ADMIN que não é nenhuma identidade produtora do conteúdo
 > normativo da Versão vigente confirma a checagem jurídica e a pedagógica e aprova; o
 > sistema recusa quando falta confirmação, quando não há Versão para aprovar, quando
@@ -333,6 +336,8 @@ regra**, **Bloco da quebra** (SPEC-005); **Publicação**, **Variante do PDF**,
   recusar a aprovação.
 
 ### FEAT-032-002: Carimbo de Versão aprovada no PDF exportado
+
+**Jira**: KAN-151
 
 **Verificação (gate 9)**: 2026-09-29 — `qa`, execução real ponta a ponta contra o backend local (HEAD `5984073`, Postgres de dev): 6/6 ACs (AC-032-009/010/011/012/021/024) exercitados por HTTP, com aprovação por um 2º ADMIN e alteração da Tira pela rota real de Quadros; texto de cada PDF inspecionado por `pdftotext` nas 2 Variantes (a marca substitui "RASCUNHO" em toda página; 4ª linha de Versão/Data preservada).
 

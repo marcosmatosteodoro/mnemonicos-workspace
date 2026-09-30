@@ -242,7 +242,7 @@ para este roteiro num ambiente compartilhado, desativá-lo via `POST
 **Data início**:
 **Data conclusão**:
 **Commit SHA**:
-**Jira**:
+**Jira**: KAN-158
 
 **Quality gates**:
 - [ ] Implementação completa

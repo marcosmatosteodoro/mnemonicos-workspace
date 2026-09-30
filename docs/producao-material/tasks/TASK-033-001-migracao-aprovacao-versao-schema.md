@@ -136,7 +136,7 @@ TASK-033-004). Território e precedentes: `docs/producao-material/MAP.md` e PLAN
 **Data início**: 2026-09-27T10:47:35-0300
 **Data conclusão**: 2026-09-27T19:13:26-0300
 **Commit SHA**: 0493efe (+ 8a302d2, f9d278a — remoções de comentário do gate 7)
-**Jira**: —
+**Jira**: KAN-152
 
 **Quality gates**:
 - [x] Implementação completa

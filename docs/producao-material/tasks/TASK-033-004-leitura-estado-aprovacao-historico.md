@@ -175,7 +175,7 @@ mesmo arquivo). Território e precedentes: `docs/producao-material/MAP.md` e PLA
 **Data início**: 2026-09-29T20:55:00-0300 (despacho; developer não capturou o início — declarado)
 **Data conclusão**: 2026-09-29T21:40:00-0300
 **Commit SHA**: 923f60e (+ e1d8426 — retry 1 dos gates 1/7; eba5603 — aplicação de fim de wave; frontend d19ecfd)
-**Jira**: — (sem acesso ao conector; ver `tracker-local-F9.md`)
+**Jira**: KAN-155
 
 **Quality gates**:
 - [x] Implementação completa
