@@ -1,15 +1,14 @@
 # Tracker local — KAN-177 (BRIEF-039 emenda SPEC-030 v0.2 · BRIEF-042 ajuste)
 
-**PENDENTE DE RECONCILIAÇÃO.** O Diretor retirou temporariamente o acesso ao Jira em
-2026-09-30, por volta das 13:26, e pediu que as informações fossem mantidas aqui até o acesso
-voltar. Quando voltar, aplique a fila abaixo **na ordem**, medindo o quadro antes de cada
-transição, e marque este arquivo como **RECONCILIADO**, com data e o estado medido depois.
+**RECONCILIADO em 2026-09-30 16:31** (o Diretor devolveu o acesso ao Jira). KAN-177 está em
+`41` Concluído (status `10007`), medido por `getJiraIssue` depois da transição. Este arquivo fica como
+registro histórico do período sem conector.
 
 ## Estado conhecido do card
 
 | Key | Tipo | Pai | Último estado MEDIDO | Quando / como |
 |---|---|---|---|---|
-| **KAN-177** | História (`10009`) | nenhum (sem épico; `getJiraIssue` sem `parent`) | `21` Em andamento (status `10005`) | 2026-09-30 13:16, retorno do `transitionJiraIssue` no despacho do developer |
+| **KAN-177** | História (`10009`) | nenhum (sem épico; `getJiraIssue` sem `parent`) | `41` Concluído (status `10007`) | 2026-09-30 16:31, `getJiraIssue` depois da transição (antes: `21` às 13:16; `31` encontrado às 16:31) |
 
 Nenhum card novo foi criado. O BRIEF-039 (emenda) e o BRIEF-042 (ajuste pontual) usam o
 KAN-177 em modo link.
@@ -40,6 +39,11 @@ KAN-177 em modo link.
 
 ## Log (mais recente no topo)
 
+- 2026-09-30 16:31: **Reconciliado.** A medição inicial deu `31` Em análise (status `10006`), e não o `21` de
+  13:16: alguém moveu o card sem conector, para a frente no trilho. Segui com a autorização do
+  Diretor ("pode atualizar") e os dois merges confirmados. Comentário `10254` (fim de dev + PRs #21/#22
+  + gates), transição `41` → `Concluído`, e `getJiraIssue` pós-transição confirmou `10007`. Sem
+  `parent`, então não há épico a consultar. Os passos 2 e 4 da fila foram num comentário só.
 - 2026-09-30 14:12: Diretor avisou o merge do PR #22 e pediu para manter as informações do
   Jira atualizadas internamente até devolver o acesso. Arquivo criado.
 - 2026-09-30 13:57: Diretor avisou o merge do PR #21. Operação pendente: KAN-177 → `41`.
