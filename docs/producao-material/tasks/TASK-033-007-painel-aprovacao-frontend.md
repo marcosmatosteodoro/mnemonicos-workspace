@@ -8,7 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -19,7 +19,7 @@
 
 Acrescenta, dentro do MESMO componente `ContentVersionHistory` (F8 — form de fechamento +
 lista do histórico, sem edição/remoção), um bloco de aprovação: 2 confirmações
-(checkboxes) + botão "Aprovar Versão" com os 3 estados de FR-032-008, visível só para
+(checkboxes) + botão "Aprovar versão" com os 3 estados de FR-032-008, visível só para
 ADMIN e só quando existe Versão vigente sem `approvedById`. A autorização REAL é a rota do
 backend (`requireRole`, TASK-033-003); a ocultação/desabilitação aqui é best-effort de UX,
 nunca a garantia (a MESMA régua de FR-032-004, replicada no cliente). Nenhuma mudança de
@@ -33,6 +33,17 @@ extensão, não arquivo novo), `content-supplementary-panel.tsx` (padrão de ded
 código. Nenhum handoff anterior do slug (`docs/producao-material/handoffs/`) cobre este
 fluxo (HANDOFF-PLAN-003/013/025 tratam de login/PWA/publicação, nenhum de aprovação de
 Versão) — roteiro escrito do zero, sem herança de "não-exercitável".
+
+**Emenda 1 (retry 1 da Wave 5, 2026-09-29, Tech Lead — degrau 1, registrada no ledger)**: (a)
+FR-032-007(a) prevalece sobre COMP-033-011 — cada linha do histórico mostra o próprio estado de
+aprovação ("Aprovada por {approvedById} em {data}") para qualquer papel que vê a lista, EDITOR
+incluso; o bloco de AÇÃO segue só ADMIN. (b) `updateRawContent` (`src/store/api.ts`, fora do
+Inclui) passa a invalidar `['RawContent', 'ContentVersion']`, porque `validApprovalForExport` é
+calculado no servidor a partir do `RawContent` (gate 11, A2). (c) Copy canônica minúscula
+("Aprovar versão", "versão", "exportação" — lição ativa), fieldset/legend "Aprovação da versão
+{number}", negação antes das caixas, foco no resultado após sucesso. Os literais do Roteiro do
+gate 9 abaixo foram atualizados para essa copy. FR-032-007(b) (linha de validade) segue só no bloco
+ADMIN — pergunta ao PO na Entrega.
 
 ## Escopo
 
@@ -64,16 +75,16 @@ Versão) — roteiro escrito do zero, sem herança de "não-exercitável".
     - `isAdmin && currentVersion !== null && currentVersion.approvedById === null`: form
       com 2 `<input type="checkbox">` ("Checagem jurídica confirmada"/"Checagem
       pedagógica confirmada"), mensagem de negação (`role="alert"`,
-      `'Você não pode aprovar uma Versão que você mesmo produziu.'`) quando `isProducer`,
-      botão "Aprovar Versão" (`disabled` quando `isApproving || isProducer ||
+      `'Você não pode aprovar uma versão que você mesmo produziu.'`) quando `isProducer`,
+      botão "Aprovar versão" (`disabled` quando `isApproving || isProducer ||
       !legalCheckConfirmed || !pedagogicalCheckConfirmed`, `aria-busy={isApproving}`),
       indicador "Aprovando…" durante o envio, mensagem de sucesso ("Versão aprovada.") ou
       falha (extração de erro do backend, MESMO padrão de 2 elos já usado pelo form de
       fechamento no mesmo arquivo: `extractBackendErrorMessage(err) ??
       GENERIC_APPROVE_ERROR` — nunca uma 3ª forma de extração).
     - `isAdmin && currentVersion !== null && currentVersion.approvedById !== null`:
-      substitui o form por texto — `'Aprovada por {approvedById} em {approvedAt
-      formatado}'` + `'Válida para a próxima Exportação: sim'`/`'não'` (refletindo
+      substitui o form por texto — `'Versão {number} aprovada por {approvedById} em {approvedAt
+      formatado}'` + `'Válida para a próxima exportação: sim'`/`'não — a próxima exportação sai como rascunho. Feche uma nova versão para aprová-la.'` (refletindo
       `validApprovalForExport`).
     - `!isAdmin`: nenhum dos 2 blocos renderiza (EDITOR não vê o painel — best-effort de
       UX, FR-032-016 é a garantia real).
@@ -106,8 +117,8 @@ Versão) — roteiro escrito do zero, sem herança de "não-exercitável".
   - Montado com `me.id` IGUAL a `rawContent.authorId` (produtor via autor original,
     distinto de quem fechou) e MESMO cenário com `rawContent.lastEditedById` (produtor via
     último editor) — 2 casos, 1 por identidade (não um caso "representativo").
-  - Montado com `me.role: 'EDITOR'`: bloco de aprovação AUSENTE do DOM (nem o form nem o
-    texto "Aprovada por").
+  - Montado com `me.role: 'EDITOR'`: bloco de AÇÃO de aprovação AUSENTE do DOM (nem o form
+    nem o texto "Versão N aprovada por…"); a linha do histórico mostra "Aprovada por…" (Emenda 1).
   - **Extrator de erro — 1 teste por elo da cadeia** (lição ativa "[Testes] Extrator com
     cadeia de fallback (`a ?? b ?? c`) exige 1 teste por ramo" — mesmo defeito já
     reincidiu neste ARQUIVO em TASK-029-004): (a) resposta 409 com
@@ -200,21 +211,21 @@ para este roteiro num ambiente compartilhado, desativá-lo via `POST
 
 1. **AC-032-007 (estados da UI, FR-032-008), fluxo feliz** — login como `admin2` →
    `/content/:id`: confirmar que o bloco de aprovação aparece (2 checkboxes desmarcadas,
-   botão "Aprovar Versão" desabilitado). Marcar as 2 checkboxes → botão habilita. Clicar
-   "Aprovar Versão": usar o painel de rede para SEGURAR a resposta de `POST
+   botão "Aprovar versão" desabilitado). Marcar as 2 checkboxes → botão habilita. Clicar
+   "Aprovar versão": usar o painel de rede para SEGURAR a resposta de `POST
    .../versions/:number/approve` (interceptação de rede, decisão 4.319 — nunca confiar na
    latência real do ambiente local) e confirmar que o botão fica desabilitado/`aria-busy`
    durante a espera; liberar a resposta e confirmar a mensagem de sucesso ("Versão
-   aprovada.") e que o bloco passa a mostrar "Aprovada por `<id de admin2>` em `<data>`".
+   aprovada.") e que o bloco passa a mostrar "Versão N aprovada por `<id de admin2>` em `<data>`".
 2. **FR-032-007 (leitura do estado)** — recarregar `/content/:id`: confirmar que o
    histórico de Versões mostra a Versão como aprovada (sem precisar reabrir o formulário)
-   e que o texto "Válida para a próxima Exportação: sim" aparece (sinal de alteração
+   e que o texto "Válida para a próxima exportação: sim" aparece (sinal de alteração
    apagado).
 3. **AC-032-023 (parte UI — negação de autoaprovação visível)** — repetir a pré-condição
    num 2º Conteúdo bruto descartável, fechando a Versão como `admin1` → login como
    `admin1` (o próprio produtor) → `/content/:id`: confirmar que o bloco de aprovação
-   aparece com o botão "Aprovar Versão" DESABILITADO e a mensagem "Você não pode aprovar
-   uma Versão que você mesmo produziu." visível, mesmo marcando as 2 checkboxes — a
+   aparece com o botão "Aprovar versão" DESABILITADO e a mensagem "Você não pode aprovar
+   uma versão que você mesmo produziu." visível, mesmo marcando as 2 checkboxes — a
    garantia REAL (o backend recusaria de qualquer forma) já está provada por gate 1 em
    TASK-033-003; este passo confirma só que o FRONTEND não deixa o clique parecer
    possível.
@@ -239,17 +250,17 @@ para este roteiro num ambiente compartilhado, desativá-lo via `POST
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
-**Jira**:
+**Data início**: 2026-09-29T21:58:00-0300 (despacho)
+**Data conclusão**: 2026-09-29T23:30:00-0300
+**Commit SHA**: frontend a4e828f (+ e68553d — retry 1 dos gates 1/7/11; 43d49dc — retry do achado novo B4; merge de origin/main e4c8461 antes do retry; Entrega: 3043b46 — R-1 da aceitação do PO, validade visível a qualquer papel; caf6ea6 — copy neutra do "não" e prova do filtro da Versão vigente)
+**Jira**: KAN-158
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 5: retry 1 fechou B1-B3; B4 — achado novo nascido no retry — com retry próprio, decisão do Tech Lead de não escalar; gate 11 aprovado após retry: A1-A4) — code-reviewer, product-designer
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 5, 0 vulnerabilidade; delta do retry n/a — só endurece o bloqueio de UX) — security-engineer · Performance (gate 10): aprovado 2× (a4e828f e delta com a invalidação nova em `updateRawContent`) — performance-engineer
+- [x] Comportamento (gate 9): verificado (qa, execução real com browser em a4e828f e no delta e68553d) — carregador do gate 9 consolidado de FEAT-032-001; delta do R-1 da Entrega (3043b46/caf6ea6): pendente_handoff — HANDOFF-PLAN-033 (credencial com placeholder)

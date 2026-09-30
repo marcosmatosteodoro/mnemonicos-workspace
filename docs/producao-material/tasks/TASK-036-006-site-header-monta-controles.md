@@ -1,10 +1,10 @@
-# TASK-035-006: `SiteHeader` — monta os dois controles, verificação ponta-a-ponta
+# TASK-036-006: `SiteHeader` — monta os dois controles, verificação ponta-a-ponta
 
 **Slug**: producao-material
-**Pertence a**: PLAN-035
-**Realiza (FRs)**: FR-034-005, FR-034-009
-**Funcionalidade**: transversal (FEAT-034-001, FEAT-034-002)
-**Componente**: COMP-035-007 (principal)
+**Pertence a**: PLAN-036
+**Realiza (FRs)**: FR-036-005, FR-036-009
+**Funcionalidade**: transversal (FEAT-036-001, FEAT-036-002)
+**Componente**: COMP-036-007 (principal)
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
@@ -12,7 +12,7 @@
 
 ## Dependências
 
-- **Depende de**: TASK-035-003, TASK-035-004, TASK-035-005
+- **Depende de**: TASK-036-003, TASK-036-004, TASK-036-005
 - **Bloqueia**: nenhuma
 
 ## Contexto
@@ -20,8 +20,8 @@
 `SiteHeader` hoje só mostra logo e, fora de produção, `ApiStatus` (`site-header.tsx:7-18`).
 Esta TASK monta `AuthControl` e `ThemeToggle` ao lado dele, tornando os dois controles
 novos visíveis em toda rota onde o header aparece (`SiteHeaderGate`, exceto `/login`) —
-fecha a presença exigida por FR-034-005/009 e é o ponto de integração final do PLAN (memo —
-PLAN-035 §3 COMP-035-007, §4).
+fecha a presença exigida por FR-036-005/009 e é o ponto de integração final do PLAN (memo —
+PLAN-036 §3 COMP-036-007, §4).
 
 ## Escopo
 
@@ -31,17 +31,17 @@ PLAN-035 §3 COMP-035-007, §4).
   `process.env.NODE_ENV !== 'production'`, `site-header.tsx:14`, inalterado), dentro do
   `<div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-4
   sm:px-6">` que hoje só tem o `Link` e o `ApiStatus`. `SiteHeader` continua Server
-  Component — os 2 filhos novos é que são `'use client'` (DEC-035-007 herdada).
+  Component — os 2 filhos novos é que são `'use client'` (DEC-036-007 herdada).
 
 ### Não inclui
 - Qualquer mudança em `ApiStatus`/`site-header-gate.tsx` — `/login` continua sem
-  `SiteHeader` (A-034-003, `site-header-gate.tsx:12`, `HIDDEN_ROUTES`).
+  `SiteHeader` (A-036-003, `site-header-gate.tsx:12`, `HIDDEN_ROUTES`).
 
 ## Critérios de pronto
 
 - [ ] Render de `SiteHeader` com sessão mockada e sem sessão mockada → ambos os controles
       presentes e visíveis; `ApiStatus` presente só quando `NODE_ENV !== 'production'`
-      (comportamento já existente, não regredir) — cobre AC-034-005. Verificação
+      (comportamento já existente, não regredir) — cobre AC-036-005. Verificação
       executável: `npm --prefix mnemonicos-frontend test --
       src/components/site-header.test.tsx` → `PASS`, novo arquivo mockando
       `@/components/auth-control`/`@/components/theme-toggle` (ou `@/store/api`, a critério
@@ -73,43 +73,43 @@ sem nenhuma escolha manual salva ainda. Restaurar `localStorage` limpo e a emula
 `prefers-color-scheme` desligada ao final do roteiro (o tema escolhido durante os passos
 não deve vazar para outra verificação).
 
-1. (AC-034-008, AC-034-009, FR-034-007/008 — cascata CSS pura, não coberta em gate 1 por
-   TASK-035-003, ver "Não inclui" daquela TASK) Com `localStorage` ainda limpo (nenhuma
+1. (AC-036-008, AC-036-009, FR-036-007/008 — cascata CSS pura, não coberta em gate 1 por
+   TASK-036-003, ver "Não inclui" daquela TASK) Com `localStorage` ainda limpo (nenhuma
    escolha manual): emular `prefers-color-scheme: dark` e carregar `/` (realm `app`, sem
-   sessão) → confirmar tema escuro aplicado (AC-034-008); em seguida emular
+   sessão) → confirmar tema escuro aplicado (AC-036-008); em seguida emular
    `prefers-color-scheme: light` (ou "no preference", se o navegador expuser) e recarregar
-   `/` → confirmar tema claro aplicado (AC-034-009).
-2. (AC-034-005, AC-034-007) Ainda em `/` (realm `app`, sem sessão) → confirmar "Entrar" e o
+   `/` → confirmar tema claro aplicado (AC-036-009).
+2. (AC-036-005, AC-036-007) Ainda em `/` (realm `app`, sem sessão) → confirmar "Entrar" e o
    alternador de tema visíveis no header.
-3. (AC-034-001, AC-034-003) Clicar "Entrar" → navega para `/login`.
-4. (AC-034-002, AC-034-004, AC-034-014, AC-034-017 — parte, 2ª cláusula, verificada em
+3. (AC-036-001, AC-036-003) Clicar "Entrar" → navega para `/login`.
+4. (AC-036-002, AC-036-004, AC-036-014, AC-036-017 — parte, 2ª cláusula, verificada em
    conjunto com o passo 5 abaixo) Logar com a credencial do realm `editor`, navegar para uma rota
    interna (ex. `(interno)/content`) → confirmar "Sair" único visível no header (sem
    duplicata do antigo botão da área interna), clicar → os 3 estados observados (em
    andamento/sucesso/falha simulada via rede lenta, se aplicável — falha real exigiria
    derrubar o backend, fora do escopo deste roteiro; registrar como observação se não
    exercitável), volta a `/login` no sucesso.
-5. (AC-034-017 — 1ª e 2ª cláusulas) Antes de logar (ainda em `/`, com o SO emulando claro ou
+5. (AC-036-017 — 1ª e 2ª cláusulas) Antes de logar (ainda em `/`, com o SO emulando claro ou
    sem preferência, para garantir que a escolha manual é o que está prevalecendo, não
    coincidência de sinais), escolher tema escuro pelo alternador; logar (passo 4); confirmar
    que o tema continua escuro na área interna após o login; em seguida, com a mesma sessão
    ainda ativa, clicar em 'Sair' (repetindo a ação do passo 4) e confirmar que o tema
    continua escuro na página pública para a qual o logout redireciona — fecha a 2ª cláusula
-   de AC-034-017 (sobrevive ao logout, não só ao login).
-6. (AC-034-010, AC-034-011, AC-034-012) Com o SO/navegador emulando um esquema de cores
+   de AC-036-017 (sobrevive ao logout, não só ao login).
+6. (AC-036-010, AC-036-011, AC-036-012) Com o SO/navegador emulando um esquema de cores
    OPOSTO ao tema que será escolhido manualmente neste passo (não dependa do estado
    remanescente do passo 1) — alternar tema numa rota pública e numa rota interna;
    recarregar a página em cada uma; confirmar persistência e a paleta roxo/rosa/mauve
-   (TASK-035-002) aplicada nos dois temas, sem a ilustração decorativa de `/login` (comparar
+   (TASK-036-002) aplicada nos dois temas, sem a ilustração decorativa de `/login` (comparar
    com `/login` só para confirmar a AUSÊNCIA da ilustração fora dela).
-7. (AC-034-019) Redimensionar a janela para 360px de largura com os controles presentes
+7. (AC-036-019) Redimensionar a janela para 360px de largura com os controles presentes
    (incluindo `ApiStatus`, se em ambiente de dev) → confirmar ausência de rolagem
    horizontal.
-8. (AC-034-013, AC-034-018) Inspecionar os rótulos acessíveis dos 2 controles nos 2 temas (leitor
+8. (AC-036-013, AC-036-018) Inspecionar os rótulos acessíveis dos 2 controles nos 2 temas (leitor
    de acessibilidade ou painel de acessibilidade do DevTools); confirmar que uma mensagem
    de erro e um link, quando visíveis lado a lado com o acento roxo/rosa da paleta,
-   permanecem distinguíveis entre si — a fração NUMÉRICA de NFR-034-005 (contraste
-   `--link`/`--danger` vs `--surface`) já foi provada em gate 1 por TASK-035-002; este passo
+   permanecem distinguíveis entre si — a fração NUMÉRICA de NFR-036-005 (contraste
+   `--link`/`--danger` vs `--surface`) já foi provada em gate 1 por TASK-036-002; este passo
    cobre só a fração qualitativa (distinguibilidade visual do acento decorativo, sem piso
    numérico na SPEC); se a inspeção encontrar problema aqui, registrar como achado do gate
    11 (design).
@@ -136,7 +136,7 @@ não deve vazar para outra verificação).
 - [x] Lint limpo
 - [x] Aderência à ficha/perfil
 - [x] Code review aprovado (wave 3 — 1 retry, mock de matchMedia duplicado 3x sem extrair para tests/support/)
-- [x] ACs verificados (AC-034-005; 11/19 ACs da SPEC verificadas por execução real nesta wave)
+- [x] ACs verificados (AC-036-005; 11/19 ACs da SPEC verificadas por execução real nesta wave)
 - [ ] Segurança (gate 8): n/a — sem superfície de sessão/dado sensível nesta TASK (só wiring)
-- [x] Comportamento (gate 9): pendente_handoff — qa, PARCIAL: 11/19 ACs verificados por execução real (Playwright, sem sessão); 8 ACs (login real) em HANDOFF-PLAN-035.md — backend indisponível neste ambiente (Docker Desktop fora do ar)
+- [x] Comportamento (gate 9): pendente_handoff — qa, PARCIAL: 11/19 ACs verificados por execução real (Playwright, sem sessão); 8 ACs (login real) em HANDOFF-PLAN-036.md — backend indisponível neste ambiente (Docker Desktop fora do ar)
 - [x] Design (gate 11): aprovado (wave 3 — sem achado bloqueante novo na composição; 4 itens de dívida não-bloqueante registrados no INDEX)

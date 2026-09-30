@@ -186,7 +186,7 @@ PLAN-033 §1, §3 (COMP-033-007/008), §4 Fluxo 5.
 **Data início**: 2026-09-27T19:58:11-0300
 **Data conclusão**: 2026-09-27T21:06:53-0300
 **Commit SHA**: 8160cd1 (+ 8d01262, 08e6452 — retry dos gates 1/7; âncoras renumeradas 5984073)
-**Jira**: — (sem acesso ao conector; ver `tracker-local-F9.md`)
+**Jira**: KAN-156
 
 **Quality gates**:
 - [x] Implementação completa

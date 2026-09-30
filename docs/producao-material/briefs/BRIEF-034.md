@@ -1,98 +1,95 @@
-# BRIEF-034: Botão Entrar/Sair e troca de tema dark/light no topo da tela
+# BRIEF-034: Painel estratégico e tempo por página
 
 **Slug**: producao-material
-**Status**: Concluído (mergeado em `main`, PR #18, `e254bd1`; KAN-77 fechado no Jira — gate 9 parcial segue em HANDOFF-PLAN-035.md)
-**Data**: 2026-09-29
-**Largada**: 2026-09-29T22:34:23-0300
+**Status**: Emitido
+**Data**: 2026-09-30
+**Largada**: 2026-09-30T01:35:37-0300
 **SPEC**: SPEC-034
-**Jira**: KAN-77
-
-## Cronologia
-- Etapa 1 (SPEC) concluída: 2026-09-29T22:59:36-0300 — correções: 1, janelas: redação 1min/327l
-- Etapa 2 (PLAN) concluída: 2026-09-29T23:21:17-0300 — correções: 1 (2 achados mecânicos do plan-validator corrigidos inline pelo Tech Lead, sem re-despacho ao scribe)
-- Etapa 3 (TASKs) concluída: 2026-09-29T23:54:26-0300 — correções: 1 (3 achados mecânicos do task-validator corrigidos inline pelo Tech Lead: campo Realiza(FRs) com NFR misturado, shorthand de AC invisível ao parser, gap de teste de wiring em layout.tsx)
-- Etapa 3.5 (verificabilidade pré-código, qa) concluída: 2026-09-30T00:02:16-0300 — correções: 1 (4 achados reais do qa: AC-034-017 2ª cláusula sem exercício, NFR-034-005/AC-034-018 não-falseável, robustez de localStorage sem especificação, pré-condição implícita no roteiro do gate 9)
-- Etapa 4 (implement) concluída: 2026-09-30T07:44:41-0300 — 3 waves, 6/6 TASKs Done, convergência de fecho CONVERGIU, PO aceitação ACEITA_COM_RESSALVAS
-- Entrega concluída: 2026-09-30T07:58:48-0300 — branch pushada, Diretor confirmou a escalação pendente (remoção do "Sair" duplicado mantida)
+**Jira**: KAN-165
+**Epico**: docs/producao-material/briefs/BRIEF-2026-08-27-mnemora-studio-epic.md
 
 ## Pedido como dito
-"/keelson:auto KAN-77 — Botão Entrar/Sair + troca de tema dark/light usando a paleta do login (mnemonicos-frontend)
 
-Card: KAN-77 (História, já existe no Jira — NÃO criar card novo). A descrição do card no
-Jira já foi atualizada e é a fonte da verdade — leia ela inteira antes de tudo (getJiraIssue
-KAN-77, projeto KAN). Resumo do que ela diz, para não depender só da leitura do tracker:
-
-1. No topo da tela, na mesma área onde hoje fica o indicador "API online" (ver KAN-71 —
-   remoção desse indicador em produção), adicionar dois controles:
-   a. Botão de autenticação: "Entrar" quando não autenticado, "Sair" quando autenticado.
-   b. Troca de tema: alterna entre dark e light.
-2. Comportamento do tema: default light, mas respeita `prefers-color-scheme` do dispositivo
-   quando não há preferência salva pelo usuário; depois que o usuário escolhe manualmente,
-   essa escolha persiste e prevalece sobre a preferência do SO nas próximas visitas.
-3. Paleta de cores dos temas (dark/light) — PEDIDO NOVO do Diretor: a paleta dos dois temas
-   do app INTEIRO (não só do login) passa a ser baseada na paleta introduzida no redesign
-   visual de `/login` (KAN-73, PLAN-031, já mergeado em `main`) — tons de roxo/rosa/mauve
-   sobre fundo noturno escuro que o Diretor aprovou. O resultado tem que ser MINIMALISTA:
-   reaproveita as CORES e o contraste AA já validado (4,5:1 texto, 3:1 borda/ícone) — não a
-   composição decorativa (SEM ilustração de dunas/lua/estrelas fora de `/login`; o resto do
-   app continua com layout simples, sem elemento gráfico extra). Fonte de cor: tokens
-   `--color-night-*` de `mnemonicos-frontend/src/app/night-palette-tokens.ts` e o `@theme`
-   de `globals.css` (introduzidos em PLAN-031) — hoje só usados em `/login`; decidir e
-   registrar em DEC do PLAN como esses tokens (ou uma extensão deles) mapeiam para os
-   papéis de UI do resto do app (fundo, texto, borda, superfície de card, etc., nos dois
-   temas) é o cerne desta demanda, não um detalhe de implementação.
-
-Critérios de aceite (do card, não inventar além disso):
-- Sem preferência salva: usa `prefers-color-scheme` do dispositivo; sem preferência
-  detectável, cai em light.
-- Escolha manual do usuário persiste entre navegações/reloads e prevalece sobre o SO.
-- Autenticado → botão "Sair"; não autenticado → botão "Entrar", ambos na área hoje ocupada
-  pelo indicador de API (KAN-71).
-- Temas dark/light do app inteiro (fora de `/login`) usam a mesma família de cores
-  (roxo/rosa/mauve) do login, com contraste AA mantido, sem replicar a ilustração
-  decorativa do login.
-
-Relacionado: KAN-71 (remoção do indicador de API — a área liberada é onde os controles
-entram) · KAN-73/PLAN-031 (origem da paleta — branch já mergeada em `main`, ver
-`mnemonicos-frontend/src/app/night-palette-tokens.ts`, `globals.css` e
-`docs/producao-material/plans/PLAN-031-redesign-visual-login.md` para o histórico da
-decisão de paleta e das regras de contraste já usadas).
-
-Server Components por padrão, `'use client'` só onde há estado ou evento (o toggle de tema
-e o botão de auth precisam de client). Persistência da escolha de tema: decisão técnica do
-PLAN (localStorage é o caminho óbvio, mas registre a alternativa). Identificadores em
-inglês, texto de interface em pt-BR.
-
-Gates esperados: product-designer (gate 11, toca paleta/tokens do app inteiro — superfície
-grande), qa com verificação de tela (os dois temas, várias rotas, não só login)."
+> "Painel estratégico e tempo por página (épico: docs/producao-material/briefs/BRIEF-2026-08-27-mnemora-studio-epic.md)"
+> — Fatia 10 da fila do épico MNEMORA STUDIO. Depende de F3 (instrumentação de etapas,
+> essencial) e de F8/F9 (versionamento e aprovação, parcial) — todas entregues e mergeadas
+> em `main`.
 
 ## Interpretação do PO
 
-**Contexto**: `SiteHeader` só mostra hoje o indicador `ApiStatus` (dev-only, KAN-71 já
-escondeu em produção). Tema é 100% `prefers-color-scheme`, sem override manual nem
-persistência — não existe hoje nenhum mecanismo de escolha do usuário. A paleta noturna
-roxo/rosa/mauve (`--color-night-*`, `night-palette-tokens.ts`) existe só em `/login`
-(PLAN-031/KAN-73, já mergeada em `main`).
+**Contexto**: desde F3 a fábrica grava um evento append-only por etapa de produção
+(`ProductionStageEvent`: 8 etapas — Conteúdo bruto, Quebra da regra, Tira mnemônica,
+Associação visual, Material de reforço, Versão editorial, Aprovação da versão, Publicação
+PDF — com abertura/conclusão/retrabalho, ator e instante), e ninguém lê esses dados: não
+há consumidor, rota nem tela. A TAP (§6.2) nomeia **tempo de produção por página** como a
+métrica que decide se o modelo escala, e o épico (decisão 5, confirmada pelo Diretor em
+2026-08-27) diz que F10 nasce **só com o que a fábrica mede sozinha**. A home interna
+(`/studio`) ainda é um placeholder.
 
-**Pedido**: na área do indicador de API, dois controles novos e sempre visíveis (não
-dev-only): botão Entrar/Sair conforme sessão, e alternador de tema dark/light. Tema
-default light, mas obedece o SO quando não há escolha salva; escolha manual persiste e
-vence o SO depois. A paleta dos dois temas do app inteiro passa a usar a família de cores
-do login (reaproveitando cor + contraste AA já medido), sem a ilustração decorativa —
-mapear os tokens `--color-night-*` (ou extensão deles) para os papéis de UI do app
-(fundo/texto/borda/superfície) é a decisão técnica central, registrada em DEC do PLAN.
+**Pedido**: um **Painel estratégico** interno que mostra, a partir dos dados que a
+fábrica já grava (mais a contagem de páginas, que passa a ser gravada):
+(1) **tempo por página** — tempo de produção (lead time de calendário, régua confirmada em
+F3) por Conteúdo e por etapa, dividido pelas páginas do PDF exportado; (2) **conclusão por
+módulo** (Disciplina/Tema) — quantos Conteúdos existem e quantos já têm Versão aprovada;
+(3) **correções após revisão** — edições feitas depois do fechamento de uma Versão
+(retrabalho), rotuladas como tal; (4) **backlog** — Conteúdos ativos ainda sem Versão
+aprovada, com a etapa mais avançada alcançada e a prioridade de apresentação
+(Alta/Média/Baixa, derivada do radar — exibição adiada para F10 desde SPEC-005).
 
-**Premissas decididas** [assumido]:
-- Persistência da escolha de tema via `localStorage` (mecanismo óbvio e reversível;
-  alternativa — cookie legível por SSR para evitar flash — registrada no PLAN como DEC
-  com as duas opções).
-- Botão de auth usa a sessão já existente (`useMeQuery`/`useLogoutMutation`,
-  `SessionUser`): "Entrar" leva a `/login`, "Sair" dispara o logout já provado
-  (SPEC-002/SPEC-016) — nenhum comportamento de autenticação novo.
-- Os dois controles novos passam a existir em toda a app (inclusive produção); o
-  `ApiStatus` existente (dev-only) convive na mesma área do `SiteHeader`, sem remoção —
-  o card não pede isso.
+**Premissas decididas**:
+- A-034-001 `[assumido]` **Página = páginas reais do PDF exportado** (variante Tira,
+  incluindo as páginas suplementares de contrastes/pegadinha/flashcards/protocolo) —
+  **decidido pelo Diretor na última chamada (2026-09-30)**. A exportação passa a gravar o
+  número de páginas numa coluna nova e opcional; exportações anteriores aparecem como
+  "sem medida", nunca como zero nem estimadas.
+- A-034-002 `[assumido]` **"Erros na revisão" = correções após o fechamento de uma
+  Versão** (eventos de retrabalho posteriores ao fechamento), rotulados no painel como
+  "correções após revisão" — **decidido pelo Diretor na última chamada (2026-09-30)**. Sem
+  ação nova de "devolver para correção" nesta fatia.
+- A-034-003 `[assumido]` Tempo é **lead time de calendário** por etapa, não esforço (régua
+  E-02 de F3, confirmada pelo Diretor em 2026-09-06). Fórmula exata (retrabalho no
+  numerador — Q-009-001; abertura órfã — Q-009-002) é decisão da SPEC.
+- A-034-004 `[assumido]` Migração **aditiva** (coluna nullable) autorizada pelo Diretor
+  para dev/teste na última chamada (2026-09-30); produção segue pelo `migrate deploy` do
+  deploy, ato do Diretor.
+- A-034-005 `[assumido]` O painel é leitura interna (EDITOR e ADMIN), agregada no servidor;
+  o estudante nunca o vê (anti-persona).
 
-**Fora de escopo**: ilustração decorativa (dunas/lua/estrelas) fora de `/login`; qualquer
-mudança de comportamento de login/logout já provado; métrica de produto numérica (o card
-não declara nenhuma).
+**Fora de escopo**: "mais vendidos" e "próximos lançamentos" (venda e métricas do beta —
+Q-12 sem resposta, decisão 5 do épico); ação "devolver para correção" com motivo gravado;
+gráficos com biblioteca nova (nenhuma lib de gráfico no frontend — a apresentação usa o que
+o produto já tem); fila de produção/calendário editorial (F11, fora do MVP); reescrita do
+seed para gerar eventos históricos.
+
+## Fora de escopo
+(ver acima)
+
+## Estimativa
+
+- **Base**: pedido (BRIEF-034, A-034-001..005) · conclusão do code-scout (memo de
+  exploração) · INDEX de producao-material (PLAN-010: 3 tasks · PLAN-029: 4 tasks/3 waves ·
+  PLAN-033: 7 tasks/5 waves com retries de gate 8) · ficha (security/review/screenVerify
+  ativos; mutation/e2e nulos) · calibração: **sem base histórica** (2 demandas fechadas em
+  `estimates.md`, só PLAN-031 posterior à 4.437 — nenhum corretor aplicado)
+- **Dimensão**: ~4 waves · ~8 tasks (~3 small · ~5 medium)
+- **Por fase**: forja 0–0,5h · artefatos 1,5–4h · implementação 8–28h · gates 4–14h
+- **Total**: 14–46h (horas de ciclo, não prazo de calendário)
+- **Confiança**: média — terreno mapeado e premissas de produto fechadas, mas sem
+  calibração válida e agregação é área nova (zero `groupBy`/`aggregate` no src).
+- **Premissas**: `pageCount` nullable via `getPageCount()` antes do `.save()` (migração
+  aditiva autorizada em dev/teste) · 4 capacidades em fatias verticais, painel em `/studio`
+  sem nav nova · agregação no service, sem SQL bruto nem view; sem paginação no volume atual
+  (gate 10 decide TRISK-010-002) · gates 8/9/10/11 ativos, margem de 1–2 retries de gate 8
+  · gate 9 gera dado exercitando rotas (seed com zero eventos), parte pode fechar
+  `pendente_handoff` · mapeamento radar→prioridade já fixado (DEC-006-009) · 1–2 rodadas de
+  convergência de fecho.
+- **Lacunas**: fórmula do tempo por etapa (Q-009-001/002 — decidida na SPEC) · filtros do
+  painel (fora do pedido; +1 task se entrarem) · escopo de "correções após revisão" (todas
+  as etapas × só Conteúdo bruto — RISK-011-006) · origem da `radarClass` (coluna do
+  `RawContent` — confirmado pelo code-scout, schema.prisma:328).
+
+## Cronologia
+- largada: 2026-09-30T01:35:37-0300
+- specify: 2026-09-30T02:19:38-0300 · correções: 1 · classes: spec-ears-nao-casa(1) · spec-porte-epico(1, WARNING aceito) · spec-tecnologia-julgamento(1, identificadores de código) · mérito: product-analyst REVISAR_ANTES_DE_APROVAR (13 riscos) · po APROVAR (R0–R13, 0 escalações) · pacote do po aplicado pelo scribe em modo reescrita (v0.1→v0.2) · janelas: redação 8min/495l
+- plan: 2026-09-30T02:37:25-0300 · correções: 1 · classes: fr-sem-comp(5, campo Realiza multilinha) · comp-realiza-fora-cobertura(33, bullets de FRs cobertos multilinha) · plan-reabrir-nunca-sem-motivo(2) · cobertura 34/34 FRs + 4/4 NFRs, gap 0 · 4 WARNING plan-dec-alternativa-unica aceitos
+- tasks: 2026-09-30T03:21:49-0300 · correções: 2 · classes: task-criterio-sem-ac(1) · task-refactor-sem-identidade(1) · task-criterio-grep-nao-ancorado(6, ancorados/aceitos) · qa pré-código: 3 mecânicos + 1 decisão de produto (po resolução: opção B, V7/V8) · 8 TASKs/5 waves, graph --check --stage=tasks: 0 ERROR · janelas: redação 21min/1728l · correção 9min/1728l

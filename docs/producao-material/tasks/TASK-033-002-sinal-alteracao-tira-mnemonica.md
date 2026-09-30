@@ -133,7 +133,7 @@ negociação. Território e precedentes: `docs/producao-material/MAP.md`,
 **Data início**: 2026-09-27T18:52:00-0300
 **Data conclusão**: 2026-09-27T19:13:26-0300
 **Commit SHA**: 9322b66 (+ d705d9f, f9d278a — retry e residual do gate 7)
-**Jira**: —
+**Jira**: KAN-153
 
 **Quality gates**:
 - [x] Implementação completa

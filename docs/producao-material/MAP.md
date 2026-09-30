@@ -416,6 +416,58 @@
   eixo observável (ordem, copy, reset pós-sucesso), não só para os "3 estados de UI" —
   mnemonicos-frontend/src/components/content-version-history.tsx.
 
+## Controle de qualidade e gate de Versão aprovada (F9 · PLAN-033)
+
+- [2026-09-29 · PLAN-033] `ContentVersion` ganhou `approvedById String?` (FK
+  `ContentVersionApprover` → User, `onDelete: Restrict`) e `approvedAt DateTime?` — `null`
+  até a aprovação, nunca revertidos (ato irreversível, FR-032-005); valor aditivo
+  `APROVACAO_VERSAO` no `ProductionStageType`. Migração aditiva
+  `prisma/migrations/20260927135234_add_content_version_approval` — mnemonicos-backend/
+  prisma/schema.prisma.
+- [2026-09-29 · PLAN-033] `approveContentVersion` (`POST /contents/:id/versions/:number/
+  approve`, `verifyOrigin` + `requireRole('ADMIN')`, body Zod com os 2 checks
+  `z.literal(true)`): dentro da `$transaction`, lock `FOR UPDATE` no `RawContent` pai e
+  guardas NESTA ORDEM — alcance → Versão vigente (maior `number`) → número do path → já
+  aprovada → segregação de funções por 3 identidades (`ContentVersion.authorId`,
+  `RawContent.authorId`, `RawContent.lastEditedById`) → guarda de edição pós-fechamento
+  (evento `CONTEUDO_BRUTO` com `sequence` maior que o do último `VERSAO_EDITORIAL` — ordena
+  por `sequence` atribuído depois do lock, nunca por relógio de aplicação, DEC-033-006
+  Emendas 1/2) → fonte normativa na Versão → sinal de alteração. Escrita por `updateMany`
+  condicionado a `approvedById: null` + evento `APROVACAO_VERSAO`/`CONCLUSAO`. Custo: 11
+  statements, constante. Recusas em pt-BR com o próximo passo — mnemonicos-backend/src/
+  modules/content-versions/content-versions.{service,routes,schema}.ts.
+- [2026-09-29 · PLAN-033] `resolveAlterationSignal` — sinal de alteração combinado:
+  conteúdo (`hasVersionedContentChanged` contra o `contentSnapshot`, curto-circuito) OU Tira
+  (`occurredAt` do último `ProductionStageEvent` `TIRA_MNEMONICA`, escolhido por `sequence`,
+  maior que `closedAt` — comparação por relógio de aplicação, sem prova de interleaving). ÚNICO
+  predicado de "aprovada e válida" (`approvedById !== null && !sinal`), usado em 3 lugares:
+  `approveContentVersion` (guarda), `listContentVersions` (`validApprovalForExport`,
+  computado só para a vigente e só quando aprovada; demais entradas `false`) e
+  `resolveVersionStampForPdf` (carimbo) — mudar a regra é mudar os 3 juntos.
+  `listContentVersions` lê `contentSnapshot` só internamente e monta a resposta campo a
+  campo (9 chaves, provadas no teste HTTP de rotas); custo 2/5/4 statements, constante em N
+  — mnemonicos-backend/src/modules/content-versions/content-versions.service.ts.
+- [2026-09-29 · PLAN-033] Carimbo no PDF: `resolveHeaderLabel` (`pdf-composer.ts`) troca
+  "RASCUNHO" por "Conteúdo normativo e Tira mnemônica — Versão N aprovada" em toda página
+  quando `approvedAndValid`; 4ª linha de Versão/Data preservada — mnemonicos-backend/src/
+  modules/publication/{publication.service,pdf-composer}.ts.
+- [2026-09-29 · PLAN-033] Frontend: `approveContentVersion` (RTK Query, invalida só
+  `ContentVersion`) + `useApproveContentVersionMutation`; `updateRawContent` invalida
+  `['RawContent', 'ContentVersion']` porque `validApprovalForExport` depende do `RawContent`
+  (lição `campo-calculado-de-outro-recurso-invalida-a-tag-do-endpoint-que-o-exibe`) —
+  mnemonicos-frontend/src/store/api.ts. Painel em `content-version-history.tsx`, entre a
+  lista e o form de fechamento: cada linha do histórico mostra "Aprovada por … em …" para
+  qualquer papel (FR-032-007(a)); bloco de AÇÃO só para ADMIN — fieldset "Aprovação da
+  versão N", negação de autoaprovação pelas 3 identidades (best-effort de UX; identidade
+  ainda carregando = botão desabilitado), estado de aprovação zerado ao trocar de Versão;
+  linha "Válida para a próxima exportação" só no bloco ADMIN — mnemonicos-frontend/src/
+  components/content-version-history.tsx.
+- [2026-09-29 · PLAN-033] Ambiente do gate 9 de tela: segregação de funções exige 2
+  identidades distintas (EDITOR produtor + ADMIN semeado aprovador basta); não há rota de
+  reativar conta desativada (`users.routes.ts` só tem `disable`); o SW de app-shell
+  (`public/sw.js`) pode servir bundle obsoleto de sessão anterior — desregistrar e limpar
+  Cache Storage antes de exercitar.
+
 ## Instalabilidade PWA (avulso · PLAN-013)
 
 - [2026-09-07 · PLAN-013] `mnemonicos-frontend` ganhou manifesto (`app/manifest.ts`),
@@ -444,28 +496,28 @@
   (`chrome://apps`, prompt do navegador) e ciclo completo login/logout com SW ativo —
   ver `docs/producao-material/handoffs/HANDOFF-PLAN-013.md`.
 
-## Header unificado — sessão e tema (avulso · PLAN-035)
+## Header unificado — sessão e tema (avulso · PLAN-036)
 
-- [2026-09-30 · PLAN-035] `SiteHeader` (`mnemonicos-frontend/src/components/site-header.tsx`)
+- [2026-09-30 · PLAN-036] `SiteHeader` (`mnemonicos-frontend/src/components/site-header.tsx`)
   passou a montar `AuthControl` (controle único de sessão — Entrar/Sair/neutro,
   `src/components/auth-control.tsx`, consome `useMeSilentQuery`) e `ThemeToggle`
   (alternador manual de tema, `src/components/theme-toggle.tsx`) ao lado de `ApiStatus`
   (dev-only, intocado). `InternalShell` (`src/components/internal-shell.tsx`) **perdeu**
   o `<header>`/`LogoutControl` próprio que tinha antes — o logout da área interna agora
   vem exclusivamente do header — mnemonicos-frontend/src/components/site-header.tsx:1-30.
-- [2026-09-30 · PLAN-035] `useMeSilentQuery` (`store/api.ts`) é a leitura de sessão SEM
+- [2026-09-30 · PLAN-036] `useMeSilentQuery` (`store/api.ts`) é a leitura de sessão SEM
   efeito colateral — usa `queryFn`/`rawBaseQuery` direto, contornando
   `baseQueryWithReauth` (que hoje trata renovação/expulsão em qualquer 401). `useMeQuery`
   original continua intocado, usado só por `InternalShell` — os dois caminhos de leitura
   de sessão coexistem deliberadamente (DEC-035-005) — mnemonicos-frontend/src/store/api.ts:739-747.
-- [2026-09-30 · PLAN-035] Tema deixou de ser 100% `prefers-color-scheme`: `data-theme`
+- [2026-09-30 · PLAN-036] Tema deixou de ser 100% `prefers-color-scheme`: `data-theme`
   (atributo em `<html>`, lido/escrito via `localStorage['mnemonicos:theme']`) permite
   override manual, com CSS em 3 camadas em `globals.css` (`:root` claro default;
   `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {...} }`;
   `:root[data-theme="dark"] {...}` explícito) — script de bootstrap síncrono
   (`src/lib/theme-bootstrap.ts`, embutido no `<head>` de `layout.tsx`) aplica a escolha
   salva ANTES da hidratação, evitando FOUC — mnemonicos-frontend/src/app/globals.css:63-170.
-- [2026-09-30 · PLAN-035] Papéis de UI do app inteiro (`--surface`/`--surface-raised`/
+- [2026-09-30 · PLAN-036] Papéis de UI do app inteiro (`--surface`/`--surface-raised`/
   `--border-subtle`) passaram a apontar para a paleta noturna (`--color-night-*`,
   antes só usada em `/login`) — `--text-strong`/`--text-muted`/`--danger`/`--link`
   permanecem com os valores de sempre (já provados AA contra o novo fundo).
@@ -473,9 +525,9 @@
   `NIGHT_PALETTE_ROLE_VS_SURFACE_PAIRS` (pares de contraste novos, fonte única) e as
   constantes `THEME_STORAGE_KEY`/`ThemeName` (contrato compartilhado entre o bootstrap e o
   `ThemeToggle`) — mnemonicos-frontend/src/app/night-palette-tokens.ts:1-230.
-- [2026-09-30 · PLAN-035] Verificação de tela **parcial**: 11/19 ACs de SPEC-034
+- [2026-09-30 · PLAN-036] Verificação de tela **parcial**: 11/19 ACs de SPEC-036
   verificados por execução real (Playwright, sem sessão); 8 ACs que exigem login real
-  ficam pendentes — `docs/producao-material/handoffs/HANDOFF-PLAN-035.md` (backend
+  ficam pendentes — `docs/producao-material/handoffs/HANDOFF-PLAN-036.md` (backend
   indisponível neste ambiente, não é falha de código).
 
 ## Tamanho do código (linha de base do épico)

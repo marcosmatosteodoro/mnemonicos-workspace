@@ -1,10 +1,10 @@
-# TASK-035-005: `AuthControl` — consolidação do controle único de sessão
+# TASK-036-005: `AuthControl` — consolidação do controle único de sessão
 
 **Slug**: producao-material
-**Pertence a**: PLAN-035
-**Realiza (FRs)**: FR-034-001, FR-034-002, FR-034-003, FR-034-004, FR-034-006, FR-034-014, FR-034-016
-**Funcionalidade**: FEAT-034-001 (primária)
-**Componente**: COMP-035-001 (principal), COMP-035-006
+**Pertence a**: PLAN-036
+**Realiza (FRs)**: FR-036-001, FR-036-002, FR-036-003, FR-036-004, FR-036-006, FR-036-014, FR-036-016
+**Funcionalidade**: FEAT-036-001 (primária)
+**Componente**: COMP-036-001 (principal), COMP-036-006
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
@@ -12,8 +12,8 @@
 
 ## Dependências
 
-- **Depende de**: TASK-035-001 (consome `useMeSilentQuery`)
-- **Bloqueia**: TASK-035-006
+- **Depende de**: TASK-036-001 (consome `useMeSilentQuery`)
+- **Bloqueia**: TASK-036-006
 
 ## Contexto
 
@@ -21,8 +21,8 @@ Hoje o único botão "Sair" vive dentro de `InternalShell` (`LogoutControl`,
 `internal-shell.tsx:70-124`), com um `<header>` próprio que a área interna monta por
 conta. `AuthControl` absorve esse comportamento — os mesmos três estados de AC-002-027 —
 e passa a viver no header, alcançável de qualquer rota, decidindo entre "Entrar"/"Sair"/
-neutro a partir de `useMeSilentQuery` (TASK-035-001), sem nunca disparar logout a partir de
-um clique sem sessão (DEC-035-006; memo — PLAN-035 §3 COMP-035-001/006, §6 DEC-035-006).
+neutro a partir de `useMeSilentQuery` (TASK-036-001), sem nunca disparar logout a partir de
+um clique sem sessão (DEC-036-006; memo — PLAN-036 §3 COMP-036-001/006, §6 DEC-036-006).
 
 ## Escopo
 
@@ -61,7 +61,7 @@ um clique sem sessão (DEC-035-006; memo — PLAN-035 §3 COMP-035-001/006, §6 
   não mais pai/filho — a prova precisa da MESMA vizinhança que a produção monta).
 
 ### Não inclui
-- Montagem de `AuthControl` no `SiteHeader` (TASK-035-006, que o torna visível de fato).
+- Montagem de `AuthControl` no `SiteHeader` (TASK-036-006, que o torna visível de fato).
 - Comportamento de login/logout em si (`useLoginMutation`/`useLogoutMutation`, mensagens,
   `/auth/login`/`/auth/logout`) — intocado, SPEC-002/SPEC-016.
 
@@ -69,8 +69,8 @@ um clique sem sessão (DEC-035-006; memo — PLAN-035 §3 COMP-035-001/006, §6 
 
 - [ ] Sem sessão (`useMeSilentQuery` retorna `{ data: null, isLoading: false }`) →
       renderiza "Entrar"; clique → navega para `/login`, NUNCA chama `useLogoutMutation` —
-      cobre AC-034-001, AC-034-003, AC-034-006, NFR-034-002 e AC-034-013 (parte — rótulo do controle de
-      autenticação; a parte do alternador é de TASK-035-004), pelo próprio `getByRole('button',
+      cobre AC-036-001, AC-036-003, AC-036-006, NFR-036-002 e AC-036-013 (parte — rótulo do controle de
+      autenticação; a parte do alternador é de TASK-036-004), pelo próprio `getByRole('button',
       { name: 'Entrar' })` usado na asserção. Verificação executável: `npm --prefix mnemonicos-frontend
       test -- src/components/auth-control.test.tsx` → `PASS`, mockando `@/store/api` (mesmo
       padrão de `internal-shell.test.tsx:12-15`) e afirmando, após o clique com
@@ -78,13 +78,13 @@ um clique sem sessão (DEC-035-006; memo — PLAN-035 §3 COMP-035-001/006, §6 
       trigger NUNCA chamado. Mutante: fazer o clique disparar logout também reprova.
 - [ ] Com sessão → renderiza "Sair" com os 3 estados (em andamento/sucesso/falha), mesma
       mensagem `'Não foi possível sair agora. Tente novamente.'`, navegação para `/login`
-      no sucesso — cobre AC-034-002, AC-034-004, AC-034-014 (migração de AC-002-027). Mesmo arquivo,
+      no sucesso — cobre AC-036-002, AC-036-004, AC-036-014 (migração de AC-002-027). Mesmo arquivo,
       reaproveitando/adaptando literalmente os 3 casos de
       `internal-shell.test.tsx:172-206` (trigger de `useLogoutMutation` resolvendo/
       rejeitando, mesmas asserções de `aria-busy`/`role="status"`/mensagem).
 - [ ] `useMeSilentQuery` ainda carregando/não iniciado (`isLoading: true` ou
       `isUninitialized: true`) → nem "Entrar" nem "Sair" renderizado, clique não aciona
-      nada — cobre AC-034-016. Mesmo arquivo, caso com o mock retornando esse estado e
+      nada — cobre AC-036-016. Mesmo arquivo, caso com o mock retornando esse estado e
       afirmando ausência dos dois `role="button"` (`"Entrar"`/`"Sair"`) via `queryByRole`.
 - [ ] `internal-shell.test.tsx` atualizado: SEM asserção de botão "Sair" dentro de
       `InternalShell` (ele não existe mais ali) — o describe `'InternalShell — controle de
@@ -107,7 +107,7 @@ um clique sem sessão (DEC-035-006; memo — PLAN-035 §3 COMP-035-001/006, §6 
       navegação/reset; logout 204 → navega, sem mensagem; logout 204 + `me` 401 seguinte →
       sem laço de refresh, sem `?sessao=expirada`; logout 500 + 401 autenticado seguinte →
       ainda expulsa via refresh esgotado; login dentro da janela `justLoggedOut` limpa a
-      flag; janela expira e a re-autenticação volta ao normal) — cobre AC-034-002, AC-034-004, AC-034-014 no
+      flag; janela expira e a re-autenticação volta ao normal) — cobre AC-036-002, AC-036-004, AC-036-014 no
       caminho real, e a passagem do `me`/`InternalShell` continuando a funcionar do lado de
       `AuthControl`/`meSilent` sem side-effect cruzado. Verificação executável: `npm
       --prefix mnemonicos-frontend test -- src/components/auth-control.integration.test.tsx`
@@ -137,7 +137,7 @@ um clique sem sessão (DEC-035-006; memo — PLAN-035 §3 COMP-035-001/006, §6 
 - [x] Lint limpo
 - [x] Aderência à ficha/perfil
 - [x] Code review aprovado (wave 2 — 1 retry, mutante da prova de logout 500 sobrevivia após migração pai/filho→irmãos)
-- [x] ACs verificados (AC-034-001, AC-034-002, AC-034-003, AC-034-004, AC-034-006, AC-034-013 parcial, AC-034-014, AC-034-016)
+- [x] ACs verificados (AC-036-001, AC-036-002, AC-036-003, AC-036-004, AC-036-006, AC-036-013 parcial, AC-036-014, AC-036-016)
 - [x] Segurança (gate 8): aprovado (wave 2) — security-engineer, corrida meIs401AfterLogout preservada na migração
-- [ ] Comportamento (gate 9): n/a — FEAT-034-001 ainda não completou (todas as TASKs Done, mas gate 9 roda no fecho da wave em que a FEAT completa — Wave 3, TASK-035-006)
+- [ ] Comportamento (gate 9): n/a — FEAT-036-001 ainda não completou (todas as TASKs Done, mas gate 9 roda no fecho da wave em que a FEAT completa — Wave 3, TASK-036-006)
 - [x] Design (gate 11): aprovado (wave 2 — 2 retries: cursor-pointer/hover ausente nos dois botões, depois `brightness-105` imperceptível no tema escuro corrigido para troca de token `bg`)

@@ -4,7 +4,9 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-035/KAN-77 — mergeado em `main` e fechado no Jira; gate 9 PARCIAL, handoff pendente. PLAN-033/F9 — Wave 4 fechada: TASK-033-006 Done; próximo: Wave 5, painel de aprovação)
+**Última atualização**: 2026-09-30 (duas demandas em paralelo neste slug — PLAN-036/KAN-77:
+mergeado em `main` e fechado no Jira, gate 9 PARCIAL, handoff pendente. PLAN-035/F10
+KAN-165: Wave 4 fechada, TASK-035-007 Done)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -17,29 +19,34 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ## Capacidades
 
 ### Em desenvolvimento
-- Aprovação da Versão vigente com checklist de qualidade e segregação de funções (SPEC-032/FEAT-032-001, PLAN-033, 🟡 — backend (aprovação + leitura do estado de aprovação) entregue e aprovado nas Waves 2-3, mutation na Wave 4; falta o painel na tela, Wave 5). Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica (SPEC-032/**PLAN-033**, F9 do épico MNEMORA STUDIO, 🟡 6/7 TASKs Done). Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate.
+- Painel estratégico e tempo por página (SPEC-034 → **PLAN-035**, F10 do épico MNEMORA STUDIO, 2026-09-30) — registro de páginas na Exportação (`PublicationEvent.pageCount`, migração aditiva autorizada em dev/teste) + Painel estratégico como página inicial da área interna (tempo por página/etapa, agregados com cobertura, conclusão por Módulo, correções após revisão por etapa, backlog ativos − concluídos). Jira: Épico KAN-165.
 
 ### Implementadas
 - Controle único de sessão (Entrar/Sair/neutro) e alternador de tema claro/escuro no header
-  do app (SPEC-034/**PLAN-035**, Jira Story KAN-77, ✅ 2026-09-30) — presentes em toda
+  do app (SPEC-036/**PLAN-036**, Jira Story KAN-77, ✅ 2026-09-30) — presentes em toda
   rota (pública e interna, inclusive produção), consolidando o logout hoje próprio da área
   interna num único ponto de acionamento; paleta unificada roxo/rosa/mauve herdada de
   `/login` (SPEC-030) estendida ao app inteiro, com o mesmo piso de contraste AA e sem a
   ilustração decorativa; persistência de tema por dispositivo/navegador, independente de
   conta. 6/6 TASKs Done, 3 waves — 5 rodadas de retry reais (cobertura de mutante/DEC em
-  TASK-035-002, cadeia de fallback sem teste em TASK-035-004, mutante enfraquecido por
-  migração de topologia de teste em TASK-035-005, mock duplicado em TASK-035-006) + 1
+  TASK-036-002, cadeia de fallback sem teste em TASK-036-004, mutante enfraquecido por
+  migração de topologia de teste em TASK-036-005, mock duplicado em TASK-036-006) + 1
   achado bloqueante de acessibilidade (cursor/hover ausente, depois `brightness`
   imperceptível no tema escuro) corrigido em 2 rodadas por erro de escopo do Tech Lead no
   1º retry (declarado no ledger). Gate 9 (`qa`) **PARCIAL**: 11/19 ACs VERIFICADOS por
   execução real (Playwright, sem sessão); 8 ACs pendentes de login real —
-  `HANDOFF-PLAN-035.md` (backend indisponível neste ambiente, Docker Desktop fora do ar).
+  `HANDOFF-PLAN-036.md` (backend indisponível neste ambiente, Docker Desktop fora do ar).
   4 itens de dívida de design não-bloqueante (layout shift, posição de erro, altura dos
   controles, `next/link`). PO da SPEC: ACEITA_COM_RESSALVAS — remoção do "Sair" duplicado
   da área interna **confirmada pelo Diretor na Entrega**. **Mergeado em `main`**
   (`mnemonicos-frontend`, PR #18, `e254bd1`, 2026-09-30) e KAN-77 fechado no Jira
   (Concluído) — sem épico-pai (projeção compacta), sem passo 2/3 do trilho a aplicar.
   Handoff de verificação de tela (8 ACs) segue aberto até rodar com backend saudável.
+  (Numeração original desta demanda era SPEC-034/PLAN-035/TASK-035-00X — renumerada para
+  036 em 2026-09-30 por colisão real com outra demanda paralela deste mesmo slug, ver
+  Histórico recente.)
+- Registro de páginas na Exportação (SPEC-034/FEAT-034-001, PLAN-035, ✅ 2026-09-30) — `PublicationEvent.pageCount` (migração aditiva `20260930062551_add_publication_event_page_count`, aplicada em dev/teste; produção pelo deploy), contagem fail-safe na composição (falha → `null`, Exportação segue), leitura no Painel pela 1ª Exportação Tira após o 1º fechamento de Versão. Gate 9 VERIFICADO (HTTP + banco reais).
+- Aprovação da Versão vigente com checklist de qualidade e segregação de funções (SPEC-032/FEAT-032-001, PLAN-033, ✅ 2026-09-29) — `POST /contents/:id/versions/:number/approve` (ADMIN, 2 confirmações, segregação de funções por 3 identidades produtoras, fonte normativa obrigatória, guarda de edição pós-fechamento ordenada por `sequence`, duplo travamento anti-corrida); leitura do estado de aprovação e de `validApprovalForExport` no histórico; painel na tela com cada linha do histórico mostrando a própria aprovação. Gate 9 VERIFICADO (tela real + integração). Resolve RISK-002-001/RISK-028-004. Pendências ao Diretor na Entrega: Tira no escopo do gate (E-1) e linha de validade para EDITOR (FR-032-007(b)).
 - Carimbo de Versão aprovada no PDF exportado (SPEC-032/FEAT-032-002, ✅ 2026-09-29) — a 1ª linha do cabeçalho de toda página troca "RASCUNHO" por "Conteúdo normativo e Tira mnemônica — Versão N aprovada" só quando a Versão vigente está aprovada e sem alteração posterior (conteúdo ou Tira); gate 9 VERIFICADO por execução real (6/6 ACs, pdftotext nas 2 Variantes).
 - Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, ✅ 2026-08-30) — módulo `users/` (criar/listar/desativar/resetar senha) + seed; gate 9 APROVADO. Montagem das rotas em `apiRoutes` fica com TASK-003-011 (Wave 6).
 - Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, ✅ 2026-08-31) — login com três estados observáveis + mensagem genérica pt-BR + sessão expirada; rotação de família, freio de login, cookies `httpOnly`. Gate 9 **pendente_handoff** (trânsito real à área interna no sucesso — causa: credencial; seed em HANDOFF-PLAN-003.md).
@@ -113,7 +120,8 @@ fechado._
 | SPEC-028 | Versionamento editorial e fechamento legislativo | Approved | 2026-09-26 |
 | SPEC-030 | Redesenho visual da tela de login | Approved | 2026-09-28 |
 | SPEC-032 | Controle de qualidade e gate de versão aprovada | Approved | 2026-09-27 |
-| SPEC-034 | Botão de sessão e tema dark/light no header do app | Approved | 2026-09-29 |
+| SPEC-034 | Painel estratégico e tempo por página | Approved | 2026-09-30 |
+| SPEC-036 | Botão de sessão e tema dark/light no header do app (renumerada de SPEC-034 por colisão de ID entre sessões paralelas) | Done | 2026-09-29 |
 
 ## PLANs
 
@@ -132,8 +140,9 @@ fechado._
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
-| PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 6/7 🟡 | Approved |
-| PLAN-035 | SPEC-034 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 6/6 ✅ | Done — **mergeado em `main`** (PR #18, `e254bd1`, 2026-09-30) |
+| PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 7/7 ✅ | Approved |
+| PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 7/8 🟡 | Approved |
+| PLAN-036 | SPEC-036 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 6/6 ✅ | Done — **mergeado em `main`** (PR #18, `e254bd1`, 2026-09-30) |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -212,11 +221,20 @@ fechado._
 | Checagem pedagógica (confirmação) | Atestação, feita pelo ADMIN no ato de aprovação, de que o material — incluindo a Tira mnemônica vinculada — cumpre a função de recuperação | SPEC-032 |
 | Segregação de funções (do ato de aprovação) | Regra aplicada pelo sistema (fail-secure, não disciplina operacional): o aprovador não pode ser nenhuma identidade produtora do conteúdo normativo da Versão (quem a fechou, autor original do Conteúdo bruto, ou último editor antes do fechamento) | SPEC-032 |
 | Conteúdo normativo (escopo da aprovação) | O recorte avaliado pela aprovação: texto normativo, Classe do radar de prova, fonte normativa, blocos/síntese da Quebra da regra (já versionados por F8) mais a Tira mnemônica vinculada; exclui Contraste, Pegadinha elaborada, Flashcard e Associação visual | SPEC-032 |
-| Controle de autenticação (do header) | Botão sempre visível no header que alterna entre "Entrar" (sem sessão) e "Sair" (com sessão), consumindo o estado de sessão já existente — não redefine login/logout; é o único ponto de acionamento de logout do app | SPEC-034 |
-| Alternador de tema | Controle sempre visível no header que permite ao usuário trocar manualmente entre tema claro e escuro | SPEC-034 |
-| Escolha de tema salva | Preferência de tema definida manualmente pelo usuário, por dispositivo/navegador (independente de conta), que passa a prevalecer sobre a preferência do dispositivo | SPEC-034 |
-| Preferência de esquema de cores do dispositivo | Sinal do sistema operacional/navegador indicando se o ambiente do usuário está configurado para tema claro ou escuro (equivalente a `prefers-color-scheme`) | SPEC-034 |
-| Paleta unificada (do app) | Família de cores (roxo/rosa/mauve) e piso de contraste AA já validados em `/login` (SPEC-030), estendidos aos dois temas do restante do app, sem a ilustração decorativa daquela tela | SPEC-034 |
+| Painel estratégico | Tela de leitura agregada, interna a EDITOR/ADMIN, página inicial da área interna: tempo de produção por página, tempo por etapa, conclusão por módulo, correções após revisão e backlog de produção — só com o que a fábrica mede sozinha | SPEC-034 |
+| Página (da Exportação) | Número de páginas reais do PDF emitido por uma Exportação (Variante Tira inclui as suplementares), registrado no momento da Exportação, nunca recomputado | SPEC-034 |
+| Sem medida | Estado de dado numérico não capturado — nunca zero nem estimado | SPEC-034 |
+| Tempo de produção por página | Tempo do início registrado da produção (criação instrumentada) até a 1ª Exportação Tira após o 1º fechamento de Versão, dividido pelas Páginas dessa Exportação | SPEC-034 |
+| Tempo por etapa | Lead time de calendário do 1º ao último evento de uma etapa (retrabalho incluso), só com abertura e conclusão registradas; senão "em aberto", "não percorrida" ou "sem duração medida" | SPEC-034 |
+| Correções após revisão | Retrabalho de etapa de conteúdo ocorrido, por sequência, depois do 1º fechamento de Versão; contado por etapa, nunca somado entre etapas | SPEC-034 |
+| Módulo | Um Tema do acervo agrupado por Disciplina (a TAP chama de "módulo") | SPEC-034 |
+| Concluído | Conteúdo com Versão vigente aprovada e válida para exportação (regra única de F9) | SPEC-034 |
+| Backlog de produção | Conteúdos ativos não concluídos (ativos − concluídos), com etapa mais avançada (Conteúdo bruto → … → Aprovação), prioridade de apresentação e idade | SPEC-034 |
+| Controle de autenticação (do header) | Botão sempre visível no header que alterna entre "Entrar" (sem sessão) e "Sair" (com sessão), consumindo o estado de sessão já existente — não redefine login/logout; é o único ponto de acionamento de logout do app | SPEC-036 |
+| Alternador de tema | Controle sempre visível no header que permite ao usuário trocar manualmente entre tema claro e escuro | SPEC-036 |
+| Escolha de tema salva | Preferência de tema definida manualmente pelo usuário, por dispositivo/navegador (independente de conta), que passa a prevalecer sobre a preferência do dispositivo | SPEC-036 |
+| Preferência de esquema de cores do dispositivo | Sinal do sistema operacional/navegador indicando se o ambiente do usuário está configurado para tema claro ou escuro (equivalente a `prefers-color-scheme`) | SPEC-036 |
+| Paleta unificada (do app) | Família de cores (roxo/rosa/mauve) e piso de contraste AA já validados em `/login` (SPEC-030), estendidos aos dois temas do restante do app, sem a ilustração decorativa daquela tela | SPEC-036 |
 
 ## Decisões irreversíveis
 
@@ -235,6 +253,9 @@ fechado._
 
 | ID | Risco | Mitigação | Origem |
 |----|-------|-----------|--------|
+| — | Verificação de tela pendente — HANDOFF-PLAN-033 (`docs/producao-material/handoffs/HANDOFF-PLAN-033.md`) — V1–V3: leitura "Válida para a próxima exportação" para EDITOR e ADMIN após o R-1 da aceitação (FR-032-007(b)); `qa` sem credencial utilizável (realms `app`/`admin1` do `keelson.local.json` com placeholder) — comportamento coberto por teste de componente com mutante; 2 rodadas anteriores de browser real verificadas | Diretor preenche os 2 realms e exercita V1–V3 (≈5 min) ou roda `/keelson:verify-handoff` | HANDOFF-PLAN-033 |
+| RISK-032-006 | `saveRuleBreakdown` não registra a identidade de quem salva a Quebra da regra: com 2+ contas, quem montou a estrutura pedagógica pode aprovar a própria checagem pedagógica — fora das 3 identidades produtoras de FR-032-004 (lacuna de SPEC) | Q1 ao Diretor na Entrega. Default: brief avulso logo após o merge, obrigatório antes de um 2º ADMIN real operar; exposição nula com 1 ADMIN | PO, aceitação da F9 |
+| TRISK-033-004 | Sinal de alteração da Tira compara `occurredAt` do último evento `TIRA_MNEMONICA` com `closedAt` (relógio de aplicação × relógio do banco), a mesma classe que a Emenda 2 da DEC-033-006 trocou por `sequence` para `CONTEUDO_BRUTO`; sem prova de interleaving. Sustenta a métrica-guarda (b) da SPEC-032 §1.3 | Risco prático baixo (exige skew maior que o intervalo fechamento→edição); próxima mudança em `resolveAlterationSignal` traz a comparação por `sequence` + teste de interleaving | code-reviewer (convergência de fecho) e PO |
 | — | Verificação de tela pendente — HANDOFF-PLAN-031 (`docs/producao-material/handoffs/HANDOFF-PLAN-031.md`) — V1 (AC-030-012, login real por clique físico com e sem `next`): sandbox do subagent `qa` bloqueou digitação de credencial real em UI (causa `permissao_ambiente`, não indisponibilidade); evidência composta forte já obtida (POST real ao endpoint que `LoginForm` chama, direto e via proxy, 200 + cookies `HttpOnly` + role correta nos dois caminhos; guard `isSafeRelativePath`/`INTERNAL_HOME` coberto por teste automatizado sem regressão) | roteiro completo no handoff; 1 clique real de login (com `next` e sem `next`) por alguém sem a mesma restrição de sandbox — Diretor ou sessão local, 2 min | HANDOFF-PLAN-031 |
 | — | Borda de 1px do `SiteHeader` cruza a ilustração da lua em `/login` (achado do `product-designer`, verificado por captura real + medição de luminância) — comportamento pré-existente de TODAS as rotas (não é regressão nem parte deste diff), só fica mais visível sobre a ilustração noturna | Nenhuma — registrado a critério do Diretor, se quiser tratar em outra rodada | product-designer, convergência de fecho de PLAN-031 |
 | — | Ausência de regra CSS `:-webkit-autofill`/`:autofill` nos campos de `/login` (`login-form.tsx`/`password-field.tsx`/`globals.css`) — risco plausível para o autofill do navegador sobrescrever o estilo em pílula, não confirmado empiricamente (Chromium headless não expõe o password manager nativo) | Verificar com navegador real + credencial salva; se confirmado, adicionar regra de override usando os tokens `night-pill-*` | qa, gate 9 de PLAN-031 (achado fora de escopo) |
@@ -356,29 +377,42 @@ fechado._
 | RISK-030-003 | Cenários de cenário/robustez sem AC formal (trânsito guard→`/login?next=`→login→`next`, foco de teclado, robustez da ilustração/autofill/`forced-colors`, aviso de sessão expirada acima da dobra em 360px) — decisão do PO: cobertos pelo roteiro de verificação dos gates 9/11, não por AC | Roteiro do `qa`/`product-designer` na implementação deve exercitar os itens listados em SPEC-030 §9 | SPEC-030 §9 (veredito PO) |
 | ~~Q-030-001~~ | **RESOLVIDO 2026-09-28 (PLAN-031)** — route group dedicado rejeitado: `code-scout` achou que este projeto só tem um root layout, e um `layout.tsx` de route group aninha DENTRO dele, não o substitui; promover um 2º root exigiria mover todas as rotas soltas de `src/app/` para um grupo irmão. DEC-031-001: fundo em tela cheia via `position: fixed; inset: 0` dentro da árvore normal da página (sem route group) — preserva header/footer de graça (FR-030-013). | — nenhuma | SPEC-030 §9 → PLAN-031 DEC-031-001 |
 | TRISK-031-003 | `position: fixed` do fundo em tela cheia (COMP-031-002) depende de nenhum ancestral (`Providers`/`SiteHeader`/`<main>`) declarar `transform`/`filter`/`perspective`/`contain` — se algum declarar, o backdrop deixa de posicionar relativo ao viewport | Verificação visual na implementação, item de roteiro do gate 9/11 — não bloqueante | PLAN-031 §8 |
-| RISK-034-001 | Sem mecanismo de persistência de tema definido na SPEC (decisão do PLAN), a estratégia escolhida pode causar troca visível do tema errado na 1ª pintura (FOUC) se a leitura da escolha salva depender só do cliente | NFR-034-004 declara o comportamento esperado (SHOULD); técnica cabe ao PLAN | SPEC-034 §9 |
-| RISK-034-002 | Paleta noturna só tem contraste AA medido para os papéis de UI de `/login` (fundo, pílula, botão, texto) — estendê-la ao app pode expor papéis novos (erro/sucesso/link/foco/hover) sem token equivalente já validado | Mapeamento e prova de contraste dos papéis novos ficam com o PLAN; NFR-034-005 exige distinguibilidade mínima | SPEC-034 §9 |
-| RISK-034-003 | O mecanismo de detecção de sessão do controle de autenticação precisa conviver com `baseQueryWithReauth` (`mnemonicos-frontend/src/store/api.ts`) sem disparar sua rota de expulsão (`resetApiState`+redirect `/login?sessao=expirada`) para visitante anônimo em rota pública | FR-034-015 trava o requisito observável; mecanismo exato de adaptação é decisão técnica do PLAN | SPEC-034 §9 |
-| ~~—~~ | **RESOLVIDO 2026-09-30 (Entrega)** — PO escalou a remoção do botão "Sair" próprio da área interna em favor do controle único do header (FR-034-014); Diretor confirmou a remoção na Entrega (AskUserQuestion). | — nenhuma | po, aprovação de SPEC-034 → Diretor, Entrega de PLAN-035 |
-| — | Dívida de design não-bloqueante (gate 11, Wave 3): (1) estado neutro do `AuthControl` (`return null`) causa layout shift quando resolve para Entrar/Sair, o `ThemeToggle` ao lado salta; (2) mensagem de erro do logout (`flex-col`, abaixo do botão) pode empurrar o header verticalmente; (3) `ThemeToggle` (`h-9 rounded-full`) e os botões de `AuthControl` (`px-4 py-2 surface-card`) não têm altura/forma idênticas; (4) "Entrar" é `<button onClick={router.push}>` em vez de `next/link` (produto usa `next/link` em outros pontos de navegação) | Nenhuma ação nesta entrega — 4 ajustes opcionais de composição, nenhum fura piso de acessibilidade; candidatos a diff de limpeza futuro ou brief avulso | product-designer, gate 11 Wave 3 de PLAN-035 |
-| — | Verificação de tela pendente — HANDOFF-PLAN-035 (`docs/producao-material/handoffs/HANDOFF-PLAN-035.md`) — 8 ACs (AC-034-002/004/006/014/015/016/017/018) dependem de login real (realm `editor`); backend indisponível neste ambiente (Docker Desktop não sobe, Postgres fora do ar) — 11/19 ACs já VERIFICADOS por execução real (Playwright, sem sessão) | roteiro completo no handoff; exercitar com backend saudável (outra máquina/CI, ou este ambiente reparado) | HANDOFF-PLAN-035 |
-| TRISK-035-004 | `data-theme` setado pelo script de bootstrap (fora do React) pode divergir do estado interno de `ThemeToggle` se o componente assumir um tema default fixo no 1º render em vez de ler o atributo já aplicado no `<html>`/a escolha salva — risco de hidratação ou de o alternador "nascer" com rótulo/estado errado | `ThemeToggle` deve ler `document.documentElement.dataset.theme`, nunca assumir default hardcoded — item de verificação da TASK/gate 1 | PLAN-035 §8 |
+| RISK-034-001 | Lead time de calendário não é esforço: Conteúdo parado infla tempo por etapa/página | Rótulo e leitura como lead time; nunca métrica por pessoa (NFR-034-004) | SPEC-034 §9 |
+| RISK-034-003 | Conteúdos cuja 1ª Exportação Tira pós-fechamento é anterior a F10 ficam "sem medida" para sempre; cobertura nasce baixa | Cobertura (medidos/ativos) exibida no Painel | SPEC-034 §9 |
+| RISK-034-004 | Ambiente semeado direto (sem eventos) mostra Painel vazio/"sem medida" — reflexo fiel do dado | Gate 9 gera dado exercitando rotas | SPEC-034 §9 |
+| RISK-034-005 | 1º consumidor real da leitura de eventos de etapa, sem paginação (herdado de TRISK-010-002) | PLAN/gate 10 decidem | SPEC-034 §9 |
+| RISK-034-006 | O Painel fornece o número, não o critério de escala; o limiar segue em PIL-001 | — | SPEC-034 §9 |
+| RISK-036-001 | Sem mecanismo de persistência de tema definido na SPEC (decisão do PLAN), a estratégia escolhida pode causar troca visível do tema errado na 1ª pintura (FOUC) se a leitura da escolha salva depender só do cliente | NFR-036-004 declara o comportamento esperado (SHOULD); técnica cabe ao PLAN | SPEC-036 §9 |
+| RISK-036-002 | Paleta noturna só tem contraste AA medido para os papéis de UI de `/login` (fundo, pílula, botão, texto) — estendê-la ao app pode expor papéis novos (erro/sucesso/link/foco/hover) sem token equivalente já validado | Mapeamento e prova de contraste dos papéis novos ficam com o PLAN; NFR-036-005 exige distinguibilidade mínima | SPEC-036 §9 |
+| RISK-036-003 | O mecanismo de detecção de sessão do controle de autenticação precisa conviver com `baseQueryWithReauth` (`mnemonicos-frontend/src/store/api.ts`) sem disparar sua rota de expulsão (`resetApiState`+redirect `/login?sessao=expirada`) para visitante anônimo em rota pública | FR-036-015 trava o requisito observável; mecanismo exato de adaptação é decisão técnica do PLAN | SPEC-036 §9 |
+| ~~—~~ | **RESOLVIDO 2026-09-30 (Entrega)** — PO escalou a remoção do botão "Sair" próprio da área interna em favor do controle único do header (FR-036-014); Diretor confirmou a remoção na Entrega (AskUserQuestion). | — nenhuma | po, aprovação de SPEC-036 → Diretor, Entrega de PLAN-036 |
+| — | Dívida de design não-bloqueante (gate 11, Wave 3): (1) estado neutro do `AuthControl` (`return null`) causa layout shift quando resolve para Entrar/Sair, o `ThemeToggle` ao lado salta; (2) mensagem de erro do logout (`flex-col`, abaixo do botão) pode empurrar o header verticalmente; (3) `ThemeToggle` (`h-9 rounded-full`) e os botões de `AuthControl` (`px-4 py-2 surface-card`) não têm altura/forma idênticas; (4) "Entrar" é `<button onClick={router.push}>` em vez de `next/link` (produto usa `next/link` em outros pontos de navegação) | Nenhuma ação nesta entrega — 4 ajustes opcionais de composição, nenhum fura piso de acessibilidade; candidatos a diff de limpeza futuro ou brief avulso | product-designer, gate 11 Wave 3 de PLAN-036 |
+| — | Verificação de tela pendente — HANDOFF-PLAN-036 (`docs/producao-material/handoffs/HANDOFF-PLAN-036.md`) — 8 ACs (AC-036-002/004/006/014/015/016/017/018) dependem de login real (realm `editor`); backend indisponível neste ambiente (Docker Desktop não sobe, Postgres fora do ar) — 11/19 ACs já VERIFICADOS por execução real (Playwright, sem sessão) | roteiro completo no handoff; exercitar com backend saudável (outra máquina/CI, ou este ambiente reparado) | HANDOFF-PLAN-036 |
+| TRISK-036-004 | `data-theme` setado pelo script de bootstrap (fora do React) pode divergir do estado interno de `ThemeToggle` se o componente assumir um tema default fixo no 1º render em vez de ler o atributo já aplicado no `<html>`/a escolha salva — risco de hidratação ou de o alternador "nascer" com rótulo/estado errado | `ThemeToggle` deve ler `document.documentElement.dataset.theme`, nunca assumir default hardcoded — item de verificação da TASK/gate 1 | PLAN-036 §8 |
 
 ## Histórico recente
 
-- 2026-09-30: **PLAN-035 mergeado em `main`** (`mnemonicos-frontend`, PR #18, `e254bd1`) e
+> Nota de numeração (2026-09-30): `SPEC-034`/`PLAN-035`/`TASK-035-00X`/`BRIEF-034` foram
+> alocados por DUAS demandas paralelas neste slug (colisão real de `next-id.sh` entre
+> sessões concorrentes). O Painel estratégico (F10, KAN-165) manteve a numeração original,
+> por já ter mais entradas e ter sido a 1ª a chegar na `main`. O header de sessão/tema
+> (KAN-77) foi renumerado para `SPEC-036`/`PLAN-036`/`TASK-036-00X`/`BRIEF-036` na
+> reconciliação do pull — nenhum dos dois lados foi descartado.
+
+- 2026-09-30: **PLAN-036 mergeado em `main`** (`mnemonicos-frontend`, PR #18, `e254bd1`) e
   KAN-77 fechado no Jira (Concluído) — ato do Diretor. Sem épico-pai (projeção compacta,
   como KAN-73): trilho do card para nesse passo, sem filho de épico a consultar. Handoff
-  de verificação de tela (`HANDOFF-PLAN-035.md`, 8 ACs) segue aberto — próximo passo é
+  de verificação de tela (`HANDOFF-PLAN-036.md`, 8 ACs) segue aberto — próximo passo é
   rodar o roteiro com o backend de pé.
-- 2026-09-30: convergência de fecho verde em `92542c5` (dedup: aplicada) — PLAN-035/
-  SPEC-034, 0 gaps, 9 DECs confirmadas no código final. 3 achados não-bloqueantes fora de
+- 2026-09-30 08:12: **Wave 4 de PLAN-035 fechada** — TASK-035-007 (espelho de `PRODUCTION_STAGE_TYPES`/`CONTENT_STAGE_TYPES`/`PresentationPriority` e dos tipos `*Response` do Painel no frontend; contrato cross-repo por nome+tipo; endpoint `getStrategicPanel` com `forceRefetch` — `refetchOnMountOrArgChange` não é opção de endpoint no RTK Query, DEC-035-019/COMP-035-018 corrigidos no PLAN). Gates: code-reviewer reprovou (paridade só por nomes; Record de retrabalho mais largo; docblock), retry APROVADO; security-engineer APROVADO; performance-engineer APROVADO com regra de 1 subscriber (critério herdado na TASK-035-008).
+- 2026-09-30: convergência de fecho verde em `92542c5` (dedup: aplicada) — PLAN-036/
+  SPEC-036, 0 gaps, 9 DECs confirmadas no código final. 3 achados não-bloqueantes fora de
   escopo: `layout.test.tsx` tem helper duplicado (`findElementByType`/
   `containsComponentType`); `viewport.themeColor` (`layout.tsx:24-28`) continua preso à
   paleta antiga (ink) e a `prefers-color-scheme`, ignorando a escolha manual de tema —
   candidato a diff de limpeza futuro; nota de coesão (`THEME_STORAGE_KEY`/`ThemeName` em
   `night-palette-tokens.ts`, importados por `theme-bootstrap.ts`, lib dependendo de app).
-- 2026-09-30: **PLAN-035 implementado (6 tasks), aguardando promoção manual de Status.**
+- 2026-09-30: **PLAN-036 implementado (6 tasks), aguardando promoção manual de Status.**
   Header unificado de sessão (`AuthControl`) e tema (`ThemeToggle`) com paleta noturna
   estendida ao app inteiro. 3 waves, 6/6 TASKs Done — 5 rodadas de retry reais (cobertura
   de mutante/DEC, cadeia de fallback sem teste, mutante enfraquecido por mudança de
@@ -386,17 +420,50 @@ fechado._
   ausente, depois `brightness` imperceptível no tema escuro — 2ª rodada por erro de escopo
   do Tech Lead no 1º retry, declarado). Gates 1-7/8/11 aprovados em todas as waves
   aplicáveis. Gate 9 (`qa`) **PARCIAL**: 11/19 ACs VERIFICADOS por execução real
-  (Playwright); 8 ACs (login real) em `HANDOFF-PLAN-035.md` — backend indisponível neste
+  (Playwright); 8 ACs (login real) em `HANDOFF-PLAN-036.md` — backend indisponível neste
   ambiente (Docker Desktop não sobe). PO da SPEC: ESCALAR (E-01, não-bloqueante —
   confirmação da remoção do "Sair" duplicado da área interna, default aplicado, vai à
   Entrega). 4 itens de dívida de design não-bloqueante registrados em Riscos ativos.
-- 2026-09-30: furo no plano em TASK-035-001 — `useMeSilentQuery` foi declarado no endpoint
+- 2026-09-30 07:20: **Wave 3 de PLAN-035 fechada** — TASK-035-006 (`GET /strategic-panel`, EDITOR/ADMIN, allowlist por ramo, `contents[]` por Conteúdo, 7 statements fixos, agrupamento O(N+E)). Gates: code-reviewer reprovou (bloco por Conteúdo ausente — furo no plano; ramo medido sem prova; estado entre `it`), retry; 2ª reprovação no critério `res.json(payload)` → teto 4.88 resolvido pela escada com "aplicar e fechar"; extrator textual novo reprovado e trocado por prova comportamental; security-engineer APROVADO (wave + delta); performance-engineer reprovou O(N·E) e aprovou após `Map` — **NFR-034-002 medido: p95 176 ms em 200×50 (alvo 1.500), 572 ms em 1000×50, corpo 193 KiB**. FEAT-034-001 completa: gate 9 VERIFICADO pelo `qa` (linha na SPEC).
+- 2026-09-30 06:50: gate 10 da Wave 3 de PLAN-035 reprovou TASK-035-006 por agrupamento O(N·E) (`.filter` por Conteúdo): NFR-034-002 medido passa no volume de referência (p95 216 ms, 200×50, corpo 193 KiB) mas estoura a 5× (p95 1.611 ms); variante `Map` medida em 594 ms. Critério novo na TASK-035-006; DEC-035-018 ganha o teto medido no `Reabrir se` (~2.500 Conteúdos p/ o alvo, ~4.700 p/ corpo Vercel, RISK-025-007).
+- 2026-09-30: furo no plano em TASK-036-001 — `useMeSilentQuery` foi declarado no endpoint
   `meSilent` (`store/api.ts`) mas nunca entrou na lista de export nomeado que os outros 30+
   hooks do arquivo usam (`export const { ... } = api;`), então a importação que
-  TASK-035-005 precisa fazer não compilava — destino: ajuste localizado, sancionado dentro
-  de TASK-035-005 (1 linha adicional no export, sem mudar o comportamento já provado de
-  TASK-035-001).
-- 2026-09-29 23:20: **PLAN-035 criado via `/keelson:auto` (cobre 100% de SPEC-034) e
+  TASK-036-005 precisa fazer não compilava — destino: ajuste localizado, sancionado dentro
+  de TASK-036-005 (1 linha adicional no export, sem mudar o comportamento já provado de
+  TASK-036-001).
+- 2026-09-30 06:00: furo no plano em TASK-035-006 — o payload do Painel (TASK-035-004) nasceu sem o bloco por Conteúdo e a rota o omitiu (achado do gate 4 da Wave 3: FR-034-004/005/006/025 sem dado na fronteira HTTP) — destino: ajuste localizado da TASK (Tech Lead): `StrategicPanelPayload.contents` em `aggregateStrategicPanel` (strategic-panel-calculations.ts entra no Inclui só para isso) + critérios de um caso por ramo, allowlist por unit e sem estado entre `it`; retry.
+- 2026-09-30 05:32: **Wave 2 de PLAN-035 fechada** — TASK-035-004 (cálculo puro por Conteúdo + agregação/backlog + prioridade derivada) e TASK-035-005 (6 leituras em lote, factory-wide, snapshot só das vigentes aprovadas). Gates: code-reviewer reprovou as duas no gate 1 (testes não discriminantes), retry consolidado; TASK-035-005 reprovada 2ª vez no gate 7 (sonda de query duplicada) → teto 4.88 resolvido pela escada (Diretor ausente) com o default "aplicar e fechar" — `withQueryEventProbe` em tests/support; performance-engineer reprovou o `contentSnapshot` do histórico → PLAN-035 v0.2, re-review APROVADO; security-engineer APROVADO (wave e delta; gitleaks ausente). Lições: 4 novas + 1 confirmada.
+- 2026-09-30 05:15: ajuste de PLAN pós-gates da Wave 2 de PLAN-035 — gate 10 (performance-engineer) reprovou a leitura de versões com `contentSnapshot` de todo o histórico append-only: PLAN-035 v0.2 (COMP-035-007 chave leve + `listApprovedVersionSnapshots`; DEC-035-014 passa a 7 statements fixos); TASK-035-005/006 ajustadas com critérios; gate 1 (code-reviewer) reprovou TASK-035-004/005 por testes não discriminantes (16/17 mutantes do produtor e eixo pertencimento) — retry consolidado.
+- 2026-09-30 04:33: furo no plano em TASK-035-005 — `RAW_CONTENT_VERSIONED_SELECT`/`RULE_BREAKDOWN_VERSIONED_SELECT` não eram exportadas por `content-versions.service.ts` (a TASK presumia que sim) — destino: ajuste localizado da TASK (Tech Lead): `content-versions.service.ts` entra no Escopo > Inclui só para acrescentar `export` às 2 constantes, com critério próprio; re-emitida.
+- 2026-09-30 04:10: **Wave 1 de PLAN-035 fechada** — TASK-035-001 (`PublicationEvent.pageCount`, migração aditiva `20260930062551_add_publication_event_page_count` aplicada em dev/teste; contagem fail-safe), TASK-035-002 (predicado de F9 extraído para `isVersionAltered`, comportamento idêntico, curto-circuito de I/O mantido), TASK-035-003 (`formatDurationPtBr`). Gates: code-reviewer reprovou 001 (gate 1: par de reexportações não discriminante) e 003 (gate 6: `!`), 1 retry cada, re-review APROVADO; security-engineer APROVADO (gitleaks ausente); performance-engineer APROVADO. Fora de escopo estacionado: predicado TIRA de F9 compara por relógio de aplicação (herdado). Lição de projeto nova: prova-de-escrita-que-nao-reescreve-registro-anterior-usa-valores-distintos.
+- 2026-09-30 03:21: **PLAN-035 decomposto em 8 TASKs / 5 waves** (6 medium, 2 small; rota única). Lint: 1 volta de correção (task-criterio-sem-ac TASK-007, task-refactor-sem-identidade TASK-002, greps ancorados); grafo limpo; task-validator PASS. Rodada 3.5: `qa` pré-código 3 achados mecânicos + 1 de produto → `po` (resolução) opção B — roteiro do gate 9 da TASK-035-008 ganha V7 (correções após revisão) e V8 (ordenação do backlog) por rotas reais; V5 (vazio global) provado por teste de componente, não-exercitável sem alterar o acervo de dev (decisão do Tech Lead). Jira: sub-tasks KAN-168..KAN-175.
+- 2026-09-30 02:37: **PLAN-035 criado e Approved** (via `/keelson:auto`, cobertura total de SPEC-034 — Caso D). `scribe` sobre o reconhecimento do `code-scout`; plan-validator: 0 ERROR após 2 correções mecânicas de forma (bullets de FRs cobertos e campos `Realiza` multilinha, que o parser lia só na 1ª linha — mesma classe de PLAN-033) + 2 `Reabrir se: nunca` sem motivo; 4 WARNING `plan-dec-alternativa-unica` aceitos (precedente PLAN-033). 22 COMPs, 20 DECs (10 herdadas, 10 novas, nenhuma irreversível), 4 TRISKs. Achado da redação: `RawContent` não tem título — identificação mínima = id + disciplina/tema (DEC-035-016).
+- 2026-09-30 02:20: **SPEC-034 criada e Approved (F10, via `/keelson:auto`, BRIEF-034).** Última chamada: Diretor decidiu página = páginas do PDF (coluna nova na Exportação), "erros na revisão" = correções pós-fechamento, migração aditiva autorizada em dev/teste. `scribe` redigiu v0.1 (2 FEATs/18 FRs); spec-validator PASS (0 ERROR); `product-analyst` REVISAR_ANTES_DE_APROVAR (13 riscos); `po` APROVAR com pacote R0–R13, 0 escalações, 10 decisões em nome do Diretor (a mais sensível: janela até a 1ª Exportação Tira pós-fechamento). Reescrita v0.2: 2 FEATs, 34 FRs, 4 NFRs, 24 ACs, 14 premissas, 6 riscos; revalidação 0 ERROR (spec-porte-epico WARNING aceito — inflação por repartição EARS, decisão registrada). Responde Q-009-001/Q-009-002 (SPEC-009) e avalia o gatilho de A-005-001 (não disparou). Jira: Épico KAN-165 (Relates KAN-6), Stories KAN-166 (FEAT-034-001) e KAN-167 (FEAT-034-002).
+- 2026-09-30 00:25: **F9 mergeada pelo Diretor** — PR #10 backend (`3ba13b5`) e PR #17 frontend
+  (`1728d78`) em `main`. Jira: KAN-150/KAN-151 → Concluído (trilho pós-merge); `parent = KAN-149`
+  lido do quadro: 2/2 filhos em Concluído; épico KAN-149 → Concluído por confirmação do Diretor. A migração `20260927135234_add_content_version_approval` entra no próximo deploy do
+  backend. Pendentes: HANDOFF-PLAN-033, Q1 (RISK-032-006).
+- 2026-09-30 00:20: **Entrega da F9 — convergência de fecho e aceitação do PO.** Convergência
+  (code-reviewer): merge APROVADO, 1 gap parcial FR-032-007(b); o PO aceitou com ressalvas e pediu
+  a mesma correção (R-1). Retry R-1 (frontend `3043b46`): a leitura "Válida para a próxima
+  exportação" sai do bloco de ação ADMIN e passa a aparecer na linha da Versão vigente para
+  qualquer papel; `caf6ea6` troca a copy do "não" por uma frase neutra (a do ADMIN mandava um
+  passo que a segregação recusa) e prova o filtro da Versão vigente. Backend `c76dbc1`: só
+  comentário no schema. Gate 9 do R-1 `pendente_handoff` (credencial com placeholder no
+  `keelson.local.json`) → HANDOFF-PLAN-033. Riscos novos: RISK-032-006 (Q1) e TRISK-033-004.
+  Frontend 656/656. Os dois repos contêm `origin/main`, sem conflito.
+- 2026-09-29 23:35: **Wave 5 de PLAN-033 fechada — TASK-033-007 Done; PLAN-033 7/7; FEAT-032-001
+  VERIFICADA.** Painel de aprovação em `content-version-history.tsx`. Antes do retry, merge de
+  `origin/main` no frontend (`e4c8461`, sem conflito). Retry 1 fechou B1-B3 (prova: ordem das
+  caixas, fake espelhando `z.literal(true)`, 2 Versões) e A1-A4 (reset do estado por Versão,
+  `updateRawContent` invalida `ContentVersion`, copy minúscula, fieldset "Aprovação da versão N");
+  B4 (achado novo do retry, resets sem prova própria) teve retry próprio. Decisão do Tech Lead:
+  FR-032-007(a) prevalece — cada linha do histórico mostra a própria aprovação (Emenda 1 na
+  TASK). Gates 8/10 aprovados; gate 9 verificado 2× por browser. Frontend `a4e828f`/`e68553d`/
+  `43d49dc`. 654/654 frontend, 418+565 backend. Lições: 3 de projeto + LRN-048 e reincidência
+  de LRN-004 (processo).
+- 2026-09-29 23:20: **PLAN-036 criado via `/keelson:auto` (cobre 100% de SPEC-036) e
   promovido a Approved.** 100% frontend, sem tocar backend. 6 DECs novas (todas
   reversíveis): script de bootstrap de tema sem dependência nova (`data-theme` +
   localStorage); CSS em 3 camadas (`:root` claro / `@media prefers-color-scheme:
@@ -406,11 +473,11 @@ fechado._
   deliberadamente não remapeados); extensão de `night-palette-tokens.ts`; endpoint
   `meSilent` (`queryFn` contornando `baseQueryWithReauth`) para checar sessão sem efeito
   colateral em rota pública; consolidação do logout em `AuthControl` (remove
-  `LogoutControl` de `internal-shell.tsx`). 7 COMPs, 4 TRISKs (3 herdados dos RISK-034-00X
-  da SPEC, 1 novo — TRISK-035-004, hidratação do tema). `artifact-lint`/`graph.sh`: 0
+  `LogoutControl` de `internal-shell.tsx`). 7 COMPs, 4 TRISKs (3 herdados dos RISK-036-00X
+  da SPEC, 1 novo — TRISK-036-004, hidratação do tema). `artifact-lint`/`graph.sh`: 0
   ERROR (2 achados mecânicos corrigidos — enum `Irreversível: nao`, `**Realiza**` quebrado
   em 2 linhas invisível ao parser).
-- 2026-09-29 22:59: **SPEC-034 criada via `/keelson:auto` (KAN-77, BRIEF-034) e promovida a
+- 2026-09-29 22:59: **SPEC-036 criada via `/keelson:auto` (KAN-77, BRIEF-036) e promovida a
   Approved.** Botão único de sessão (Entrar/Sair/neutro) + alternador de tema claro/escuro no
   header, em toda rota inclusive produção, consolidando o logout hoje próprio da área
   interna; paleta unificada roxo/rosa/mauve de `/login` (SPEC-030) estendida ao app inteiro

@@ -6,6 +6,7 @@
 **Autor**: scribe
 **Data**: 2026-09-27
 **Brief**: BRIEF-032
+**Jira**: KAN-149
 
 ## 1. Contexto e objetivo
 
@@ -259,6 +260,10 @@ regra**, **Bloco da quebra** (SPEC-005); **Publicação**, **Variante do PDF**,
 
 ### FEAT-032-001: Aprovação da Versão vigente com checklist de qualidade e segregação de funções
 
+**Jira**: KAN-150
+
+**Verificação (gate 9)**: 2026-09-29 — consolidado: (1) `qa`, execução real com browser contra backend/frontend locais (frontend `a4e828f` e, no delta do retry, `e68553d`; backend `eba5603`) — aprovação por ADMIN não-produtor com o envio represado (`aria-busy`/desabilitado), estado persistido após recarregar, negação de autoaprovação para o produtor, ramo "não" da validade após editar o conteúdo na mesma página, reset do estado ao fechar nova Versão, linha "Aprovada por…" por Versão para ADMIN e EDITOR (AC-032-001/007/020/023, parte UI); (2) ACs só-backend (AC-032-002 a 008 e 013 a 019) provados por integração com Postgres real e mutantes nos gates 1/8 de TASK-033-003/004 (565/565). (3) Entrega, R-1 da aceitação: a leitura de validade (FR-032-007(b)) passou a aparecer para qualquer papel — coberta por teste de componente com mutante; a confirmação em tela está `pendente_handoff` (HANDOFF-PLAN-033).
+
 > Do ponto de vista do QA: um ADMIN que não é nenhuma identidade produtora do conteúdo
 > normativo da Versão vigente confirma a checagem jurídica e a pedagógica e aprova; o
 > sistema recusa quando falta confirmação, quando não há Versão para aprovar, quando
@@ -333,6 +338,8 @@ regra**, **Bloco da quebra** (SPEC-005); **Publicação**, **Variante do PDF**,
   recusar a aprovação.
 
 ### FEAT-032-002: Carimbo de Versão aprovada no PDF exportado
+
+**Jira**: KAN-151
 
 **Verificação (gate 9)**: 2026-09-29 — `qa`, execução real ponta a ponta contra o backend local (HEAD `5984073`, Postgres de dev): 6/6 ACs (AC-032-009/010/011/012/021/024) exercitados por HTTP, com aprovação por um 2º ADMIN e alteração da Tira pela rota real de Quadros; texto de cada PDF inspecionado por `pdftotext` nas 2 Variantes (a marca substitui "RASCUNHO" em toda página; 4ª linha de Versão/Data preservada).
 

@@ -1,29 +1,58 @@
 # Tracker local — F9 (SPEC-032 / PLAN-033)
 
-Registro das operações de Jira que ficaram por fazer, porque esta sessão não tem acesso ao
-conector Atlassian. Nada aqui foi aplicado ao quadro `KAN`. Quando o acesso voltar, rode
-`/keelson:jira-sync producao-material --dry-run` e aplique a partir desta lista. Ids de
-tipo e transição medidos neste board: `CLAUDE.md` do workspace e `docs/_meta/jira.KAN.md`.
+**RECONCILIADO em 2026-09-29 22:33** (acesso ao conector Atlassian restabelecido, aviso do
+Diretor) — todas as estruturas abaixo foram criadas/transicionadas no quadro `KAN` pelo
+gancho de reconciliação (§12) do `tracker-sync`. Este arquivo fica como registro histórico
+do período sem conector; as keys gravadas nos artefatos SDD (`**Jira**:` da SPEC/FEATs,
+campo `Jira:` da closure das TASKs) são agora a fonte viva — não este arquivo.
 
-## Estruturas a criar
+## Estruturas criadas — estado aplicado
 
-| Artefato | Tipo Jira | Pai | Estado alvo agora |
-|---|---|---|---|
-| SPEC-032 — Controle de qualidade e gate de versão aprovada | Epic (`10006`) | — (fatia 9 do épico KAN-6) | intocado pelo ciclo |
-| FEAT-032-001 — Aprovação da Versão vigente com checklist e segregação de funções | História (`10009`) | Epic da SPEC-032 | `21` Em andamento |
-| FEAT-032-002 — Carimbo de Versão aprovada no PDF exportado | História (`10009`) | Epic da SPEC-032 | `21` Em andamento |
-| TASK-033-001 — Migração de aprovação de Versão | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
-| TASK-033-002 — Sinal de alteração da Tira mnemônica | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
-| TASK-033-003 — Aprovação de Versão (backend) | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
-| TASK-033-004 — Leitura do estado de aprovação | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
-| TASK-033-005 — Carimbo de aprovação no PDF | Subtask (`10007`) | FEAT-032-002 | `41` Concluído |
-| TASK-033-006 — Tipos e mutation de aprovação (frontend) | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
-| TASK-033-007 — Painel de aprovação (frontend) | Subtask (`10007`) | FEAT-032-001 | `11` Tarefas pendentes |
+| Artefato | Tipo Jira | Key | Pai | Estado aplicado |
+|---|---|---|---|---|
+| SPEC-032 — Controle de qualidade e gate de versão aprovada | Epic (`10006`) | **KAN-149** | — (relates to KAN-6, fatia 9) | intocado (roadmap) |
+| FEAT-032-001 — Aprovação da Versão vigente com checklist e segregação de funções | História (`10009`) | **KAN-150** | KAN-149 | `21` Em andamento |
+| FEAT-032-002 — Carimbo de Versão aprovada no PDF exportado | História (`10009`) | **KAN-151** | KAN-149 | `21` Em andamento + comentário "pronta p/ QA, gate 9 verificado" |
+| TASK-033-001 — Migração de aprovação de Versão | Subtask (`10007`) | **KAN-152** | KAN-150 | `41` Concluído |
+| TASK-033-002 — Sinal de alteração da Tira mnemônica | Subtask (`10007`) | **KAN-153** | KAN-150 | `41` Concluído |
+| TASK-033-003 — Aprovação de Versão (backend) | Subtask (`10007`) | **KAN-154** | KAN-150 | `41` Concluído |
+| TASK-033-004 — Leitura do estado de aprovação | Subtask (`10007`) | **KAN-155** | KAN-150 | `41` Concluído |
+| TASK-033-005 — Carimbo de aprovação no PDF | Subtask (`10007`) | **KAN-156** | KAN-151 | `41` Concluído |
+| TASK-033-006 — Tipos e mutation de aprovação (frontend) | Subtask (`10007`) | **KAN-157** | KAN-150 | `41` Concluído |
+| TASK-033-007 — Painel de aprovação (frontend) | Subtask (`10007`) | **KAN-158** | KAN-150 | `21` Em andamento (Wave 5 em revisão) |
 
-Teto do §9: nenhuma História passa de `31` Em análise pelo ciclo. `41` é ato do Diretor
-depois do merge.
+Teto do §9 respeitado: nenhuma História passou de `21` (Em andamento) — `31`/`41` ficam
+para `--phase finish-dev` e para o ato do Diretor pós-merge, respectivamente. Epic
+(KAN-149) intocado pelo ciclo, como sempre.
 
 ## Log de operações pendentes (mais recente no topo)
+
+- 2026-09-30: **Epic KAN-149 fechado** (passo 3 do trilho pós-merge, confirmação explícita
+  do Diretor — "Fechar KAN-149") — JQL `parent = KAN-149` relido: 2/2 filhos (KAN-150,
+  KAN-151) em `41` Concluído. KAN-149 transicionado `21` Em andamento → `41` Concluído
+  (transição direta id `41`, sem walker) + comentário "Fatia F9 entregue e mergeada —
+  backend PR #10 (3ba13b5), frontend PR #17 (1728d78). Fechado por confirmação do
+  Diretor." `getJiraIssue` pós-transição confirma status `Concluído` (id `10007`).
+
+- 2026-09-30: **Trilho pós-merge aplicado** (aviso do Diretor — backend PR #10 `3ba13b5`,
+  2026-09-30T03:21:54Z; frontend PR #17 `1728d78`, 2026-09-30T03:22:02Z) — KAN-150
+  (FEAT-032-001) e KAN-151 (FEAT-032-002) transicionadas `31` Em análise → `41` Concluído
+  (não-regressão OK, `getJiraIssue` confirmou `31` antes de mover) + comentário "Mergeado —
+  backend PR #10 (3ba13b5) e frontend PR #17 (1728d78)" em cada uma. JQL `parent = KAN-149`
+  lido do quadro após a transição: KAN-150 `41` Concluído, KAN-151 `41` Concluído — os dois
+  únicos filhos do épico. Epic KAN-149 **intocado** nesta execução por instrução explícita
+  (doutrina exige confirmar a intenção com o Diretor antes de mover épico com todos os
+  filhos em `41` — não é ato automático desta rodada).
+
+- 2026-09-29 23:35: Wave 5 fechada — KAN-158 (TASK-033-007) → `41`; finish-dev: KAN-150/KAN-151 → `31` Em análise (aplicado via conector, ver resumo do sync).
+
+- 2026-09-29 22:33: **Reconciliação aplicada** (gancho §12, conector restabelecido) — Epic
+  KAN-149 criado (link "relates to" com KAN-6, achado de config: Epic não tem campo
+  `parent` neste projeto); Histórias KAN-150/KAN-151 criadas sob KAN-149 e movidas a `21`;
+  KAN-151 recebeu o comentário do marco "pronta p/ QA" (FEAT-032-002, 6/6 ACs); 7 sub-tasks
+  criadas (KAN-152..158) — KAN-152/153/154/155/156/157 → `41` Concluído, KAN-158 (TASK-033-007)
+  → `21` Em andamento. Keys gravadas em SPEC-032 (cabeçalho + sob cada heading FEAT) e no
+  campo `Jira:` da closure de cada TASK-033-*.
 
 - 2026-09-29 21:56: Wave 4 fechada — TASK-033-006: despacho `21` e closure `41` Concluído.
 

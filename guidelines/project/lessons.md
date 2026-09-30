@@ -685,7 +685,13 @@ do mesmo repo (inclusive fronteira de runtime — script servido sem bundler × 
 compilado) que um comentário declara "idênticos"/"espelhados"/"mesma estrutura" — inclusive
 quando o comentário está sendo SUAVIZADO para deixar de afirmar paridade.
 **Estado:** ativa
-**Contadores:** confirmada 5 · contestada 0
+**Extensão (2026-09-30, PLAN-035 gate 1 da Wave 4 — eixo TIPO×NOME):** a rede de paridade do Painel
+comparava só NOMES de campo (molde `extractInterfaceFields`); tipo mais largo (`reworkCountByStage` com
+`ProductionStageType` × `ContentStageType`), tipo trocado (`timePerPage` string) e literal discriminante
+divergente ficavam verdes, com o docblock afirmando "NOMES e a FORMA". Quando o critério afirma TIPO ou o
+consumidor ramifica por literal de união, a paridade compara o texto de tipo normalizado por campo, com
+mapa explícito de nomes de tipo e os conjuntos de literais; mutante de tipo e mutante de literal vermelhos.
+**Contadores:** confirmada 6 · contestada 0
 
 ## [Segurança] Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos
 
@@ -1120,7 +1126,7 @@ que não emite eventos nunca exercita esse eixo.
 **Validade:** toda TASK cujo critério de pronto recusa um valor composto (conjunto, faixa,
 combinação de campos validados em conjunto) ou decide por guarda composta, neste projeto.
 **Estado:** ativa
-**Contadores:** confirmada 4 · contestada 0
+**Contadores:** confirmada 5 · contestada 0 (reincidência 2026-09-30: PLAN-035 TASK-035-005 — eixo pertencimento `IN (ids)` sem prova nas leituras em lote; corolário: leitura em lote por conjunto de ids tem o eixo pertencimento no Critério de pronto)
 
 **Reincidência (Wave 4 de PLAN-027, TASK-027-005, gate 7):** o `where` composto de
 `removePegadinhaText`/`savePegadinhaText` (`ACTIVE_RAW_CONTENT_WHERE` + `scopeWhere(actor)`)
@@ -1769,7 +1775,7 @@ fechamento cruza o resultado contra o AST real (`ts.createSourceFile` + `node.bo
 **Validade:** geral (qualquer teste que prove estrutura de código por extração textual
 sem parser — grep/indexOf de código-fonte).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0 (reincidência 2026-09-30: PLAN-035 TASK-035-006 — extrator de corpo de `contents.map` por balanceamento de chaves sem controle positivo; trocado por prova comportamental com contador de acesso)
 
 ## [Performance] Teto de duração via `Promise.race`+`setTimeout` não corta trabalho CPU-bound síncrono — e teste que prova o teto com dublê `setTimeout` não falsifica nada
 
@@ -2044,7 +2050,7 @@ beneficia do refetch do pai).
 **Validade:** geral (qualquer opção de refetch/invalidação ligada num subscriber que não é
 o primeiro a montar sobre a mesma chave de cache RTK Query, neste frontend).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0 (2026-09-30, PLAN-035 gate 10 da Wave 4: corolário — `forceRefetch: () => true` POR ENDPOINT torna todo subscriber primário e `refetchOnMountOrArgChange: false` no hook não o desliga; exige 1 único subscriber por tela e teste montado carga fria = 1 GET / revisita = 2 GETs — mnemonicos-frontend/src/store/api.ts)
 
 ## [Testes] Prova de "refetch ao remontar" que cria um store NOVO a cada montagem nunca exercita cache quente — mutante que remove a opção sobrevive
 

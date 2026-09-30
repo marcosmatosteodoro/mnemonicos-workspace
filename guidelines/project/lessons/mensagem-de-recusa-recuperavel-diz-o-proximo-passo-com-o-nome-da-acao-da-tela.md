@@ -2,10 +2,11 @@
 area: Design
 estado: ativa
 validade: indeterminada
-confirmada: 0
+confirmada: 1
 contestada: 0
 paths:
   - mnemonicos-backend/src/modules/**/*.service.ts
+  - mnemonicos-frontend/src/components/**
 tags: [copy, erro]
 ---
 ## [Design] Mensagem de recusa recuperável diz o próximo passo com o nome da ação da tela
@@ -23,3 +24,11 @@ página"); quando a guarda lê um snapshot imutável, o texto deixa claro que co
 atual não basta. Sem termo técnico (parâmetro de rota, id). Minúscula "versão" como a copy
 canônica da tela. Referência: mensagens de `approveContentVersion` e
 `mnemonicos-frontend/src/components/content-version-history.tsx`.
+
+**Extensão (gate 11 do retry R-1 da Entrega da F9, 2026-09-29):** o próximo passo tem de ser
+POSSÍVEL para quem lê, conferido contra a guarda do backend que o decide, nos estados que o
+próprio passo cria. "Feche uma nova versão para aprová-la", mostrado ao ADMIN, era falso: quem
+fecha vira autor e a segregação de funções (`producerIds` em `approveContentVersion`) recusa a
+autoaprovação. Se o passo não serve a todos os leitores da frase, use uma formulação impessoal e
+verdadeira em todas as combinações ("Uma nova versão precisa ser fechada e aprovada por um ADMIN
+que não a produziu").

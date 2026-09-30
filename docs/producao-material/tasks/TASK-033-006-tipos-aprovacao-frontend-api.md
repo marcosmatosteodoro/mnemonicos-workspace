@@ -97,7 +97,7 @@ Território e precedentes: `docs/producao-material/MAP.md`,
 **Data início**: 2026-09-29T21:42:00-0300 (despacho; developer não mediu o início — declarado)
 **Data conclusão**: 2026-09-29T21:55:00-0300
 **Commit SHA**: frontend 7c83015 (+ ebda177 — aplicação de fim de wave: âncora sem sustentação retirada do comentário)
-**Jira**: — (sem acesso ao conector; ver `tracker-local-F9.md`)
+**Jira**: KAN-157
 
 **Quality gates**:
 - [x] Implementação completa

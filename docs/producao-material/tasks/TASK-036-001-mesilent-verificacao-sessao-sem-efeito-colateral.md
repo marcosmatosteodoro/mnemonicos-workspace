@@ -1,10 +1,10 @@
-# TASK-035-001: `meSilent` — checagem de sessão sem efeito colateral
+# TASK-036-001: `meSilent` — checagem de sessão sem efeito colateral
 
 **Slug**: producao-material
-**Pertence a**: PLAN-035
-**Realiza (FRs)**: FR-034-015
-**Funcionalidade**: FEAT-034-001 (primária)
-**Componente**: COMP-035-004 (principal)
+**Pertence a**: PLAN-036
+**Realiza (FRs)**: FR-036-015
+**Funcionalidade**: FEAT-036-001 (primária)
+**Componente**: COMP-036-004 (principal)
 **Wave**: 1
 **Tamanho estimado**: small
 **Tipo**: feature
@@ -13,7 +13,7 @@
 ## Dependências
 
 - **Depende de**: nenhuma
-- **Bloqueia**: TASK-035-005
+- **Bloqueia**: TASK-036-005
 
 ## Contexto
 
@@ -21,7 +21,7 @@ O header precisa saber se há sessão ativa sem herdar o efeito colateral de
 `baseQueryWithReauth` (renovação + `resetApiState`/redirect `/login?sessao=expirada` em
 qualquer 401 fora de login/refresh/janela de logout — `store/api.ts:368-427`). `meSilent`
 lê `/auth/me` direto por `rawBaseQuery` (`api.ts:308-312`), sempre resolvendo `{ data }`,
-nunca side-effect (DEC-035-005; memo — PLAN-035 §1 e §6/DEC-035-005).
+nunca side-effect (DEC-036-005; memo — PLAN-036 §1 e §6/DEC-036-005).
 
 ## Escopo
 
@@ -38,7 +38,7 @@ nunca side-effect (DEC-035-005; memo — PLAN-035 §1 e §6/DEC-035-005).
   endpoint — nenhum código adicional além de declará-lo).
 - Sem `providesTags`/`invalidatesTags` que acoplem `meSilent` ao ciclo de cache de
   `me`/`SessionUser` — os dois caminhos de leitura de sessão permanecem desacoplados
-  (DEC-035-005, consequências).
+  (DEC-036-005, consequências).
 
 ### Não inclui
 - `useMeQuery`/endpoint `me` (`api.ts:727-730`) — intocado.
@@ -50,8 +50,8 @@ nunca side-effect (DEC-035-005; memo — PLAN-035 §1 e §6/DEC-035-005).
 ## Critérios de pronto
 
 - [ ] 401 em `GET /auth/me` → `meSilent` resolve `{ data: null }`, **sem** disparar
-      `POST /auth/refresh` e **sem** chamar `reauth.redirect` — cobre AC-034-015 e a
-      proibição de efeito colateral de FR-034-015. Verificação executável:
+      `POST /auth/refresh` e **sem** chamar `reauth.redirect` — cobre AC-036-015 e a
+      proibição de efeito colateral de FR-036-015. Verificação executável:
       `npm --prefix mnemonicos-frontend test -- src/store/api.test.ts -t "meSilent"` →
       `PASS`, com um caso novo no mesmo arquivo (reaproveitando o harness já declarado ali —
       `route`/`fetchSpy`/`newStore()`/`track()`, `api.test.ts:24-105`) que arma `route` para
@@ -72,8 +72,8 @@ nunca side-effect (DEC-035-005; memo — PLAN-035 §1 e §6/DEC-035-005).
 
 ## Riscos específicos
 
-- TRISK-035-003 (divergência futura entre `me`/`meSilent` se o contrato de `/auth/me`
-  mudar) é só documentado aqui (comentário cruzado nos dois endpoints, DEC-035-005) — não
+- TRISK-036-003 (divergência futura entre `me`/`meSilent` se o contrato de `/auth/me`
+  mudar) é só documentado aqui (comentário cruzado nos dois endpoints, DEC-036-005) — não
   há mitigação de código adicional nesta TASK.
 
 ---
@@ -93,6 +93,6 @@ nunca side-effect (DEC-035-005; memo — PLAN-035 §1 e §6/DEC-035-005).
 - [x] Lint limpo
 - [x] Aderência à ficha/perfil
 - [x] Code review aprovado (wave 1)
-- [x] ACs verificados (AC-034-015)
+- [x] ACs verificados (AC-036-015)
 - [x] Segurança (gate 8): aprovado (wave 1) — security-engineer
-- [ ] Comportamento (gate 9): n/a — FEAT-034-001 ainda não completou (aguarda TASK-035-005)
+- [ ] Comportamento (gate 9): n/a — FEAT-036-001 ainda não completou (aguarda TASK-036-005)

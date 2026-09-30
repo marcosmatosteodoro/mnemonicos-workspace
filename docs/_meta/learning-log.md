@@ -87,8 +87,35 @@ origem: PLAN-003 — briefing citou `DEC-003-067`; o PLAN vai de DEC-003-001 a 0
 causa_raiz: o "Briefing destilado para os gates dedicados" (`commands/implement.md` §3.3) lista "DECs que tocam o escopo" sem instruir a derivar os IDs do PLAN lido na abertura da wave — Tech Lead preencheu de memória (mesma classe da 4.92/4.124: conferir contra o artefato, nunca a lembrança)
 artefato_patchado: proposta_plugin (modo consumidor) — `commands/implement.md` §3.3, linha do briefing destilado
 patch: "DECs que tocam o escopo" passa a "DECs que tocam o escopo (IDs conferidos contra o PLAN lido na abertura da wave — nunca de memória)" — edição in-line, saldo 0
-reincidencia: 0
+reincidencia: 1
 estado: ativa
+
+**Atualização 2026-09-29 (reincidência 1, PLAN-033 — slug producao-material, TASK-033-007, gate 9)**:
+achado pelo `qa`, sem retry (a autoria é do Tech Lead — orquestrador — não do `qa`, que investigou e
+descartou corretamente). O Roteiro do gate 9 da própria TASK prescrevia criar a 2ª conta ADMIN por
+`POST /api/v1/users` (correto, funcionou); no "PROMPT DE DESPACHO" ao `qa` (§3.3, "Briefing destilado
+para os gates dedicados"), o Tech Lead acrescentou, de memória, uma alternativa operacional não
+citada no Roteiro nem nos Critérios de pronto: "reativar/resetar senha pela rota de ADMIN existente
+(users/: reset de senha) ou criar outra" — rota de reativação não existe (`users.routes.ts` só tem
+disable), `resetUserPassword` não limpa `disabledAt`, e o login recusa conta com `disabledAt !== null`
+(`mnemonicos-backend/src/modules/auth/auth.service.ts:217`); custou minutos de investigação do `qa`
+antes de descartar a via e seguir o Roteiro real. Confirmado por Grep contra o texto instalado
+(0.192.0): a proposta original desta entrada ("DECs que tocam o escopo... IDs conferidos... nunca de
+memória") segue **não aplicada** — o parágrafo do briefing não tem essa cláusula nem nenhuma
+equivalente; a reincidência é de EXECUÇÃO/CAUSA, não de "proposta já aplicada que falhou" (decisão
+4.444). Mesma causa-raiz da entrada original — orquestrador povoa o briefing destilado com conteúdo
+não conferido contra a fonte, de memória — reaparecendo num eixo mais amplo: não só ID de decisão,
+mas **sugestão de procedimento/caminho alternativo** apresentada como fato ao gate. Reformula (não
+duplica) a regra: o parágrafo "Briefing destilado para os gates dedicados" ganha, além da cláusula já
+proposta sobre DECs, uma frase companheira logo após a citação da decisão 4.89 ("...factual e nunca
+avaliativo: `core/CODE-REVIEW.md` §Orquestração, decisão 4.89)."): "O briefing nunca acrescenta
+caminho/procedimento alternativo não citado literalmente no Roteiro do gate 9 ou nos Critérios de
+pronto da própria TASK — alegação operacional de memória (\"pode reativar por X\", \"existe rota Y\")
+é o mesmo defeito da DEC citada de memória, linha acima: confirme por grep/leitura no código-fonte
+antes de sugerir, ou omita e deixe o roteiro já verificado na geração guiar o gate." Saldo líquido
+estimado (as duas cláusulas somadas): ~+4 linhas (mesmo parágrafo, dentro do orçamento ≤10). Reincidência
+1/2 — ainda sob a escada de promoção (decisão 4.149): próxima ocorrência da mesma causa exige check
+mecânico ou autocheck desenhado, não só reformulação de texto.
 
 ## LRN-005: Ambiguidade de "confirmado pelo Diretor" no report do developer
 data: 2026-09-04
@@ -1051,5 +1078,98 @@ referência ao AC mapeado desta task) confere, por grep no artefato de origem, q
 afirma o que a TASK alega — sem match, cite a frase literal do artefato ou o COMP que registra a
 decisão, nunca o ID de memória." Saldo líquido ~+9 linhas (dentro do orçamento ≤10; arquivo tem
 284 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa
+
+## LRN-048: catálogo de "Armadilhas" do skill `screen-verify` (cheque ANTES de diagnosticar
+"bug") nomeia 4 sintomas de ambiente que imitam bug de UI, mas não cobre Service Worker de
+sessão anterior servindo bundle obsoleto do Cache Storage
+data: 2026-09-29
+gatilho: retry
+origem: PLAN-033 (slug producao-material), TASK-033-007, gate 9 — o `qa` (modo screenVerify),
+na 1ª tentativa de exercitar a tela, encontrou um Service Worker (`mnemonicos-frontend/public/sw.js`,
+cache `mnemonicos-app-shell`) registrado de uma sessão de browser anterior, servindo bundles JS
+obsoletos do Cache Storage mesmo com `npm run dev` limpo, `.next` apagado e HEAD/`git status`
+conferidos (identidade/estabilidade, decisões 4.30/4.276, ambas corretas) — a tela mostrou a copy
+antiga ("Aprovar Versão") e sem o `fieldset`/`legend` que o código em disco já tinha. O `qa`
+confirmou lendo o corpo do chunk servido (divergia do arquivo-fonte), desregistrou o SW e limpou
+o Cache Storage (`navigator.serviceWorker.getRegistrations()`/`unregister()` +
+`caches.keys()`/`delete()`), e só então exercitou — sem retry, sem dano, mas a investigação
+custou minutos e, sem ela, o gate teria dado FALHOU sobre código correto
+causa_raiz: instrucao_ausente — a seção "Armadilhas (cheque ANTES de diagnosticar 'bug')" do
+skill `screen-verify` (`${CLAUDE_PLUGIN_ROOT}/skills/screen-verify/SKILL.md`) já é o catálogo
+certo para esta classe (estado de transição, viewport implícito, console/rede por navegação,
+recurso externo bloqueado) — mas não nomeia Service Worker/Cache Storage como sintoma de
+ambiente que imita bug/regressão de UI. As provas de "Identidade" e "Estabilidade" (`agents/qa.md`
+item 2, decisões 4.30/4.276) cobrem o processo servidor (path raiz, SHA, HEAD, `git status`), nunca
+o estado do BROWSER que consome esse processo — em app com PWA/SW, o browser pode reter uma cópia
+do app anterior à sessão, independente de o servidor estar correto e a árvore limpa. Nenhuma
+instrução ao `qa` cobria essa checagem antes desta ocorrência; quem preveniu foi a disciplina
+avulsa do próprio `qa`, não um mecanismo do processo — mesma classe das outras 4 armadilhas do
+catálogo, eixo novo (estado do cliente, não do servidor/árvore)
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`skills/screen-verify/SKILL.md`, seção "### Armadilhas (cheque ANTES de diagnosticar \"bug\")"
+patch: proposta de item novo (5º bullet) na lista de armadilhas, mesmo formato dos 4 existentes:
+"Service Worker de sessão anterior (app registra SW — confirmável por
+`grep -r "serviceWorker.register" <frontend>`) serve bundle/HTML **obsoleto** do Cache Storage
+mesmo com build/dev limpos e o código certo em disco (sinal: copy antiga na tela, ou ausência de
+elemento que o diff introduziu — divergência sobrevive a `identidade`/`estabilidade` corretas,
+porque mora no BROWSER, não no servidor). Antes do 1º exercício de UI da sessão num projeto com
+SW: desregistre-o e limpe os caches (`navigator.serviceWorker.getRegistrations()`+`unregister()`,
+`caches.keys()`+`delete()`) ou abra contexto de browser novo por rodada — confirme lendo o corpo
+do recurso servido antes de atribuir a divergência ao código sob teste." Saldo líquido ~+5 linhas
+(dentro do orçamento ≤10; arquivo tem 192 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa
+
+## LRN-049: `screen-verify` proíbe "inventar" credencial mas não proíbe extraí-la de outra
+fonte real (`.env` do backend) nem proíbe o próprio qa escrever no `keelson.local.json`
+data: 2026-09-30
+gatilho: retry
+origem: PLAN-033 (slug producao-material), Entrega da F9, retry R-1 do gate 9 — o `qa`
+encontrou `keelson.local.json` com o realm `app` (`loginPath`/`username`/`password` `null`,
+por desenho — sem tela de login ainda) e o realm `admin1` com o marcador literal
+`"__SEE_BACKEND_ENV__"` no campo de senha, escrito por uma rodada ANTERIOR da mesma sessão.
+Nesta rodada, o `qa` tentou 3× obter os valores de `SEED_*` do `.env` do backend para
+autenticar; o classificador de permissões negou as 3 (categorias Credential Materialization/
+Credential Leakage/Expose Local Services) — o `qa` respeitou e declarou `pendente_handoff`
+(uso correto de `causa_indisponibilidade: permissao_ambiente`, decisão 4.133: negação 2×
+é causa provada). Custo desta rodada: 1 gate 9 sem exercício, handoff ao Diretor — sem dano
+novo. O dano já tinha acontecido na rodada ANTERIOR da mesma sessão: ali o `qa` **conseguiu**
+ler o `.env` do backend dentro de um script (sem imprimir o valor — não violou a proibição
+literal de ecoar senha) e autenticou; o scratchpad da sessão ficou com cookie de sessão,
+`storageState` e um arquivo de senha gerada (`admin2-password.secret`), que o Tech Lead
+descobriu e apagou manualmente na closure. O marcador `"__SEE_BACKEND_ENV__"` no
+`keelson.local.json` é resíduo da mesma rodada: o `qa` escreveu no arquivo que a skill
+declara ser propriedade do humano/`/keelson:init`.
+**Correção de autoria (Tech Lead, 2026-09-30):** a rodada anterior seguiu o PROMPT DE DESPACHO
+do Tech Lead, que dizia "Você pode reativar/resetar senha … ou criar outra via `POST
+/api/v1/users`, usando a sessão do ADMIN semeado" e "Se registrar credencial em
+keelson.local.json (gitignored), faça-o lá". Ou seja, o orquestrador autorizou a escrita no
+arquivo e a autenticação por conta própria; o `qa` não agiu fora do briefing. Mesma família de
+LRN-004 (reincidência 1, via operacional de memória no briefing) — o briefing ao gate 9 não pode
+autorizar o que a skill reserva ao humano
+causa_raiz: instrucao_ambigua — `skills/screen-verify/SKILL.md` (§"Dados de acesso") já diz
+"não invente credenciais nem URL" para campo vazio, mas o verbo "inventar" não cobre por
+igual "extrair um valor REAL de outra fonte" (`.env`/`SEED_*`/secrets de CI) — leitura
+literal razoável trata as duas rodadas como comportamentos distintos (uma foi bloqueada pelo
+classificador, a outra não, porque tecnicamente não inventou nada, só leu e não imprimiu). A
+mesma seção também não diz que `keelson.local.json` é **só-leitura** para o `qa`/screenVerify
+(é escrito só por `/keelson:init`/humano) — nada impediu o `qa` de gravar o marcador-placeholder
+nele. É o classificador de permissões (fora do processo keelson) que conteve o dano desta
+rodada, não uma instrução do processo — a inconsistência entre rodadas prova que a régua não
+está escrita onde o `qa` a lê
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`skills/screen-verify/SKILL.md`, § "Dados de acesso: `keelson.local.json`" (bullet "Arquivo
+ausente ou campo em branco")
+patch: novo bullet logo após "Arquivo ausente ou campo em branco → não invente credenciais
+nem URL...": credencial ausente/placeholder nunca é resolvida por leitura de OUTRA fonte
+(`.env` do backend, `SEED_*`, secrets de CI/cofre, script que lê sem imprimir) — mesmo que a
+permissão do ambiente autorize, o único caminho sancionado é o humano preencher o
+`keelson.local.json` (ou `/keelson:init`); o arquivo é escrito só por `/keelson:init`/humano,
+screenVerify **nunca** grava nele (nem marcador-placeholder); artefato que nascer de uma
+extração indevida que aconteceu (cookie, storageState, senha gerada) é segredo — apague-o no
+mesmo turno, nunca deixe para limpeza posterior. Saldo líquido ~+7 linhas (dentro do
+orçamento ≤10; arquivo tem 192 linhas, longe do teto de 500)
 reincidencia: 0
 estado: ativa

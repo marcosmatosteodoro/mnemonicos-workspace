@@ -1,10 +1,10 @@
-# TASK-035-002: Paleta unificada — papéis de UI do app na paleta noturna
+# TASK-036-002: Paleta unificada — papéis de UI do app na paleta noturna
 
 **Slug**: producao-material
-**Pertence a**: PLAN-035
-**Realiza (FRs)**: FR-034-013
-**Funcionalidade**: FEAT-034-002 (primária)
-**Componente**: COMP-035-005 (principal)
+**Pertence a**: PLAN-036
+**Realiza (FRs)**: FR-036-013
+**Funcionalidade**: FEAT-036-002 (primária)
+**Componente**: COMP-036-005 (principal)
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: feature
@@ -13,16 +13,16 @@
 ## Dependências
 
 - **Depende de**: nenhuma
-- **Bloqueia**: TASK-035-003, TASK-035-004
+- **Bloqueia**: TASK-036-003, TASK-036-004
 
 ## Contexto
 
 Hoje `--surface`/`--surface-raised`/`--border-subtle` usam a paleta `--color-ink-*`
 genérica fora de `/login` (`globals.css:63-79`). Esta TASK migra os três papéis para a
 paleta noturna já validada em `/login` (SPEC-030/PLAN-031), nas três camadas de seletor
-que DEC-035-002 introduz, e estende `night-palette-tokens.ts` com os pares de contraste
-que essa migração passa a exigir por nome semântico (DEC-035-003/004; memo — PLAN-035 §3
-COMP-035-005, §6 DEC-035-002/003/004).
+que DEC-036-002 introduz, e estende `night-palette-tokens.ts` com os pares de contraste
+que essa migração passa a exigir por nome semântico (DEC-036-003/004; memo — PLAN-036 §3
+COMP-036-005, §6 DEC-036-002/003/004).
 
 ## Escopo
 
@@ -32,7 +32,7 @@ COMP-035-005, §6 DEC-035-002/003/004).
     → `--surface: var(--color-night-panel-bg)`; `--surface-raised: #ffffff` → `--surface-raised:
     var(--color-night-pill-bg)`; `--border-subtle: var(--color-ink-200)` → `--border-subtle:
     var(--color-night-pill-border)`. `--text-strong`, `--text-muted`, `--link`, `--danger`
-    permanecem com o valor exato de hoje (DEC-035-003).
+    permanecem com o valor exato de hoje (DEC-036-003).
   - Reestruturar `@media (prefers-color-scheme: dark) { :root { ... } }` (`globals.css:75-132`)
     para `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { ... } }`,
     mantendo todo o conteúdo interno — `--surface`/`--surface-raised`/`--border-subtle`
@@ -42,8 +42,8 @@ COMP-035-005, §6 DEC-035-002/003/004).
   - Acrescentar `:root[data-theme="dark"] { ... }` (mesmo nível de `@layer base`, fora do
     `@media`) com os valores EXATOS do bloco `:not([data-theme="light"])` acima — inclusive
     `--surface`/`--surface-raised`/`--border-subtle` e os `--color-night-*` redeclarados
-    (cópia literal, não um subconjunto; DEC-035-002). A leitura/gravação de `data-theme` em
-    si é wiring de TASK-035-003/004, fora desta TASK.
+    (cópia literal, não um subconjunto; DEC-036-002). A leitura/gravação de `data-theme` em
+    si é wiring de TASK-036-003/004, fora desta TASK.
 - `mnemonicos-frontend/src/app/night-palette-tokens.ts`:
   - Novo export `NIGHT_PALETTE_SURFACE_ROLE_PAIRS: readonly NightPalettePanelLabelPair[]`
     (reusa a interface já existente `NightPalettePanelLabelPair`, `night-palette-tokens.ts:95-102`
@@ -52,31 +52,31 @@ COMP-035-005, §6 DEC-035-002/003/004).
     `NIGHT_PALETTE_PANEL_LABEL_PAIR` já mede (`night-palette-tokens.ts:111-116`; ~17,04:1 no
     tema claro, ~18,65:1 no escuro, comentado em `globals.css:51-55`/`125-129`) — nome distinto
     (ex.: `'texto do app (--text-strong) sobre --surface unificado'`) porque agora a alegação é
-    sobre o app inteiro (AC-034-012), não só o painel de `/login`; (b) `--border-subtle` vs
+    sobre o app inteiro (AC-036-012), não só o painel de `/login`; (b) `--border-subtle` vs
     `--color-night-panel-bg` — par NOVO (a `NIGHT_PALETTE_CONTRAST_PAIRS` já mede
     `--color-night-pill-border` vs `--color-night-pill-bg`/`--color-night-panel-bg` por TOKEN,
     `night-palette-tokens.ts:52-57`/`78-82`, ~4,20:1 e ~4,70:1 no claro, ~5,13:1 e ~6,14:1 no
     escuro — mas nenhuma entrada hoje resolve a indireção `--border-subtle` por NOME
     semântico).
-  - Exportar o contrato congelado que TASK-035-003/004 consomem: `THEME_STORAGE_KEY: string`
+  - Exportar o contrato congelado que TASK-036-003/004 consomem: `THEME_STORAGE_KEY: string`
     (ex. `'mnemonicos:theme'`) e `export type ThemeName = 'light' | 'dark'` — símbolos NOVOS,
     declarados só aqui; as duas TASKs seguintes importam, nunca redeclaram (princípio 2 da
     decomposição, `commands/tasks.md` Etapa 1).
 
 ### Não inclui
-- Script de bootstrap (TASK-035-003); `ThemeToggle` (TASK-035-004).
+- Script de bootstrap (TASK-036-003); `ThemeToggle` (TASK-036-004).
 - Medição de `--link`/`--danger`/acento da paleta como *distinguibilidade decorativa* entre
   si (sem piso numérico declarado na SPEC) — fica para o gate 9/11, é a parte qualitativa de
-  NFR-034-005/AC-034-018. O contraste AA NUMÉRICO de `--link`/`--danger` contra o novo
-  `--surface` (NFR-034-003, que já se aplica a qualquer texto, incluindo esses dois) ENTRA
+  NFR-036-005/AC-036-018. O contraste AA NUMÉRICO de `--link`/`--danger` contra o novo
+  `--surface` (NFR-036-003, que já se aplica a qualquer texto, incluindo esses dois) ENTRA
   nesta TASK (ver Critérios de pronto).
 - Qualquer alteração de VALOR de `--text-strong`/`--text-muted`/`--danger`/`--link`
-  (DEC-035-003).
+  (DEC-036-003).
 
 ## Critérios de pronto
 
 - [ ] `--text-strong` vs `--surface` (novo valor) ≥ 4,5:1 e `--border-subtle` vs `--surface`
-      ≥ 3:1, nos dois temas — cobre AC-034-012, NFR-034-003. Verificação executável:
+      ≥ 3:1, nos dois temas — cobre AC-036-012, NFR-036-003. Verificação executável:
       `npm --prefix mnemonicos-frontend test -- src/app/globals-theme-contrast.test.ts` →
       `PASS`, com um novo bloco `describe.each` no mesmo arquivo, no MESMO padrão já usado
       para `NIGHT_PALETTE_PANEL_LABEL_PAIR` (`globals-theme-contrast.test.ts:39-64`): tema
@@ -93,7 +93,7 @@ COMP-035-005, §6 DEC-035-002/003/004).
       reprova.
 - [ ] Os três tokens (`--surface`, `--surface-raised`, `--border-subtle`) têm o MESMO valor
       em `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { ... } }` e
-      em `:root[data-theme="dark"] { ... }` (DEC-035-002, prevenção da divergência que a
+      em `:root[data-theme="dark"] { ... }` (DEC-036-002, prevenção da divergência que a
       própria decisão registra como risco). Verificação executável: `npm --prefix
       mnemonicos-frontend test -- src/app/globals-theme-contrast.test.ts -t "seletores
       escuros"` → `PASS`, com um teste que usa `extractCssBlock` (já genérico,
@@ -106,9 +106,9 @@ COMP-035-005, §6 DEC-035-002/003/004).
       cobertura, `commands/tasks.md` Etapa 3): mesmo arquivo de teste, caso que importa os
       dois símbolos e afirma `typeof THEME_STORAGE_KEY === 'string' && THEME_STORAGE_KEY.length
       > 0`.
-- [ ] `--link` e `--danger` (valores atuais, intocados por DEC-035-003) mantêm ≥4,5:1 contra
+- [ ] `--link` e `--danger` (valores atuais, intocados por DEC-036-003) mantêm ≥4,5:1 contra
       o novo `--surface` (`--color-night-panel-bg`) nos dois temas — cobre a fração numérica
-      de AC-034-018/NFR-034-005 que NFR-034-003 já exige para qualquer texto. Verificação
+      de AC-036-018/NFR-036-005 que NFR-036-003 já exige para qualquer texto. Verificação
       executável: mesmo arquivo `globals-theme-contrast.test.ts`, 2 novos pares (`--link` vs
       `--surface`, `--danger` vs `--surface`) no mesmo `describe.each` dos demais. Fixe o
       valor esperado calculando com a mesma fórmula de `theme-css-parser.ts:97-153` contra os
@@ -120,10 +120,10 @@ COMP-035-005, §6 DEC-035-002/003/004).
 
 ## Riscos específicos
 
-- TRISK-035-002 (contraste de `--link`/`--danger` contra o novo `--surface`): a fração
-  NUMÉRICA (NFR-034-003) passa a ser medida nesta TASK (ver Critérios de pronto); a fração
-  qualitativa de distinguibilidade do acento (NFR-034-005) permanece para o gate 9/11, por
-  decisão explícita de DEC-035-003.
+- TRISK-036-002 (contraste de `--link`/`--danger` contra o novo `--surface`): a fração
+  NUMÉRICA (NFR-036-003) passa a ser medida nesta TASK (ver Critérios de pronto); a fração
+  qualitativa de distinguibilidade do acento (NFR-036-005) permanece para o gate 9/11, por
+  decisão explícita de DEC-036-003.
 
 ---
 
@@ -142,7 +142,7 @@ COMP-035-005, §6 DEC-035-002/003/004).
 - [x] Lint limpo
 - [x] Aderência à ficha/perfil
 - [x] Code review aprovado (wave 1 — 1 retry, re-review do delta aprovado)
-- [x] ACs verificados (AC-034-012, AC-034-018)
+- [x] ACs verificados (AC-036-012, AC-036-018)
 - [x] Segurança (gate 8): aprovado (wave 1) — security-engineer
-- [ ] Comportamento (gate 9): n/a — FEAT-034-002 ainda não completou (aguarda TASK-035-003/004)
+- [ ] Comportamento (gate 9): n/a — FEAT-036-002 ainda não completou (aguarda TASK-036-003/004)
 - [x] Design (gate 11): aprovado (wave 1) — product-designer, 1 retry (regressão real em technique-card.tsx corrigida)

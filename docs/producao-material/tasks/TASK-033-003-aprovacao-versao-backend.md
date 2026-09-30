@@ -502,7 +502,7 @@ TASK de wiring posterior (princípio 4).
 **Data início**: 2026-09-27T19:24:02-0300
 **Data conclusão**: 2026-09-27T21:58:16-0300
 **Commit SHA**: 2e9998c (+ e9a1360, 563f350, 49489c9 — retries dos gates 1/7/8/11; frontend 053a6ab; âncoras renumeradas 5984073/94711c9)
-**Jira**: — (sem acesso ao conector; ver `tracker-local-F9.md`)
+**Jira**: KAN-154
 
 **Quality gates**:
 - [x] Implementação completa
