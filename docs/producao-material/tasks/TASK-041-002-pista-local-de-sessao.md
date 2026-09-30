@@ -7,7 +7,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -40,7 +40,7 @@ Convenção dos comandos: executados na raiz do repositório `mnemonicos-fronten
 - [ ] **`session-hint.ts` — contrato do item (sem AC)** — `npm test -- src/lib/session-hint.test.ts` → `Tests: 9 passed, 9 total`; um caso por linha: **S1** `SESSION_HINT_KEY` é o literal `'mnemonicos:session-hint'` (valor do PLAN-041 §5) · **S2** `hasSessionHint()` é `false` sem pista · **S3** `setSessionHint()` → `hasSessionHint()` é `true` · **S4** `clearSessionHint()` → `false` · **S5** `localStorage.getItem(SESSION_HINT_KEY) === '1'` após `setSessionHint()` (igualdade com o literal fixado; nenhum dado de pessoa: a função não recebe argumento) · **S6** `localStorage.getItem` lançando → `hasSessionHint()` devolve `false` sem propagar · **S7** `localStorage.setItem` lançando → `setSessionHint()` não propaga e `hasSessionHint()` segue `false` · **S8** `localStorage.removeItem` lançando → `clearSessionHint()` não propaga · **S9** o **acesso à propriedade** `window.localStorage` lançando (`SecurityError` no getter, eixo distinto do método) → `hasSessionHint()` `false`, `setSessionHint()` e `clearSessionHint()` sem propagar. Um mutante por sujeito (remover o `try/catch` de cada uma das 3 funções → S6/S9, S7/S9 e S8/S9 reprovam respectivamente): **M1**, **M2**, **M3**.
 - [ ] **Fiação no store e no `InternalShell`, com store real** (oráculo montado — lição `predicado-de-decis-o-de-ui-a-partir-de-estado-de-rtk-query-s-se-prova-no-componente-montado`, que vale para o efeito do `InternalShell` montado contra a `api` real) — `npm test -- src/components/session-hint.integration.test.tsx` → `Tests: 12 passed, 12 total`; **W1** `login` 200 → pista presente · **W2** `login` 401 → pista **ausente** · **W3** pista presente + `logout` 204 → pista apagada · **W4** pista presente + `logout` 500 → pista **preservada** · **W5** `InternalShell` montado, `me` 200 EDITOR → pista presente · **W6** `InternalShell` montado, `me` 401 + refresh 401 → pista ausente · **W7** `InternalShell` montado, `me` **403** (STUDENT real, `requireRole`; sessão sem papel de acesso, que a lição `leitura-exigida-para-todo-papel-fica-fora-da-guarda-de-papel-da-acao` manda não ficar atrás de guarda de papel) → pista **ausente** (só o login e o `me` com sucesso gravam) e o comportamento de hoje preservado: `useMeQuery` com 403 → `isError` → `router.replace('/login')` e render `null` (`internal-shell.tsx:35-55`; a mensagem de permissão só aparece com `data`, W12) · **W8** `localStorage.setItem` lançando → `login.initiate` resolve com o usuário e o cache é zerado como hoje (sem propagar) · **W9** `localStorage.removeItem` lançando → `logout` 204 conclui, `resetApiState` acontece e a navegação segue (caso de AC-040-024 abaixo) · **W10** login pela UI — ver critério de AC-040-024 · **W11** logout pela UI — idem · **W12** `InternalShell` montado, `me` 200 STUDENT (**defesa em profundidade**, declarado: o backend real responde 403, W7) → pista presente (o efeito grava para qualquer papel com `data`). Mutantes (cada um deve deixar o arquivo **vermelho** pelo comando acima): **M4** `setSessionHint()` do `login` fora do sucesso (antes do `await queryFulfilled`) → W2 · **M5** remover `setSessionHint()` do `login` → W1 · **M6** `clearSessionHint()` do `logout` fora do sucesso → W4 · **M7** remover `clearSessionHint()` do `logout` → W3 · **M8** `setSessionHint()` do `InternalShell` incondicional (mesmo sem `data`) → W6 (e W7) · **M9** remover o efeito do `InternalShell` → W5 · **M10** `setSessionHint()` do `InternalShell` só para papel de acesso → W12.
 - [ ] **AC-040-024 e FR-040-010 (login e logout inalterados, valor observável completo — nunca "o teste não muda")** — `npm test -- src/components/session-hint.integration.test.tsx` → **W10** `LoginForm` real sobre a store real: login 200 sem `next` → `router.push` chamado 1× com `INTERNAL_HOME` (`'/studio'`) e com `next="/studio/equipe"` → chamado 1× com `'/studio/equipe'`, nunca `INTERNAL_HOME` nesse caso; **W11** `AuthControl` real sobre a store real: logout 204 → `router.push('/login')` exato, 0 `reauth.redirect`, 0 `POST /auth/refresh`; **W8/W9** provam que falha de storage não altera nenhum desses desfechos. Prova pré-existente lida no eixo do predicado: `login-form.test.tsx:119,132,193` afirmam o destino do `push` (INTERNAL_HOME / `next`) com a mutation **mockada** — provam o componente, não a costura com o store real; o caso W10 fecha a costura. Diff de escopo: `git diff --stat b729a76 HEAD -- src/components/login-form.tsx src/proxy.ts` → saída **vazia** (ausência; no commit-pai também vazia — o alvo não-vazio do diff da TASK é coberto pelos critérios anteriores).
-- [ ] Mutantes: **10 mutantes declarados (M1–M10), 10 provas** — aplicados ao arquivo real **em worktree descartável** (`git worktree add ../wt-mut-041-002 HEAD`, `node_modules` ligado ao do worktree principal, nunca `npm install`/`npm ci`), cada um rodado pelo comando do critério correspondente (arquivo inteiro, nunca `-t`) com controle negativo (sem mutante, mesmo comando → verde, mesma contagem) antes da rodada; ao fim `git worktree remove` e `git status --porcelain` da árvore da TASK **vazio** (o symlink `node_modules` do worktree está em `info/exclude`) (lição `sonda-de-investiga-o-n-o-nasce-em-tests-contagem-de-teste-declara-a-rvore`).
+- [ ] Mutantes: **11 mutantes declarados (M1–M10 + Mutante A), 11 provas** (Mutante A — remover `resetApiState` do `logout.onQueryStarted` → W9 — acrescentado no retry dos gates da Wave 2) — aplicados ao arquivo real **em worktree descartável** (`git worktree add ../wt-mut-041-002 HEAD`, `node_modules` ligado ao do worktree principal, nunca `npm install`/`npm ci`), cada um rodado pelo comando do critério correspondente (arquivo inteiro, nunca `-t`) com controle negativo (sem mutante, mesmo comando → verde, mesma contagem) antes da rodada; ao fim `git worktree remove` e `git status --porcelain` da árvore da TASK **vazio** (o symlink `node_modules` do worktree está em `info/exclude`) (lição `sonda-de-investiga-o-n-o-nasce-em-tests-contagem-de-teste-declara-a-rvore`).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff (produção e teste) — `npx eslint --max-warnings=0 $(git diff --name-only --diff-filter=d b729a76...HEAD | grep -E '\.(ts|tsx)$')` → exit 0; `npm run typecheck` → exit 0; `npx prettier --check $(git diff --name-only --diff-filter=d b729a76...HEAD)` → exit 0; `npm run lint` → exit 0.
 
 ## Riscos específicos
@@ -55,19 +55,19 @@ Convenção dos comandos: executados na raiz do repositório `mnemonicos-fronten
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-09-30T15:20:08-0300
+**Data conclusão**: 2026-09-30T15:32:14-0300
+**Commit SHA**: ccb7fea
+**Jira**: — (sub-task não criada: acesso ao Jira retirado pelo Diretor; pendente de reconciliação)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer (Wave 2)
+- [x] Comportamento (gate 9): consolidado (DoD, Etapa 4) — SPEC-040 sem FEATs; login/logout reais no Roteiro da TASK-041-003
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
