@@ -1470,8 +1470,16 @@ origem: SPEC-040/PLAN-041 (KAN-180), `/keelson:tasks` — critério fixou 16 tes
 causa_raiz: instrucao_ausente — o parágrafo "verificação executável" cobre contagem de grep (LRN-041: universo×delta) mas não a contagem de TESTES: Grep estático não expande `it.each`/`test.each`, e o `scribe` não tem shell (`agents/scribe.md` l.61), então nada o levava a pedir a medição à main session
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, parágrafo "verificação executável" (Etapa 3, l.193 e vizinhas)
 patch: frase: N de testes em critério vem de execução (`--listTests`/reporter), nunca de Grep de `it(`/`test(`; scribe não roda — a main session mede e entrega o N no briefing. Saldo +2 linhas (tasks.md: 283 linhas)
-reincidencia: 0 (família de LRN-041, causa distinta)
+reincidencia: 1 (família de LRN-041, causa distinta)
 estado: ativa
+
+**Atualização 2026-09-30 (reincidência 1, SPEC-044/PLAN-046, KAN-178 — TASK-046-001/002/005)**: a
+mesma causa em eixo mais amplo — não só `it.each`: integrações HTTP fixadas em "12" (executado: 14),
+baselines 83 vs 86 e 49 vs 50; o `qa` pré-código pegou pela fixação executada. Grep no plugin 0.192.0
+(`--listTests`, `it.each`, `execução` em `commands/tasks.md`): proposta segue **não aplicada** (4.444).
+Proposta reformulada (mesmo dono, mesma frase, escopo = todo N/baseline de contagem, não só testes
+unitários): ver mensagem_mantenedor. Reincidência 1 < 2: escada 4.149 ainda não exige check novo; o
+`qa` pré-código já é o autocheck mecânico que pegou as 3 ocorrências.
 
 ## LRN-062: `agents/scribe.md` (sem shell) não diz o que fazer com valor que só comando produz — deixou `HH:MM` literal no INDEX
 data: 2026-09-30
@@ -1481,4 +1489,44 @@ causa_raiz: instrucao_ausente — `scribe.md` l.61 diz "não roda scripts" e l.3
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `agents/scribe.md` l.61
 patch: frase no corolário do sem-shell: valor que só comando produz chega medido no pacote; ausente -> `duvidas`, nunca placeholder literal. Saldo +0 linha (mesma linha; scribe.md: 61 linhas)
 reincidencia: 0 (Grep `HH:MM`/`medido` em scribe.md 0.192.0: ausente; LRN-061 é causa em outro artefato)
+estado: ativa
+
+## LRN-063: `scripts/ledger.sh mark-read` quebra quando a raiz do repo tem espaço no caminho
+data: 2026-09-30
+gatilho: verificacao_falhou
+origem: SPEC-044/PLAN-046 (KAN-178, slug producao-material) — `ledger.sh <raiz> mark-read despacho …` com raiz `…/Área de trabalho/…` devolveu `sed: can't read /home/…/Área: No such file`; as closures leram as marcas direto dos arquivos
+causa_raiz: verificador_furado — `found="$found $f"` seguido de `for f in $found` (l.308/315/324) fatia o caminho por espaço; nenhum texto ao gerador preveniria
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `scripts/ledger.sh`, ação `mark-read` (l.304-325)
+patch: `found` vira array bash, dedupe por igualdade, `"${found[@]}"` nos dois laços; autocheck: rodar `mark-read` numa raiz temporária com espaço. Saldo ~+4 linhas
+reincidencia: 0 (Grep `for f in $found` em ledger.sh 0.192.0: presente nas l.315/324)
+estado: ativa
+
+## LRN-064: prova de paleta por fonte (`commands/tasks.md`) fixa o extrator pelo vocabulário do redator, não pela gramática do alvo
+data: 2026-09-30
+gatilho: gate_reprovado
+origem: SPEC-044/PLAN-046, TASK-046-004 — o critério redigiu o extrator de cor como `<util>-(--x)`/`[var(--x)]`, mas a mesma TASK prescreve `text-link` (nome de `@utility`); gate 1 reprovou 2× (1ª: `@utility` e namespace `@theme`; 2ª: type hint `[color:…]` e `!`)
+causa_raiz: instrucao_ausente — os itens (a)/(b) mandam conferir literal/estrutura contra a fonte, mas nada manda que o extrator de uma prova por fonte cubra todas as vias sintáticas do alvo nem prove cada via não óbvia com mutante; a parte específica de Tailwind 4 (3 vias de cor) é lição de PROJETO (alvo: projeto)
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, parágrafo após o item (h) (l.214)
+patch: frase: extrator de prova por fonte cobre a gramática inteira do alvo, com ≥1 mutante por via não óbvia. Saldo +1 linha longa
+reincidencia: 0
+estado: ativa
+
+## LRN-065: mutante prescrito em critério de NFR de rede pode ser inerte por construção
+data: 2026-09-30
+gatilho: gate_reprovado
+origem: SPEC-044/PLAN-046, TASK-046-004 (K1) — o critério previa que uma 2ª assinatura `useMeQuery` na sidebar fizesse o G17 (contagem de GET) reprovar; RTK Query dedupa, então o mutante não produz request e nunca morre
+causa_raiz: instrucao_ausente — a fixação manda o par "que estado faz este comando FALHAR?" (l.188) mas o mutante é aplicado a código que ainda não existe; nada manda raciocinar se o mutante tem efeito no canal que o teste observa
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, mesma frase de LRN-064 (l.214)
+patch: mutante prescrito precisa poder morrer: efeito observável no canal lido (NFR de rede → refetch/fetch/`initiate` forçado). Saldo +1 linha (mesma frase de LRN-064)
+reincidencia: 0
+estado: ativa
+
+## LRN-066: critério multi-sujeito (item f de `commands/tasks.md`) aplicado com 1 mutante para 3 sujeitos, e o helper de teste não expunha o dado
+data: 2026-09-30
+gatilho: gate_reprovado
+origem: SPEC-044/PLAN-046, TASK-046-005 — o critério pedia remoção de 3 listeners (keydown, pointerdown, change), a lista trazia só o de keydown, e o helper não expunha os listeners `change`: M-a sobreviveu
+causa_raiz: instrucao_ausente — o item (f) já exige "mutante por sujeito" (Grep 0.192.0 confirma), mas não cobre o caso em que o sujeito vive num helper de teste que não expõe o dado: sem observação possível, o mutante por sujeito é inatingível (irmã de 4.109 e da lição de projeto `helper-de-teste-que-nao-expoe-o-dado-se-estende-nunca-se-copia`)
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, item (f) (l.210)
+patch: frase no fim do item (f): sujeito que vive em helper exige que o critério mande o helper expor o dado; helper que não expõe se estende na TASK. Saldo +1 linha longa
+reincidencia: 0 (regra base do (f) presente; o eixo helper é novo)
 estado: ativa

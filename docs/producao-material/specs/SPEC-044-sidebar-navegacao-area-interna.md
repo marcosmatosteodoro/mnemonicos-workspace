@@ -106,6 +106,8 @@ Toda rota interna do escopo (Painel, Conteúdos e Biblioteca visual) é alcanç�
 - **NFR-044-004** [MUST] As suítes de comportamento da SPEC-040 e da SPEC-036, com as emendas desta SPEC aplicadas, devem passar com 0 falhas.
 
 ## 7. Critérios de aceitação (Given-When-Then)
+**Verificação (gate 9)**: 2026-09-30 — PARCIAL / pendente_handoff (qa, Etapa 4 do PLAN-046). Exercitado em tela, anônimo: AC-044-005, AC-044-007, AC-044-019 (parcial, sem baseline lado a lado), AC-044-013/025 (parte visitante), AC-044-018 (parte pública a 360). Pendentes no HANDOFF-PLAN-046 (motivo `permissao_ambiente` — login automatizado barrado pelo classificador de permissões): AC-044-001..004, 006, 008..018, 020..026 e a métrica §1.3; AC-044-006 também sem conta sem papel.
+
 - **AC-044-001** (cobre FR-044-001, FR-044-002)
   Dado um usuário com sessão ativa e papel suficiente, quando abre qualquer página da área interna (`/studio`, `/content`, `/content/new`, `/content/[id]`, `/content/[id]/breakdown`, `/content/[id]/tira`, `/visual-library`), então a sidebar mostra Painel, Conteúdos e Biblioteca visual, nessa ordem, com os destinos `/studio`, `/content` e `/visual-library`; e uma lista de itens com um item a mais resulta em mais um link na sidebar sem alterar o componente.
 - **AC-044-002** (cobre FR-044-003)
