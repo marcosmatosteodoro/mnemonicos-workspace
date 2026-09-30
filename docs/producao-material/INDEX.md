@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
+**Última atualização**: 2026-09-30 (SPEC-044/KAN-178 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
 `main` e fechadas no Jira — PLAN-036/KAN-77: gate 9 PARCIAL, handoff pendente. PLAN-035/F10
 KAN-165: 8/8 TASKs Done, FEAT-034-001/002 VERIFICADAS, épico fechado; pendência de deploy
 em DEPLOY-035-001)
@@ -97,6 +97,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   → `/`, fora do `<form>` (FR-030-015/016, AC-030-015). O ajuste BRIEF-042 deixou o link centralizado e sem sublinhado, por decisão do Diretor.
 
 ### Especificadas, ainda não planejadas
+- Sidebar de navegação da área interna (SPEC-044, BRIEF-044, Jira KAN-178) — Painel, Conteúdos e Biblioteca visual, montada uma vez na casca e só no estado pronto; menu recolhível abaixo do breakpoint da sidebar fixa (~1280px, medido pelo PLAN); logo do header vai a `/studio` com sessão ativa e papel com acesso à área interna, e a `/` em qualquer outro caso; "Voltar ao conteúdo" na Tira; container de largura único sem estreitar o conteúdo (absorve BRIEF-037). Emenda SPEC-040 v0.5 (logo).
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
 
@@ -128,7 +129,8 @@ fechado._
 | SPEC-032 | Controle de qualidade e gate de versão aprovada | Approved | 2026-09-27 |
 | SPEC-034 | Painel estratégico e tempo por página | Approved | 2026-09-30 |
 | SPEC-036 | Botão de sessão e tema dark/light no header do app (renumerada de SPEC-034 por colisão de ID entre sessões paralelas) | Done | 2026-09-29 |
-| SPEC-040 | Sessão reconhecida abre a área logada | Approved | 2026-09-30 |
+| SPEC-040 | Sessão reconhecida abre a área logada (v0.5 — logo emendado pela SPEC-044) | Approved | 2026-09-30 |
+| SPEC-044 | Sidebar de navegação da área interna | Approved | 2026-09-30 |
 
 ## PLANs
 
@@ -203,7 +205,7 @@ fechado._
 | Rótulo acessível dinâmico (do toggle) | Texto acessível (ex.: `aria-label`) do controle de alternância, que muda conforme o estado atual do campo — "mostrar senha" quando oculto, "ocultar senha" quando visível | SPEC-016 |
 | Página 404 (personalizada) | Tela exibida quando o usuário acessa uma rota inexistente, com a identidade visual da aplicação (paleta, tipografia, componentes de marca) e um link/botão de volta — em contraste com a página de erro genérica do framework | SPEC-019 |
 | Rota inexistente | Qualquer URL solicitada na aplicação que não corresponde a nenhuma rota definida — cai na 404 personalizada na área pública sempre, e na área interna só com sessão ativa (sem sessão, o guard de SPEC-002 prevalece) | SPEC-019 |
-| Home pública | A página inicial da aplicação em `/`, exibida a quem não tem sessão reconhecida com papel com acesso à área interna. `/` segue destino fixo do link de volta da 404 e do logo, independente de sessão; quem tem sessão reconhecida é levado dali à área interna. Promessa mantida: `/` nunca exige sessão nem leva à tela de login | SPEC-019 · emendada por SPEC-040 |
+| Home pública | A página inicial da aplicação em `/`, exibida a quem não tem sessão reconhecida com papel com acesso à área interna. `/` segue destino fixo do link de volta da 404, e do logo quando não há sessão ativa com papel com acesso à área interna (com essa sessão, o logo vai a `/studio` — SPEC-044); quem tem sessão reconhecida é levado dali à área interna. Promessa mantida: `/` nunca exige sessão nem leva à tela de login | SPEC-019 · emendada por SPEC-040 e SPEC-044 |
 | Sessão reconhecida | Sessão que o sistema aceita agora **ou** que se renova sem pedir senha de novo; corresponde à "sessão ativa" do card KAN-180 e não redefine "sessão ativa" da SPEC-036 (= sessão aceita agora) | SPEC-040 |
 | Conferência da sessão | Verificação, feita quando a página inicial é aberta (nunca por pré-carregamento), de se há sessão reconhecida e de qual é o papel da conta | SPEC-040 |
 | Estado neutro (página inicial) | Aparência da página inicial enquanto a conferência da sessão dura: sem conteúdo da Home pública e sem "Entrar"/"Sair" (o neutro do cabeçalho de FR-036-016) | SPEC-040 |
@@ -247,6 +249,18 @@ fechado._
 | Escolha de tema salva | Preferência de tema definida manualmente pelo usuário, por dispositivo/navegador (independente de conta), que passa a prevalecer sobre a preferência do dispositivo | SPEC-036 |
 | Preferência de esquema de cores do dispositivo | Sinal do sistema operacional/navegador indicando se o ambiente do usuário está configurado para tema claro ou escuro (equivalente a `prefers-color-scheme`) | SPEC-036 |
 | Paleta unificada (do app) | Família de cores (roxo/rosa/mauve) e piso de contraste AA já validados em `/login` (SPEC-030), estendidos aos dois temas do restante do app, sem a ilustração decorativa daquela tela | SPEC-036 |
+| Casca da área interna | Componente que envolve toda página interna e resolve os estados de sessão e permissão (carregando, sem sessão, sem permissão, pronto) | SPEC-044 |
+| Estado pronto (da casca) | Sessão ativa e papel suficiente: a vista interna é renderizada | SPEC-044 |
+| Sidebar | Menu lateral de navegação da área interna, com itens de uma lista declarada: Painel (`/studio`), Conteúdos (`/content`) e Biblioteca visual (`/visual-library`) | SPEC-044 |
+| Item de menu | Entrada da sidebar, definida por rótulo e destino numa lista declarada | SPEC-044 |
+| Conteúdos (item) | Item da sidebar que leva à mesma lista (`/content`) que o link "Conteúdos brutos" das páginas; os dois rótulos coexistem | SPEC-044 |
+| Seção atual | Item de menu cujo destino é a rota aberta ou prefixo dela em fronteira de segmento; subpáginas de `/content` pertencem a Conteúdos | SPEC-044 |
+| Logo do header | Logo do cabeçalho do app, link cujo destino é `/studio` ou `/` conforme a sessão (SPEC-044) | SPEC-044 |
+| Páginas públicas | Home pública, login e página 404 | SPEC-044 |
+| Breakpoint da sidebar fixa | Menor largura de viewport em que a sidebar fixa cabe sem estreitar o conteúdo abaixo da largura de antes da SPEC-044; medido pelo PLAN (esperado ~1280px) | SPEC-044 |
+| Menu recolhível | Forma da sidebar abaixo do breakpoint da sidebar fixa: fechada por padrão, aberta por botão; disclosure não modal | SPEC-044 |
+| Container de largura | Envoltório que limita a largura máxima e define o espaçamento lateral do conteúdo da página | SPEC-044 |
+| Volta ao conteúdo | Link "Voltar ao conteúdo" na Tira mnemônica, que leva à página do conteúdo (`/content/[id]`) | SPEC-044 |
 
 ## Decisões irreversíveis
 
@@ -265,6 +279,12 @@ fechado._
 
 | ID | Risco | Mitigação | Origem |
 |----|-------|-----------|--------|
+| RISK-044-001 | Interação mobile e acessibilidade do menu recolhível (disclosure não modal: foco, Esc, toque fora, troca de rota) já geraram re-gate de design neste slug | ACs 009–012, 021, 022 e gate 11 | SPEC-044 |
+| RISK-044-002 | Unificar o container de largura pode regredir as páginas públicas (BRIEF-037 absorvido) | AC-044-019 provado em tela nos dois temas | SPEC-044 |
+| RISK-044-003 | Gate 9 do estado "sem permissão" depende de conta sem o papel exigido (não há seed); sem ela a prova em tela fica em handoff | A-044-006/A-044-010; prova por teste automatizado | SPEC-044 |
+| RISK-044-004 | Conferência de sessão falha deixa o logo em `/` para pessoa logada | fail-secure; recuperação pelo login ou pela Home pública | SPEC-044 |
+| RISK-044-005 | Sem filtro por papel: o 1º item de menu cuja rota exija papel mais restrito que o da área interna reabre o filtro por papel | gatilho de reabertura; exposição nula hoje | SPEC-044 |
+| RISK-044-006 | Breakpoint da sidebar fixa (~1280px) é medido pelo PLAN; divergência muda a fração de telas com menu recolhível | A-044-008; AC-044-018 nas larguras 360/768/1024/1280/1440 | SPEC-044 |
 | — | Verificação de tela pendente — HANDOFF-PLAN-041 (`docs/producao-material/handoffs/HANDOFF-PLAN-041.md`) — V1–V8: ACs de SPEC-040 que exigem sessão real (002/003/009/012/013 literal/016/017/018/019/025, 010, 020, passo 0 com pista); causa `credencial` (realms `admin1`/`admin2` do `keelson.local.json` desatualizados: `admin1` sem e-mail → 422, senhas → 401) | Diretor atualiza os realms (e pode criar `editor` a partir do `SEED_EDITOR_*`) e roda o roteiro — ~20 min | HANDOFF-PLAN-041 |
 | RISK-040-001 | Conferência da sessão pela página inicial concorrendo com renovação de outra aba/requisição pode, fora da janela de graça, revogar a família de sessão e derrubar sessão válida | NFR-040-001 / NFR-040-006 / AC-040-012 / AC-040-020; estratégia no PLAN | SPEC-040 |
 | — | Verificação de tela pendente — HANDOFF-PLAN-033 (`docs/producao-material/handoffs/HANDOFF-PLAN-033.md`) — V1–V3: leitura "Válida para a próxima exportação" para EDITOR e ADMIN após o R-1 da aceitação (FR-032-007(b)); `qa` sem credencial utilizável (realms `app`/`admin1` do `keelson.local.json` com placeholder) — comportamento coberto por teste de componente com mutante; 2 rodadas anteriores de browser real verificadas | Diretor preenche os 2 realms e exercita V1–V3 (≈5 min) ou roda `/keelson:verify-handoff` | HANDOFF-PLAN-033 |
@@ -414,6 +434,7 @@ fechado._
 > (KAN-77) foi renumerado para `SPEC-036`/`PLAN-036`/`TASK-036-00X`/`BRIEF-036` na
 > reconciliação do pull — nenhum dos dois lados foi descartado.
 
+- 2026-09-30 17:43: **SPEC-044 criada e Approved** via `/keelson:auto --from=KAN-178` (BRIEF-044, Jira KAN-178 em modo link, sem card novo). v0.2: 27 FRs, 4 NFRs, 26 ACs, sem FEATs. spec-validator v0.1 1 ERROR (termo fora do glossário) + 13 WARNING → revalidação v0.2 0 ERROR (4 FR >30 palavras, MUST 25/27). product-analyst REVISAR_ANTES_DE_APROVAR (14 riscos) → po APROVAR, 0 escalações, decisões em nome do Diretor: logo exige sessão ativa + papel com acesso; AC-040-018 preservado; **sidebar fixa só a partir do breakpoint em que não estreita o conteúdo (~1280px), no lugar do default `md`** (motivo: AC de largura do card); 404 raiz sem sidebar; Tira mantém "Conteúdos brutos". **Emenda SPEC-040 v0.4 → v0.5** (FR-040-009, AC-040-010, §4.1/§4.2, A-040-008, A-040-012 e termo Home pública deste INDEX): o logo com sessão ativa e papel com acesso vai direto a `/studio`; o link da 404 segue fixo em `/`. BRIEF-037 absorvido (fecha na Entrega).
 - 2026-09-30 17:28: **BRIEF-045 (avulso, KAN-186): botão "Sair" do header vira "Saindo" com spinner**, a pedido do Diretor depois do merge do KAN-185. KAN-186 é uma Tarefa criada nesta largada, com `Relates` para o KAN-185. É avulso porque SPEC-036/SPEC-002 prometem só os três estados do logout (em andamento = desabilitado + indicador), não o texto "Saindo…". O padrão já foi decidido no BRIEF-043, então não há DEC. Implementação pelo developer na branch `feat/producao-material-logout-botao-saindo`.
 - 2026-09-30 17:25: **PR #24 mergeado pelo Diretor** (`mnemonicos-frontend`, merge `f7760a2`, KAN-185). BRIEF-043 → Concluído. KAN-185 → Concluído (41) no Jira, comentário 10259. Não tem épico pai, então não há filhos a consultar. O V2 do HANDOFF-PLAN-031 (login de sucesso real) segue aberto até o Diretor preencher a evidência.
 - 2026-09-30 17:22: **PR #24 aberto** (`mnemonicos-frontend`, `feat/producao-material-login-botao-entrando` → `main`, KAN-185) a pedido do Diretor, com o build OK na branch. O merge espera o V2 do HANDOFF-PLAN-031 (login de sucesso real). KAN-185 segue em Em análise.
@@ -448,6 +469,8 @@ fechado._
 - 2026-09-30 13:50: **PLAN-041 criado e Approved** (SPEC-040, 100% dos FRs/NFRs). 5 COMPs, 5 DECs novas (todas reversíveis) + 7 herdadas, 6 TRISKs. `proxy.ts`/DEC-003-011/COMP-003-022 preservados literalmente (RISK-040-002 resolvido por preservação). plan-validator 0 ERROR; 1 WARNING mecânico (DEC-041-005 alternativa única) e TRISK-041-006 atualizado pelo Tech Lead inline (precedente DEC-035-001). Ponto de reúso para o KAN-178: `homeSessionCheck` + pista local de sessão.
 - 2026-09-30 13:44: **SPEC-040 criada e Approved** via `/keelson:auto --from=KAN-180` (BRIEF-040, Jira KAN-180 em modo link). 16 FRs, 6 NFRs, 24 ACs, sem FEATs. spec-validator 0 ERROR (1 auto-fix). product-analyst REVISAR_ANTES_DE_APROVAR (11 riscos) → po APROVAR com 14 resoluções: termo "Sessão reconhecida" (sem emenda à SPEC-036), emenda do glossário "Home pública" (SPEC-019), teto de 3 s + ida tardia, conferência atual a cada abertura e nunca por pré-carregamento, página pública sem script, ACs de execução real nomeados. Jira: acesso retirado temporariamente pelo Diretor; sync pendente de reconciliação.
 - 2026-09-30 13:20: /keelson:triage (re-triagem, `--from=KAN-180`) confirmou a classificação de 12:52 para "usuário com sessão que entra na aplicação vai direto à área logada" como **categoria 1**. A demanda muda a promessa de guarda de rota da SPEC-002 (DEC-003-011 / COMP-003-022, `proxy.ts:97` só cobre rotas internas) e exige DECs, então não cabe como emenda 1b: presença × validade do cookie (`proxy.ts:68` só confere se existe), `/login` com sessão, papel `STUDENT`, e o destino `/` da 404 (SPEC-019). Duas coisas mudaram desde as 12:52. (a) O KAN-176 foi mergeado (`b729a76`) e hoje quem tem sessão e abre `/` fica sem link para `/studio`. (b) O KAN-178 foi triado com a DEC "destino do logo × KAN-180", e o redirecionamento de `/` resolveria o logo sem mudar o link (`site-header.tsx:13`). Recomendação: rodar o KAN-180 antes do KAN-178. Ação: `/keelson:auto --from=KAN-180` (SPEC em modo `link`, sem card novo), aguardando confirmação do Diretor.
+- 2026-09-30 13:25: /keelson:triage classificou demanda "sidebar de navegação da área interna (Painel, Conteúdos, Biblioteca visual)" (KAN-178) como categoria 1 (capacidade nova sem SPEC que a cubra; promete destaque da seção atual, menu recolhível no celular e logo por estado de sessão, e exige DEC: montagem na casca × layout do grupo `(interno)`, padrão do menu no celular, regra de seção ativa, destino do logo × KAN-180). O card cita "BRIEF-036" para o container duplicado, mas o brief certo é o **BRIEF-037** (renumeração de 2026-09-30); a proposta é absorvê-lo no escopo. Ação: `/keelson:auto` com `--from=KAN-178` (modo `link`, sem card novo), aguardando confirmação do Diretor.
+- 2026-09-30 13:30: **Diretor respondeu à triagem do KAN-178**: o KAN-180 roda primeiro, e o logo por sessão do KAN-178 vai reusar a DEC de sinal de sessão do KAN-180. O Diretor também reforçou que a sidebar só aparece na área logada, nunca na área não logada nem em `/login` (isso já estava nos ACs do card e agora é restrição explícita para o BRIEF). A absorção do BRIEF-037 continua em aberto.
 - 2026-09-30 14:20: **Diretor autorizou absorver o BRIEF-037 no escopo do KAN-178**. O container duplicado sai junto com a sidebar, e o BRIEF-037 fecha como absorvido pela SPEC nova. A largada continua esperando o merge do KAN-180.
 - 2026-09-30 13:10: **PR #20 mergeado pelo Diretor** (`mnemonicos-frontend`, merge `b729a76`), BRIEF-038 → Concluído. KAN-176 → Concluído (41) no Jira. Ele não tem épico-pai, então não há filhos a consultar. Até o KAN-180 entrar, quem tem sessão e cai em `/` fica sem link para `/studio`.
 - 2026-09-30 13:05: **BRIEF-038 (KAN-176) implementado e revisado.** Gates 1–7 aprovados depois de 1 retry, e gates 8 e 11 aprovados. O gate 9 foi VERIFICADO em tela e o gate 10 é n/a. Commit `6ff6519` no frontend e PR #20 aberto, com KAN-176 em Em análise. Falta o merge do Diretor, lembrando da ordem em relação ao KAN-180.

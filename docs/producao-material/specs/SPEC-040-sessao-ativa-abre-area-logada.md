@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Status**: Approved
-**Versão**: 0.4
+**Versão**: 0.5
 **Autor**: scribe (redação delegada pelo Tech Lead; contrato Diretor–PO, BRIEF-040)
 **Data**: 2026-09-30
 **Jira**: KAN-180
@@ -34,7 +34,7 @@ Termos herdados do glossário consolidado do INDEX: Sessão autenticada, Credenc
 | Termo | Definição | Origem |
 |-------|-----------|--------|
 | Sessão reconhecida | Sessão que o sistema aceita agora **ou** que se renova sem pedir senha de novo (quem entrou há dias e ainda está dentro da validade da renovação conta como reconhecida). Corresponde à "sessão ativa" do card KAN-180; não redefine "sessão ativa" da SPEC-036 (= sessão aceita agora) | BRIEF-040 / A-040-001 |
-| Home pública | A página inicial da aplicação em `/`, exibida a quem não tem sessão reconhecida com papel com acesso à área interna. `/` segue destino fixo do link de volta da 404 e do logo, independente de sessão; quem tem sessão reconhecida é levado dali à área interna (SPEC-040). Promessa mantida: `/` nunca exige sessão nem leva à tela de login | SPEC-019 · emendada por SPEC-040 |
+| Home pública | A página inicial da aplicação em `/`, exibida a quem não tem sessão reconhecida com papel com acesso à área interna. `/` segue destino fixo do link de volta da 404, e do logo quando não há sessão ativa com papel com acesso à área interna (SPEC-044); quem tem sessão reconhecida é levado dali à área interna (SPEC-040). Promessa mantida: `/` nunca exige sessão nem leva à tela de login | SPEC-019 · emendada por SPEC-040 e SPEC-044 |
 | Renovação sem nova senha | Troca de uma credencial de acesso vencida por outra nova usando o token de renovação (SPEC-002), sem nova autenticação da pessoa | SPEC-002 |
 | Conferência da sessão | Verificação, feita quando a página inicial é aberta, de se há sessão reconhecida e de qual é o papel da conta | SPEC-040 |
 | Estado neutro | Aparência da página inicial enquanto a conferência da sessão está em andamento: sem o conteúdo da página inicial pública e sem "Entrar"/"Sair" (é o neutro do cabeçalho de FR-036-016) | SPEC-040 |
@@ -51,7 +51,7 @@ Termos herdados do glossário consolidado do INDEX: Sessão autenticada, Credenc
 - Reconhecer como sessão reconhecida também a que só se renova sem nova senha.
 - Permanência na página inicial pública para: sem sessão reconhecida (nunca entrou, vencida, revogada, não renovável), falha da conferência, navegador sem script e papel sem acesso à área interna — sem ida ao login e sem aviso de sessão expirada.
 - Ida à área interna sem prender a pessoa no "voltar" do navegador.
-- Logo do cabeçalho e link de volta da 404 mantidos apontando para a página inicial (quem tem sessão chega à área interna pelo redirecionamento).
+- Link de volta da 404 mantido apontando para a página inicial (quem tem sessão chega à área interna pelo redirecionamento). O destino do logo do cabeçalho segue a SPEC-044 (emenda v0.5).
 - Abrir o app instalado equivale a abrir a página inicial (endereço de partida do app, SPEC-013): mesmo comportamento.
 - Não-regressão explícita de login, logout, guarda das rotas internas e página inicial pública para o anônimo.
 - Salvaguardas de segurança e de desempenho do fluxo (NFRs).
@@ -60,13 +60,13 @@ Termos herdados do glossário consolidado do INDEX: Sessão autenticada, Credenc
 - **Tela de login e outras páginas públicas com sessão reconhecida**: seguem como hoje (sem redirecionamento); candidato a card próprio; evita colisão com KAN-177 (BRIEF-039), em andamento na mesma tela. Resposta a "e `/login` com sessão?": fora.
 - **Mudança nas regras de sessão** (duração, renovação, revogação, endpoints de sessão): não muda. Resposta a "e se a sessão durasse mais?": fora.
 - **Controle de autenticação do cabeçalho mostrar "Entrar" para sessão renovável em outras páginas públicas**: comportamento atual, não muda aqui.
-- **Navegação/sidebar da área interna e destino do logo por estado de sessão** (KAN-178): o logo continua apontando para a página inicial.
+- **Navegação/sidebar da área interna** (KAN-178, SPEC-044): fora desta SPEC. O destino do logo por estado de sessão, antes adiado aqui, passou à SPEC-044 (emenda v0.5); o link de volta da 404 continua fixo na página inicial.
 - **Mensagem ou tela para o papel sem acesso**: esse papel só fica na página inicial pública, sem aviso. Resposta a "e o que o estudante vê?": nada novo.
 - **Mudança no conteúdo da página inicial pública** (inclusive o "Entrar" do corpo, KAN-176): fora.
 - **Observabilidade de produto** (contagem de visitas redirecionadas): não há instrumentação nova; a métrica é verificada por teste (§1.3).
 - **Redirecionar sessão reconhecida em navegador sem pista de sessão**: fora — vê a página pública nessa abertura e se corrige na próxima passagem pela área interna ou pelo login (A-040-014). Resposta a "e na primeira vez depois do deploy?": página pública uma vez.
 - **Ver a página inicial pública estando com sessão reconhecida** (ex.: ADMIN conferindo a vitrine): sem caminho; para vê-la, sair ou usar janela anônima. Resposta a "e se eu quiser ver a home logado?": fora (card KAN-180).
-- **Nova conferência ao clicar no logo estando já na página inicial**: não é nova abertura da página e não confere a sessão de novo; quem ficou na página pública com sessão reconhecida (falha da conferência, login em outra aba) recupera pela recarga (RISK-040-005). Resposta a "e se eu clicar no logo depois de uma falha?": recarregue a página; o logo por estado de sessão é do KAN-178.
+- **Nova conferência ao clicar no logo estando já na página inicial**: não é nova abertura da página e não confere a sessão de novo; quem ficou na página pública com sessão reconhecida (falha da conferência, login em outra aba) recupera pela recarga (RISK-040-005). Resposta a "e se eu clicar no logo depois de uma falha?": recarregue a página; o logo por estado de sessão é da SPEC-044 (KAN-178).
 
 ## 5. Requisitos funcionais (EARS)
 - **FR-040-001** [MUST] Quando alguém abre a página inicial num navegador que guarda pista de sessão, o sistema deve conferir se há sessão reconhecida e qual o papel da conta antes de decidir o que mostrar.
@@ -77,7 +77,7 @@ Termos herdados do glossário consolidado do INDEX: Sessão autenticada, Credenc
 - **FR-040-006** [MUST] Se a conferência da sessão falha (serviço indisponível ou erro de rede), então o sistema deve exibir a página inicial pública, sem tela de login nem aviso.
 - **FR-040-007** [MUST] Se a conta tem sessão reconhecida mas papel sem acesso à área interna, então o sistema deve exibir a página inicial pública e nunca levá-la à área interna.
 - **FR-040-008** [MUST] Quando o sistema leva a pessoa à área interna a partir da página inicial, o sistema deve substituir a entrada da página inicial no histórico, sem laço no "voltar" do navegador.
-- **FR-040-009** [MUST] O logo do cabeçalho e o link de volta da 404 devem continuar apontando para a página inicial; com sessão reconhecida, chegam à área interna pelo redirecionamento (FR-040-003).
+- **FR-040-009** [MUST] O link de volta da 404 deve continuar apontando, fixo, para a página inicial; com sessão reconhecida, chega à área interna pelo redirecionamento (FR-040-003). O destino do logo do cabeçalho segue a SPEC-044 (emenda v0.5).
 - **FR-040-010** [MUST] O sistema deve manter inalterados o login e o logout.
 - **FR-040-011** [MUST] Se a conferência não conclui dentro do teto da conferência, então o sistema deve encerrar o estado neutro e exibir a página inicial pública, sem tela de login nem aviso.
 - **FR-040-012** [MUST] Quando a conferência conclui após o teto com sessão reconhecida e papel com acesso, e a pessoa segue na página inicial, o sistema deve levá-la à área interna (FR-040-008).
@@ -117,7 +117,7 @@ Três estados (princípio 4.67), da visita à página inicial: *em andamento* �
 - **AC-040-009** (cobre FR-040-003, FR-040-008)
   Dado uma pessoa levada à área interna a partir da página inicial, quando ela aciona "voltar" do navegador, então não retorna à página inicial nem fica em laço entre a página inicial e a área interna.
 - **AC-040-010** (cobre FR-040-009, FR-040-003)
-  Dado uma pessoa com sessão reconhecida e papel com acesso na 404 ou dentro da área interna, quando clica no link de volta da 404 ou no logo do cabeçalho, então chega à página inicial da área interna, e os dois links continuam apontando para a página inicial.
+  Dado uma pessoa com sessão reconhecida e papel com acesso na 404 ou dentro da área interna, quando clica no link de volta da 404, então chega à página inicial da área interna, e o link continua apontando para a página inicial. (O destino do logo do cabeçalho é coberto pela SPEC-044.)
 - **AC-040-011** (cobre FR-040-015, FR-040-016)
   Dado um visitante anônimo, quando abre uma rota interna, então vai à tela de login com retorno, como antes; e a página inicial pública exibida a ele tem o mesmo conteúdo de antes.
 - **AC-040-012** (cobre NFR-040-001)
@@ -157,11 +157,11 @@ Três estados (princípio 4.67), da visita à página inicial: *em andamento* �
 - **A-040-005** [assumido] [evidência: crença] Teto de 1 s para o estado neutro em ambiente local com o serviço de sessão disponível; sem baseline de produto. O PLAN mede e pode propor outro teto.
 - **A-040-006** [assumido] [evidência: medido] O serviço de sessão **não** registra evento de segurança para a visita anônima: `POST /auth/refresh` sem token ou com token inexistente responde 401 sem evento (`auth.service.ts:311,326`); `GET /auth/me` sem sessão responde 401 sem evento (`authenticate.ts:58-61`); só se registram `login.*`, `token.refresh` (sucesso), `token.reuse`, `logout` e `authz.denied` (`lib/audit.ts`, linha `auth:<type>`). NFR-040-003 é satisfeito pelo serviço vigente; AC-040-013 é prova de não-regressão. (A v0.2 afirmava o contrário; corrigida na resolução pré-código, qa A1.)
 - **A-040-007** [assumido] [evidência: crença] Enquanto a conferência dura, o anônimo também vê o estado neutro por um instante antes da página pública: custo aceito pelo Diretor na largada (BRIEF-040, "Premissas decididas"); não é tratado como defeito.
-- **A-040-008** [assumido] [evidência: medido] Logo do cabeçalho (`site-header.tsx:13`) e link da 404 (`not-found.tsx:15`) apontam hoje para a página inicial; não mudam (decisão do Diretor, BRIEF-040).
+- **A-040-008** [assumido] [evidência: medido] Logo do cabeçalho (`site-header.tsx:13`) e link da 404 (`not-found.tsx:15`) apontam hoje para a página inicial. O link da 404 não muda (decisão do Diretor, BRIEF-040); o logo passa a seguir a SPEC-044 (emenda v0.5, KAN-178: o BRIEF-040 e o §4.2 original adiaram o logo por sessão a esse card).
 - **A-040-009** [assumido] [evidência: crença] A "página inicial da área interna" é a entrada de sempre (o painel estratégico, SPEC-034); se o destino mudar, vale o destino vigente da área interna.
 - **A-040-010** [assumido] [evidência: crença] Teto da conferência de 3 s escolhido pelo PO em nome do Diretor; o PLAN mede a latência da conferência completa em produção com serviço frio e registra; p95 medido acima do teto volta ao PO; não se troca em silêncio.
 - **A-040-011** [assumido] [evidência: medido] Compatibilidade com SPEC-036: FR-036-001/002 e AC-036-002 inalterados; o neutro do cabeçalho na página inicial é o de FR-036-016; nenhuma emenda à SPEC-036.
-- **A-040-012** [assumido] [evidência: medido] Emenda do termo "Home pública" (SPEC-019), com a nova redação do §3: a página inicial em `/` é exibida a quem não tem sessão reconhecida com papel com acesso; `/` segue destino fixo do link de volta da 404 e do logo, independente de sessão. Promessa mantida: `/` nunca exige sessão nem leva à tela de login.
+- **A-040-012** [assumido] [evidência: medido] Emenda do termo "Home pública" (SPEC-019), com a nova redação do §3: a página inicial em `/` é exibida a quem não tem sessão reconhecida com papel com acesso; `/` segue destino fixo do link de volta da 404, e do logo quando não há sessão ativa com papel com acesso à área interna (SPEC-044, emenda v0.5). Promessa mantida: `/` nunca exige sessão nem leva à tela de login. Registro de versão: v0.5 — emenda pela SPEC-044 (KAN-178), veredito do PO em nome do Diretor.
 - **A-040-013** [assumido] [evidência: medido] O endereço de partida do app instalado é a página inicial (NFR-013-007) e não muda.
 - **A-040-014** [assumido] [evidência: crença] O navegador guarda uma **pista de sessão** (marca não-sensível de "houve sessão aqui", gravada no login e na área interna, apagada no logout e na conferência sem sessão) que decide **só se há conferência**, nunca acesso. Sem pista, a visita é tratada como anônima: Home pública imediata, sem estado neutro e sem conferência. Motivo: poupar o anônimo (público da vitrine) do estado neutro e de duas chamadas em série até o teto de 3 s — o BRIEF-040 aceitou "um instante" de neutro, não o teto. Exceção aceita: sessão reconhecida sem pista neste navegador (anterior a esta entrega, armazenamento limpo ou bloqueado) vê a página pública nessa abertura; com armazenamento limpo, corrige-se na próxima passagem pela área interna ou pelo login. Decisão do PO em nome do Diretor (resolução pré-código, 2026-09-30); reversível — a alternativa é conferir sempre (PLAN-041 DEC-041-002).
 
