@@ -135,7 +135,7 @@ Convenção dos comandos: executados na raiz do repositório `mnemonicos-fronten
 **Data início**: 2026-09-30T15:38:02-0300
 **Data conclusão**: 2026-09-30T16:21:29-0300
 **Commit SHA**: 95fb386
-**Jira**: — (sub-task não criada: acesso ao Jira retirado pelo Diretor; pendente de reconciliação)
+**Jira**: KAN-183
 
 **Quality gates**:
 - [x] Implementação completa
