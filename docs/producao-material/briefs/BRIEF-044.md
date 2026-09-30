@@ -1,7 +1,7 @@
 # BRIEF-044: Sidebar de navegação da área interna
 
 **Slug**: producao-material
-**Status**: Emitido
+**Status**: Aceito (ACEITA_COM_RESSALVAS — gate 9 com login pendente em HANDOFF-PLAN-046; alinhamento header/footer aguardando o Diretor)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T17:26:28-0300
 **SPEC**: SPEC-044
@@ -168,3 +168,10 @@ Reutilizada do `estimator` rodado nesta sessão (2026-09-30, antes da largada), 
 - Etapa 2 (PLAN) concluída: 2026-09-30T17:52:53-0300 · correções: 0 · classes: comp-muitos-frs(1)
 - Etapa 3 (TASKs) concluída: 2026-09-30T18:27:58-0300 · correções: 0 · classes: task-criterio-grep-nao-ancorado(5) · task-wave-overlap-arquivo(1) · task-overlap-fr(5) · janelas: redação 24min/561l
 - Etapa 3.5 (verificabilidade pré-código, qa + task-validator) concluída: 2026-09-30T18:27:58-0300 · correções: 1 · classes: contagem-estatica-divergente(5) · metrica-mede-elemento-errado(1) · prova-contraste-por-token-nao-por-par(1) · criterio-inexequivel-largura(1) · faceta-real-ausente(1) · titulo-nao-prova(1) · ramo-condicional-sem-fato(1) · licao-omitida-do-recorte(3) · plan-desatualizado(3)
+- Etapa 4 (implement) concluída: 2026-09-30T20:39:00-0300 — 3 waves, 5/5 TASKs Done, 6 retries (2 pela escada degrau 1), gate 9 PARCIAL (handoff por `permissao_ambiente`)
+- Entrega (aceitação do PO) concluída: 2026-09-30T20:40:29-0300 — ACEITA_COM_RESSALVAS; convergência de fecho verde em 06a7932
+
+## Relatório de aceitação (PO)
+**Aceitação**: ACEITA_COM_RESSALVAS — nada entregue contraria o brief; os 10 critérios do card estão implementados e cobertos por teste automatizado; o fora de escopo continua de fora.
+**Ressalvas**: (1) prova em tela com login pendente para 22 ACs e a métrica §1.3 — login manual do Diretor (realm `admin1`/`editor`) pelos roteiros V1–V7 do HANDOFF-PLAN-046, recomendado antes do merge; (2) BRIEF-037 fechado como absorvido nesta Entrega; (3) header/footer `max-w-5xl` desalinhados até 128px da área interna acima de 1024px — decisão do Diretor (proposta: seguir e abrir brief avulso para alinhar só nas rotas internas).
+**Decisões em nome do Diretor destacadas**: sidebar fixa só a partir de 1280px (no lugar do default `md`, pela promessa de largura do card); sem conta sem papel → "sem permissão" só por teste (vetável); 2 retries pela escada degrau 1, só em teste.

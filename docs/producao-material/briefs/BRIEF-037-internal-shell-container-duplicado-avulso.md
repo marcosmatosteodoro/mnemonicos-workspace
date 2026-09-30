@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Aberto
+**Status**: Concluído (absorvido pela SPEC-044/PLAN-046, KAN-178 — autorização do Diretor em 2026-09-30)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T10:48:47-0300
 **Origem**: Diretor (pedido em sessão — resposta à pergunta estacionada da Entrega de F10, 2026-09-30: "Brief avulso para depois")
@@ -31,6 +31,6 @@ visual fora do escopo de F10; registrado para execução posterior, sem código 
 nenhuma — o brief é a unidade de execução
 
 ## Execução
-- **Implementado por**: pendente — aguardando o Diretor autorizar a execução (sem card no quadro até lá)
-- **Revisado por**: pendente
-- **Commit**: pendente
+- **Implementado por**: developer, na TASK-046-001 do PLAN-046 (`PageContainer`; `<main>` raiz sem container) — sem card próprio: o trabalho está sob KAN-178 / KAN-187
+- **Revisado por**: code-reviewer (gates 1–7), security-engineer (gate 8), product-designer (gate 11) na Wave 1; qa (gate 9 anônimo: Home e 404 com as classes de antes, 1440 e 360, 2 temas — resto no HANDOFF-PLAN-046 V5)
+- **Commit**: 9b60fc2, 1915183 (mnemonicos-frontend, branch feat/producao-material-sidebar-navegacao)

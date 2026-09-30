@@ -3,7 +3,7 @@ id: HANDOFF-PLAN-046
 slug: producao-material
 branch: feat/producao-material-sidebar-navegacao
 status: Pendente
-criado: 2026-09-30T20:45:00-0300
+criado: 2026-09-30T20:39:00-0300
 origem: PLAN-046
 commits: [9b60fc2, 1915183, 7b26119, 8c60101, d448ca5, 583049a, 761ccc0, 54b99bf, 581bfeb, 7234431, e6c01d2, 06a7932]
 motivo: permissao_ambiente
@@ -73,7 +73,7 @@ Os Roteiros completos, fixados antes do código, estão nas TASKs
 ### V2 — Menu recolhível abaixo de 1280px (AC-044-009, 010, 011, 021, 022, 024 + pendências do gate 11)
 - **Tela/rota**: qualquer rota interna a 360, 768 e 1024; celular emulado com toque
 - **Realm**: `editor`
-- **Passos**: 1) fechado: botão "Menu" com `aria-expanded="false"`, itens fora do Tab, conteúdo nem coberto nem empurrado; 2) abrir: `aria-expanded="true"`, painel no fluxo; 3) fechar por item, Esc e clique fora — o foco volta ao botão; 4) com o menu aberto, tocar/clicar num controle **logo abaixo do painel**: aciona esse controle (sem deslocamento sob o dedo); 5) com o foco num campo ou link do conteúdo, fechar por clique fora ou Esc: o foco **não** é roubado (PLAN v0.3); 6) trocar de rota com o menu aberto (voltar/avançar/link na página): fecha; voltar à rota original: segue fechado; 7) cruzar 1280px com o menu aberto (resize) e voltar: fechado e "recolhido"; 8) a 1280: nav 224 / conteúdo 984; 9) 360px: sem rolagem horizontal da página com o menu aberto e fechado (header com logo, tema, auth e `ApiStatus` em dev); 10) hover do botão e dos itens (aberto e em xl) visível nos dois temas; anel de foco após clique de mouse fora (Chrome e Safari); 11) rolar arrastando no toque não fecha o menu.
+- **Passos**: 1) fechado: botão "Menu" com `aria-expanded="false"`, itens fora do Tab, conteúdo nem coberto nem empurrado; 2) abrir: `aria-expanded="true"`, painel no fluxo; 3) fechar por item, Esc e clique fora — o foco volta ao botão; 4) com o menu aberto, tocar/clicar num controle **logo abaixo do painel**: aciona esse controle (sem deslocamento sob o dedo); 5) com o foco num campo ou link do conteúdo, fechar por clique fora ou Esc: o foco **não** é roubado (PLAN v0.3); 6) trocar de rota com o menu aberto (voltar/avançar/link na página): fecha; voltar à rota original: segue fechado; 7) cruzar 1280px com o menu aberto (resize) e voltar: fechado e "recolhido"; 8) a 1280: nav 224 / conteúdo 984; 9) 360px: sem rolagem horizontal da página com o menu aberto e fechado (header com logo, tema, auth e `ApiStatus` em dev); 10) hover do botão e dos itens (aberto e em xl) visível nos dois temas; anel de foco após clique de mouse fora (Chrome e Safari); 11) rolar arrastando no toque não fecha o menu. 12) iPhone (Safari): com o menu aberto, tocar em texto comum do conteúdo (elemento não interativo) fecha o menu — o `click` de elemento não interativo pode não subir ao document no iOS (ponto da convergência de fecho).
 - **Esperado**: AC-044-009..011/021/022/024 e as pendências do gate 11 como descritas.
 - **Risco se falhar**: menu que não abre/fecha no celular, foco perdido, toque em alvo errado, rolagem horizontal a 360.
 - **Evidência**: _(preencher na verificação)_
