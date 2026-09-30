@@ -444,6 +444,40 @@
   (`chrome://apps`, prompt do navegador) e ciclo completo login/logout com SW ativo —
   ver `docs/producao-material/handoffs/HANDOFF-PLAN-013.md`.
 
+## Header unificado — sessão e tema (avulso · PLAN-035)
+
+- [2026-09-30 · PLAN-035] `SiteHeader` (`mnemonicos-frontend/src/components/site-header.tsx`)
+  passou a montar `AuthControl` (controle único de sessão — Entrar/Sair/neutro,
+  `src/components/auth-control.tsx`, consome `useMeSilentQuery`) e `ThemeToggle`
+  (alternador manual de tema, `src/components/theme-toggle.tsx`) ao lado de `ApiStatus`
+  (dev-only, intocado). `InternalShell` (`src/components/internal-shell.tsx`) **perdeu**
+  o `<header>`/`LogoutControl` próprio que tinha antes — o logout da área interna agora
+  vem exclusivamente do header — mnemonicos-frontend/src/components/site-header.tsx:1-30.
+- [2026-09-30 · PLAN-035] `useMeSilentQuery` (`store/api.ts`) é a leitura de sessão SEM
+  efeito colateral — usa `queryFn`/`rawBaseQuery` direto, contornando
+  `baseQueryWithReauth` (que hoje trata renovação/expulsão em qualquer 401). `useMeQuery`
+  original continua intocado, usado só por `InternalShell` — os dois caminhos de leitura
+  de sessão coexistem deliberadamente (DEC-035-005) — mnemonicos-frontend/src/store/api.ts:739-747.
+- [2026-09-30 · PLAN-035] Tema deixou de ser 100% `prefers-color-scheme`: `data-theme`
+  (atributo em `<html>`, lido/escrito via `localStorage['mnemonicos:theme']`) permite
+  override manual, com CSS em 3 camadas em `globals.css` (`:root` claro default;
+  `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {...} }`;
+  `:root[data-theme="dark"] {...}` explícito) — script de bootstrap síncrono
+  (`src/lib/theme-bootstrap.ts`, embutido no `<head>` de `layout.tsx`) aplica a escolha
+  salva ANTES da hidratação, evitando FOUC — mnemonicos-frontend/src/app/globals.css:63-170.
+- [2026-09-30 · PLAN-035] Papéis de UI do app inteiro (`--surface`/`--surface-raised`/
+  `--border-subtle`) passaram a apontar para a paleta noturna (`--color-night-*`,
+  antes só usada em `/login`) — `--text-strong`/`--text-muted`/`--danger`/`--link`
+  permanecem com os valores de sempre (já provados AA contra o novo fundo).
+  `night-palette-tokens.ts` ganhou `NIGHT_PALETTE_SURFACE_ROLE_PAIRS`/
+  `NIGHT_PALETTE_ROLE_VS_SURFACE_PAIRS` (pares de contraste novos, fonte única) e as
+  constantes `THEME_STORAGE_KEY`/`ThemeName` (contrato compartilhado entre o bootstrap e o
+  `ThemeToggle`) — mnemonicos-frontend/src/app/night-palette-tokens.ts:1-230.
+- [2026-09-30 · PLAN-035] Verificação de tela **parcial**: 11/19 ACs de SPEC-034
+  verificados por execução real (Playwright, sem sessão); 8 ACs que exigem login real
+  ficam pendentes — `docs/producao-material/handoffs/HANDOFF-PLAN-035.md` (backend
+  indisponível neste ambiente, não é falha de código).
+
 ## Tamanho do código (linha de base do épico)
 
 - [2026-08-27 · epico] 13 arquivos de produção + 3 de teste no backend, 12 + 2 no frontend, uma única página (`/`), nenhuma tela de estudo; `study-slice` existe e não é consumido por ninguém — contagem via ferramentas de busca, sem arquivo único âncora

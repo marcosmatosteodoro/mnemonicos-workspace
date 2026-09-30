@@ -130,7 +130,7 @@ fechado._
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
 | PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 6/7 🟡 | Approved |
-| PLAN-035 | SPEC-034 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 6/6 ✅ | Approved |
+| PLAN-035 | SPEC-034 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 6/6 ✅ | Done (sugerido) |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -363,6 +363,18 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-30: **PLAN-035 implementado (6 tasks), aguardando promoção manual de Status.**
+  Header unificado de sessão (`AuthControl`) e tema (`ThemeToggle`) com paleta noturna
+  estendida ao app inteiro. 3 waves, 6/6 TASKs Done — 5 rodadas de retry reais (cobertura
+  de mutante/DEC, cadeia de fallback sem teste, mutante enfraquecido por mudança de
+  topologia de teste, mock duplicado) + 2 rodadas de acessibilidade visual (cursor/hover
+  ausente, depois `brightness` imperceptível no tema escuro — 2ª rodada por erro de escopo
+  do Tech Lead no 1º retry, declarado). Gates 1-7/8/11 aprovados em todas as waves
+  aplicáveis. Gate 9 (`qa`) **PARCIAL**: 11/19 ACs VERIFICADOS por execução real
+  (Playwright); 8 ACs (login real) em `HANDOFF-PLAN-035.md` — backend indisponível neste
+  ambiente (Docker Desktop não sobe). PO da SPEC: ESCALAR (E-01, não-bloqueante —
+  confirmação da remoção do "Sair" duplicado da área interna, default aplicado, vai à
+  Entrega). 4 itens de dívida de design não-bloqueante registrados em Riscos ativos.
 - 2026-09-30: furo no plano em TASK-035-001 — `useMeSilentQuery` foi declarado no endpoint
   `meSilent` (`store/api.ts`) mas nunca entrou na lista de export nomeado que os outros 30+
   hooks do arquivo usam (`export const { ... } = api;`), então a importação que
