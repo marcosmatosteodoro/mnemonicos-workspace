@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso (decisão 4.86)
-**Status**: Emitido
+**Status**: Aceito (ACEITA, 2026-09-30; PR #25 aberto, aguardando revisão e merge do Diretor)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T17:27:52-0300
 **Origem**: Diretor, em sessão ("Crie outro jira e implemente, deve ser feito o mesmo para sair"), logo após o merge do KAN-185
@@ -52,5 +52,33 @@ Os critérios do card KAN-186, com as premissas abaixo:
 ## Decomposição
 nenhuma — o brief é a unidade de execução (um executor, um diff no mnemonicos-frontend).
 
+## Estimativa
+- **Base**: pedido (BRIEF-045/KAN-186, P-045-001..005, rota avulsa sem SPEC nem DEC) · análogo
+  direto BRIEF-043/KAN-185 (mesmo padrão; ~15 min de implementação com gates numa parede de ~31
+  min) · ficha (review, security e screenVerify ativos) · calibração: 5 demandas após a
+  descontinuidade 4.437, nenhuma na rota avulsa. Corretor: as duas emendas de 1 componente
+  fecharam abaixo do piso, então o piso fica perto da implementação do BRIEF-043 e o teto guarda
+  gordura só para retry e gate 9.
+- **Dimensão**: ~1 wave · ~0 tasks (brief como unidade de execução, porte de ~1 small).
+- **Por fase**: forja 0–0,05 · artefatos 0–0,05 · implementação 0,1–0,35 · gates 0,15–0,6
+- **Total**: 0,25–1,05h (horas de ciclo, não prazo de calendário)
+- **Confiança**: média. O análogo é medido e tem o mesmo padrão. A incerteza está no gate 9
+  (estado passageiro "Saindo" com sessão e redirecionamento para `/login`) e na falta de
+  calibração da rota avulsa.
+- **Premissas**: `Spinner` reusado sem mudar a API · tokens do botão "Sair" já atendem AA sem
+  opacidade · região viva fora do `aria-busy` sem reestruturar o header · `handleLogout` intacto,
+  sem backend · gates 1–7, 8, 9 e 11 em paralelo, 10 n/a, com margem para 1 retry e 2 rodadas do
+  gate 9 · PR, merge e card fora da faixa.
+- **Lacunas**: nenhuma
+
+## Aceitação (PO)
+**ACEITA** (2026-09-30), sem ressalvas que conflitem com o brief. P-045-001..005 foram entregues, com evidência por teste e pelos gates 9 e 11 em app real. Limite da prova: o logout real contra o backend não foi exercido (`auth/me` e logout interceptados). O brief exige `handleLogout` intacto, e o código confirma que ele não mudou.
+
+## Pendências do Diretor
+- Revisar e mergear o PR #25 (`feat/producao-material-logout-botao-saindo`, `0edec2a`).
+- Jira sem acesso: a fila para reconciliar está em `docs/producao-material/tracker-local-KAN-186.md` (finish-dev → `31` e comentário do PR).
+- Sugestões fora de escopo, para card futuro se quiser: "Entrar" sem `min-w` (larguras diferentes entre páginas); foco cai no `body` ao desabilitar (já acontecia antes, vale também para o login); duplo clique síncrono antes do re-render (já acontecia antes, revogação idempotente).
+
 ## Cronologia
 - 2026-09-30T17:27:52-0300 — largada (rota avulsa).
+- 2026-09-30T17:44:31-0300 — implementação, gates e entrega (gates 8, 9 e 11 de primeira; gates 1–7 com 1 retry e re-gate aprovado; aceitação ACEITA; commit `0edec2a`, PR #25; Jira em fila local por ordem do Diretor).

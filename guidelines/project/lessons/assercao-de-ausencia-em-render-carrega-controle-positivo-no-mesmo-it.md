@@ -2,7 +2,7 @@
 area: Testes
 estado: em-observacao
 validade: indeterminada
-confirmada: 0
+confirmada: 1
 contestada: 0
 paths:
   - mnemonicos-frontend/src/**/*.test.tsx
