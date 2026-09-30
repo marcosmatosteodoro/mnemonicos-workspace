@@ -600,7 +600,11 @@ referência; gate 10 mede o p95 real contra esse volume antes da Entrega.
   refresh, invalidação) sem volume real que a justifique agora.
 **Consequências**: se o gate 10 medir acima do alvo, a correção entra como ajuste
 (cache/índice/paginação), não como reabertura de escopo desta DEC.
-**Reabrir se**: gate 10 medir p95 acima do alvo no volume de referência.
+**Reabrir se**: gate 10 medir p95 acima do alvo no volume de referência, ou a fábrica se
+aproximar do teto medido na Wave 3 (2026-09-30, gate 10): com agrupamento O(N+E), o p95 cruza
+1.500 ms por volta de ~2.500 Conteúdos ativos (594 ms medidos em 1.000), e o corpo sem compressão
+(~0,97 KiB por Conteúdo) chega ao limite de 4,5 MB de function da Vercel por volta de ~4.700
+(RISK-025-007) — antes disso, paginação ou pré-agregação.
 **Irreversível**: não
 **Aderência à ficha/perfil**: nova
 

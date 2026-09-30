@@ -352,6 +352,8 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-30 06:50: gate 10 da Wave 3 de PLAN-035 reprovou TASK-035-006 por agrupamento O(N·E) (`.filter` por Conteúdo): NFR-034-002 medido passa no volume de referência (p95 216 ms, 200×50, corpo 193 KiB) mas estoura a 5× (p95 1.611 ms); variante `Map` medida em 594 ms. Critério novo na TASK-035-006; DEC-035-018 ganha o teto medido no `Reabrir se` (~2.500 Conteúdos p/ o alvo, ~4.700 p/ corpo Vercel, RISK-025-007).
+
 - 2026-09-30 06:00: furo no plano em TASK-035-006 — o payload do Painel (TASK-035-004) nasceu sem o bloco por Conteúdo e a rota o omitiu (achado do gate 4 da Wave 3: FR-034-004/005/006/025 sem dado na fronteira HTTP) — destino: ajuste localizado da TASK (Tech Lead): `StrategicPanelPayload.contents` em `aggregateStrategicPanel` (strategic-panel-calculations.ts entra no Inclui só para isso) + critérios de um caso por ramo, allowlist por unit e sem estado entre `it`; retry.
 
 - 2026-09-30 05:32: **Wave 2 de PLAN-035 fechada** — TASK-035-004 (cálculo puro por Conteúdo + agregação/backlog + prioridade derivada) e TASK-035-005 (6 leituras em lote, factory-wide, snapshot só das vigentes aprovadas). Gates: code-reviewer reprovou as duas no gate 1 (testes não discriminantes), retry consolidado; TASK-035-005 reprovada 2ª vez no gate 7 (sonda de query duplicada) → teto 4.88 resolvido pela escada (Diretor ausente) com o default "aplicar e fechar" — `withQueryEventProbe` em tests/support; performance-engineer reprovou o `contentSnapshot` do histórico → PLAN-035 v0.2, re-review APROVADO; security-engineer APROVADO (wave e delta; gitleaks ausente). Lições: 4 novas + 1 confirmada.

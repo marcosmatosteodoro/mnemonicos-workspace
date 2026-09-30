@@ -158,6 +158,14 @@ constante — sem esperar TASK de wiring posterior.
 
 ## Critérios de pronto
 
+- [ ] **Achado do gate 10 da Wave 3 (performance-engineer) — sem redistribuição O(N·E)**: depois das
+      leituras em lote, `buildStrategicPanel` agrupa os filhos por `rawContentId` num `Map` UMA vez
+      (O(N+E)) — toda coleção redistribuída por Conteúdo (eventos de etapa, publicações Tira; lista não
+      exaustiva) —, nunca `.filter` por Conteúdo dentro do laço. Prova: `grep -nE
+      '\.filter\(' mnemonicos-backend/src/modules/strategic-panel/strategic-panel.service.ts | grep
+      -vE ':\s*(//|\*)'` sem `.filter` dentro do `contents.map` (calibrado contra 775172a → ≥2) E um
+      teste que fixe o comportamento (resultado idêntico ao atual para fixture com ≥2 Conteúdos
+      intercalados); medição do gate 10 re-rodada em 2 volumes (200 e 1000) com p95 declarado.
 - [ ] **Achado do gate 4 da Wave 3 — bloco por Conteúdo na fronteira HTTP** (FR-034-004/005/006/011/025):
       `GET /strategic-panel` devolve `contents[]` com, por Conteúdo ativo: `contentId`,
       `disciplineName`, `topicName`, `totalTime`, `timePerPage`, `perStage` (as 8 etapas),
