@@ -15,6 +15,8 @@ artefatos SDD ficam com a linha `Jira:` pendente até lá.
 
 ## Log de operações pendentes (mais recente no topo)
 
+- 2026-09-30 18:58 (Wave 1 do PLAN-046): História **KAN-178** `11` → `21` Em andamento (1ª TASK despachada às 18:29, gancho `despacho`); sub-tarefas de TASK-046-001, 002 e 003 (a criar, ver abaixo) `21` no despacho e `41` Concluído na closure (commits de produção 9b60fc2+1915183, 7b26119+8c60101, d448ca5+583049a). Teto do §9: a História fica em `21` até o `--phase finish-dev`.
+
 - 2026-09-30 (Etapa 3, gancho `tasks`): **criar 5 sub-tarefas** (`10007`) sob KAN-178, uma por TASK, e gravar a key no campo `Jira:` da closure de cada uma:
   - TASK-046-001 — Container de largura único (PageContainer) · wave 1
   - TASK-046-002 — Logo do header por sessão · wave 1
