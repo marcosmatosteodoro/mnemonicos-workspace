@@ -1,7 +1,7 @@
 # PLAN-035: Botão de sessão e tema dark/light no header do app
 
 **Slug**: producao-material
-**Status**: Approved
+**Status**: Done
 **Versão**: 0.2
 **Autor**: scribe
 **Data**: 2026-09-29

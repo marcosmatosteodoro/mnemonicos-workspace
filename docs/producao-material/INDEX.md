@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-035/KAN-77 — implementado, 6/6 TASKs Done, gate 9 PARCIAL (handoff pendente). PLAN-033/F9 — Wave 4 fechada: TASK-033-006 Done; próximo: Wave 5, painel de aprovação)
+**Última atualização**: 2026-09-30 (PLAN-035/KAN-77 — mergeado em `main` e fechado no Jira; gate 9 PARCIAL, handoff pendente. PLAN-033/F9 — Wave 4 fechada: TASK-033-006 Done; próximo: Wave 5, painel de aprovação)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -35,8 +35,11 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   execução real (Playwright, sem sessão); 8 ACs pendentes de login real —
   `HANDOFF-PLAN-035.md` (backend indisponível neste ambiente, Docker Desktop fora do ar).
   4 itens de dívida de design não-bloqueante (layout shift, posição de erro, altura dos
-  controles, `next/link`). PO da SPEC: ESCALAR (remoção do "Sair" duplicado da área
-  interna, default aplicado — mantida — confirmação vai à Entrega).
+  controles, `next/link`). PO da SPEC: ACEITA_COM_RESSALVAS — remoção do "Sair" duplicado
+  da área interna **confirmada pelo Diretor na Entrega**. **Mergeado em `main`**
+  (`mnemonicos-frontend`, PR #18, `e254bd1`, 2026-09-30) e KAN-77 fechado no Jira
+  (Concluído) — sem épico-pai (projeção compacta), sem passo 2/3 do trilho a aplicar.
+  Handoff de verificação de tela (8 ACs) segue aberto até rodar com backend saudável.
 - Carimbo de Versão aprovada no PDF exportado (SPEC-032/FEAT-032-002, ✅ 2026-09-29) — a 1ª linha do cabeçalho de toda página troca "RASCUNHO" por "Conteúdo normativo e Tira mnemônica — Versão N aprovada" só quando a Versão vigente está aprovada e sem alteração posterior (conteúdo ou Tira); gate 9 VERIFICADO por execução real (6/6 ACs, pdftotext nas 2 Variantes).
 - Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, ✅ 2026-08-30) — módulo `users/` (criar/listar/desativar/resetar senha) + seed; gate 9 APROVADO. Montagem das rotas em `apiRoutes` fica com TASK-003-011 (Wave 6).
 - Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, ✅ 2026-08-31) — login com três estados observáveis + mensagem genérica pt-BR + sessão expirada; rotação de família, freio de login, cookies `httpOnly`. Gate 9 **pendente_handoff** (trânsito real à área interna no sucesso — causa: credencial; seed em HANDOFF-PLAN-003.md).
@@ -130,7 +133,7 @@ fechado._
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
 | PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 6/7 🟡 | Approved |
-| PLAN-035 | SPEC-034 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 6/6 ✅ | Done (sugerido) |
+| PLAN-035 | SPEC-034 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 6/6 ✅ | Done — **mergeado em `main`** (PR #18, `e254bd1`, 2026-09-30) |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -363,6 +366,11 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-30: **PLAN-035 mergeado em `main`** (`mnemonicos-frontend`, PR #18, `e254bd1`) e
+  KAN-77 fechado no Jira (Concluído) — ato do Diretor. Sem épico-pai (projeção compacta,
+  como KAN-73): trilho do card para nesse passo, sem filho de épico a consultar. Handoff
+  de verificação de tela (`HANDOFF-PLAN-035.md`, 8 ACs) segue aberto — próximo passo é
+  rodar o roteiro com o backend de pé.
 - 2026-09-30: convergência de fecho verde em `92542c5` (dedup: aplicada) — PLAN-035/
   SPEC-034, 0 gaps, 9 DECs confirmadas no código final. 3 achados não-bloqueantes fora de
   escopo: `layout.test.tsx` tem helper duplicado (`findElementByType`/

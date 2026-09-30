@@ -1,7 +1,7 @@
 # BRIEF-034: Botão Entrar/Sair e troca de tema dark/light no topo da tela
 
 **Slug**: producao-material
-**Status**: Aceito (com ressalvas — gate 9 parcial, ver HANDOFF-PLAN-035.md; escalação da remoção do "Sair" da área interna CONFIRMADA pelo Diretor na Entrega)
+**Status**: Concluído (mergeado em `main`, PR #18, `e254bd1`; KAN-77 fechado no Jira — gate 9 parcial segue em HANDOFF-PLAN-035.md)
 **Data**: 2026-09-29
 **Largada**: 2026-09-29T22:34:23-0300
 **SPEC**: SPEC-034
