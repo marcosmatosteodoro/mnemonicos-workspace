@@ -7,9 +7,9 @@
 
 ### Wave 1 (setup-first, paralelizável — 3 TASKs sem dependência entre si: migração de
 schema, refactor de F9 e util de frontend tocam arquivos distintos)
-- [ ] TASK-035-001 ⏸ Todo
-- [ ] TASK-035-002 ⏸ Todo
-- [ ] TASK-035-003 ⏸ Todo
+- [x] TASK-035-001 ✅ Done
+- [x] TASK-035-002 ✅ Done
+- [x] TASK-035-003 ✅ Done
 
 ### Wave 2 (depende de Wave 1 — as 2 TASKs abaixo NÃO dependem uma da outra: TASK-035-004
 depende só de TASK-035-002 [`isVersionAltered`]; TASK-035-005 depende só de TASK-035-001

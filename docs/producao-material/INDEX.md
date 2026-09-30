@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (SPEC-034/F10 — Painel estratégico e tempo por página — criada e Approved; Jira KAN-165)
+**Última atualização**: 2026-09-30 (PLAN-035/F10 — Wave 1 fechada: TASK-035-001/002/003 Done)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -114,7 +114,7 @@ fechado._
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
 | PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 7/7 ✅ | Approved |
-| PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 0/8 ⏸ | Approved |
+| PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 3/8 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -351,6 +351,8 @@ fechado._
 | RISK-034-006 | O Painel fornece o número, não o critério de escala; o limiar segue em PIL-001 | — | SPEC-034 §9 |
 
 ## Histórico recente
+
+- 2026-09-30 04:10: **Wave 1 de PLAN-035 fechada** — TASK-035-001 (`PublicationEvent.pageCount`, migração aditiva `20260930062551_add_publication_event_page_count` aplicada em dev/teste; contagem fail-safe), TASK-035-002 (predicado de F9 extraído para `isVersionAltered`, comportamento idêntico, curto-circuito de I/O mantido), TASK-035-003 (`formatDurationPtBr`). Gates: code-reviewer reprovou 001 (gate 1: par de reexportações não discriminante) e 003 (gate 6: `!`), 1 retry cada, re-review APROVADO; security-engineer APROVADO (gitleaks ausente); performance-engineer APROVADO. Fora de escopo estacionado: predicado TIRA de F9 compara por relógio de aplicação (herdado). Lição de projeto nova: prova-de-escrita-que-nao-reescreve-registro-anterior-usa-valores-distintos.
 
 - 2026-09-30 03:21: **PLAN-035 decomposto em 8 TASKs / 5 waves** (6 medium, 2 small; rota única). Lint: 1 volta de correção (task-criterio-sem-ac TASK-007, task-refactor-sem-identidade TASK-002, greps ancorados); grafo limpo; task-validator PASS. Rodada 3.5: `qa` pré-código 3 achados mecânicos + 1 de produto → `po` (resolução) opção B — roteiro do gate 9 da TASK-035-008 ganha V7 (correções após revisão) e V8 (ordenação do backlog) por rotas reais; V5 (vazio global) provado por teste de componente, não-exercitável sem alterar o acervo de dev (decisão do Tech Lead). Jira: sub-tasks KAN-168..KAN-175.
 
