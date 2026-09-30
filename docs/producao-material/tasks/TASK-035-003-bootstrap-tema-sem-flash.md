@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -123,17 +123,18 @@ fim.
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T02:27:36-0300
+**Data conclusão**: 2026-09-30T02:41:57-0300
+**Commit SHA**: 4c6dd19
 **Jira**: KAN-161
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (663/663 na suíte após a task)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 2)
+- [x] ACs verificados (AC-034-009 parcial, AC-034-011)
+- [x] Segurança (gate 8): aprovado (wave 2) — security-engineer, script inline sem interpolação de dado externo (sem XSS)
+- [ ] Comportamento (gate 9): n/a — FEAT-034-002 ainda não completou (aguarda TASK-035-004)
+- [x] Design (gate 11): aprovado (wave 2) — product-designer, teste de wiring do `<script>` no `<head>` confirmado não-decorativo

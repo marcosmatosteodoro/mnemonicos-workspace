@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -102,17 +102,18 @@ do dispositivo a partir da escolha (FR-034-011; memo — PLAN-035 §3 COMP-035-0
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T02:43:19-0300
+**Data conclusão**: 2026-09-30T03:35:31-0300
+**Commit SHA**: 482b1a9
 **Jira**: KAN-162
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (672/672 na suíte)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 2 — 1 retry, cadeia de fallback sem teste por ramo)
+- [x] ACs verificados (AC-034-007, AC-034-010, AC-034-011, AC-034-013 parcial)
+- [ ] Segurança (gate 8): n/a — sem superfície de sessão/dado sensível
+- [ ] Comportamento (gate 9): n/a — FEAT-034-002 ainda não completou (todas as TASKs Done, mas gate 9 roda no fecho da wave em que a FEAT completa — Wave 3, TASK-035-006 é quem monta os controles)
+- [x] Design (gate 11): aprovado (wave 2 — 1 retry, botão sem cursor-pointer/hover perceptível)

@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -126,17 +126,18 @@ um clique sem sessão (DEC-035-006; memo — PLAN-035 §3 COMP-035-001/006, §6 
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T02:57:48-0300
+**Data conclusão**: 2026-09-30T06:52:55-0300
+**Commit SHA**: b44d129
 **Jira**: KAN-163
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (672/672 na suíte)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 2 — 1 retry, mutante da prova de logout 500 sobrevivia após migração pai/filho→irmãos)
+- [x] ACs verificados (AC-034-001, AC-034-002, AC-034-003, AC-034-004, AC-034-006, AC-034-013 parcial, AC-034-014, AC-034-016)
+- [x] Segurança (gate 8): aprovado (wave 2) — security-engineer, corrida meIs401AfterLogout preservada na migração
+- [ ] Comportamento (gate 9): n/a — FEAT-034-001 ainda não completou (todas as TASKs Done, mas gate 9 roda no fecho da wave em que a FEAT completa — Wave 3, TASK-035-006)
+- [x] Design (gate 11): aprovado (wave 2 — 2 retries: cursor-pointer/hover ausente nos dois botões, depois `brightness-105` imperceptível no tema escuro corrigido para troca de token `bg`)
