@@ -124,6 +124,14 @@ Lead na decomposição (item 6).
 
 ## Critérios de pronto
 
+- [ ] **Pendência herdada (gate 10 da Wave 4, performance-engineer) — 1 GET por visita**: o endpoint
+      usa `forceRefetch: () => true` (não `refetchOnMountOrArgChange` no endpoint). Na tela: (1) UM único
+      subscriber de `useGetStrategicPanelQuery` (`StrategicPanelBoard`); as seções recebem slices por
+      prop e nunca chamam o hook; (2) não passar `refetchOnMountOrArgChange` no hook; (3) nenhum
+      componente montado depois da resposta ou condicionado a `isFetching`/`isSuccess` assina a chave.
+      Prova: teste de componente com UM store e `fetch` contado — carga fria = 1 GET `/strategic-panel`;
+      desmonta e remonta no mesmo store (revisita) = 2 GETs; mutante (em `git worktree add`) que faz uma
+      seção chamar o hook → a contagem da carga fria sobe e o teste reprova.
 - [ ] Testes cobrem AC-034-014, AC-034-015, AC-034-016, AC-034-017, AC-034-023 —
       verificação executável: `npm --prefix mnemonicos-frontend test --
       strategic-panel-board.test.tsx` → `OK (N tests)`. Fixada antes do código.

@@ -2044,7 +2044,7 @@ beneficia do refetch do pai).
 **Validade:** geral (qualquer opção de refetch/invalidação ligada num subscriber que não é
 o primeiro a montar sobre a mesma chave de cache RTK Query, neste frontend).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Contadores:** confirmada 1 · contestada 0 (2026-09-30, PLAN-035 gate 10 da Wave 4: corolário — `forceRefetch: () => true` POR ENDPOINT torna todo subscriber primário e `refetchOnMountOrArgChange: false` no hook não o desliga; exige 1 único subscriber por tela e teste montado carga fria = 1 GET / revisita = 2 GETs — mnemonicos-frontend/src/store/api.ts)
 
 ## [Testes] Prova de "refetch ao remontar" que cria um store NOVO a cada montagem nunca exercita cache quente — mutante que remove a opção sobrevive
 

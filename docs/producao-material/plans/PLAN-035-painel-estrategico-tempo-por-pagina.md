@@ -322,8 +322,9 @@ DECLARAÇÃO×DECLARAÇÃO) para as interfaces do painel.
 ### COMP-035-018: Endpoint RTK Query `getStrategicPanel`
 **Responsabilidade**: `mnemonicos-frontend/src/store/api.ts` — `getStrategicPanel: builder.query<
 StrategicPanelResponse, void>({ query: () => '/strategic-panel', providesTags:
-['StrategicPanel'], refetchOnMountOrArgChange: true })` (DEC-035-019 — refetch na
-montagem em vez de tag de invalidação cruzando os módulos que a SPEC agrega).
+['StrategicPanel'], forceRefetch: () => true })` (DEC-035-019 — refetch a cada visita em vez
+de tag de invalidação cruzando os módulos que a SPEC agrega; `refetchOnMountOrArgChange` não é
+opção por endpoint no RTK Query — TS2353 —, ajuste da Wave 4).
 **Realiza**: FR-034-017
 **Interface pública**: `useGetStrategicPanelQuery()`
 **Dependências**: COMP-035-017
@@ -613,8 +614,10 @@ aproximar do teto medido na Wave 3 (2026-09-30, gate 10): com agrupamento O(N+E)
 `publication`, `content-versions`). Uma tag `StrategicPanel` invalidada por toda mutation
 relevante exigiria que cada módulo futuro que mexe nesses dados se lembrasse de invalidar
 um endpoint que não é o seu.
-**Decisão**: `getStrategicPanel` usa `refetchOnMountOrArgChange: true` — cada visita à tela
-refaz a leitura, sem depender de invalidação cruzada.
+**Decisão**: `getStrategicPanel` refaz a leitura a cada visita à tela (implementado como
+`forceRefetch: () => true` no endpoint — ajuste da Wave 4, a opção `refetchOnMountOrArgChange`
+não existe por endpoint), sem depender de invalidação cruzada; exige 1 único subscriber por tela
+(gate 10 da Wave 4: subscriber secundário que monta depois da resposta faz +1 GET).
 **Alternativas consideradas**:
 - Tag `StrategicPanel` invalidada por toda mutation de `RawContent`/`ContentVersion`/
   `PublicationEvent`, descartada: superfície de manutenção alta e frágil — mesma classe de
