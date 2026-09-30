@@ -27,6 +27,8 @@ para `--phase finish-dev` e para o ato do Diretor pós-merge, respectivamente. E
 
 ## Log de operações pendentes (mais recente no topo)
 
+- 2026-09-29 23:35: Wave 5 fechada — KAN-158 (TASK-033-007) → `41`; finish-dev: KAN-150/KAN-151 → `31` Em análise (aplicado via conector, ver resumo do sync).
+
 - 2026-09-29 22:33: **Reconciliação aplicada** (gancho §12, conector restabelecido) — Epic
   KAN-149 criado (link "relates to" com KAN-6, achado de config: Epic não tem campo
   `parent` neste projeto); Histórias KAN-150/KAN-151 criadas sob KAN-149 e movidas a `21`;

@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-29 (PLAN-033/F9 — Wave 4 fechada: TASK-033-006 Done (mutation de aprovação no RTK Query); FEAT-032-002 implementada e VERIFICADA; próximo: Wave 5, painel de aprovação. SPEC-030/PLAN-031 — redesenho da tela de login — entregue por sessão paralela)
+**Última atualização**: 2026-09-29 (PLAN-033/F9 — Wave 5 fechada: 7/7 TASKs Done; FEAT-032-001 e FEAT-032-002 implementadas e VERIFICADAS; ciclo na Entrega. SPEC-030/PLAN-031 — redesenho da tela de login — entregue por sessão paralela)
 **Mapa do território**: MAP.md
 
 ## Resumo
@@ -17,9 +17,9 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ## Capacidades
 
 ### Em desenvolvimento
-- Aprovação da Versão vigente com checklist de qualidade e segregação de funções (SPEC-032/FEAT-032-001, PLAN-033, 🟡 — backend (aprovação + leitura do estado de aprovação) entregue e aprovado nas Waves 2-3, mutation na Wave 4; falta o painel na tela, Wave 5). Gate de aprovação de Versão editorial (checagem jurídica + pedagógica, segregação de funções por 3 identidades produtoras, pré-condição de fonte normativa, duplo travamento anti-corrida) com carimbo "Versão aprovada" no PDF cobrindo o conteúdo normativo + Tira mnemônica (SPEC-032/**PLAN-033**, F9 do épico MNEMORA STUDIO, 🟡 6/7 TASKs Done). Resolve RISK-002-001/RISK-028-004. Escalação não-bloqueante pendente de confirmação do Diretor na Entrega: inclusão da Tira mnemônica no escopo do gate.
 
 ### Implementadas
+- Aprovação da Versão vigente com checklist de qualidade e segregação de funções (SPEC-032/FEAT-032-001, PLAN-033, ✅ 2026-09-29) — `POST /contents/:id/versions/:number/approve` (ADMIN, 2 confirmações, segregação de funções por 3 identidades produtoras, fonte normativa obrigatória, guarda de edição pós-fechamento ordenada por `sequence`, duplo travamento anti-corrida); leitura do estado de aprovação e de `validApprovalForExport` no histórico; painel na tela com cada linha do histórico mostrando a própria aprovação. Gate 9 VERIFICADO (tela real + integração). Resolve RISK-002-001/RISK-028-004. Pendências ao Diretor na Entrega: Tira no escopo do gate (E-1) e linha de validade para EDITOR (FR-032-007(b)).
 - Carimbo de Versão aprovada no PDF exportado (SPEC-032/FEAT-032-002, ✅ 2026-09-29) — a 1ª linha do cabeçalho de toda página troca "RASCUNHO" por "Conteúdo normativo e Tira mnemônica — Versão N aprovada" só quando a Versão vigente está aprovada e sem alteração posterior (conteúdo ou Tira); gate 9 VERIFICADO por execução real (6/6 ACs, pdftotext nas 2 Variantes).
 - Provisionamento de contas internas por ADMIN + seed do 1º ADMIN (SPEC-002/FEAT-002-003, PLAN-003, ✅ 2026-08-30) — módulo `users/` (criar/listar/desativar/resetar senha) + seed; gate 9 APROVADO. Montagem das rotas em `apiRoutes` fica com TASK-003-011 (Wave 6).
 - Autenticação de sessão da equipe interna (SPEC-002/FEAT-002-001, PLAN-003, ✅ 2026-08-31) — login com três estados observáveis + mensagem genérica pt-BR + sessão expirada; rotação de família, freio de login, cookies `httpOnly`. Gate 9 **pendente_handoff** (trânsito real à área interna no sucesso — causa: credencial; seed em HANDOFF-PLAN-003.md).
@@ -111,7 +111,7 @@ fechado._
 | PLAN-027 | SPEC-026 | 29/29 FRs + 5/5 NFRs (models `Contrast`/`ProductionFlashcard` N:1 diretos com `RawContent`; coluna `pegadinhaText` nullable; valor aditivo `MATERIAL_REFORCO` no `ProductionStageType`; composição suplementar no PDF via `buildSupplementaryPagesPdf` + `copyPages`, ambas Variantes; diálogo de confirmação com foco gerenciado compartilhado; telas alcançáveis via `ContentSupplementaryPanel`, refetch na revisita) | 8/8 ✅ | Done (sugerido) |
 | PLAN-029 | SPEC-028 | 11/11 FRs + 3/3 NFRs (model `ContentVersion` append-only com `contentSnapshot: Json`; valor aditivo `VERSAO_EDITORIAL` no `ProductionStageType`; lock de linha do `RawContent` pai para numeração sequencial; extensão de `publication.service.ts`/`pdf-composer.ts` para o carimbo de Versão/Data no PDF, com marca fail-secure de alteração pós-fechamento) | 4/4 ✅ | Approved |
 | PLAN-031 | SPEC-030 | 14/14 FRs + 6/6 NFRs (fundo em tela cheia via `position: fixed` sem route group — DEC-031-001; ilustração SVG inline + CSS puro, sem asset/dependência nova — DEC-031-002; paleta como tokens aditivos no `@theme` — DEC-031-003; restyle de `LoginForm`/`PasswordField` sem tocar comportamento) | 6/6 ✅ | Approved |
-| PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 6/7 🟡 | Approved |
+| PLAN-033 | SPEC-032 | 18/18 FRs + 3/3 NFRs (colunas `approvedById`/`approvedAt` em `ContentVersion` + valor aditivo `APROVACAO_VERSAO`; `approveContentVersion` com o mesmo lock transacional de F8 + idempotência por `updateMany` condicional; segregação de funções por 3 identidades produtoras lidas ao vivo; `resolveAlterationSignal` estendendo o sinal de F8 para cobrir a Tira mnemônica via reuso de `ProductionStageEvent`; carimbo "Versão aprovada" no PDF substituindo "Rascunho") | 7/7 ✅ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -332,6 +332,16 @@ fechado._
 
 ## Histórico recente
 
+- 2026-09-29 23:35: **Wave 5 de PLAN-033 fechada — TASK-033-007 Done; PLAN-033 7/7; FEAT-032-001
+  VERIFICADA.** Painel de aprovação em `content-version-history.tsx`. Antes do retry, merge de
+  `origin/main` no frontend (`e4c8461`, sem conflito). Retry 1 fechou B1-B3 (prova: ordem das
+  caixas, fake espelhando `z.literal(true)`, 2 Versões) e A1-A4 (reset do estado por Versão,
+  `updateRawContent` invalida `ContentVersion`, copy minúscula, fieldset "Aprovação da versão N");
+  B4 (achado novo do retry, resets sem prova própria) teve retry próprio. Decisão do Tech Lead:
+  FR-032-007(a) prevalece — cada linha do histórico mostra a própria aprovação (Emenda 1 na
+  TASK). Gates 8/10 aprovados; gate 9 verificado 2× por browser. Frontend `a4e828f`/`e68553d`/
+  `43d49dc`. 654/654 frontend, 418+565 backend. Lições: 3 de projeto + LRN-048 e reincidência
+  de LRN-004 (processo).
 - 2026-09-29 21:56: **Wave 4 de PLAN-033 fechada — TASK-033-006 Done.** `approveContentVersion`
   (RTK Query, `POST /contents/:id/versions/:number/approve`, invalida só `ContentVersion`) e o hook
   `useApproveContentVersionMutation`; paridade de `ContentVersion` conferida nos 2 lados (entregue

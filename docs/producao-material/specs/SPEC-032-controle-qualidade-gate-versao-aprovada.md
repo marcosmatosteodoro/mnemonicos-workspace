@@ -262,6 +262,8 @@ regra**, **Bloco da quebra** (SPEC-005); **Publicação**, **Variante do PDF**,
 
 **Jira**: KAN-150
 
+**Verificação (gate 9)**: 2026-09-29 — consolidado: (1) `qa`, execução real com browser contra backend/frontend locais (frontend `a4e828f` e, no delta do retry, `e68553d`; backend `eba5603`) — aprovação por ADMIN não-produtor com o envio represado (`aria-busy`/desabilitado), estado persistido após recarregar, negação de autoaprovação para o produtor, ramo "não" da validade após editar o conteúdo na mesma página, reset do estado ao fechar nova Versão, linha "Aprovada por…" por Versão para ADMIN e EDITOR (AC-032-001/007/020/023, parte UI); (2) ACs só-backend (AC-032-002 a 008 e 013 a 019) provados por integração com Postgres real e mutantes nos gates 1/8 de TASK-033-003/004 (565/565).
+
 > Do ponto de vista do QA: um ADMIN que não é nenhuma identidade produtora do conteúdo
 > normativo da Versão vigente confirma a checagem jurídica e a pedagógica e aprova; o
 > sistema recusa quando falta confirmação, quando não há Versão para aprovar, quando

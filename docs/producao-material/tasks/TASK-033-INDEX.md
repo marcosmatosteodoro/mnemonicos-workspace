@@ -24,7 +24,7 @@ sequenciada por colisão de escrita, princípio 2, nunca por dependência funcio
 - [x] TASK-033-006 ✅ Done
 
 ### Wave 5 (depende de TASK-033-006)
-- [ ] TASK-033-007 ⏸ Todo
+- [x] TASK-033-007 ✅ Done
 <!-- Status agregado e as tabelas de cobertura (FR, AC, funcionalidade) NÃO se escrevem
 (4.409): `graph.sh <slug> --format=tables --plan MMM` as deriva das TASKs. O checklist
 de waves acima é afirmação de despacho e inventário do fecho de wave (4.92) — fica. -->
