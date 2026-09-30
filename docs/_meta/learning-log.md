@@ -977,3 +977,52 @@ aceite explícito do critério — cada um com asserção própria que morre. Sa
 (mesmo parágrafo, dentro do orçamento ≤10; arquivo tem 284 linhas, longe do teto de 500)
 reincidencia: 0
 estado: ativa
+
+## LRN-047: catálogo "resistir a contorno" de `commands/tasks.md` (item a) não exige comparar o
+literal do comando de verificação contra a forma FINAL do símbolo já nomeada no Inclui, nem
+confere o texto do ID citado como justificativa de uma decisão de escopo
+data: 2026-09-29
+gatilho: gate_reprovado
+origem: PLAN-033 (slug producao-material), Wave 4, TASK-033-006 — o Critério de pronto
+prescreveu `grep -n "approveContentVersion" src/store/api.ts` → "ao menos 2 ocorrências
+(declaração + export do hook)", mas o próprio Escopo > Inclui da TASK já nomeava o hook final
+como `useApproveContentVersionMutation` (RTK Query: endpoint em camelCase vira hook
+`use<Pascal>Mutation`) — o literal do comando, case-sensitive, casa só a declaração do endpoint
+(1 ocorrência real); `grep -i` acharia 3, mascarando a divergência de case em vez de expô-la. A
+mesma TASK citou "A-032-011 análogo a A-028-001" como justificativa para não invalidar
+`RawContent` no cache — A-032-011 (SPEC-032) trata do carimbo do PDF, não de invalidação de
+cache. O developer, fiel ao texto da TASK, copiou a âncora para um comentário de código
+(`api.ts:674`); achado do `code-reviewer` no gate 1-7, sem retry: a âncora saiu no
+commit de fim de wave, sem dano em produção)
+causa_raiz: instrucao_ausente — o item (a) do catálogo "resistir a contorno" (`commands/tasks.md`,
+Etapa 3) já manda conferir o literal do comando "contra a fonte real" e já cobre o caso do
+ARQUIVO-alvo ainda não existente (roda contra o molde), mas não cobre o caso do SÍMBOLO ainda
+não existente que a própria TASK introduz: nada instrui comparar o literal do comando de
+verificação, byte a byte (case incluso), contra a forma final que o Escopo > Inclui da MESMA
+task já nomeia — o comando nasceu do nome do endpoint (fonte plausível, mas não é a forma final)
+em vez do nome do hook gerado, e a leitura corrida do parágrafo não convida à comparação direta
+entre as duas menções. Separadamente, nenhum item do catálogo cobre citação de ID (A-/FR-/DEC-)
+usada como JUSTIFICATIVA de uma decisão de escopo (não como referência ao AC mapeado desta task):
+o "Princípio único" do parágrafo introdutório já manda conferir "tudo que o critério afirma sobre
+o mundo" contra a fonte, mas ID citado em prosa de justificativa fica fora do escopo textual dos
+8 itens (a-h) — o scribe citou de memória, sem grep no artefato de origem (SPEC-032) para
+confirmar que o texto do ID afirma o que a TASK alega. Dedup conferido contra o ledger inteiro:
+LRN-041 é família próxima (grep de contagem no mesmo parágrafo) mas causa-raiz distinta —
+contagem pré-existente vs. delta, não literal case-divergente contra forma final já nomeada na
+mesma TASK
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`,
+catálogo "resistir a contorno" (Etapa 3, item (a) + item novo, ~l.205 e ~l.212 da v0.192.0)
+patch: (1) extensão in-line do item (a), logo após "...e literal fixado contra a convenção real
+faz o cumprimento à risca quebrar o código certo.": "Símbolo que a própria TASK introduz (ainda
+não existe no arquivo-alvo) usa, no comando de verificação, o literal EXATO — case incluso — que
+o Escopo > Inclui já nomeia como forma final (nome do hook gerado, nunca o nome do endpoint que o
+origina); confira por comparação direta de string entre as duas menções, nunca `grep -i` (mascara
+a divergência de case em vez de expô-la)." (2) item novo no catálogo (letra a atribuir pelo
+mantenedor — mesma disputa de slot já registrada em LRN-012/015/030/033/037/039/040/046):
+"Citação de ID (A-/FR-/DEC-) usada como JUSTIFICATIVA de uma decisão de escopo (não como
+referência ao AC mapeado desta task) confere, por grep no artefato de origem, que o texto do ID
+afirma o que a TASK alega — sem match, cite a frase literal do artefato ou o COMP que registra a
+decisão, nunca o ID de memória." Saldo líquido ~+9 linhas (dentro do orçamento ≤10; arquivo tem
+284 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa

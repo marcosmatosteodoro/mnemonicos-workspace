@@ -17,13 +17,15 @@ tipo e transição medidos neste board: `CLAUDE.md` do workspace e `docs/_meta/j
 | TASK-033-003 — Aprovação de Versão (backend) | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
 | TASK-033-004 — Leitura do estado de aprovação | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
 | TASK-033-005 — Carimbo de aprovação no PDF | Subtask (`10007`) | FEAT-032-002 | `41` Concluído |
-| TASK-033-006 — Tipos e mutation de aprovação (frontend) | Subtask (`10007`) | FEAT-032-001 | `11` Tarefas pendentes |
+| TASK-033-006 — Tipos e mutation de aprovação (frontend) | Subtask (`10007`) | FEAT-032-001 | `41` Concluído |
 | TASK-033-007 — Painel de aprovação (frontend) | Subtask (`10007`) | FEAT-032-001 | `11` Tarefas pendentes |
 
 Teto do §9: nenhuma História passa de `31` Em análise pelo ciclo. `41` é ato do Diretor
 depois do merge.
 
 ## Log de operações pendentes (mais recente no topo)
+
+- 2026-09-29 21:56: Wave 4 fechada — TASK-033-006: despacho `21` e closure `41` Concluído.
 
 - 2026-09-29 21:45: Wave 3 fechada — TASK-033-004: despacho `21` e closure `41` Concluído.
 

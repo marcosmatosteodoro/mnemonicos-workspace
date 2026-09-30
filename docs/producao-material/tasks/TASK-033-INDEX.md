@@ -21,7 +21,7 @@ sequenciada por colisão de escrita, princípio 2, nunca por dependência funcio
 
 ### Wave 4 (depende de TASK-033-003 E TASK-033-004 — o formato de resposta
 `ContentVersionDetail` só está congelado depois das duas)
-- [ ] TASK-033-006 ⏸ Todo
+- [x] TASK-033-006 ✅ Done
 
 ### Wave 5 (depende de TASK-033-006)
 - [ ] TASK-033-007 ⏸ Todo

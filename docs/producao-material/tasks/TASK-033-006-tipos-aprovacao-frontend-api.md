@@ -7,7 +7,7 @@
 **Wave**: 4
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -94,17 +94,17 @@ Território e precedentes: `docs/producao-material/MAP.md`,
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
-**Jira**:
+**Data início**: 2026-09-29T21:42:00-0300 (despacho; developer não mediu o início — declarado)
+**Data conclusão**: 2026-09-29T21:55:00-0300
+**Commit SHA**: frontend 7c83015 (+ ebda177 — aplicação de fim de wave: âncora sem sustentação retirada do comentário)
+**Jira**: — (sem acesso ao conector; ver `tracker-local-F9.md`)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 4, sem retry; desvio do critério de grep — case-sensitive não casa com `useApprove…` — declarado pelo developer e confirmado: autoria da TASK) — code-reviewer
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — mutation de cliente para rota já revisada no gate 8 da TASK-033-003; autorização segue no servidor · Performance (gate 10) n/a (sem superfície de custo) · Design (gate 11) n/a (sem interface)
+- [x] Comportamento (gate 9): consolidado FEAT-032-001 — carregador: Roteiro do gate 9 de TASK-033-007 (Wave 5), que exercita a mutation pelo painel contra a store real
