@@ -54,7 +54,7 @@ seção "Roteiro do gate 9" (passos 0–12).
   REAL (`npm ci`; symlink quebra o `next build` do Turbopack); `npm run dev` para o V1, depois
   `npm run build && npx next start -p 3000` para o resto (nunca os dois juntos, o `.next` é
   compartilhado). O `.env` do backend já tem `CORS_ORIGINS` com `http://localhost:3000`.
-- Credenciais: realms `admin1`/`admin2` de `keelson.local.json` **atualizados** (ver `sonda:`).
+- Credenciais: **atualizadas em 2026-09-30** a pedido do Diretor — `admin1` = ADMIN do seed (e-mail + senha do `.env` do backend) e realm novo `editor` = EDITOR do seed; login conferido por POST real (ambos 200, papéis ADMIN e EDITOR). `admin2` está **desativado** no banco de dev (401) e foi substituído por `editor` nos itens abaixo — reativá-lo é alteração de dado, decisão do Diretor.
 - Migrações/seeds pendentes DESTA branch: nenhuma.
 - Feature flags / permissões necessárias: nenhuma.
 - Dados de teste: a pista de sessão é gravada pelo próprio app no login e ao passar pela área interna
@@ -90,7 +90,7 @@ conferência origina.
 
 ### V3 — Sessão renovável sem senha (AC-040-003) e duas abas (AC-040-012)
 - **Tela/rota**: http://localhost:3000/
-- **Realm**: admin2 (V3a) e admin1 (V3b)
+- **Realm**: editor (V3a) e admin1 (V3b)
 - **Passos**: passos 2 e 4 do Roteiro, incluindo a 2ª rodada de "família viva" do passo 4.
 - **Esperado**: renovação sem senha, com 1 `POST /auth/refresh` 200 e ida a `/studio`; nas duas abas a sessão continua válida. Registrar `AUTH_REFRESH_GRACE_SECONDS` (default 10).
 - **Risco se falhar**: quem entrou ontem cai na vitrine, ou a família de sessão é revogada.
@@ -106,7 +106,7 @@ conferência origina.
 
 ### V5 — Teto com ida tardia (AC-040-016)
 - **Tela/rota**: http://localhost:3000/
-- **Realm**: admin2
+- **Realm**: editor
 - **Passos**: passo 5 do Roteiro, com `page.route` atrasando `/api/v1/auth/me` além de 3 s.
 - **Esperado**: home pública ao fim do teto e depois `/studio` via `replace`; o "voltar" não retorna a `/`.
 - **Risco se falhar**: sessão sob serviço frio fica na vitrine ou entra em laço.
@@ -122,7 +122,7 @@ conferência origina.
 
 ### V7 — "Voltar" e bfcache (AC-040-009, AC-040-019)
 - **Tela/rota**: http://localhost:3000/
-- **Realm**: admin2
+- **Realm**: editor
 - **Passos**: passos 3 e 8 do Roteiro (login pela UI ou receita alternativa, com o Esperado de cada uma).
 - **Esperado**: nenhum laço `/` ↔ `/studio`; a volta até `/` com sessão leva a `/studio`.
 - **Risco se falhar**: a pessoa fica presa no histórico ou vê a vitrine logada.
@@ -130,7 +130,7 @@ conferência origina.
 
 ### V8 — Sessão sem pista (AC-040-025) e complementares (AC-040-010, AC-040-020)
 - **Tela/rota**: http://localhost:3000/ e http://localhost:3000/studio
-- **Realm**: admin2 (V8a) e admin1 (V8b/c)
+- **Realm**: editor (V8a) e admin1 (V8b/c)
 - **Passos**: passos 10, 11 e 12 do Roteiro.
 - **Esperado**: (a) sem pista, a home pública aparece uma vez, sem conferência, e depois de passar por `/studio` vai direto; (b) clique no logo e link da 404 com sessão levam a `/studio` sem a vitrine visível; (c) `/studio` ociosa não origina conferência nem renovação da home.
 - **Risco se falhar**: exceção da pista maior que a declarada, ou prefetch disparando renovação.
