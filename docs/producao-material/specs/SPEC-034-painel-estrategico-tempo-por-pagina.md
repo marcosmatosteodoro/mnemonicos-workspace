@@ -152,6 +152,7 @@ requisito só faz sentido para ele, está no slug ou na SPEC errada.
 
 ### FEAT-034-002: Painel estratégico
 **Jira**: KAN-167
+**Verificação (gate 9)**: 2026-09-30 — VERIFICADO pelo `qa` em tela real (frontend `d6d1940` já com a nova identidade visual da main, backend `1fd4550`; EDITOR `app` + ADMIN `admin1`): AC-034-014/016/017/023 (3 estados com interceptação de rede, home, vazio por seção, falha nunca vira página de erro) e AC-034-008/009/010/018/020/021 com deltas antes/depois sobre Conteúdo-piloto e Conteúdo-ordenação criados e removidos pelas rotas reais; AC-034-015 não exercitável neste ambiente (decisão registrada na TASK) — prova substitutiva no teste de componente (14/14). Nota: a "etapa mais avançada" de um Conteúdo recém-criado aparece como Quebra da regra porque a criação já registra a abertura dessa etapa (F3) e A-034-006 conta abertura órfã como alcançada — comportamento conforme a premissa, a revisitar se o Diretor quiser exigir conclusão.
 
 > Tela de leitura agregada, interna a EDITOR/ADMIN, que reúne tempo por página, conclusão
 > por módulo, correções após revisão e backlog. Fluxo que o QA testa de ponta a ponta:

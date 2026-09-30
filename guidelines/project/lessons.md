@@ -1126,7 +1126,7 @@ que não emite eventos nunca exercita esse eixo.
 **Validade:** toda TASK cujo critério de pronto recusa um valor composto (conjunto, faixa,
 combinação de campos validados em conjunto) ou decide por guarda composta, neste projeto.
 **Estado:** ativa
-**Contadores:** confirmada 5 · contestada 0 (reincidência 2026-09-30: PLAN-035 TASK-035-005 — eixo pertencimento `IN (ids)` sem prova nas leituras em lote; corolário: leitura em lote por conjunto de ids tem o eixo pertencimento no Critério de pronto)
+**Contadores:** confirmada 6 · contestada 0 (reincidência 2026-09-30: PLAN-035 TASK-035-005 — eixo pertencimento `IN (ids)` sem prova nas leituras em lote; corolário: leitura em lote por conjunto de ids tem o eixo pertencimento no Critério de pronto · reincidência 2026-09-30, convergência de fecho de PLAN-035: `findCreationStartEvent` (par ABERTURA+CONCLUSAO **e** mesmo `occurredAt`) nasceu provado só no eixo "existe o par"; o mutante que tira a igualdade de instante sobreviveu 33/33 até o caso "semeado + 2 edições em instantes distintos" — `a3ed523`)
 
 **Reincidência (Wave 4 de PLAN-027, TASK-027-005, gate 7):** o `where` composto de
 `removePegadinhaText`/`savePegadinhaText` (`ACTIVE_RAW_CONTENT_WHERE` + `scopeWhere(actor)`)

@@ -29,7 +29,7 @@ congelado depois da allowlist + prova HTTP da TASK-035-006, princípio 2)
 ### Wave 5 (depende de TASK-035-007 E TASK-035-003 — a tela consome o endpoint RTK Query
 e o util de duração; única TASK de tela do PLAN, decisão deliberada de não fatiar por
 seção — as ACs de FR-034-017/033/034 descrevem o Painel como comportamento holístico)
-- [ ] TASK-035-008 ⏸ Todo
+- [x] TASK-035-008 ✅ Done
 <!-- Status agregado e as tabelas de cobertura (FR, AC, funcionalidade) NÃO se escrevem
 (4.409): `graph.sh <slug> --format=tables --plan MMM` as deriva das TASKs. O checklist
 de waves acima é afirmação de despacho e inventário do fecho de wave (4.92) — fica. -->

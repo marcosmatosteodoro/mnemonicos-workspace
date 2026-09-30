@@ -468,6 +468,54 @@
   (`public/sw.js`) pode servir bundle obsoleto de sessão anterior — desregistrar e limpar
   Cache Storage antes de exercitar.
 
+## Painel estratégico e tempo por página (F10 · PLAN-035)
+
+- [2026-09-30 · PLAN-035] `PublicationEvent.pageCount Int?` (migração aditiva
+  `20260930062551_add_publication_event_page_count`; `null` = sem medida, linhas antigas nunca
+  recomputadas). Contagem fail-safe em `mergeSupplementaryPages` (`countPagesForExport`:
+  `getPageCount()` O(1) antes do `save`, falha → `null` + `logger.warn` sem texto; a Exportação
+  segue) — mnemonicos-backend/src/modules/publication/publication.service.ts.
+- [2026-09-30 · PLAN-035] Correlação Exportação × evento de etapa `PUBLICACAO_PDF` pela identidade
+  `(rawContentId, occurredAt)` (mesmo `now`, mesma tx) — `occurredAt` é chave de correlação, a
+  ORDEM vem sempre da `sequence` do evento de etapa (DEC-035-011). Se o evento e o
+  `PublicationEvent` deixarem de nascer na mesma tx, a correlação quebra (TRISK-035-002).
+- [2026-09-30 · PLAN-035] Predicado único de F9 extraído: `isVersionAltered(current, version,
+  latestTiraOccurredAt)` em `content-versions/version-alteration.ts` (puro);
+  `resolveAlterationSignal` mantém o curto-circuito de I/O e delega; o Painel reusa em lote —
+  mudar a regra "aprovada e válida" é mudar essa função (4 consumidores).
+- [2026-09-30 · PLAN-035] Módulo `strategic-panel` (sem model próprio):
+  `strategic-panel.service.ts` (6 leituras em lote factory-wide, sem `scopeWhere` — DEC-035-013;
+  versões só com chaves leves + `listApprovedVersionSnapshots` `id IN` só das vigentes aprovadas;
+  `buildStrategicPanel` com 7 statements fixos — 4 sem nenhuma aprovada — e agrupamento por
+  `rawContentId` em `Map` O(N+E), nunca `.filter` por Conteúdo); `strategic-panel-calculations.ts`
+  (funções puras com `now`: `computeContentMetrics`, `aggregateStrategicPanel`, prioridade
+  derivada em `src/domain/presentation-priority.ts`); `strategic-panel.routes.ts`
+  (`GET /strategic-panel`, EDITOR/ADMIN, sem `verifyOrigin`, resposta por allowlist campo a campo
+  por ramo de união — `toStrategicPanelResponse`). `CONTENT_STAGE_TYPES`/`ContentStageType`
+  (5 etapas de conteúdo) movidos para `src/domain/types.ts` — mnemonicos-backend/src/modules/strategic-panel/.
+- [2026-09-30 · PLAN-035] Medido (gate 10): p95 176 ms em 200 Conteúdos × 50 eventos (alvo
+  1.500 ms), 572 ms em 1.000; corpo ~0,97 KiB por Conteúdo (193 KiB em 200); render do cliente
+  ~36 nós de DOM por Conteúdo — tetos no `Reabrir se` de DEC-035-018 (~2.500 Conteúdos p/ o
+  alvo; ~4.700 p/ corpo Vercel, RISK-025-007).
+- [2026-09-30 · PLAN-035] Frontend: espelho de `PRODUCTION_STAGE_TYPES`/`CONTENT_STAGE_TYPES`/
+  `PresentationPriority` e tipos `*Response` do Painel em `src/types/domain.ts` (paridade
+  cross-repo por NOME+TIPO em `tests/unit/strategic-panel-frontend-contract.test.ts` e
+  `domain-types-parity.test.ts` do backend); `getStrategicPanel` (RTK Query) com
+  `forceRefetch: () => true` — `refetchOnMountOrArgChange` não é opção por endpoint; exige UM
+  único subscriber por tela (seções recebem dado por prop) — mnemonicos-frontend/src/store/api.ts.
+- [2026-09-30 · PLAN-035] `/studio` deixou de ser placeholder: casca Server Component +
+  `strategic-panel-board.tsx` ('use client', único subscriber; 3 estados + vazio global com link
+  "Novo conteúdo bruto" + vazio por seção como nota inline que nunca esconde a lista; rótulos
+  pt-BR; "Sem medida — início da produção não registrado" para Conteúdo sem criação
+  instrumentada; identificador curto = 8 primeiros caracteres do id; `util formatDurationPtBr`
+  em `src/lib/format-duration.ts`). Barra de conclusão com `--progress-fill` por tema e
+  `bar-track` (surface + borda), par provado em `night-palette-tokens.ts` —
+  mnemonicos-frontend/src/components/strategic-panel-board.tsx.
+- [2026-09-30 · PLAN-035] Pré-existente, não corrigido: `InternalShell` + `<main>` do layout raiz
+  duplicam `max-w-5xl`/padding (conteúdo interno 24px recuado vs header/rodapé) — sugestão de
+  brief avulso; "etapa mais avançada" conta abertura órfã como alcançada (A-034-006), e a
+  criação do Conteúdo já abre "Quebra da regra" (F3) — a revisitar.
+
 ## Instalabilidade PWA (avulso · PLAN-013)
 
 - [2026-09-07 · PLAN-013] `mnemonicos-frontend` ganhou manifesto (`app/manifest.ts`),

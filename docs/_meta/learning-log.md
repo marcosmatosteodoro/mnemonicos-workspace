@@ -77,8 +77,18 @@ origem: PLAN-003 — Wave 7; reescrita de teste por mudança de assinatura perde
 causa_raiz: a decisão 4.174 vive só no lado do avaliador (`guidelines/core/CODE-REVIEW.md` §Convergência do re-gate); nada no lado do gerador (`commands/tasks.md`) obriga a TASK/EMENDA a declarar "asserção X do estado antigo migra para / é substituída por Y + fixture discriminante preservado" — a reescrita do teste decide sozinha e a suíte segue verde provando menos
 artefato_patchado: proposta_plugin (modo consumidor) — `commands/tasks.md`, seção "Mapeamento de cada AC"
 patch: TASK/EMENDA que remove, inverte ou troca o ramo de comportamento já coberto por teste carrega critério explícito nomeando a asserção que migra/é substituída, complemento gerador da 4.174
-reincidencia: 0
+reincidencia: 1
 estado: ativa
+
+**Atualização 2026-09-30 (reincidência 1, PLAN-035 — slug producao-material, TASK-035-002,
+DEC-035-015)**: a DEC prescreveu remover um curto-circuito de `content-versions.service.ts`
+que um teste de integração existente trava (regressão real, achada pelo `code-reviewer` antes
+do retry fechar) — mesma causa: a TASK/DEC que manda remover comportamento coberto por teste
+não nomeou qual asserção migra nem qual fixture discriminante seguia necessária. Confirmado por
+Grep contra o texto instalado (0.192.0, `commands/tasks.md`): nenhuma ocorrência de "migra"
+associada a asserção/fixture na seção "Mapeamento de cada AC" — a `proposta_plugin` desta
+entrada segue **não aplicada**; a reincidência é evidência de que ela resolveria o problema se
+aplicada (decisão 4.444), não motivo para reformular o texto proposto.
 
 ## LRN-004: briefing de despacho de gate citou ID de DEC inexistente (de memória)
 data: 2026-08-31
@@ -836,8 +846,22 @@ passa a abrir com `flushnfr()` e fechar com `nfrbuf = line; next`, guardando o i
 os dois call-sites de flush de seção (`^## `/`^### `, l.76 e l.93: `flushfr(); flushac()` →
 `flushfr(); flushnfr(); flushac()`). Saldo líquido ~+6 linhas. Total do patch: ~+12 linhas
 somando os dois arquivos (cada um dentro do orçamento ≤10 isoladamente)
-reincidencia: 0
+reincidencia: 1
 estado: ativa
+
+**Atualização 2026-09-30 (reincidência 1, PLAN-035 — slug producao-material, ciclo
+`/keelson:auto`)**: o mesmo bug do `graph.sh` (`**Realiza**` de COMP lido só na 1ª linha)
+disparou de novo — o `scribe` escreveu, no PLAN-035, bullets de `**FRs cobertos**` e o campo
+`**Realiza**:` quebrados em múltiplas linhas (formato de campo padrão do projeto, decisão
+4.156), e `graph.sh --check` devolveu 33 `comp-realiza-fora-cobertura` + 5 `fr-sem-comp`
+falsos — mesma classe do sintoma original (PLAN-031) e do item (g) desta entrada, agora sobre
+`Realiza` em vez de `Dependências`. Confirmado por Grep contra o plugin instalado (0.192.0,
+`scripts/graph.sh`): nenhuma ocorrência de `flushrealiza`/`realizabuf` — a `proposta_plugin`
+(função `splitlist`/acumulador `frbuf`-like) segue **não aplicada**. Mesma leitura de LRN-021/
+LRN-028: esta reincidência não pede reformular a causa nem o patch — o check mecânico já
+desenhado (itens acima) é a resposta certa; falta só aplicá-lo no plugin. Reforça a
+`mensagem_mantenedor`: 2ª ocorrência conhecida do mesmo bug, custando falso-positivo em massa
+(38 achados espúrios) num ciclo inteiro.
 
 ## LRN-039: "Cobertura parcial" de `commands/tasks.md` (Etapa 3, l.192) nomeia a partição
 "(parte — X)" por FACETA/GATE, mas não por ELEMENTO IRMÃO — FR repartido entre TASKs por
@@ -973,8 +997,22 @@ Contexto da DEC; premissa não confirmada é suposição, não decisão (ex.: `u
 carimbava `lastEditedById` em qualquer save, PATCH vazio incluso, contornando a segregação
 de funções da DEC-033-006 — achado só no gate 8, 2 rodadas de retry)." Saldo líquido ~+6
 linhas (mesmo item, dentro do orçamento ≤10; arquivo tem 142 linhas, longe do teto de 500)
-reincidencia: 0
+reincidencia: 1
 estado: ativa
+
+**Atualização 2026-09-30 (reincidência 1, PLAN-035 — slug producao-material, DEC do PLAN-035)**:
+mesma causa-raiz, eixo novo — a premissa não confirmada não era sobre CÓDIGO PRÓPRIO (grep de
+escritores), mas sobre a API de um pacote de TERCEIRO: a DEC nomeou o mecanismo
+`refetchOnMountOrArgChange: true` numa definição de endpoint RTK Query sem conferir contra o
+`.d.ts` da versão instalada — a opção não existe ali (TS2353), só apareceu no `tsc` do gate 1,
+já implementado. Generaliza (não duplica) a regra: "mecanismo já existente" no item 3 de
+`commands/plan.md` deixa de significar só "campo/mecanismo do PRÓPRIO código" — cobre também
+API/opção de biblioteca de terceiro citada por nome; a confirmação passa a ser "grep de
+escritores" (código próprio) OU "grep no `.d.ts` da versão instalada" (dependência de
+terceiro), conforme a origem do mecanismo citado. Confirmado por Grep contra o plugin
+instalado (0.192.0, `commands/plan.md`): nenhuma menção a `.d.ts`/dependência de terceiro no
+item 3 — a `proposta_plugin` segue **não aplicada** (não houve chance de resolver este eixo
+específico, que é extensão nova, não repetição do mesmo texto).
 
 ## LRN-044: `guidelines/core/CODE-REVIEW.md`, bullet "Comentários (Art. 7)" — achado nasce por INSTÂNCIA (o bloco mais evidente), não por CONDIÇÃO, e a 2ª instância da mesma classe sobrevive ao retry
 data: 2026-09-27
@@ -1171,5 +1209,171 @@ screenVerify **nunca** grava nele (nem marcador-placeholder); artefato que nasce
 extração indevida que aconteceu (cookie, storageState, senha gerada) é segredo — apague-o no
 mesmo turno, nunca deixe para limpeza posterior. Saldo líquido ~+7 linhas (dentro do
 orçamento ≤10; arquivo tem 192 linhas, longe do teto de 500)
+reincidencia: 0
+estado: ativa
+
+## LRN-050: catálogo "resistir a contorno" de `commands/tasks.md` (itens a-h) não cobre código
+literal PRESCRITO no Critério de pronto (não só valor/grep) que viola anti-padrão já proibido
+pelo perfil de linguagem ativo
+data: 2026-09-30
+gatilho: gate_reprovado
+origem: PLAN-035 (slug producao-material), TASK-035-003 — o Critério de pronto prescreveu
+literalmente `parts[0]!` (non-null assertion) para extrair um segmento de path; o perfil de
+linguagem ativo (`next-16.md`) já proíbe non-null assertion como anti-padrão. O developer
+cumpriu o critério à risca e reproduziu a violação; achado do `code-reviewer` no gate 1-7,
+1 retry
+causa_raiz: instrucao_ausente — o item (a) do catálogo ("Literal contra a fonte") já exige
+conferir nome/credencial/símbolo contra a fonte real, mas trata só de VALOR; nenhum item cobre
+o caso em que o próprio CÓDIGO a escrever é prescrito literalmente no Critério — o scribe
+redige a expressão mais direta para o efeito descrito, sem confrontá-la contra o catálogo de
+anti-padrões do perfil de linguagem (`guidelines/project/*` + perfil embarcado) antes de
+fixar; leitura literal do critério pelo developer foi razoável e reproduziu exatamente a
+violação
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`commands/tasks.md`, catálogo "resistir a contorno" (Etapa 3, mesmo parágrafo dos itens a-h)
+patch: proposta de item novo (letra a atribuir pelo mantenedor — mesma disputa de slot já
+registrada em LRN-012/015/030/033/037/039/040/046/047): trecho de código PRESCRITO literalmente
+no Critério de pronto (não só nome/valor/comando) é conferido, antes de fixado, contra o
+catálogo de anti-padrões do perfil de linguagem ativo e das guidelines de projeto — expressão
+que o perfil já proíbe (non-null assertion, `any`, mutação de estado global, etc.) nunca entra
+como literal a reproduzir; nomeie a forma permitida (guard/narrowing) em vez da forma banida.
+Saldo líquido ~+6 linhas (dentro do orçamento ≤10)
+reincidencia: 0
+estado: ativa
+
+## LRN-051: catálogo "resistir a contorno" de `commands/tasks.md` (item b, "Estrutura, não grep
+de texto") não exige calibrar o oráculo de grep contra 1 positivo conhecido antes de fixado —
+regex BRE com alternância sem `-E` nunca casa e o critério nunca falha
+data: 2026-09-30
+gatilho: gate_reprovado
+origem: PLAN-035 (slug producao-material) — um Critério de pronto prescreveu oráculo por
+`grep` com alternância (`padrao1|padrao2`) sem a flag `-E`/`-P`; em BRE (grep básico), `|` é
+literal, não alternância — o comando nunca casa nenhum dos dois padrões e o critério, tal como
+escrito, é estruturalmente insatisfazível NA DIREÇÃO ERRADA: sempre "sem match", nunca acusa
+ausência real nem confirma presença real. Achado do `code-reviewer` antes do developer
+implementar, sem dano — mas o critério, se executado como prescrito, nunca teria falhado
+mesmo com o código errado
+causa_raiz: instrucao_ausente — o item (b) ("Estrutura, não grep de texto", decisão 4.161) já
+cobre grep que casa a camada errada ou prosa/docblock, mas não cobre a classe "o comando em si
+está mal formado para o motor de regex declarado/implícito" (BRE vs. ERE/PCRE); nada instrui
+RODAR o comando literal do critério contra um caso POSITIVO conhecido (uma amostra onde o
+padrão deveria casar) antes de fixá-lo — a calibração contra 1 positivo é o que expõe um
+oráculo estruturalmente inerte, e nenhum item do catálogo a exige
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`commands/tasks.md`, item (b) do catálogo "resistir a contorno" (Etapa 3)
+patch: proposta de extensão in-line do item (b), logo após a citação do lint
+`task-criterio-grep-nao-ancorado`: "; e todo oráculo de grep fixado é rodado, na fixação, contra
+UM CASO POSITIVO conhecido (amostra onde o padrão deveria casar) — comando que não casa o
+positivo é oráculo inerte (ex.: alternância `a|b` em BRE sem `-E`, `|` tratado como literal),
+nunca fixado sem a flag/motor de regex correta." Saldo líquido ~+4 linhas (mesma linha/
+parágrafo, dentro do orçamento ≤10)
+reincidencia: 0
+estado: ativa
+
+## LRN-052: família 4.307/4.321 ("condição, nunca endereço/instância", `guidelines/core/CODE-REVIEW.md`) não distingue divergência de NOME (ajuste legítimo contra o tipo real) de AUSÊNCIA
+de um bloco inteiro do contrato mínimo (lacuna a escalar, nunca suprimir em silêncio)
+data: 2026-09-30
+gatilho: gate_reprovado
+origem: PLAN-035 (slug producao-material), TASK-035-006 — aplicando a disciplina "confira
+contra o tipo real" (família 4.307), o developer estreitou a resposta HTTP ao payload
+efetivamente produzido e suprimiu o bloco "por Conteúdo" inteiro do contrato — FR-034-004/005/
+006/025 ficaram sem dado — herdando em silêncio uma lacuna que já vinha de TASK-035-004.
+Achado pelo `code-reviewer`, 1 retry
+causa_raiz: instrucao_ausente — a família 4.307/4.321 instrui conferir a promessa contra a
+fonte real e corrigir a divergência, mas não distingue dois tipos de divergência: NOME/forma
+(o campo existe com outro nome/tipo — ajuste legítimo, corrige e segue) vs. AUSÊNCIA de um
+bloco inteiro que o contrato mínimo promete (a fonte real simplesmente não produz o dado —
+gap real, não erro de citação); tratar os dois como "conferir e ajustar" convida a suprimir o
+bloco ausente como se fosse mero acerto de forma, em vez de escalar como lacuna herdada
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`guidelines/core/CODE-REVIEW.md`, parágrafo da família 4.307/4.321 (~l.588-594 da v0.192.0)
+patch: proposta de extensão in-line, logo após a citação da família 4.307: "Divergência achada
+ao conferir promessa contra fonte real tem duas classes, nunca tratadas igual: NOME/forma (o
+dado existe, só com outro rótulo/tipo — corrige e segue) e AUSÊNCIA de um bloco inteiro do
+contrato mínimo (a fonte real não produz o dado prometido) — a 2ª nunca é 'corrigida' por
+supressão silenciosa do bloco; é lacuna herdada, escalada com a TASK de origem citada, nunca
+absorvida em silêncio pela TASK que apenas confirmava o tipo." Saldo líquido ~+5 linhas
+(dentro do orçamento ≤10)
+reincidencia: 0
+estado: ativa
+
+## LRN-053: critério de mutação em `commands/tasks.md` não exige nomear a CAMADA de teste que
+alcança o mutante prescrito, nem proíbe o developer de trocar o mutante em silêncio quando o
+instrumento não o alcança
+data: 2026-09-30
+gatilho: gate_reprovado
+origem: PLAN-035 (slug producao-material), TASK-035-006 — o Critério de pronto pediu teste
+UNIT de `toStrategicPanelResponse` e citou o mutante `res.json(payload)` (que vive no HANDLER,
+camada de rota) como o que reprovaria; o teste unit estruturalmente não alcança essa linha —
+o developer trocou o mutante por outro, alcançável pelo unit, sem declarar a troca. Achado do
+`code-reviewer`
+causa_raiz: instrucao_ausente — os itens (c)/(f) do catálogo já prescrevem mutante como prova
+de fechamento, mas nenhum exige que o mutante nomeado seja pareado com a CAMADA de teste que
+o Critério pede (unit/integration/rota) — mutante na camada errada é critério estruturalmente
+inatingível pelo instrumento prescrito, e nada proíbe o developer de substituí-lo
+silenciosamente quando percebe o descompasso; o ponto mais cedo de prevenção é o gerador (parear
+mutante e camada antes de fixar), companheiro: implementador que vê o instrumento não alcançar
+o mutante DECLARA a divergência no report, nunca substitui por conta própria
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`commands/tasks.md`, itens (c)/(f) do catálogo "resistir a contorno" (Etapa 3) +
+`agents/developer.md`, Etapa 8 (schema do report)
+patch: (1) extensão in-line dos itens (c)/(f): mutante prescrito nomeia também a CAMADA de
+teste (unit/integration/rota) que estruturalmente o alcança — mutante fora da camada do teste
+pedido é critério quebrado na fixação, não na execução. (2) `agents/developer.md`, campo novo
+no report `mutante_divergente`: quando o instrumento prescrito não alcança o mutante nomeado,
+declare aqui o mutante realmente usado e o motivo — nunca substitua em silêncio. Saldo líquido
+~+8 linhas somando os dois arquivos (cada um dentro do orçamento ≤10 isoladamente)
+reincidencia: 0
+estado: ativa
+
+## LRN-054: retry de gate de mutação (`guidelines/core/CODE-REVIEW.md`, família 4.302) aceita
+achado que cita mutante por NÚMERO/DESCRIÇÃO, sem o patch literal — re-gate roda instrumento
+diferente do que o achado original media
+data: 2026-09-30
+gatilho: retry
+origem: PLAN-035 (slug producao-material), TASK-035-008, retry 1 — o pacote de retry declarou
+"M15/M16/M18 mortos"; no re-gate, 2 mutantes do MESMO eixo sobreviveram — instrumentos
+diferentes dos que o achado original nomeou por número (a numeração do runner de mutação não é
+estável entre execuções/reordenações). Consumiu 1 rodada extra além do teto de retry (decisão
+4.88 — escalado ao default por ausência do Diretor)
+causa_raiz: instrucao_ausente — a família 4.302 ("cada item do despacho do retry nasce com o
+PAR de provas") já existe para achados de varredura (LRN-022) e comentário (LRN-044), mas não
+foi aplicada nomeadamente a achado de MUTAÇÃO: número/descrição de mutante não é um identificador
+estável entre execuções do runner — só o PATCH LITERAL (diff de 1 hunk: a linha original e a
+mutada) identifica de forma reprodutível o que o re-gate deve confirmar morto
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`guidelines/core/CODE-REVIEW.md`, família 4.302 (mesmo parágrafo de LRN-022/LRN-044)
+patch: proposta de extensão in-line: achado de gate de MUTAÇÃO que reprova por mutante
+sobrevivente entrega, no despacho do retry, o PATCH LITERAL de cada mutante citado (1 hunk:
+linha original × linha mutada) — nunca só número/descrição do runner, que não é estável entre
+execuções; o re-gate aplica os MESMOS hunks (não re-gera mutantes novos do mesmo eixo) antes de
+declarar morto. Saldo líquido ~+5 linhas (dentro do orçamento ≤10)
+reincidencia: 0
+estado: ativa
+
+## LRN-055: "Marca do despacho"/briefing de re-despacho (`commands/implement.md` §3.3) não
+proíbe a palavra "só" como delimitador de escopo — developer leu restrição de UM ITEM do
+Inclui como restrição da TASK inteira
+data: 2026-09-30
+gatilho: correcao_humana
+origem: PLAN-035 (slug producao-material), TASK-035-008 — o Tech Lead, ao re-despachar após
+furo de plano, escreveu algo como "arquivo X entra no Inclui só para acrescentar export"; o
+developer leu "só" como restrição do escopo INTEIRO da TASK (implementou apenas o export,
+ignorando o resto do Critério de pronto já fixado) — 1 volta perdida até o Tech Lead
+esclarecer
+causa_raiz: instrucao_ambigua — a primeira linha é minha: eu, Tech Lead, escrevi o briefing
+ambíguo. O parágrafo "Marca do despacho"/briefing de re-despacho não proíbe nomeadamente a
+palavra "só"/"apenas" como qualificador de UM item do Inclui — nada distingue "só" como
+delimitador do ITEM ("este arquivo entra só para X", os demais itens do Critério continuam de
+pé) de "só" como delimitador da TASK ("faça só X, ignore o resto") — mesma classe de ambiguidade
+de vocabulário já registrada em LRN-013 (enums homônimos), eixo novo (qualificador de escopo em
+prosa livre, não enum formal)
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) —
+`commands/implement.md` §3.3, parágrafo "Marca do despacho"/briefing de re-despacho
+patch: proposta de extensão in-line: briefing de re-despacho usa "além de"/"adicionalmente",
+nunca "só"/"apenas", ao justificar a entrada de um item no Inclui — e repete o escopo completo
+da TASK (todos os Critérios de pronto ainda de pé), nunca só o item novo/ajustado, para o
+developer nunca inferir restrição por omissão. Saldo líquido ~+4 linhas (dentro do orçamento
+≤10)
 reincidencia: 0
 estado: ativa
