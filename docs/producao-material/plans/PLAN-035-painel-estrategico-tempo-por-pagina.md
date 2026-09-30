@@ -605,7 +605,9 @@ referência; gate 10 mede o p95 real contra esse volume antes da Entrega.
 aproximar do teto medido na Wave 3 (2026-09-30, gate 10): com agrupamento O(N+E), o p95 cruza
 1.500 ms por volta de ~2.500 Conteúdos ativos (594 ms medidos em 1.000), e o corpo sem compressão
 (~0,97 KiB por Conteúdo) chega ao limite de 4,5 MB de function da Vercel por volta de ~4.700
-(RISK-025-007) — antes disso, paginação ou pré-agregação.
+(RISK-025-007); no cliente, o render cresce ~36 nós de DOM por Conteúdo (medido na Wave 5: 7,3k
+nós em 200, 36k em 1.000; ~90k perto de ~2.500) — antes desses tetos, paginação pelo servidor,
+pré-agregação ou virtualização da lista.
 **Irreversível**: não
 **Aderência à ficha/perfil**: nova
 
