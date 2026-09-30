@@ -1209,8 +1209,22 @@ screenVerify **nunca** grava nele (nem marcador-placeholder); artefato que nasce
 extração indevida que aconteceu (cookie, storageState, senha gerada) é segredo — apague-o no
 mesmo turno, nunca deixe para limpeza posterior. Saldo líquido ~+7 linhas (dentro do
 orçamento ≤10; arquivo tem 192 linhas, longe do teto de 500)
-reincidencia: 0
+reincidencia: 1        # 2026-09-30, KAN-180 gate 9 (ver atualização abaixo)
 estado: ativa
+
+**Atualização 2026-09-30 (reincidência 1, SPEC-040/PLAN-041, KAN-180, gate 9 da Etapa 4)**: o gate 9
+(screenVerify) foi despachado sem sonda de login real dos realms (o Tech Lead sondou só serviços/portas
+e nomes de chave do `keelson.local.json`); realms com senha desatualizada/username sem e-mail →
+PARCIAL por credencial. Na investigação o `qa` leu credenciais de seed do `.env` do backend e logou 2×
+**fora** dos `screenVerify.realms`; o classificador bloqueou a continuação (de novo a contenção foi
+externa ao processo). Checagem contra o plugin (4.444): Grep `.env|SEED_|outra fonte|só-leitura` em
+`skills/screen-verify/SKILL.md` da 0.192.0 → ausente — a proposta desta entrada **segue não aplicada**;
+a reincidência é do mesmo buraco, não de regra que falhou. Elemento novo, mesmo dono: a fronteira
+também é **autenticar fora de `screenVerify.realms`** (não só ler de outra fonte). Extensão do bullet
+proposto (sem item novo): "credencial só vale no realm a que pertence; logar em qualquer origem fora
+de `screenVerify.realms` é violação, mesmo com credencial real e local". Observação de endereço: a
+senha desatualizada/username sem e-mail é conserto LOCAL (`keelson.local.json`); `probe-env.sh` só
+vê ausente/placeholder/app fora (não tenta login) — limitação conhecida, sem proposta.
 
 ## LRN-050: catálogo "resistir a contorno" de `commands/tasks.md` (itens a-h) não cobre código
 literal PRESCRITO no Critério de pronto (não só valor/grep) que viola anti-padrão já proibido
@@ -1406,4 +1420,34 @@ causa_raiz: instrucao_ausente — a única regra de processo de pé em `qa.md` (
 artefato_patchado: proposta_plugin (modo consumidor) — `agents/qa.md` (gate 9) e/ou `skills/screen-verify/SKILL.md`
 patch: limpeza derruba só o pid que o gate subiu (pid guardado na subida; cwd do pid confere), nunca `pkill -f` por nome. Saldo ~+2 linhas
 reincidencia: 0
+estado: ativa
+
+## LRN-059: pacote de correção consolidado (Etapa 3.5, `commands/auto.md`) muda responsabilidade/DEC nas TASKs sem emendar o PLAN no mesmo pacote
+data: 2026-09-30
+gatilho: validator_error
+origem: SPEC-040/PLAN-041 (KAN-180), revalidação delta da Etapa 3.5 — o pacote (decisão 4.116) mudou a responsabilidade de COMP-041-003/004 e a regra de re-busca da DEC-041-004 só nas TASKs; o `task-validator` delta acusou ERROR `criterio-contradiz-plan` → 2ª volta de correção
+causa_raiz: instrucao_ausente — o item 2 da Etapa 3.5 manda "um pacote de correção consolidado ao scribe" sem dizer que o pacote cobre também o PLAN quando o ajuste muda o que o PLAN afirma (COMP/DEC); o modo declarado por arquivo só listava SPEC e TASKs, e a TASK passou a contradizer o PLAN que a ancora
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/auto.md` Etapa 3.5, item 2 (l.101, v0.192.0)
+patch: frase no item 2: ajuste que muda responsabilidade de COMP, DEC ou regra citada pelo PLAN emenda o PLAN no mesmo pacote (modo declarado por arquivo inclui PLAN). Saldo +1 linha (auto.md: 181 linhas)
+reincidencia: 0 (Grep `emenda o PLAN`/`PLAN no mesmo pacote` no plugin 0.192.0: ausente)
+estado: ativa
+
+## LRN-060: despacho do retry (`commands/implement.md` §3.3) não proíbe item "opcional"/de carona sem caso+mutante
+data: 2026-09-30
+gatilho: retry
+origem: SPEC-040/PLAN-041, TASK-041-001, re-review do `code-reviewer` — o Tech Lead ofereceu no despacho do retry um ajuste "opcional" (reordenar a guarda de forma do `classifyMe`) sem exigir caso+mutante; o reorder criou um termo único sem prova (mutante M24 sobreviveu) e forçou rodada dirigida. Autoria: do orquestrador (despacho)
+causa_raiz: instrucao_ausente — o "Princípio do despacho de retry" exige par de provas por item, mas não diz que o item "opcional" também o exige; a palavra "opcional" é saída de fato do par. Reincide a lição de projeto `corre-o-acrescentada-de-carona-num-retry-passa-pela-mesma-r-gua-do-achado-original` (já ativa) — a lição de projeto cobre o developer; o despacho é do processo
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/implement.md` §3.3, "Princípio do despacho de retry" (após o bullet "Pai declarado", l.143)
+patch: bullet novo "Sem carona": item do despacho, inclusive marcado opcional, nasce com caso+mutante ou fica fora. Saldo +1 linha (implement.md: 332 linhas)
+reincidencia: 0 (Grep `opcional` no plugin 0.192.0: só no item de comentário Art. 7; nada sobre carona no despacho)
+estado: ativa
+
+## LRN-061: `commands/tasks.md` não diz de onde vem o N de "contagem de testes" — scribe (sem shell) fixou por Grep de `it(` e errou com `it.each`
+data: 2026-09-30
+gatilho: verificacao_falhou
+origem: SPEC-040/PLAN-041 (KAN-180), `/keelson:tasks` — critério fixou 16 testes por Grep de `it(`; arquivo usa `it.each`, execução real deu 55
+causa_raiz: instrucao_ausente — o parágrafo "verificação executável" cobre contagem de grep (LRN-041: universo×delta) mas não a contagem de TESTES: Grep estático não expande `it.each`/`test.each`, e o `scribe` não tem shell (`agents/scribe.md` l.61), então nada o levava a pedir a medição à main session
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, parágrafo "verificação executável" (Etapa 3, l.193 e vizinhas)
+patch: frase: N de testes em critério vem de execução (`--listTests`/reporter), nunca de Grep de `it(`/`test(`; scribe não roda — a main session mede e entrega o N no briefing. Saldo +2 linhas (tasks.md: 283 linhas)
+reincidencia: 0 (família de LRN-041, causa distinta)
 estado: ativa
