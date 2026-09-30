@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -213,17 +213,17 @@ já existe e não muda; só o efeito colateral de gravação ganha um campo novo
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-09-30T03:23:59-0300
+**Data conclusão**: 2026-09-30T04:03:18-0300
+**Commit SHA**: 104c94f (impl) · bac63db (retry gate 1) · 6b9d0ba (remoções gate 7)
 **Jira**: KAN-168
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado — security-engineer (wave 1)
+- [x] Comportamento (gate 9): consolidado FEAT-034-001 — carregador: roteiro do gate 9 da TASK-035-008 (Exportação medida, V4/V6) no fecho da FEAT
