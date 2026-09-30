@@ -160,6 +160,16 @@ constante — sem esperar TASK de wiring posterior.
       --testPathPatterns=strategic-panel.query-count.integration.test.ts` → `OK (2
       tests)`, com a contagem de statements dos 2 volumes IMPRESSA no teste (comentário +
       valor capturado) — mesma contagem nos dois. Fixada antes do código.
+- [ ] **Pendência herdada (gate 10 da Wave 1, performance-engineer) — sem N+1 por composição
+      no predicado de F9**: nos 2 volumes, a fixture inclui Conteúdos com Versão vigente
+      APROVADA e NÃO alterada (o ramo que, em `resolveAlterationSignal`, faria 1 `findFirst`
+      de TIRA por Conteúdo) — nesses volumes a contagem de statements continua igual; e
+      `buildStrategicPanel` nunca chama `resolveAlterationSignal` (1 função de orquestração no
+      Escopo, 1 prova: `grep -n "resolveAlterationSignal"
+      mnemonicos-backend/src/modules/strategic-panel/*.ts | grep -vE ':\s*(//|\*)'` → 0,
+      calibrado contra `content-versions.service.ts` → ≥1). Mutante (em `git worktree add`)
+      que chama `resolveAlterationSignal` por Conteúdo aprovado → contagem diverge entre os 2
+      volumes e o teste de NFR-034-001 reprova.
 - [ ] Censo de rotas atualizado (47→48) — verificação executável: `npm --prefix
       mnemonicos-backend run test:integration --
       --testPathPatterns=route-authz-matrix.integration.test.ts` → `OK (N tests)`.

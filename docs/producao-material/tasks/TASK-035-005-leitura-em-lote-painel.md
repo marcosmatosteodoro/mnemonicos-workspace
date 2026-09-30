@@ -36,6 +36,10 @@ não reabre a lógica de filtro/select, só as chama.
 
 ### Inclui
 
+- `mnemonicos-backend/src/modules/content-versions/content-versions.service.ts` — **ajuste por furo no
+  plano (Tech Lead, 2026-09-30)**: acrescentar `export` às declarações já existentes de
+  `RAW_CONTENT_VERSIONED_SELECT` (:108) e `RULE_BREAKDOWN_VERSIONED_SELECT` (:119) — só a
+  palavra `export`, sem mudar valor, nome nem consumidores (aditivo; F9 intocado).
 - `mnemonicos-backend/src/modules/strategic-panel/strategic-panel.service.ts` (novo
   módulo — schema→service→routes; esta TASK só a camada de leitura, sem `.routes.ts`
   ainda, que é TASK-035-006):
@@ -116,6 +120,17 @@ não reabre a lógica de filtro/select, só as chama.
 
 ## Critérios de pronto
 
+- [ ] **Ajuste por furo no plano — export das constantes de select versionado**: as 2
+      declarações passam a `export const` sem outra mudança — verificação executável:
+      `grep -nE '^export const (RAW_CONTENT_VERSIONED_SELECT|RULE_BREAKDOWN_VERSIONED_SELECT)'
+      mnemonicos-backend/src/modules/content-versions/content-versions.service.ts` → 2 linhas
+      (calibrado contra o commit-pai cb5e834 → 0 linhas); `git diff cb5e834 --
+      mnemonicos-backend/src/modules/content-versions/content-versions.service.ts` mostra só
+      as 2 linhas com `export` acrescentado; suíte de F9
+      (`npm --prefix mnemonicos-backend test -- content-versions` e
+      `npm --prefix mnemonicos-backend run test:integration --
+      --testPathPatterns=content-versions.service.integration.test.ts`) com a mesma contagem
+      verde de antes.
 - [ ] Testes cobrem AC-034-011, NFR-034-004 (parte), NFR-034-003 (parte) — verificação
       executável: `npm --prefix mnemonicos-backend run test:integration --
       --testPathPatterns=strategic-panel.service.integration.test.ts` → `OK (N tests)`.

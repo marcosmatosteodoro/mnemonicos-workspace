@@ -190,6 +190,16 @@ funções sem reabrir a regra.
       (parte cálculo), AC-034-019, AC-034-020, AC-034-021, AC-034-024 — verificação
       executável: `npm --prefix mnemonicos-backend test --
       strategic-panel-calculations.test.ts` → `OK (N tests)`. Fixada antes do código.
+- [ ] **Pendência herdada (gate 8 da Wave 1, security-engineer) — paridade do evento de
+      Tira com F9**: todo ponto que deriva `latestTiraOccurredAt` a partir de `stageEvents`
+      escolhe o evento `TIRA_MNEMONICA` de MAIOR `sequence` (mesmo desempate do `findFirst`
+      `orderBy: { sequence: 'desc' }` de `resolveAlterationSignal`), nunca o de maior
+      `occurredAt` — 1 ponto de derivação no Escopo, 1 prova: teste em
+      `strategic-panel-calculations.test.ts` com 2 eventos TIRA em que o de maior `sequence`
+      tem `occurredAt` ANTERIOR ao outro e cai antes do `closedAt` (o outro depois) →
+      `concluded === true`; mutante (em `git worktree add`) que escolhe por `occurredAt` →
+      o teste reprova. Verificação: `npm --prefix mnemonicos-backend test --
+      strategic-panel-calculations.test.ts` → `OK (N tests)` com o caso nomeado no relatório.
 - [ ] `derivePresentationPriority` cobre as 5 classes (3 casos no balde BAIXA) —
       verificação executável: `npm --prefix mnemonicos-backend test --
       presentation-priority.test.ts` → `OK (5 tests)`.
