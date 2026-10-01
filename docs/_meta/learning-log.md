@@ -1470,7 +1470,7 @@ origem: SPEC-040/PLAN-041 (KAN-180), `/keelson:tasks` — critério fixou 16 tes
 causa_raiz: instrucao_ausente — o parágrafo "verificação executável" cobre contagem de grep (LRN-041: universo×delta) mas não a contagem de TESTES: Grep estático não expande `it.each`/`test.each`, e o `scribe` não tem shell (`agents/scribe.md` l.61), então nada o levava a pedir a medição à main session
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, parágrafo "verificação executável" (Etapa 3, l.193 e vizinhas)
 patch: frase: N de testes em critério vem de execução (`--listTests`/reporter), nunca de Grep de `it(`/`test(`; scribe não roda — a main session mede e entrega o N no briefing. Saldo +2 linhas (tasks.md: 283 linhas)
-reincidencia: 1 (família de LRN-041, causa distinta)
+reincidencia: 2 (família de LRN-041, causa distinta; 2ª em PLAN-049, ver atualização ao fim da entrada)
 estado: ativa
 
 **Atualização 2026-09-30 (reincidência 1, SPEC-044/PLAN-046, KAN-178 — TASK-046-001/002/005)**: a
@@ -1480,6 +1480,22 @@ baselines 83 vs 86 e 49 vs 50; o `qa` pré-código pegou pela fixação executad
 Proposta reformulada (mesmo dono, mesma frase, escopo = todo N/baseline de contagem, não só testes
 unitários): ver mensagem_mantenedor. Reincidência 1 < 2: escada 4.149 ainda não exige check novo; o
 `qa` pré-código já é o autocheck mecânico que pegou as 3 ocorrências.
+
+**Atualização 2026-09-30 (reincidência 2, PLAN-049 — slug producao-material, `/keelson:tasks`, Etapa 5)**:
+as 6 TASKs saíram com critérios de gate 1 sem evidência de fixação executada (baselines, "Tests: N
+passed", mutantes); o `qa` pré-código executou parte e achou divergências (`.tsx` vs `.ts`, contagens).
+Causa mais funda que a de N-de-testes: o contrato (`commands/tasks.md` l.188, "executado na fixação…
+o que ele devolve entra no critério como evidência") atribui a execução ao redator, que é o `scribe`
+(`tools: Read, Write, Edit, Glob, Grep`, sem shell) — o contrato é inexecutável pelo executor nomeado e
+ninguém é dono da execução. Grep no plugin 0.192.0 (`listTests`, `it.each`, `dono da execução`,
+`evidência:` em tasks/scribe/auto/implement): ausente — proposta não aplicada (4.444). **Escada 4.149
+(reincidencia ≥ 2)**: proposta reformulada e promovida — (1) texto: dono da execução = main session
+(Etapa 5, antes do grafo), l.188 passa a nomear isso e a fonte do N; (2) **check mecânico desenhado**:
+fato de lint `task-criterio-sem-evidencia` em `artifact-lint.sh`/`lint-contract.md` — linha de Critérios
+de gate 1 com esperado numérico (`\b[0-9]+ (tests?|passed|casos)\b`, "baseline") ou mutante nomeado
+(`M[0-9]+[a-z]?`) sem marca `evidência:` na mesma linha/bloco → entra no delta ao `scribe` como os fatos
+não-`(W)`. Imecanizável: se a evidência é verdadeira (só execução prova) — por isso o `qa` pré-código
+segue como amostragem independente. Esta formulação substitui a frase pendente acima (um dono, uma regra).
 
 ## LRN-062: `agents/scribe.md` (sem shell) não diz o que fazer com valor que só comando produz — deixou `HH:MM` literal no INDEX
 data: 2026-09-30
@@ -1518,8 +1534,18 @@ origem: SPEC-044/PLAN-046, TASK-046-004 (K1) — o critério previa que uma 2ª 
 causa_raiz: instrucao_ausente — a fixação manda o par "que estado faz este comando FALHAR?" (l.188) mas o mutante é aplicado a código que ainda não existe; nada manda raciocinar se o mutante tem efeito no canal que o teste observa
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, mesma frase de LRN-064 (l.214)
 patch: mutante prescrito precisa poder morrer: efeito observável no canal lido (NFR de rede → refetch/fetch/`initiate` forçado). Saldo +1 linha (mesma frase de LRN-064)
-reincidencia: 0
+reincidencia: 1 (PLAN-049, TASK-049-002, ver atualização; Grep 0.192.0 por `poder morrer|fora do alcance|controle` em tasks.md: ausente)
 estado: ativa
+
+**Atualização 2026-09-30 (reincidência 1, PLAN-049 — slug producao-material, TASK-049-002, re-review
+do `code-reviewer`)**: o critério prescrito pelo scribe ("M9a → casos 1 e 2 reprovam, caso 3 segue verde
+como controle") era impossível: o mutante `if (status === 403) return literal` também alcança o caso 3.
+Mesma causa de fundo (mutante prescrito sem raciocinar o alcance contra os casos), lado espelho: lá o
+mutante não morria; aqui o "controle" morre junto. A causa operacional (critério fixado sem execução) é
+a de LRN-061/reinc. 2 — a execução da fixação pega, mas a regra de autoria abaixo previne antes. Frase
+reformulada (mesma da pendente, +1 cláusula): "…e todo caso declarado verde sob o mutante ('controle')
+fica fora do alcance do predicado mutado — releia o predicado contra cada caso; sem caso fora do alcance,
+declare 'controle = negativo (sem mutante, verde)'". Reincidência 1 < 2: sem check novo exigido.
 
 ## LRN-066: critério multi-sujeito (item f de `commands/tasks.md`) aplicado com 1 mutante para 3 sujeitos, e o helper de teste não expunha o dado
 data: 2026-09-30
@@ -1528,8 +1554,9 @@ origem: SPEC-044/PLAN-046, TASK-046-005 — o critério pedia remoção de 3 lis
 causa_raiz: instrucao_ausente — o item (f) já exige "mutante por sujeito" (Grep 0.192.0 confirma), mas não cobre o caso em que o sujeito vive num helper de teste que não expõe o dado: sem observação possível, o mutante por sujeito é inatingível (irmã de 4.109 e da lição de projeto `helper-de-teste-que-nao-expoe-o-dado-se-estende-nunca-se-copia`)
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, item (f) (l.210)
 patch: frase no fim do item (f): sujeito que vive em helper exige que o critério mande o helper expor o dado; helper que não expõe se estende na TASK. Saldo +1 linha longa
-reincidencia: 0 (regra base do (f) presente; o eixo helper é novo)
+reincidencia: 2 (2026-10-01, PLAN-049 Wave 3, ambos achados do `code-reviewer`: (i) TASK-049-004 exigia `redactSecret` em "qualquer mensagem de recusa" e prescreveu 1 mutante para 3 canais de exibição (alerta geral, 422 por campo, 409 junto ao e-mail) — 2 mutantes sobreviveram com 26/26 verde; (ii) TASK-049-005 Q9 descreveu o repasse de `onNotice` até `UsersScreen`, o mutante cobria só `UsersList` e o diálogo; prop opcional sempre fornecida em produção desligou o typecheck como guarda e "apagar onNotice={setNotice}" sobreviveu. Mesma causa: sujeito contado pelo texto do critério, não pelas instâncias no código. Grep 0.192.0 de `commands/tasks.md` (item f, l.210): regra base presente, sem "canal"/"elo"/prop obrigatória — proposta de LRN-066 e esta ainda não aplicadas. Escada 4.149: autocheck desenhado na proposta, abaixo)
 estado: ativa
+patch_reincidencia: item (f) ganha frase que define sujeito = instância varrida no código (canais de exibição = chamadas do sanitizador; elos = componentes do repasse), 1 caso + 1 mutante por sujeito ou prop obrigatória com typecheck declarado oráculo; autocheck: nº de sujeitos varridos no diff = nº de mutantes mortos (confronto no fecho). Saldo +1 linha longa (tasks.md: 283 linhas)
 
 ## LRN-067: `screen-verify` manda preencher o login com o valor da senha mas não diz o que fazer quando o sandbox do browser não lê o arquivo — o qa tentou rotas de materialização da credencial
 data: 2026-09-30
@@ -1549,4 +1576,14 @@ causa_raiz: verificador_furado — o leitor Python (l.94-103) busca só `login.g
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `scripts/probe-env.sh` (l.94-103 e l.141) + `scripts/tests/probe-env/run.sh`
 patch: flag nova `fora_de_login` quando o campo está preenchido no realm mas vazio em `login{}`; evidência passa a nomeá-la; caso de teste novo. Saldo ~+6 linhas
 reincidencia: 0 (LRN-016/017 são outras causas no mesmo script: encoding e realm público)
+estado: ativa
+
+## LRN-069: emenda de premissa de DEC com a wave em curso não varre as âncoras `DEC-NNN-XXX` já escritas no código
+data: 2026-09-30
+gatilho: gate_reprovado
+origem: PLAN-049 (slug producao-material), Wave 1, TASK-049-002 — a DEC-049-010 teve a premissa corrigida no PLAN (commit 794cada) no meio da wave, mas o docblock-âncora no código (`src/lib/account-mutations.ts:5-10`, worktree wt-gestao-usuarios) foi commitado com a premissa refutada; achado do `code-reviewer`
+causa_raiz: instrucao_ausente — `commands/implement.md` §3.5 (l.212) manda ajustar PLAN e TASKs quando o furo muda uma DEC, mas nenhum passo varre as âncoras da DEC no código do diff; o artefato é atualizado, o comentário que o cita (Art. 7: âncora `DEC-` é o que sobrevive) fica com a premissa antiga. Distinta de LRN-008 (premissa refutada em BRIEF) e LRN-059 (PLAN×TASK)
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/implement.md` §3.5, bullet "O furo muda o PLAN" (l.212)
+patch: frase no bullet: emenda de premissa de DEC com código já escrito → o despacho de retomada manda `grep -rn 'DEC-<id>'` no diff da TASK, cada comentário relido contra o texto emendado, report com "N âncoras, N conferidas"; o `code-reviewer` re-executa o grep. Saldo +2 linhas (implement.md: 332 linhas)
+reincidencia: 0 (Grep 0.192.0 por `âncora`/`DEC-<id>` em implement.md §3.5: ausente)
 estado: ativa
