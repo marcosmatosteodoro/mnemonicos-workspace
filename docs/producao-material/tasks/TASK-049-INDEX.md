@@ -7,7 +7,7 @@
 
 ### Wave 1 (paralelizável)
 - [x] TASK-049-001 ✅ Done
-- [ ] TASK-049-002 ⏸ Todo
+- [x] TASK-049-002 ✅ Done
 
 ### Wave 2 (depende de Wave 1)
 - [ ] TASK-049-003 ⏸ Todo

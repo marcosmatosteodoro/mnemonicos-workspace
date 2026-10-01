@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-049/KAN-179 em implementação — 1/6 TASKs; PLAN-046/KAN-178 mergeado em `main` — PR #26; gate 9 com login pendente em HANDOFF-PLAN-046; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
+**Última atualização**: 2026-09-30 (PLAN-049/KAN-179 em implementação — 2/6 TASKs; PLAN-046/KAN-178 mergeado em `main` — PR #26; gate 9 com login pendente em HANDOFF-PLAN-046; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
 `main` e fechadas no Jira — PLAN-036/KAN-77: gate 9 PARCIAL, handoff pendente. PLAN-035/F10
 KAN-165: 8/8 TASKs Done, FEAT-034-001/002 VERIFICADAS, épico fechado; pendência de deploy
 em DEPLOY-035-001)
@@ -156,7 +156,7 @@ fechado._
 | PLAN-036 | SPEC-036 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 6/6 ✅ | Done — **mergeado em `main`** (PR #18, `e254bd1`, 2026-09-30) |
 | PLAN-041 | SPEC-040 | 16/16 FRs + 6/6 NFRs (decisão no navegador na própria home com `proxy.ts` intocado; pista local de sessão decide só se há conferência; estado neutro por script inline da página + teto de 3 s; `homeSessionCheck` RTK Query com renovação silenciosa extraída do `baseQueryWithReauth`; `router.replace` + reconferência em volta/bfcache) | 4/4 ✅ | Done (sugerido) |
 | PLAN-046 | SPEC-044 | 27/27 FRs + 4/4 NFRs (sidebar no ramo pronto da casca; lista declarada amarrada às rotas; breakpoint `xl` + container `max-w-7xl` com conta nas 5 larguras; container sai do `<main>` raiz para `PageContainer`; disclosure no fluxo com fechamento derivado da rota; `SiteLogo` por `meSilent` + pista no clique; sem token novo) | 5/5 ✅ | Approved — **mergeado em `main`** (PR #26, `5bce413`, 2026-09-30) |
-| PLAN-049 | SPEC-048 | 25/25 FRs + 5/5 NFRs (guarda ADMIN por mapa de papel na fonte única `internal-routes.ts`, shell único deriva do `usePathname()`; menu de 4 itens filtrado por papel vindo do shell, 0 chamadas novas; senha fora do store por `initiate(args, {track:false})`; paginação anterior/seguinte; busca com debounce de 300 ms; `AccountConfirmDialog` novo; `PasswordField` com prop de erro aditiva; só frontend) | 1/6 🟡 | Approved |
+| PLAN-049 | SPEC-048 | 25/25 FRs + 5/5 NFRs (guarda ADMIN por mapa de papel na fonte única `internal-routes.ts`, shell único deriva do `usePathname()`; menu de 4 itens filtrado por papel vindo do shell, 0 chamadas novas; senha fora do store por `initiate(args, {track:false})`; paginação anterior/seguinte; busca com debounce de 300 ms; `AccountConfirmDialog` novo; `PasswordField` com prop de erro aditiva; só frontend) | 2/6 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
