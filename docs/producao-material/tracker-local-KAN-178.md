@@ -1,5 +1,10 @@
 # Tracker local — KAN-178 (SPEC-044 / BRIEF-044)
 
+**PENDENTE DE RECONCILIAÇÃO desde 2026-09-30 21:05** — o Diretor mergeou o PR #26 e retirou de
+novo o acesso ao conector ("atualize os jiras localmente para passar para o site depois"). As
+operações abaixo, no topo do log, ainda **não** foram aplicadas no quadro `KAN`; o `tracker-sync`
+as aplica quando o acesso voltar (§12, idempotente — conferir o status antes de transicionar).
+
 **RECONCILIADO em 2026-09-30 19:36** (acesso ao conector Atlassian restabelecido, aviso do
 Diretor) — todas as estruturas abaixo foram criadas/transicionadas no quadro `KAN` pelo
 gancho de reconciliação (§12) do `tracker-sync`. Este arquivo fica como registro histórico
@@ -24,6 +29,12 @@ da SPEC, campo `Jira:` da closure das TASKs) são agora a fonte viva — não es
 | SPEC-044 — Sidebar de navegação da área interna | História (`10009`), raiz em modo `link` | **KAN-178** | — (sem épico) | `11` Tarefas pendentes, vinculada pelo gancho `specify` às 17:3x (antes do corte) |
 
 ## Log de operações pendentes (mais recente no topo)
+
+- 2026-09-30 21:05 (trilho pós-merge, aviso do Diretor) — **PENDENTE**:
+  1. **KAN-178** (História): `31` Em análise → `41` **Concluído** (conferir que está em `31` antes; não-regressão).
+  2. Comentário no **KAN-178**: "Mergeado — mnemonicos-frontend PR #26 (`5bce413`, 2026-10-01T00:04:35Z), branch `feat/producao-material-sidebar-navegacao`. Verificação de tela com login segue em `docs/producao-material/handoffs/HANDOFF-PLAN-046.md` (V1–V7). Alinhamento de header/footer em BRIEF-047 (avulso, sem card)."
+  3. Filhos de épico: **n/a** — KAN-178 não tem épico-pai (projeção compacta, como KAN-180/KAN-77); não há épico a consultar nem a fechar.
+  4. Sub-tarefas KAN-187..191: já em `41` Concluído (sem operação).
 
 - 2026-09-30 19:16 (Wave 2 do PLAN-046): sub-tarefa de TASK-046-004 `21` no despacho (18:54) e `41` Concluído na closure (commits 761ccc0, 54b99bf, 581bfeb).
 

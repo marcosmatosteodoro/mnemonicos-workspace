@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-046/KAN-178 em implementação — 3 waves fechadas, 5/5 ✅, Etapa 4 em curso; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
+**Última atualização**: 2026-09-30 (PLAN-046/KAN-178 mergeado em `main` — PR #26; gate 9 com login pendente em HANDOFF-PLAN-046; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
 `main` e fechadas no Jira — PLAN-036/KAN-77: gate 9 PARCIAL, handoff pendente. PLAN-035/F10
 KAN-165: 8/8 TASKs Done, FEAT-034-001/002 VERIFICADAS, épico fechado; pendência de deploy
 em DEPLOY-035-001)
@@ -153,7 +153,7 @@ fechado._
 | PLAN-035 | SPEC-034 | 34/34 FRs + 4/4 NFRs (`PublicationEvent.pageCount Int?` com contagem fail-safe na composição; módulo `strategic-panel` com 5 consultas de contagem fixa + funções puras com `now`; correlação Exportação×evento de etapa por (rawContentId, occurredAt), ordem sempre por `sequence`; predicado de F9 extraído para função pura reusada em lote; `/studio` vira o Painel; 22 COMPs, 20 DECs todas reversíveis, 4 TRISKs) | 8/8 ✅ | Done — **mergeado em `main`** (PR #11 backend, PR #19 frontend, 2026-09-30) |
 | PLAN-036 | SPEC-036 | 16/16 FRs + 5/5 NFRs (`AuthControl`/`ThemeToggle` novos no `SiteHeader`; script de bootstrap de tema sem dependência nova; `meSilent` via `queryFn` contornando `baseQueryWithReauth`; mapeamento de `--surface`/`--surface-raised`/`--border-subtle` para a paleta noturna, extensão de `night-palette-tokens.ts`; consolidação do logout — `internal-shell.tsx` perde seu `LogoutControl` próprio) | 6/6 ✅ | Done — **mergeado em `main`** (PR #18, `e254bd1`, 2026-09-30) |
 | PLAN-041 | SPEC-040 | 16/16 FRs + 6/6 NFRs (decisão no navegador na própria home com `proxy.ts` intocado; pista local de sessão decide só se há conferência; estado neutro por script inline da página + teto de 3 s; `homeSessionCheck` RTK Query com renovação silenciosa extraída do `baseQueryWithReauth`; `router.replace` + reconferência em volta/bfcache) | 4/4 ✅ | Done (sugerido) |
-| PLAN-046 | SPEC-044 | 27/27 FRs + 4/4 NFRs (sidebar no ramo pronto da casca; lista declarada amarrada às rotas; breakpoint `xl` + container `max-w-7xl` com conta nas 5 larguras; container sai do `<main>` raiz para `PageContainer`; disclosure no fluxo com fechamento derivado da rota; `SiteLogo` por `meSilent` + pista no clique; sem token novo) | 5/5 ✅ | Approved |
+| PLAN-046 | SPEC-044 | 27/27 FRs + 4/4 NFRs (sidebar no ramo pronto da casca; lista declarada amarrada às rotas; breakpoint `xl` + container `max-w-7xl` com conta nas 5 larguras; container sai do `<main>` raiz para `PageContainer`; disclosure no fluxo com fechamento derivado da rota; `SiteLogo` por `meSilent` + pista no clique; sem token novo) | 5/5 ✅ | Approved — **mergeado em `main`** (PR #26, `5bce413`, 2026-09-30) |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -438,6 +438,7 @@ fechado._
 > (KAN-77) foi renumerado para `SPEC-036`/`PLAN-036`/`TASK-036-00X`/`BRIEF-036` na
 > reconciliação do pull — nenhum dos dois lados foi descartado.
 
+- 2026-09-30 21:05: **PR #26 mergeado pelo Diretor** (`mnemonicos-frontend`, merge `5bce413`). Jira sem acesso: KAN-178 → Concluído (41) + comentário de merge **registrados como pendentes** em `tracker-local-KAN-178.md`, para reconciliar quando o acesso voltar. Sem épico-pai: não há filhos a consultar. Verificação de tela com login segue em HANDOFF-PLAN-046; alinhamento de header/footer em BRIEF-047.
 - 2026-09-30 21:05: **PR #26 aberto a pedido do Diretor** (`mnemonicos-frontend`, `feat/producao-material-sidebar-navegacao` → `main`). Merge de teste com a `main` atual (já com o #25, botão "Saindo") sem conflito; 71 suítes / 1023 testes verdes no resultado do merge. Pendente antes do merge: HANDOFF-PLAN-046 (login manual). KAN-178 segue em Em análise até o aviso de merge.
 - 2026-09-30 20:58: **Diretor decidiu o alinhamento de header/footer** (pergunta estacionada da Entrega do KAN-178): "Brief avulso depois" → `briefs/BRIEF-047-header-footer-alinhados-area-interna-avulso.md` aberto (sem card até autorizar a execução); a entrega do KAN-178 segue como está (TRISK-046-005 passa a ter destino).
 - 2026-09-30 20:40: **BRIEF-037 fechado como absorvido** pela SPEC-044/PLAN-046 (TASK-046-001, commits 9b60fc2/1915183; sem card próprio). **Aceitação do PO do BRIEF-044: ACEITA_COM_RESSALVAS** — prova em tela com login pendente (HANDOFF-PLAN-046), alinhamento header/footer à área interna aguardando o Diretor.
