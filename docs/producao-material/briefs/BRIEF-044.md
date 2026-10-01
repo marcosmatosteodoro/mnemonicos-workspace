@@ -1,7 +1,7 @@
 # BRIEF-044: Sidebar de navegação da área interna
 
 **Slug**: producao-material
-**Status**: Concluído (mergeado em `main`, PR #26, `5bce413`; KAN-178 → Concluído pendente de reconciliação no Jira — verificação com login segue em HANDOFF-PLAN-046; alinhamento header/footer em BRIEF-047)
+**Status**: Concluído (mergeado em `main`, PR #26, `5bce413`; KAN-178 Concluído no Jira em 2026-10-01 — verificação com login segue em HANDOFF-PLAN-046; alinhamento header/footer em BRIEF-047)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T17:26:28-0300
 **SPEC**: SPEC-044
