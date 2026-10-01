@@ -6,7 +6,7 @@
 ## Ordem de execução (waves)
 
 ### Wave 1 (paralelizável)
-- [ ] TASK-049-001 ⏸ Todo
+- [x] TASK-049-001 ✅ Done
 - [ ] TASK-049-002 ⏸ Todo
 
 ### Wave 2 (depende de Wave 1)
