@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-09-30 (PLAN-049/KAN-179 mergeado em `main` (PR #27, `6adbdf8`) — gate 9 PARCIAL em HANDOFF-PLAN-049, KAN-179 Concluído; PLAN-046/KAN-178 mergeado em `main` — PR #26; gate 9 com login pendente em HANDOFF-PLAN-046; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
+**Última atualização**: 2026-10-01 (SPEC-050/KAN-219 criada e Approved — ações da linha em ícones + reativação de conta, emenda a SPEC-048; PLAN-049/KAN-179 mergeado em `main` (PR #27, `6adbdf8`) — gate 9 PARCIAL em HANDOFF-PLAN-049, KAN-179 Concluído; PLAN-046/KAN-178 mergeado em `main` — PR #26; gate 9 com login pendente em HANDOFF-PLAN-046; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
 `main` e fechadas no Jira — PLAN-036/KAN-77: gate 9 PARCIAL, handoff pendente. PLAN-035/F10
 KAN-165: 8/8 TASKs Done, FEAT-034-001/002 VERIFICADAS, épico fechado; pendência de deploy
 em DEPLOY-035-001)
@@ -102,6 +102,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   → `/`, fora do `<form>` (FR-030-015/016, AC-030-015). O ajuste BRIEF-042 deixou o link centralizado e sem sublinhado, por decisão do Diretor.
 
 ### Especificadas, ainda não planejadas
+- Reativação de conta desativada e coluna de Ações da Tela Usuários em controles compactos (Ativar/Desativar), com log de auditoria pontual da reativação — SPEC-050, primeira fatia do épico v2 de gestão de usuários (KAN-218), `Approved` 2026-10-01.
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
 
@@ -136,6 +137,7 @@ fechado._
 | SPEC-040 | Sessão reconhecida abre a área logada (v0.5 — logo emendado pela SPEC-044) | Approved | 2026-09-30 |
 | SPEC-044 | Sidebar de navegação da área interna | Approved | 2026-09-30 |
 | SPEC-048 | Gestão de usuários (ADMIN) — emenda a navegação da SPEC-044 | Approved | 2026-09-30 |
+| SPEC-050 | Usuários — ações em ícone e reativação de conta (emenda a SPEC-048) | Approved | 2026-10-01 |
 
 ## PLANs
 
@@ -275,6 +277,8 @@ fechado._
 | Busca de contas | Trecho de nome ou e-mail aplicado à lista, aparado; vazio equivale a sem busca; máximo 120 caracteres | SPEC-048 |
 | Confirmação (de ação sobre conta) | Passo antes de desativar ou redefinir senha que identifica a conta-alvo (nome e e-mail), diz a consequência e exige decisão | SPEC-048 |
 | Ação sobre a própria conta | Desativar a própria conta ou redefinir a própria senha pela Tela Usuários; encerra a sessão do ADMIN | SPEC-048 |
+| Ativar | Ação oposta de "Desativar": move a Situação da conta de "Desativada" para "Ativa", liberando a pessoa para autenticar de novo. Mesmo par de estado de "Situação (da conta)" | SPEC-050 |
+| Controle de ação (coluna Ações) | Elemento interativo da coluna "Ações" na linha de uma conta: visualmente compacto, sem rótulo de texto permanente ao lado, disponível/indisponível conforme a Situação, com nome acessível identificando a pessoa-alvo e a ação | SPEC-050 |
 
 ## Decisões irreversíveis
 
@@ -304,6 +308,13 @@ fechado._
 | RISK-048-009 | A tela torna trivial criar a 2ª conta ADMIN: destrava RISK-032-001, mas expõe RISK-032-005 e RISK-032-006 (conserto "obrigatório antes de um 2º ADMIN real operar") | texto de ajuda no papel ADMIN (FR-048-009); decisão do Diretor 2026-10-01: merge livre; brief avulso do RISK-032-006 logo após o merge; nenhum 2º ADMIN real até ele entrar | SPEC-048 |
 | RISK-048-010 | `%` ou `_` na busca de contas podem trazer contas a mais (classe LIKE não corrigida em `users.service.ts`) | PLAN mede o comportamento real; correção na história de backend | SPEC-048 |
 | RISK-048-012 | OWASP A07: senha inicial/redefinida escolhida pelo ADMIN e repassada fora do sistema, sem tela de troca da própria senha | história de UI de troca da própria senha proposta na Entrega | SPEC-048 |
+| RISK-050-001 | "Redefinir senha" sai da linha sem realocação (SPEC-050): sem caminho de tela até a página de edição existir — inclui conta recém-reativada que esqueceu a senha | risco aceito, pendência do épico KAN-218; rota de servidor (FR-048-019..024) intacta, só a UI na linha é removida | SPEC-050 |
+| RISK-050-002 | OWASP A09: reativar ganha log pontual (NFR-050-001), mas criar/desativar/redefinir senha continuam sem trilha de autor — RISK-048-008 permanece aberto para essas três | história de backend de auditoria candidata (mesma decisão do Diretor de RISK-048-008) | SPEC-050 |
+| RISK-050-003 | Troca de botões de texto por controles compactos pode regressar acessibilidade (histórico de re-gate de AA no slug) | AC-050-009/AC-050-010; gate 11 | SPEC-050 |
+| RISK-050-005 | Censo de rotas do backend (`route-authz-matrix`) travado em número fixo de pares; rota nova de reativar precisa entrar no array e no comentário do título | tripwire por desenho — atualização manual do array e do comentário | SPEC-050 |
+| RISK-050-006 | Origem do controle visual (SVG próprio ou biblioteca) é decisão do PLAN; biblioteca nova soma auditoria de dependência e pode acionar gate 10 pelo peso de bundle | decisão do PLAN-050 | SPEC-050 |
+| RISK-050-007 | Reativar conta ADMIN desativada produz um 2º ADMIN ativo; herda RISK-048-009/RISK-032-006 e a decisão do Diretor de 2026-10-01 (nenhum 2º ADMIN real até RISK-032-006 entrar) | diretriz operacional do Diretor; gate 9 só com conta descartável (nunca `admin2` real de dev); Entrega relembra a diretriz | SPEC-050 |
+| Q-050-001 | Existe necessidade de, no mesmo fluxo de reativar, também mudar o papel da conta ou prepará-la para edição? (herdado de Q-048-001, ainda sem resposta) | fora desta SPEC se a resposta for sim — viraria outro card | SPEC-050 |
 | TRISK-049-002 | Senha: `track:false` a mantém fora do estado, mas a ação Redux despachada carrega `meta.arg` e é visível ao Redux DevTools em desenvolvimento | teste de store real durante/depois do voo e no 401 com controle positivo; `devTools` desligado em produção; gate 8 | PLAN-049 |
 | TRISK-049-005 | AA e foco de tabela, painel de criação, `AccountConfirmDialog` e `PasswordField` (`night-pill`) dentro da área interna, nos dois temas | só pares de token já provados + teste de fonte; foco/Esc/trap por comportamento; prova em tela no gate 9/11 | PLAN-049 |
 | RISK-044-002 | Unificar o container de largura pode regredir as páginas públicas (BRIEF-037 absorvido) | AC-044-019 provado em tela nos dois temas | SPEC-044 |
@@ -452,6 +463,8 @@ fechado._
 | TRISK-036-004 | `data-theme` setado pelo script de bootstrap (fora do React) pode divergir do estado interno de `ThemeToggle` se o componente assumir um tema default fixo no 1º render em vez de ler o atributo já aplicado no `<html>`/a escolha salva — risco de hidratação ou de o alternador "nascer" com rótulo/estado errado | `ThemeToggle` deve ler `document.documentElement.dataset.theme`, nunca assumir default hardcoded — item de verificação da TASK/gate 1 | PLAN-036 §8 |
 
 ## Histórico recente
+
+- 2026-10-01 17:10: **SPEC-050 criada e Approved** via `/keelson:auto` (BRIEF-050, Jira KAN-219 em modo link — História pré-existente do épico KAN-218, filha do Diretor; tracker-sync gravou `**Jira Story**: KAN-219`, sem Epic-stub nem Stories por FEAT). 14 FRs, 3 NFRs, 14 ACs, 7 RISKs, 2 FEATs. spec-validator 0 ERROR (WARNINGs estilísticos aceitos, mesmo nível do slug). product-analyst REVISAR_ANTES_DE_APROVAR (9 achados: remoção de "Redefinir senha" sem realocação quebra o caminho de tela de quem esqueceu a senha; conflito aparente com a diretriz do Diretor sobre 2º ADMIN; emenda não declarada à SPEC-048; + 6 achados menores) → po APROVAR, 0 escalação (verificou as duas diretrizes citadas no INDEX e confirmou que não conflitam — o próprio card KAN-219 é a diretriz mais recente, e a liberação de 2º ADMIN já cobre a exposição equivalente). **Emenda a SPEC-048** (subseção §8): textos de reativação indisponível (FR-048-013/015) superados por FR-050-007/008; FEAT-048-004 (redefinir senha) perde o ponto de entrada na linha, comportamento continua especificado para quando for realocado.
 
 > Nota de numeração (2026-09-30): `SPEC-034`/`PLAN-035`/`TASK-035-00X`/`BRIEF-034` foram
 > alocados por DUAS demandas paralelas neste slug (colisão real de `next-id.sh` entre
