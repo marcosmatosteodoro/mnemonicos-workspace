@@ -17,4 +17,4 @@
 - [x] TASK-049-005 ✅ Done
 
 ### Wave 4 (depende de Wave 3)
-- [ ] TASK-049-006 ⏸ Todo
+- [x] TASK-049-006 ✅ Done

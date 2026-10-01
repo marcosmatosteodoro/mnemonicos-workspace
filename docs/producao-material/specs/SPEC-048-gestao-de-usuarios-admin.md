@@ -104,7 +104,7 @@ Termos novos desta SPEC:
 > Do ponto de vista do QA: ADMIN vê o item de menu, abre a tela, vê a lista paginada, busca e
 > percorre os estados; EDITOR não vê o item e é recusado no endereço e no servidor; sem sessão vai ao login.
 
-**Verificação (gate 9)**: 2026-09-30 — pendente: consolidado na rodada final do gate 9 (Roteiro da TASK-049-006, passo 0 + passos da lista), por decisão do PO na Etapa 3.5; ainda não exercitado em tela.
+**Verificação (gate 9)**: 2026-10-01 — PARCIAL / pendente_handoff (qa, rodada final consolidada). **Exercitado em tela, anônimo**: AC-048-003 (`/users` sem sessão → 307 `/login?next=%2Fusers`) e ausência do item "Usuários" sem sessão. **Pendente de tela** (causa: `permissao_ambiente` — login de admin1/editor depende do Diretor; receita 2 vetada pelo PO): AC-048-001/002/004/005/006/007/008/027/025 com sessão — HANDOFF-PLAN-049 V1, V2, V3, V5, V8. AC-048-004 tem evidência complementar no backend (`route-authz-matrix`, 48 verdes).
 
 - **FR-048-001** [MUST] Enquanto a sessão tem papel ADMIN, o sistema DEVE exibir o item "Usuários" na navegação da área interna; enquanto a sessão tem papel EDITOR, o sistema NÃO DEVE exibir esse item; o sistema NÃO DEVE alterar os demais itens da navegação.
 - **FR-048-002** [MUST] Quando um ADMIN abre a tela Usuários, o sistema DEVE exibir a lista das contas internas.
@@ -119,7 +119,7 @@ Termos novos desta SPEC:
 ### FEAT-048-002: Criar conta
 > Do ponto de vista do QA: o ADMIN preenche o formulário, vê erros por campo, envia, vê a conta na lista sem recarregar e confirma que a senha não ficou em lugar nenhum.
 
-**Verificação (gate 9)**: 2026-10-01 — pendente: consolidado na rodada final do gate 9 (Roteiro da TASK-049-006), por decisão do PO na Etapa 3.5; ainda não exercitado em tela.
+**Verificação (gate 9)**: 2026-10-01 — PARCIAL / pendente_handoff (qa, rodada final consolidada): nada exercitável sem sessão de ADMIN (causa: `permissao_ambiente`) — HANDOFF-PLAN-049 V4.
 
 - **FR-048-009** [MUST] Quando o ADMIN abre o formulário de criação, o sistema DEVE oferecer os campos nome, e-mail, papel (EDITOR ou ADMIN, com EDITOR pré-selecionado) e senha, com a senha no campo de senha com mostrar/ocultar; enquanto o papel ADMIN está escolhido, o sistema DEVE exibir junto ao campo papel um texto de ajuda de uma frase dizendo o que o papel concede (gerir contas, fazer a revisão jurídica e aprovar versão), sem diálogo adicional de confirmação (A-048-015).
 - **FR-048-010** [MUST] Se o nome está vazio, o e-mail é inválido ou a senha tem menos de 12 caracteres, então o sistema DEVE mostrar a mensagem em pt-BR junto ao campo correspondente, sem enviar; quando o servidor recusa um campo, o sistema DEVE mostrar a mensagem do servidor junto a esse campo.
@@ -130,7 +130,7 @@ Termos novos desta SPEC:
 ### FEAT-048-003: Desativar conta
 > Do ponto de vista do QA: o ADMIN escolhe uma conta ativa, confirma sabendo que a pessoa será desconectada, vê a situação mudar; as recusas do servidor aparecem sem quebrar a tela.
 
-**Verificação (gate 9)**: 2026-10-01 — pendente: consolidado na rodada final do gate 9 (Roteiro da TASK-049-006), por decisão do PO na Etapa 3.5; ainda não exercitado em tela.
+**Verificação (gate 9)**: 2026-10-01 — PARCIAL / pendente_handoff (qa, rodada final consolidada): nada exercitável sem sessão de ADMIN (causa: `permissao_ambiente`) — HANDOFF-PLAN-049 V6, V10.
 
 - **FR-048-014** [MUST] Enquanto uma conta está ativa, o sistema DEVE oferecer a ação "Desativar" nela; enquanto está desativada, o sistema NÃO DEVE oferecer essa ação.
 - **FR-048-015** [MUST] Quando o ADMIN aciona "Desativar", o sistema DEVE abrir uma confirmação que mostra o nome e o e-mail da conta-alvo, diz que a pessoa será desconectada e que "a reativação não está disponível nesta tela", move o foco para dentro dela e devolve o foco ao acionador ao cancelar; cancelar NÃO DEVE alterar a conta.
@@ -140,6 +140,8 @@ Termos novos desta SPEC:
 
 ### FEAT-048-004: Redefinir senha
 > Do ponto de vista do QA: o ADMIN define nova senha para uma conta ativa, confirmando que as sessões dela serão encerradas; o sucesso não exibe a senha.
+
+**Verificação (gate 9)**: 2026-10-01 — PARCIAL / pendente_handoff (qa, rodada final consolidada): nada exercitável sem sessão de ADMIN (causa: `permissao_ambiente`) — HANDOFF-PLAN-049 V7, V9.
 
 - **FR-048-019** [MUST] Enquanto uma conta está ativa, o sistema DEVE oferecer a ação "Redefinir senha" nela; enquanto está desativada, o sistema NÃO DEVE oferecê-la (A-048-003).
 - **FR-048-020** [MUST] Quando o ADMIN aciona "Redefinir senha", o sistema DEVE abrir uma confirmação que mostra o nome e o e-mail da conta-alvo, com o campo de senha com mostrar/ocultar, que diz que as sessões da conta serão encerradas, move o foco para dentro dela e o devolve ao acionador ao cancelar; cancelar NÃO DEVE alterar a conta.

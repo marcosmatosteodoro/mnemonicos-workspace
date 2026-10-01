@@ -436,6 +436,13 @@ com controle negativo (sem mutante, invocação certa → 18/18 verde) antes de 
 régua desta lição cobre o **avaliador**, não só quem escreve o critério: todo mutante precisa
 de controle negativo no mesmo universo de invocação, ou "morreu" e "não rodou" são indistinguíveis.
 
+**Reincidência (2026-10-01, TASK-049-006, PLAN-049/KAN-179):** a trava anti-duplo-envio (`useRef`) do
+diálogo de redefinir senha foi provada com dois cliques no botão Confirmar, que o `busy` já desabilita;
+remover a trava deixava a suíte verde enquanto o Enter no campo de senha (ainda habilitado em voo)
+reenviava. A fronteira da invariante é o CANAL de envio que continua aberto durante o voo (submit/Enter
+de campo, atalho), não o botão desabilitado. Prova: `users-screen.reset.integration.test.tsx` (R8t),
+mutante sem a trava morre pelo comando do critério (commit `056bf21`).
+
 ## [Testes] Sintoma novo só vira "dívida conhecida" depois de reproduzido sem o diff
 
 **Erro:** o aviso "Jest did not exit one second after the test run" foi atribuído no report

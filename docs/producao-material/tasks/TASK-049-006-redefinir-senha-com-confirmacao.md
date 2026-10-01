@@ -8,7 +8,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -123,19 +123,19 @@ Este Roteiro percorre a **tela inteira no estado final** (lista, criar, desativa
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-10-01T00:13:15-0300
+**Data conclusão**: 2026-10-01T00:37:52-03:00
+**Commit SHA**: 384fd79 + 056bf21 (retry de gate) (mnemonicos-frontend, branch feat/producao-material-gestao-usuarios)
+**Jira**: KAN-179 (modo link; conector sem acesso — tracker-local-KAN-179.md)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (fecha também as 3 pendências roteadas da TASK-049-005: I1, I2, I3)
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 4 + re-gate do delta) — security-engineer
+- [x] Comportamento (gate 9): pendente_handoff — qa, rodada final consolidada 2026-10-01: passo 0 parcial (AC-048-003 executado anônimo: 307 → `/login?next=%2Fusers`; ausência anônima do item); passos 0 (logado) e 1–10, 5b, 5c, 8b pendentes por `permissao_ambiente` (login de admin1/editor depende do Diretor; receita 2 vetada pelo PO). Roteiro consolidado em `docs/producao-material/handoffs/HANDOFF-PLAN-049.md` (V1–V10).
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
