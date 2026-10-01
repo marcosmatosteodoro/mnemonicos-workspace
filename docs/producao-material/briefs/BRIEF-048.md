@@ -1,7 +1,7 @@
 # BRIEF-048: Tela de gestão de usuários (ADMIN)
 
 **Slug**: producao-material
-**Status**: Emitido
+**Status**: Aceito (ACEITA_COM_RESSALVAS — gate 9 em tela pendente em HANDOFF-PLAN-049)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T21:07:04-0300
 **SPEC**: SPEC-048
@@ -84,3 +84,5 @@ redefine a senha das contas internas, sem tocar no backend.
 - specify: 2026-09-30T21:23:34-0300 · correções: 1 · classes: spec-feat-fora-da-5(4) · id-duplicado(4)
 - plan: 2026-09-30T21:35:11-0300 · correções: 0
 - tasks: 2026-09-30T22:16:56-0300 · correções: 1 · classes: ac-sem-task(1) · janelas: redação 25min/577l
+- implement: 2026-10-01T00:37:52-0300
+- entrega: 2026-10-01T00:56:16-0300

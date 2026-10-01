@@ -1587,3 +1587,23 @@ artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) �
 patch: frase no bullet: emenda de premissa de DEC com código já escrito → o despacho de retomada manda `grep -rn 'DEC-<id>'` no diff da TASK, cada comentário relido contra o texto emendado, report com "N âncoras, N conferidas"; o `code-reviewer` re-executa o grep. Saldo +2 linhas (implement.md: 332 linhas)
 reincidencia: 0 (Grep 0.192.0 por `âncora`/`DEC-<id>` em implement.md §3.5: ausente)
 estado: ativa
+
+## LRN-070: TASK prescreve regra (validação/mensagem/limite) sem cruzá-la com símbolos já criados na branch e congela no "Não inclui" o arquivo que já a tinha
+data: 2026-10-01
+gatilho: gate_reprovado
+origem: PLAN-049 (slug producao-material), Wave 4, TASK-049-006 — a TASK prescreveu a validação local de senha (12..200 + mensagens), pôs `create-user-form.tsx` (criado na mesma branch numa wave anterior e já com a regra) no "Não inclui" e proibiu arquivo novo de produção; a política nasceu em duplicata e só foi extraída no retry. Achado do `code-reviewer` (superfície (b) do gate 7)
+causa_raiz: instrucao_ausente — o item (h) de `commands/tasks.md` confronta molde citado e prova pré-existente, mas nada manda cruzar a REGRA que a TASK prescreve com equivalentes já criados na branch antes de fechar o "Não inclui"; o Inclui/Não inclui nasceu de um desenho que a duplicata tornava inevitável (cumprir à risca = duplicar). Irmã de LRN-025 (lado do developer, que aqui estava proibido de extrair pela própria TASK)
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, fim do item (h) (l.212 da v0.192.0)
+patch: frase: TASK que prescreve regra (validação, mensagem, limite) procura equivalente entre os arquivos criados na branch (`git diff --name-status --diff-filter=A <base>...HEAD` + grep do literal/regra) antes de fixar Inclui/Não inclui; havendo, a extração entra no Inclui (e o arquivo sai do Não inclui) ou a duplicata vira dívida declarada no PLAN. Saldo +1 linha longa
+reincidencia: 0 (Grep 0.192.0 de tasks.md por `diff-filter=A`/`criados na branch`: ausente; escada 4.149 não exigida)
+estado: ativa
+
+## LRN-071: critério de "fonte única" por grep fixou como literal uma copy derivada de constante — a prova premiou duplicar
+data: 2026-10-01
+gatilho: gate_reprovado
+origem: PLAN-049 (slug producao-material), Wave 4, TASK-049-006, critério W4(a) — mandou `grep` em 'ao menos 12 caracteres'; no código a string era template derivado de `PASSWORD_MIN`; o developer desfez a derivação para o grep bater (número duplicado no módulo). Achado do `code-reviewer`
+causa_raiz: instrucao_ausente — o item (b) de `commands/tasks.md` (grep de texto falha nos dois sentidos) e o (a) (literal contra a fonte) não nomeiam a classe "oráculo de unicidade/fonte única cujo padrão inclui valor interpolado": o grep só casa se a derivação for desfeita, então cumprir à risca viola o invariante que o critério protege. Distinta de LRN-051 (motor de regex) e LRN-064 (gramática do alvo)
+artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, item (b) (l.206 da v0.192.0), antes de "Lint `task-criterio-grep-nao-ancorado`"
+patch: frase: critério de fonte única por grep busca o trecho invariante da copy (ex.: 'ao menos'), nunca o valor interpolado de constante; se a string é derivada, o critério declara que a derivação se mantém. Saldo +1 linha longa
+reincidencia: 0 (Grep 0.192.0 de tasks.md por `interpol|invariante da copy|fonte única`: ausente)
+estado: ativa
