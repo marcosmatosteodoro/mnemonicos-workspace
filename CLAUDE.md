@@ -120,30 +120,45 @@ decisão do Diretor — não a faça por iniciativa própria.
 O sync do keelson tem **teto**: nenhum gancho automático passa da coluna de desenvolvimento
 (§9 do protocolo, decisão 4.65 — uma Story já foi fechada indevidamente por régua
 automática). Acima do teto quem decide é o Diretor; o Tech Lead executa a ordem, nunca a
-antecipa. Ids medidos neste board — iguais para Epic, História, Tarefa e Subtask:
-`11` Tarefas pendentes · `21` Em andamento · `31` Em análise · `41` Concluído.
+antecipa.
+
+🔴 **Desde 2026-10-01 são dois fluxos, com ids diferentes** (medição completa e histórico
+em [docs/_meta/jira.KAN.md](docs/_meta/jira.KAN.md)):
+
+- **Epic e Subtask** — fluxo simples, transições globais (de qualquer status):
+  `11` Tarefas pendentes · `21` Em andamento · `41` Concluído. Nascem em Tarefas pendentes.
+  **Não têm** Backlog nem Em análise (o `31` saiu deles).
+- **História e Tarefa** — fluxo novo, **direcional**: Backlog → Tarefas pendentes → Em
+  andamento → Análise pendente → Em análise → Concluído (e voltas). **Nascem em Backlog.**
+  O id da transição **depende do status de origem** — `21`/`31`/`41` **não existem** nestes
+  tipos, e o mesmo número pode levar a lugares diferentes conforme a origem. Antes de mover,
+  consulte `getTransitionsForJiraIssue` no card e use o id que ele devolver para o status-alvo;
+  só pule a consulta se o par (origem → alvo) já estiver medido no mapa.
 
 | Momento | Quem dispara | Subtask | História | Epic |
 | --- | --- | --- | --- | --- |
-| TASK despachada | gancho do ciclo | `21` Em andamento | `21` Em andamento | intocado |
+| TASK despachada | gancho do ciclo | `21` Em andamento | Em andamento — de Backlog são **dois saltos** (`4` → Tarefas pendentes, `6` → Em andamento) | intocado |
 | TASK fechada | closure da TASK | `41` Concluído | — | intocado |
-| Desenvolvimento terminado | `--phase finish-dev` | `41` Concluído | `31` **Em análise** | intocado |
-| **Diretor mergeou** | **aviso do Diretor** | — | `41` **Concluído** | condicional, abaixo |
+| Desenvolvimento terminado | `--phase finish-dev` | `41` Concluído | **Análise pendente** (decisão do Diretor, 2026-10-01) | intocado |
+| Diretor começa a revisar | Diretor, no quadro | — | Em análise (In Review) | intocado |
+| **Diretor mergeou** | **aviso do Diretor** | — | **Concluído** | condicional, abaixo |
 
 **Ao mergear, avise.** O Tech Lead não descobre merge sozinho, e o teto do §9 existe
-justamente para ele não adivinhar: História parada em "Em análise" significa "esperando o
-merge", não "esquecida". Recebido o aviso, o Tech Lead:
+justamente para ele não adivinhar: História parada em "Análise pendente" ou "Em análise"
+significa "esperando revisão/merge", não "esquecida". Recebido o aviso, o Tech Lead:
 
-1. move a História mergeada para `41` (Concluído);
+1. move a História mergeada para Concluído. O fluxo é direcional: Concluído só é
+   alcançável a partir de Em análise, então pode exigir o salto Análise pendente → Em
+   análise antes. Consulte as transições do card, não assuma o id;
 2. **consulta os filhos do épico** por JQL (`parent = <EPIC>`) — o estado vem do quadro,
    nunca da memória da sessão nem do que o `INDEX.md` diz;
-3. se **todos** os filhos estiverem em `41`, move o épico para `41` também; se sobrar
+3. se **todos** os filhos estiverem em Concluído, move o épico para `41` também; se sobrar
    qualquer filho aberto, **o épico não se toca**.
 
 O passo 2 não é formalidade. Épico com filho pendente é estado **correto**, não pendência
 a limpar — fechar épico por impressão de que "acabou" é a mesma classe de erro que o teto
 do §9 previne. O quadro também não distingue épico que "esvaziou" de épico que "vai receber
-mais": com todos os filhos em `41`, confirme a intenção com o Diretor antes de mover
+mais": com todos os filhos em Concluído, confirme a intenção com o Diretor antes de mover
 (histórico dos casos em [docs/_meta/jira.KAN.md](docs/_meta/jira.KAN.md)).
 
 Este trilho é doutrina **deste workspace**, executada pelo Tech Lead via conector MCP: o
