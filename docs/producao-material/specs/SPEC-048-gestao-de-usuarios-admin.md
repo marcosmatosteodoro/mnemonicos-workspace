@@ -104,6 +104,8 @@ Termos novos desta SPEC:
 > Do ponto de vista do QA: ADMIN vê o item de menu, abre a tela, vê a lista paginada, busca e
 > percorre os estados; EDITOR não vê o item e é recusado no endereço e no servidor; sem sessão vai ao login.
 
+**Verificação (gate 9)**: 2026-09-30 — pendente: consolidado na rodada final do gate 9 (Roteiro da TASK-049-006, passo 0 + passos da lista), por decisão do PO na Etapa 3.5; ainda não exercitado em tela.
+
 - **FR-048-001** [MUST] Enquanto a sessão tem papel ADMIN, o sistema DEVE exibir o item "Usuários" na navegação da área interna; enquanto a sessão tem papel EDITOR, o sistema NÃO DEVE exibir esse item; o sistema NÃO DEVE alterar os demais itens da navegação.
 - **FR-048-002** [MUST] Quando um ADMIN abre a tela Usuários, o sistema DEVE exibir a lista das contas internas.
 - **FR-048-003** [MUST] Se um EDITOR abre o endereço da tela Usuários, então o sistema DEVE exibir "Você não tem permissão para ver esta página." e NÃO DEVE exibir nem solicitar dado de conta algum.
