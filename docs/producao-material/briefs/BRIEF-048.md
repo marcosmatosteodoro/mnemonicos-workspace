@@ -83,3 +83,4 @@ redefine a senha das contas internas, sem tocar no backend.
 ## Cronologia
 - specify: 2026-09-30T21:23:34-0300 · correções: 1 · classes: spec-feat-fora-da-5(4) · id-duplicado(4)
 - plan: 2026-09-30T21:35:11-0300 · correções: 0
+- tasks: 2026-09-30T22:16:56-0300 · correções: 1 · classes: ac-sem-task(1) · janelas: redação 25min/577l
