@@ -438,6 +438,7 @@ fechado._
 > (KAN-77) foi renumerado para `SPEC-036`/`PLAN-036`/`TASK-036-00X`/`BRIEF-036` na
 > reconciliação do pull — nenhum dos dois lados foi descartado.
 
+- 2026-09-30 21:05: **PR #26 aberto a pedido do Diretor** (`mnemonicos-frontend`, `feat/producao-material-sidebar-navegacao` → `main`). Merge de teste com a `main` atual (já com o #25, botão "Saindo") sem conflito; 71 suítes / 1023 testes verdes no resultado do merge. Pendente antes do merge: HANDOFF-PLAN-046 (login manual). KAN-178 segue em Em análise até o aviso de merge.
 - 2026-09-30 20:58: **Diretor decidiu o alinhamento de header/footer** (pergunta estacionada da Entrega do KAN-178): "Brief avulso depois" → `briefs/BRIEF-047-header-footer-alinhados-area-interna-avulso.md` aberto (sem card até autorizar a execução); a entrega do KAN-178 segue como está (TRISK-046-005 passa a ter destino).
 - 2026-09-30 20:40: **BRIEF-037 fechado como absorvido** pela SPEC-044/PLAN-046 (TASK-046-001, commits 9b60fc2/1915183; sem card próprio). **Aceitação do PO do BRIEF-044: ACEITA_COM_RESSALVAS** — prova em tela com login pendente (HANDOFF-PLAN-046), alinhamento header/footer à área interna aguardando o Diretor.
 - 2026-09-30 20:39: convergência de fecho verde em 06a7932 (dedup: aplicada) — PLAN-046/SPEC-044, 0 gaps; pendência de consolidação: `stripComments` duplicado em 2 testes.
