@@ -119,6 +119,8 @@ Termos novos desta SPEC:
 ### FEAT-048-002: Criar conta
 > Do ponto de vista do QA: o ADMIN preenche o formulário, vê erros por campo, envia, vê a conta na lista sem recarregar e confirma que a senha não ficou em lugar nenhum.
 
+**Verificação (gate 9)**: 2026-10-01 — pendente: consolidado na rodada final do gate 9 (Roteiro da TASK-049-006), por decisão do PO na Etapa 3.5; ainda não exercitado em tela.
+
 - **FR-048-009** [MUST] Quando o ADMIN abre o formulário de criação, o sistema DEVE oferecer os campos nome, e-mail, papel (EDITOR ou ADMIN, com EDITOR pré-selecionado) e senha, com a senha no campo de senha com mostrar/ocultar; enquanto o papel ADMIN está escolhido, o sistema DEVE exibir junto ao campo papel um texto de ajuda de uma frase dizendo o que o papel concede (gerir contas, fazer a revisão jurídica e aprovar versão), sem diálogo adicional de confirmação (A-048-015).
 - **FR-048-010** [MUST] Se o nome está vazio, o e-mail é inválido ou a senha tem menos de 12 caracteres, então o sistema DEVE mostrar a mensagem em pt-BR junto ao campo correspondente, sem enviar; quando o servidor recusa um campo, o sistema DEVE mostrar a mensagem do servidor junto a esse campo.
 - **FR-048-011** [MUST] Quando o ADMIN envia o formulário de criação, o sistema DEVE refletir três estados observáveis: *em andamento* — o botão de envio fica desabilitado, com indicador, e um segundo envio não dispara; *sucesso* — o formulário é fechado ou limpo e uma confirmação é exibida; *falha* — uma mensagem em pt-BR, com erros por campo quando o servidor os informa, e o formulário permanece para nova tentativa.
@@ -127,6 +129,8 @@ Termos novos desta SPEC:
 
 ### FEAT-048-003: Desativar conta
 > Do ponto de vista do QA: o ADMIN escolhe uma conta ativa, confirma sabendo que a pessoa será desconectada, vê a situação mudar; as recusas do servidor aparecem sem quebrar a tela.
+
+**Verificação (gate 9)**: 2026-10-01 — pendente: consolidado na rodada final do gate 9 (Roteiro da TASK-049-006), por decisão do PO na Etapa 3.5; ainda não exercitado em tela.
 
 - **FR-048-014** [MUST] Enquanto uma conta está ativa, o sistema DEVE oferecer a ação "Desativar" nela; enquanto está desativada, o sistema NÃO DEVE oferecer essa ação.
 - **FR-048-015** [MUST] Quando o ADMIN aciona "Desativar", o sistema DEVE abrir uma confirmação que mostra o nome e o e-mail da conta-alvo, diz que a pessoa será desconectada e que "a reativação não está disponível nesta tela", move o foco para dentro dela e devolve o foco ao acionador ao cancelar; cancelar NÃO DEVE alterar a conta.

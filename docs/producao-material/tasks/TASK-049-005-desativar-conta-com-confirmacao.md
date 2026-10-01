@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -84,19 +84,19 @@ Convenção dos comandos: executados na raiz do repositório `mnemonicos-fronten
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-09-30T23:23:40-0300
+**Data conclusão**: 2026-09-30T23:58:40-03:00
+**Commit SHA**: 3e633ac + 454219f (furo no plano) + 1625443 (retry de gate) (mnemonicos-frontend, branch feat/producao-material-gestao-usuarios)
+**Jira**: KAN-179 (modo link; conector sem acesso — tracker-local-KAN-179.md)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado — com pendência roteada: 2 achados mecânicos do re-review (items-center-safe no diálogo; onNotice obrigatório + teste montando UsersScreen) e 1 do gate 11 (aviso limpo ao começar a operação) viraram critérios herdados da TASK-049-006 (teto de 1 retry; decisão do Tech Lead, escada degrau 1)
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 3 + re-gate do delta) — security-engineer
+- [x] Comportamento (gate 9): consolidado (FEAT-048-003) — carregador: Roteiro do gate 9 da TASK-049-006 (passos 2–4 e 5c, desativação de D2 e recusas por fulfill), rodada final consolidada
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

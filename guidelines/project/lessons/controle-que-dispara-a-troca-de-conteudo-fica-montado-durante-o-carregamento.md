@@ -2,7 +2,7 @@
 area: Design
 estado: ativa
 validade: indeterminada
-confirmada: 0
+confirmada: 1
 contestada: 0
 paths:
   - mnemonicos-frontend/src/components/**/*.tsx
@@ -29,3 +29,14 @@ durante e depois do fetch, mais o caso do limite. Referência:
 `mnemonicos-frontend/src/components/users-list.tsx` e
 `users-list.integration.test.tsx` (F1–F4), commit `85d190f`. Eixo de prova complementar: a
 lição "Critério de restauração de foco redigido pelo EVENTO de transição…" (lessons.md).
+
+**Reincidência (2026-10-01, TASK-049-004, Wave 3 do mesmo PLAN — `confirmada: 1`):** o botão
+"Criar conta" fica `disabled` em voo e, na falha do servidor (409/422/500), o foco ficava no
+`<body>`. O título da lição falava de "troca de conteúdo (paginação, filtro, retry)" e o envio
+de formulário não foi reconhecido como o mesmo caso. **Extensão:** todo botão que recebe
+`disabled` enquanto focado (envio de formulário em voo, confirmação de diálogo) nomeia o alvo
+de foco de CADA desfecho — na falha, o primeiro campo com erro ou o campo que precisa ser
+redigitado; no sucesso, um alvo estável — aplicado depois do commit (ref + `useEffect` sobre os
+erros) para o leitor de tela ler `aria-invalid`/`aria-describedby` novos. Prova:
+`document.activeElement` após cada desfecho. Referência: `mnemonicos-frontend/src/components/create-user-form.tsx`
+(`pendingFocusRef`), commit `8522792`; molde correto do diálogo: `account-confirm-dialog.tsx` (efeito de `busy`).

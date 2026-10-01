@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -77,19 +77,19 @@ Convenção do retry: `BASE_RETRY` = `454219f` (HEAD da wave 3 na worktree `wt-g
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: 
+**Data início**: 2026-09-30T23:15:36-0300
+**Data conclusão**: 2026-09-30T23:55:55-03:00
+**Commit SHA**: 88ff4e5 + 8522792 (retry de gate) (mnemonicos-frontend, branch feat/producao-material-gestao-usuarios)
+**Jira**: KAN-179 (modo link; conector sem acesso — tracker-local-KAN-179.md)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 3 + re-gate do delta) — security-engineer
+- [x] Comportamento (gate 9): consolidado (FEAT-048-002) — carregador: Roteiro do gate 9 da TASK-049-006 (passo 1, criação de D1/D2 e e-mail duplicado), rodada final consolidada
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
