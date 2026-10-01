@@ -1,7 +1,7 @@
 # BRIEF-048: Tela de gestão de usuários (ADMIN)
 
 **Slug**: producao-material
-**Status**: Aceito (ACEITA_COM_RESSALVAS — gate 9 em tela pendente em HANDOFF-PLAN-049)
+**Status**: Concluído (mergeado em `main`, PR #27, `6adbdf8`; KAN-179 → Concluído; aceito com ressalvas — gate 9 em tela pendente em HANDOFF-PLAN-049)
 **Data**: 2026-09-30
 **Largada**: 2026-09-30T21:07:04-0300
 **SPEC**: SPEC-048
