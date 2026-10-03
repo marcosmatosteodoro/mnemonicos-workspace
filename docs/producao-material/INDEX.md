@@ -469,6 +469,12 @@ fechado._
 
 ## Histórico recente
 
+- 2026-10-03 15:43: **Convergência de fecho verde** em backend `65d0b2e` / frontend
+  `103eaa8` (dedup: aplicada — 3 achados de duplicação, pendências de consolidação para
+  o KAN-218, nenhum bloqueante). 0 gap: cada FR/NFR/AC da SPEC-050 tem realização e prova
+  no diff; as 4 emendas à SPEC-048 (§8) confirmadas no código. 0 "não solicitado": a
+  quarentena do furo no plano, os 2 retries de gate e a defesa em profundidade
+  `req.auth === undefined` foram avaliados e justificados, nenhum é escopo extra.
 - 2026-10-03 15:30: **DoD de PLAN-051 satisfeita, aguardando promoção manual de Status.**
   Suíte completa 1x (Etapa 4): backend 49/49 suites (477/477 testes, +1 novo), frontend
   92/92 suites (1286/1317 testes, 2 falhas pré-existentes conhecidas — `home-session-gate`,
