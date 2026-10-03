@@ -611,6 +611,45 @@
 - [2026-10-01 · PLAN-049] **Tela `/users`**: `page.tsx` Server Component fino (não busca dado de contas no servidor — o children vai no RSC payload também ao EDITOR); `UsersScreen` (estado em `useState`, região de aviso `role="status"` persistente, limpa ao começar cada operação), `UsersList` (um único return, barra de paginação de `data` estável no carregamento, foco preservado), `CreateUserForm` (painel inline), `AccountConfirmDialog` (alertdialog com véu `bg-(--surface)/80`, `items-center-safe`, foco contido), `DisableAccountDialog`/`ResetPasswordDialog`. `tests/support/source-classes.ts` concentra `stripComments` + `PALETTE_LITERAL` das provas de cor. — mnemonicos-frontend/src/components/users-screen.tsx:80 @ "aria-live"
 - [2026-10-01 · PLAN-049] Limitações conhecidas do backend (fora do diff): busca `contains`/ILIKE sem escape de `%`/`_` (RISK-048-010); `GET /users?search=` grava o termo no log de acesso do pino-http sem redação; sem trilha de auditoria das operações de conta (RISK-048-008); sem índice em `createdAt`/trigram para a busca. — mnemonicos-backend/src/modules/users/users.service.ts:69 @ "contains"
 
+## Reativação de conta e Ações em ícone (avulso · PLAN-051 · KAN-219)
+
+- [2026-10-03 · PLAN-051] **Log de auditoria paralelo, não generalizado**: `src/lib/audit.ts`
+  ganhou `UserAuditType`/`UserAuditEvent`/`recordUserAuditEvent`, no mesmo molde de
+  `AuthAuditType`/`recordAuthEvent` mas **sem misturar os dois domínios** (ator vs. conta-alvo
+  de uma ação administrativa) — segue só pino (`logger.info`), sem tabela de banco. Padrão a
+  repetir: ação administrativa nova que precisa de log ganha seu próprio tipo paralelo neste
+  arquivo, nunca estende `AuthAuditType`. — mnemonicos-backend/src/lib/audit.ts:49 @ "UserAuditType"
+- [2026-10-03 · PLAN-051] **Rota de reativar espelha `disableUser`**: `enableUser`
+  (`users.service.ts`) só limpa `disabledAt`, sem transação `Serializable` (decisão deliberada
+  — a ausência de lock não decide autorização, só idempotência). A guarda de login
+  (`auth.service.ts`: `login`/`resolveAccessSession`/`refresh`/`getSessionUser`) checa só
+  `disabledAt !== null` — qualquer ação futura que zere esse campo já basta para a pessoa
+  autenticar de novo, sem tocar `auth.service.ts`. — mnemonicos-backend/src/modules/users/users.service.ts:182 @ "enableUser"
+- [2026-10-03 · PLAN-051] **Censo de rotas (`route-authz-matrix.integration.test.ts`) agora em
+  49 pares** (era 48) — toda rota nova precisa somar ao array literal E atualizar o comentário
+  do título (tripwire manual, não automático). — mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts:154
+- [2026-10-03 · PLAN-051] **Célula de tabela com ação condicional por estado precisa de nó DOM
+  estável** (DEC-051-013): `users-list.tsx` trocou "render condicional por ação" (`null` quando
+  desativada) por "1 `<button>` sempre presente, props computadas da Situação" — só assim o
+  foco sobrevive à troca de estado sem remount. Padrão a repetir em qualquer célula futura que
+  alterne ação por estado (KAN-218: Editar/Excluir vão reabrir esta decisão se precisarem
+  variar a FORMA da célula, não só as props — TRISK-051-002). — mnemonicos-frontend/src/components/users-list.tsx:123 @ "if (dialog) return"
+- [2026-10-03 · PLAN-051] **Tooltip dentro de contêiner `overflow-x-auto` nunca usa
+  `top-full`/`bottom-full`**: um elemento `absolute` com `opacity-0` ainda ocupa espaço de
+  rolagem — ativa `overflow-y` do contêiner mesmo invisível. Padrão corrigido: posicionar o
+  tooltip DENTRO da altura do próprio gatilho (`right-full top-1/2 -translate-y-1/2` em vez de
+  `top-full`), nunca estendendo para fora dos limites da linha/célula que o hospeda (achado
+  real do gate 11, PLAN-051 Wave 1). — mnemonicos-frontend/src/components/users-list.tsx:84 @ "TOOLTIP_CLASS"
+- [2026-10-03 · PLAN-051] **`quality.test` da ficha nunca roda os testes de integração do
+  backend** (`jest.config.ts` exclui `*.integration.test.ts`; só `npm run test:integration`
+  os roda, comando que o `quality.test` não inclui) — achado do `code-reviewer`, ainda não
+  corrigido na ficha; ACs de backend desta e de entregas anteriores só são provados pelo
+  comando separado. — keelson.config.json @ "quality.test"
+- [2026-10-03 · PLAN-051] **Corrige a entrada de PLAN-049 acima**: RISK-048-008 (sem trilha de
+  auditoria das operações de conta) agora está mitigado SÓ para reativar (`UserAuditType`); as
+  outras 3 ações (criar/desativar/redefinir senha) continuam sem log — a mitigação é pontual,
+  não generaliza. — mnemonicos-backend/src/lib/audit.ts:49
+
 ## Tamanho do código (linha de base do épico)
 
 - [2026-08-27 · epico] 13 arquivos de produção + 3 de teste no backend, 12 + 2 no frontend, uma única página (`/`), nenhuma tela de estudo; `study-slice` existe e não é consumido por ninguém — contagem via ferramentas de busca, sem arquivo único âncora
