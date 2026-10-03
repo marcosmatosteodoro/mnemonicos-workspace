@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -101,6 +101,30 @@ dos dois é útil entregue sozinho, por isso formam uma TASK só.
   ativada." e a linha mostra "Desativar {nome}" no mesmo nó (foco ali); conta já ativa
   (reenvio/corrida) não produz erro nem evento extra percebível; 404 mostra "Conta não
   encontrada." na confirmação e a lista é atualizada (molde D7c).
+- **Furo no plano, corrigido nesta rodada (decisão 4.258)**: `PLAN-051` não listou estes 2
+  arquivos no inventário, mas quebram como consequência direta e inevitável de FR-050-012
+  (remoção do botão "Redefinir senha" da linha) — a análise já foi feita pelo developer na
+  1ª tentativa desta TASK, confirmando baseline verde antes da mudança:
+  - `mnemonicos-frontend/src/components/users-screen.create.integration.test.tsx` — caso C3
+    (asserção de texto da célula de Ações): ajuste mecânico do texto esperado, mesma classe
+    já aplicada em `users-list.integration.test.tsx` (de `'DesativarRedefinir senha'` para o
+    texto real pós-mudança, ex. `'Desativar Nova Conta'` ou equivalente ao nome da conta do
+    fixture do teste).
+  - `mnemonicos-frontend/src/components/users-screen.reset.integration.test.tsx` —
+    **quarentena**, não ajuste de texto: o describe `'UsersScreen — redefinir senha'`
+    (R1–R16c, R4f, hoje linhas 203–590) testa inteiro um fluxo cujo ponto de entrada (botão
+    "Redefinir senha" na linha) deixa de existir nesta tela (RISK-050-001, risco já aceito
+    na SPEC/PLAN — não é decisão nova). Envolva esse describe inteiro em `describe.skip(...)`
+    com comentário citando `RISK-050-001`/`FR-050-012` e a condição de reativação ("reative
+    quando a página de edição — KAN-218 — restaurar o acesso a Redefinir senha, reescrevendo
+    o ponto de entrada"). No describe `'UsersScreen — aviso persistente (herdado da Wave 3)'`
+    (hoje linhas 592+), identifique por leitura (não por suposição) **só** os casos cujo
+    arrange abre o diálogo de redefinir senha pela linha (provável candidato: `R19`, "duas
+    redefinições seguidas") e envolva-os em `it.skip`/bloco próprio com o mesmo comentário —
+    **sem** tocar os casos que exercitam Desativar/Ativar (ex. `R18`), que continuam
+    passando. `ResetPasswordDialog` em si **não é removido nem alterado** (continua existindo
+    em `account-action-dialogs.tsx`, só não é mais montado por `UsersList`) — a quarentena é
+    só dos testes que dependem do ponto de entrada que saiu da linha.
 
 ### Não inclui
 - `account-confirm-dialog.tsx`, `password-field.tsx`, `users-screen.tsx` — mecanismos reusados
@@ -197,6 +221,14 @@ dos dois é útil entregue sozinho, por isso formam uma TASK só.
   guarda de `UUID.test(id)` de `users-list.disable.integration.test.tsx:68`) em vez de aceitar
   qualquer corpo; a fixture tem ≥2 contas (ativa e desativada, ids distintos) para que o alvo
   reativado se distinga do não-alvo.
+- [ ] Furo no plano corrigido (não-regressão da suíte completa, item somado ao Inclui acima):
+  `(cd mnemonicos-frontend && npm test)` (suíte completa, sem filtro) → 0 falha nova além da
+  baseline pré-existente já conhecida (`home-session-gate.integration.test.tsx`,
+  `test/next-build-lock.test.ts` — vermelho pré-existente, sem relação com esta TASK).
+  Especificamente: `users-screen.create.integration.test.tsx` 100% verde (C3 com o texto
+  corrigido) e `users-screen.reset.integration.test.tsx` sem falha (testes dependentes do
+  botão removido em `describe.skip`/`it.skip` com comentário citando RISK-050-001, os
+  independentes — ex. R18 — continuam rodando e verdes).
 - [ ] Sem warnings/lints novos sobre todo o diff (`git diff --name-only main...HEAD`, produção
   e teste): `(cd mnemonicos-frontend && npm run lint && npm run typecheck)` → sem erro nem
   warning novo nos arquivos tocados por esta TASK.
@@ -252,17 +284,17 @@ anterior.
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-10-03T11:00:48-0300
+**Data conclusão**: 2026-10-03T12:09:51-0300
+**Commit SHA**: 5091c19 (implementação) + 103eaa8 (retry pós-gate: guarda de diálogo único + tooltip)
 **Jira**: KAN-226
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (215/244, 29 skipped — quarentena rastreada RISK-050-001)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 1, 1 retry: guarda "um diálogo por vez" sem prova viva pós-quarentena, corrigida e reconfirmada por mutante; re-review aprovado)
+- [x] ACs verificados (AC-050-001, 002, 006, 007, 008, 009, 010, 011, 012, 013, 014)
+- [x] Segurança (gate 8): aprovado (wave 1) — security-engineer, sem achados
+- [x] Comportamento (gate 9): consolidado (FEAT-050-001, FEAT-050-002)
