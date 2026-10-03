@@ -331,9 +331,9 @@ data: 2026-09-13
 gatilho: validator_error
 origem: ciclo `/keelson:auto` de F5 (slug producao-material), ambiente Windows — validação de SPEC-022 (14 ACs) e PLAN-023 (12 DECs); ambos os falsos positivos confirmados por teste isolado (`awk 'BEGIN{print tolower("então")}'` corrompe) e por leitura manual do conteúdo real
 causa_raiz: verificador_furado — o script exporta `LC_ALL=C` (l.28, comentário l.25: "Bash 3.2 + awk POSIX, sem dependências novas") e depois, em 2 checks, chama `tolower()` sobre texto pt-BR ANTES de comparar contra um literal UTF-8 embutido no próprio script: (1) `spec-ac-fora-gwt` monta `acbuf = tolower(line)` (bloco SPEC, l.173/176) e o `flushac()` (l.254) busca `"ent\303\243o"` — bytes intactos — dentro de `acbuf` já corrompido; (2) `plan-dec-irreversivel-enum` (bloco PLAN, l.338) faz `lv = tolower(v); gsub(/\303\243/, "a", lv)` — a ORDEM inverte o que o comentário `# ã→a` promete: o gsub normalizador roda DEPOIS do tolower já ter corrompido o byte, nunca casa. Neste ambiente (gawk + Windows, build cujo `tolower()` corrompe byte ≥0x80 sob locale C), os dois checks reprovam qualquer SPEC/PLAN com "então"/"não"/"ação" nas seções verificadas — nenhuma instrução ao gerador (SPEC/PLAN bem formados) preveniria; o defeito é do parser. Varredura adicional (pedida pelo relato) achou o MESMO padrão em mais 2 sítios do bloco TASK, ainda não sintomáticos porque o texto de teste não bateu neles ainda: os 2 checks da família 4.215 ("--group" sem negação / com negação, l.539 e l.558) fazem `lline = tolower(line)` e depois checam `index(lline, "não")` — mesmo padrão tolower-antes-do-literal-UTF-8, mesma corrupção esperada em texto pt-BR com "não" acentuado. Mesma classe de LRN-014/016/017 (verificador_furado em script do plugin — `graph.sh`/`probe-env.sh`), causa distinta: aqui é corrupção de byte por `tolower()` sob `LC_ALL=C`, não tokenização ingênua nem exceção de encoding não distinguida
-artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) — `scripts/artifact-lint.sh`, blocos awk SPEC (l.173, l.176 — check `spec-ac-fora-gwt`/`flushac`), PLAN (l.338 — check `plan-dec-irreversivel-enum`) e TASK (l.539, l.558 — checks 4.215 "--group")
-patch: proposta de função `lc_safe(s)` (lowercase ASCII-only — só rebaixa byte no intervalo 'A'-'Z', nunca toca byte ≥0x80, então nunca corrompe sequência UTF-8 multibyte) duplicada nos 3 blocos awk logo após cada `function trim(s) {...}` (mesmo padrão de duplicação que o arquivo já usa para `trim`/`emit` — os 3 blocos são programas awk independentes); os 5 call-sites (l.173, l.176, l.338, l.539, l.558) trocam `tolower(...)` por `lc_safe(...)`, sem mais nenhuma mudança de lógica — saldo líquido ~+3 linhas (1 linha de função por bloco; as 5 substituições de token são saldo 0)
-reincidencia: 1
+artefato_patchado: proposta_plugin (não aplicado — modo consumidor; ver mensagem_mantenedor) — `scripts/artifact-lint.sh`, blocos awk SPEC (check `spec-ac-fora-gwt`/`flushac`) e PLAN (check `plan-dec-irreversivel-enum`)
+patch: **reformulado na reincidência 2 (abaixo) — a proposta `lc_safe()` original fica superada; ver patch revisado na atualização 2026-10-03**
+reincidencia: 2
 estado: ativa
 
 **Atualização 2026-09-29 (reincidência 1, ciclo `/keelson:auto` de PLAN-031, slug
@@ -355,6 +355,40 @@ sobre SPEC/PLAN com "então"/"não" acentuado paga de novo o mesmo custo (aqui: 
 dos ACs de uma SPEC, ERROR bloqueante em 100% das DECs de um PLAN). Reforça a
 `mensagem_mantenedor` desta entrada com urgência: o mesmo bug, sem correção, atravessou 4
 execuções conhecidas (SPEC-022/PLAN-023 origem, BRIEF-019, BRIEF-020, agora SPEC/PLAN-031).
+
+**Atualização 2026-10-03 (reincidência 2, slug producao-material — PLAN-049 aprovado/mergeado
+há semanas e PLAN-051 em promoção; achado pelo `agile-coach` a pedido do Tech Lead, Grep
+isolado contra o awk real)**: `plan-dec-irreversivel-enum` reprovou (ERROR, bloqueante) 5/5 DECs
+novas de PLAN-051 e, por evidência cruzada, as 11 DECs de PLAN-049 — todas escritas
+`Irreversível: não` (forma canônica), a mesma reincidência já descrita. **Checagem contra o
+plugin instalado (decisão 4.444)**: Grep por `lc_safe` em `scripts/artifact-lint.sh` da versão
+instalada (**0.193.0**) não encontra nenhuma ocorrência — a `proposta_plugin` da reincidência 1
+segue **não aplicada**; é recorrência do mesmo buraco, não causa nova. **Mas o diagnóstico mais
+fino desta rodada revisa o MECANISMO, não só confirma a não-aplicação**: reprodução isolada
+(`printf 'não\n' | awk '{v=$0; lv=tolower(v); gsub(/\303\243/,"a",lv); print lv}'` em GNU Awk
+5.0.0/Windows) mostra que o `gsub` com escape octal de 2 bytes (`\303\243`) nunca casa contra o
+caractere multibyte "ã" quando o awk roda com reconhecimento de UTF-8 — independente de
+`tolower()` ter corrompido o byte antes (hipótese original da reincidência 1) ou não: mesmo
+isolando o `gsub` sem nenhum `tolower()` no caminho, o escape octal de byte não casa contra um
+`awk` multibyte-aware. `export LC_ALL=C` no topo do script (l.28, confirmado ainda presente em
+0.193.0) não muda esse comportamento neste build — o bash exporta a variável, mas o `gawk` do
+Windows/MSYS2 usado aqui não volta a tratar a entrada como sequência de bytes só por isso.
+**Evidência corroborante dentro do próprio arquivo**: os dois checks da família 4.215 (`task.awk`,
+antigos l.539/558, agora l.552/572) — que a entrada original apontava como "mesmo padrão,
+ainda não sintomáticos" — já NÃO usam mais escape octal: comparam contra o literal UTF-8
+`"não"` escrito diretamente no source (`index(lline, "não") == 0`), e esses dois checks não
+reproduzem o falso positivo. Ou seja: o próprio mantenedor já aplicou, em parte do arquivo, o
+padrão que resolve o problema — só não propagou para os 2 sítios que ainda usam o escape octal
+(`plan-dec-irreversivel-enum`, l.352; `spec-ac-fora-gwt`/`flushac`, l.263/l.182/l.176). **Patch
+revisado, substituindo a proposta `lc_safe()` da reincidência 1** (mais simples, já validada
+no próprio arquivo): nos 2 sítios remanescentes, troca o escape octal `\303\243` pelo literal
+UTF-8 `ã` escrito direto no source (mesmo tratamento de `ent\303\243o` → `então`) — sem
+reordenar nem envolver `tolower()`, replicando exatamente o padrão já em uso nas l.552/572;
+saldo líquido 0 (substituição de token, nenhuma linha nova). **Escada de promoção (decisão
+4.149, reincidência ≥ 2 — texto sozinho não bastaria, mas aqui a correção É código do próprio
+verificador, não prosa)**: a troca de literal já é o "check mecânico" exigido — não há
+autocheck adicional cabível além de corrigir o parser que a própria classe `verificador_furado`
+pede (passo 3 da doutrina: "conserte o check, nunca texto novo").
 
 ## LRN-022: despacho do retry (`commands/implement.md` §3.3) transcreve o COMANDO de varredura citado no achado original como ilustração, não como critério de pronto — só o endereço nomeado fecha
 data: 2026-09-13
