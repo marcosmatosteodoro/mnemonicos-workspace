@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-10-03 (PLAN-051/KAN-219 criado e Approved — rota de reativar + coluna de Ações em ícone; SPEC-050 emenda a SPEC-048; PLAN-049/KAN-179 mergeado em `main` (PR #27, `6adbdf8`) — gate 9 PARCIAL em HANDOFF-PLAN-049, KAN-179 Concluído; PLAN-046/KAN-178 mergeado em `main` — PR #26; gate 9 com login pendente em HANDOFF-PLAN-046; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
+**Última atualização**: 2026-10-03 (PLAN-051/KAN-219 implementado — 2/2 TASKs Done, KAN-225/KAN-226, rota de reativar + coluna de Ações em ícone; aguardando promoção manual de Status; PLAN-049/KAN-179 mergeado em `main` (PR #27, `6adbdf8`) — gate 9 PARCIAL em HANDOFF-PLAN-049, KAN-179 Concluído; PLAN-046/KAN-178 mergeado em `main` — PR #26; gate 9 com login pendente em HANDOFF-PLAN-046; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
 `main` e fechadas no Jira — PLAN-036/KAN-77: gate 9 PARCIAL, handoff pendente. PLAN-035/F10
 KAN-165: 8/8 TASKs Done, FEAT-034-001/002 VERIFICADAS, épico fechado; pendência de deploy
 em DEPLOY-035-001)
@@ -20,9 +20,10 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ## Capacidades
 
 ### Em desenvolvimento
-- Reativação de conta desativada e coluna de Ações da Tela Usuários em controles compactos (Ativar/Desativar), com log de auditoria pontual da reativação (SPEC-050/PLAN-051, KAN-219, primeira fatia do épico v2 de gestão de usuários KAN-218) — PLAN Approved, implementação ainda não iniciada.
 
 ### Implementadas
+- Reativar conta desativada (SPEC-050/FEAT-050-001, PLAN-051, ✅ 2026-10-03) — rota `PATCH /users/:id/enable` (ADMIN, idempotente, sem migração), log de auditoria pontual (`UserAuditType`/`recordUserAuditEvent`), `EnableAccountDialog` reusando `AccountConfirmDialog`, textos revisados. Gate 8 aprovado sem achados; gate 9 consolidado — ver linha de FEAT abaixo.
+- Coluna de Ações em controles compactos (SPEC-050/FEAT-050-002, PLAN-051, ✅ 2026-10-03) — célula de Ações migra de "render condicional por ação" para 1 botão estável por linha (ícone SVG inline, tooltip CSS, foco pós-ação estável), remove "Redefinir senha" da linha (RISK-050-001, risco aceito). Gate 11 aprovado após 1 retry (tooltip vazava rolagem da tabela, corrigido); gate 7 aprovado após 1 retry (quarentena do furo no plano removera a única prova da guarda "um diálogo por vez", restaurada). Primeira fatia do épico v2 de gestão de usuários (KAN-218).
 - Redefinir senha com confirmação (SPEC-048/FEAT-048-004, PLAN-049, ✅ 2026-10-01) — `ResetPasswordDialog` com nova senha (política única `src/lib/password-policy.ts`), trava de duplo envio provada no canal Enter, `redactSecret` nos 2 canais, aviso "Senha redefinida." (região limpa ao começar cada operação), redefinir a própria senha encerra a sessão. Gate 9 PARCIAL: HANDOFF-PLAN-049. Mergeado em `main` (PR #27, `6adbdf8`).
 - Criar conta interna pela tela (SPEC-048/FEAT-048-002, PLAN-049, ✅ 2026-10-01) — painel inline com validação local, papel EDITOR pré-selecionado e ajuda do ADMIN, senha via `PasswordField` (prop `error` aditiva) nunca retida (`track:false`, limpa em sucesso e falha, `redactSecret` nos 3 canais de mensagem), foco nomeado em cada desfecho, conta nova na 1ª linha sem recarregar. Gate 9 em HANDOFF-PLAN-049. Mergeado em `main` (PR #27, `6adbdf8`).
 - Desativar conta com confirmação (SPEC-048/FEAT-048-003, PLAN-049, ✅ 2026-10-01) — `AccountConfirmDialog` novo (alertdialog com véu, foco contido, Esc, erro visível), recusas do servidor (último ADMIN, corrida, 404) na confirmação, desativar a própria conta encerra a sessão (`endOwnSession`), lista atualiza pela invalidação mesmo na falha. 3 pendências mecânicas roteadas à TASK-049-006. Gate 9 em HANDOFF-PLAN-049. Mergeado em `main` (PR #27, `6adbdf8`).
@@ -162,7 +163,7 @@ fechado._
 | PLAN-041 | SPEC-040 | 16/16 FRs + 6/6 NFRs (decisão no navegador na própria home com `proxy.ts` intocado; pista local de sessão decide só se há conferência; estado neutro por script inline da página + teto de 3 s; `homeSessionCheck` RTK Query com renovação silenciosa extraída do `baseQueryWithReauth`; `router.replace` + reconferência em volta/bfcache) | 4/4 ✅ | Done (sugerido) |
 | PLAN-046 | SPEC-044 | 27/27 FRs + 4/4 NFRs (sidebar no ramo pronto da casca; lista declarada amarrada às rotas; breakpoint `xl` + container `max-w-7xl` com conta nas 5 larguras; container sai do `<main>` raiz para `PageContainer`; disclosure no fluxo com fechamento derivado da rota; `SiteLogo` por `meSilent` + pista no clique; sem token novo) | 5/5 ✅ | Approved — **mergeado em `main`** (PR #26, `5bce413`, 2026-09-30) |
 | PLAN-049 | SPEC-048 | 25/25 FRs + 5/5 NFRs (guarda ADMIN por mapa de papel na fonte única `internal-routes.ts`, shell único deriva do `usePathname()`; menu de 4 itens filtrado por papel vindo do shell, 0 chamadas novas; senha fora do store por `initiate(args, {track:false})`; paginação anterior/seguinte; busca com debounce de 300 ms; `AccountConfirmDialog` novo; `PasswordField` com prop de erro aditiva; só frontend) | 6/6 ✅ | Approved — **mergeado em `main`** (PR #27, `6adbdf8`, 2026-10-01) |
-| PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 0/2 ⏸ | Approved |
+| PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 2/2 ✅ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -316,6 +317,7 @@ fechado._
 | RISK-050-006 | Origem do controle visual (SVG próprio ou biblioteca) é decisão do PLAN; biblioteca nova soma auditoria de dependência e pode acionar gate 10 pelo peso de bundle | decisão do PLAN-050 | SPEC-050 |
 | RISK-050-007 | Reativar conta ADMIN desativada produz um 2º ADMIN ativo; herda RISK-048-009/RISK-032-006 e a decisão do Diretor de 2026-10-01 (nenhum 2º ADMIN real até RISK-032-006 entrar) | diretriz operacional do Diretor; gate 9 só com conta descartável (nunca `admin2` real de dev); Entrega relembra a diretriz | SPEC-050 |
 | Q-050-001 | Existe necessidade de, no mesmo fluxo de reativar, também mudar o papel da conta ou prepará-la para edição? (herdado de Q-048-001, ainda sem resposta) | fora desta SPEC se a resposta for sim — viraria outro card | SPEC-050 |
+| — | `quality.test` da ficha (`npm --prefix mnemonicos-backend test && ...`) nunca roda os testes de integração do backend — `jest.config.ts` exclui `*.integration.test.ts` por padrão, e é exatamente onde vivem as provas de AC-050-002/003/004/005/013 e o censo de rotas (achado do `code-reviewer`, gate 7, wave 1 de PLAN-051) | ajustar `quality.test` para somar `npm --prefix mnemonicos-backend run test:integration` (decisão do Diretor — muda o que "suíte completa" roda em todo ciclo futuro, não só nesta entrega) | PLAN-051 |
 | TRISK-051-001 | Métrica §1.3 da SPEC-050 (contagem de eventos em 30 dias) depende de o log de produção reter/ser consultável por esse período — não confirmável pelo código do repo | gate 9 prova que o evento existe e tem o formato certo, não que sobrevive 30 dias; fonte/dono a declarar no veredito de métrica | PLAN-051 |
 | TRISK-051-007 | Reativar conta ADMIN desativada produz um 2º ADMIN ativo (mesma exposição de RISK-050-007/RISK-048-009/RISK-032-006) | diretriz operacional do Diretor; gate 9 só com conta descartável, nunca `admin2` real de dev | PLAN-051 |
 | TRISK-051-008 | Troca de botões de texto por controles de ícone tem histórico de re-gate de AA no slug (severidade alta) | só tokens/utilitários já provados (`surface-card`, `FOCUS_CLASS`); contraste medido nos dois temas no gate 11; teste de fonte confere o conjunto de pares de `night-palette-tokens.ts` | PLAN-051 |
@@ -468,6 +470,33 @@ fechado._
 
 ## Histórico recente
 
+- 2026-10-03 15:03: **PLAN-051 implementado (2 TASKs, wave 1, KAN-225/KAN-226), aguardando
+  promoção manual de Status.** Gates: code-reviewer REPROVADO→APROVADO (1 retry — quarentena
+  do furo no plano removera a única prova viva da guarda "um diálogo por vez" em
+  `users-list.tsx`, restaurada com caso novo + mutante morto confirmado em worktree isolada);
+  security-engineer APROVADO sem achados (gitleaks indisponível no ambiente, declarado);
+  product-designer REPROVADO→APROVADO (1 retry — tooltip vazava a rolagem da tabela por
+  `top-full` dentro de `overflow-x-auto`, reposicionado para `right-full top-1/2`, confirmado
+  por aritmética real contra o arquivo). Suíte: backend 577/577, frontend 215/244 (29
+  skipped — quarentena rastreada RISK-050-001), lint/typecheck limpos. Fora de escopo real
+  (não desta TASK): `quality.test` da ficha nunca roda `test:integration` do backend — ACs
+  de backend só são provados por esse comando separado (registrado em Riscos ativos).
+  Lição candidata (processo) sobre quarentena-por-bloco sem checar prova única de código
+  vivo, roteada ao agile-coach.
+- 2026-10-03 14:33: **Furo no plano em TASK-051-002** — PLAN-051 não listou
+  `users-screen.create.integration.test.tsx` (C3) nem `users-screen.reset.integration.test.tsx`
+  (29/32 testes) no inventário; ambos quebram como consequência direta de FR-050-012 (remoção
+  do botão "Redefinir senha" da linha). Destino: C3 ajustado (texto), suíte de reset
+  quarentenada (`describe.skip`/`it.skip` citando RISK-050-001) nos casos que dependem do
+  ponto de entrada removido; `ResetPasswordDialog` intacto. TASK-051-002 amendada
+  (Inclui + critério); não é ambiguidade nova — RISK-050-001 já aceitava a remoção.
+- 2026-10-03 14:00: **Fora de escopo achado em TASK-051-001**: `npm run typecheck` (backend)
+  tem ~38 erros pré-existentes e `npm run test:integration` sem filtro falha em 8 suítes/119
+  testes do módulo publication/content-versions/strategic-panel — campos dessincronizados
+  (`ContentVersion.approvedById/approvedAt`, `PublicationEvent.pageCount`, enum
+  `ProductionStageType.APROVACAO_VERSAO`). Hipótese do developer: migração de PLAN-029/033
+  pendente de aplicar no Postgres de dev local, ou Prisma Client desatualizado. Não
+  investigado — sem relação com KAN-219/PLAN-051. Estacionado para o Diretor confirmar.
 - 2026-10-03 10:31: **PLAN-051 decomposto em 2 TASKs** (Wave 1, paralelizáveis — sem
   arquivo em comum entre backend e frontend). TASK-051-001 (medium): fatia sensível de
   backend — rota `PATCH /users/:id/enable` + `enableUser` + `UserAuditType` + censo de

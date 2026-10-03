@@ -8,7 +8,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -147,17 +147,17 @@ slug — este contexto não os repete.
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**:
-**Data conclusão**:
-**Commit SHA**:
+**Data início**: 2026-10-03T10:44:27-0300
+**Data conclusão**: 2026-10-03T10:58:05-0300
+**Commit SHA**: b33945e
 **Jira**: KAN-225
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando (577/577, 8 novos)
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado (wave 1, implementado_por: developer, revisado_por: code-reviewer)
+- [x] ACs verificados (AC-050-002, 003, 004, 005, 013)
+- [x] Segurança (gate 8): aprovado (wave 1) — security-engineer, sem achados
+- [x] Comportamento (gate 9): consolidado (FEAT-050-001)
