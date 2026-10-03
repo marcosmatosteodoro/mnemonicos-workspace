@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-10-03 (PLAN-051/KAN-219 implementado — 2/2 TASKs Done, KAN-225/KAN-226, rota de reativar + coluna de Ações em ícone; aguardando promoção manual de Status; PLAN-049/KAN-179 mergeado em `main` (PR #27, `6adbdf8`) — gate 9 PARCIAL em HANDOFF-PLAN-049, KAN-179 Concluído; PLAN-046/KAN-178 mergeado em `main` — PR #26; gate 9 com login pendente em HANDOFF-PLAN-046; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
+**Última atualização**: 2026-10-03 (PLAN-051/KAN-219: DoD satisfeita, 2/2 TASKs Done, gate 9 VERIFICADO (KAN-225/KAN-226), aguardando promoção manual de Status; PLAN-049/KAN-179 mergeado em `main` (PR #27, `6adbdf8`) — gate 9 PARCIAL em HANDOFF-PLAN-049, KAN-179 Concluído; PLAN-046/KAN-178 mergeado em `main` — PR #26; gate 9 com login pendente em HANDOFF-PLAN-046; SPEC-044 Approved, emenda SPEC-040 v0.5; PLAN-041/KAN-180 em implementação — 4/4 ✅ TASKs)
 `main` e fechadas no Jira — PLAN-036/KAN-77: gate 9 PARCIAL, handoff pendente. PLAN-035/F10
 KAN-165: 8/8 TASKs Done, FEAT-034-001/002 VERIFICADAS, épico fechado; pendência de deploy
 em DEPLOY-035-001)
@@ -163,7 +163,7 @@ fechado._
 | PLAN-041 | SPEC-040 | 16/16 FRs + 6/6 NFRs (decisão no navegador na própria home com `proxy.ts` intocado; pista local de sessão decide só se há conferência; estado neutro por script inline da página + teto de 3 s; `homeSessionCheck` RTK Query com renovação silenciosa extraída do `baseQueryWithReauth`; `router.replace` + reconferência em volta/bfcache) | 4/4 ✅ | Done (sugerido) |
 | PLAN-046 | SPEC-044 | 27/27 FRs + 4/4 NFRs (sidebar no ramo pronto da casca; lista declarada amarrada às rotas; breakpoint `xl` + container `max-w-7xl` com conta nas 5 larguras; container sai do `<main>` raiz para `PageContainer`; disclosure no fluxo com fechamento derivado da rota; `SiteLogo` por `meSilent` + pista no clique; sem token novo) | 5/5 ✅ | Approved — **mergeado em `main`** (PR #26, `5bce413`, 2026-09-30) |
 | PLAN-049 | SPEC-048 | 25/25 FRs + 5/5 NFRs (guarda ADMIN por mapa de papel na fonte única `internal-routes.ts`, shell único deriva do `usePathname()`; menu de 4 itens filtrado por papel vindo do shell, 0 chamadas novas; senha fora do store por `initiate(args, {track:false})`; paginação anterior/seguinte; busca com debounce de 300 ms; `AccountConfirmDialog` novo; `PasswordField` com prop de erro aditiva; só frontend) | 6/6 ✅ | Approved — **mergeado em `main`** (PR #27, `6adbdf8`, 2026-10-01) |
-| PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 2/2 ✅ | Approved |
+| PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 2/2 ✅ | Done (sugerido) |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -320,7 +320,6 @@ fechado._
 | — | `quality.test` da ficha (`npm --prefix mnemonicos-backend test && ...`) nunca roda os testes de integração do backend — `jest.config.ts` exclui `*.integration.test.ts` por padrão, e é exatamente onde vivem as provas de AC-050-002/003/004/005/013 e o censo de rotas (achado do `code-reviewer`, gate 7, wave 1 de PLAN-051) | ajustar `quality.test` para somar `npm --prefix mnemonicos-backend run test:integration` (decisão do Diretor — muda o que "suíte completa" roda em todo ciclo futuro, não só nesta entrega) | PLAN-051 |
 | TRISK-051-001 | Métrica §1.3 da SPEC-050 (contagem de eventos em 30 dias) depende de o log de produção reter/ser consultável por esse período — não confirmável pelo código do repo | gate 9 prova que o evento existe e tem o formato certo, não que sobrevive 30 dias; fonte/dono a declarar no veredito de métrica | PLAN-051 |
 | TRISK-051-007 | Reativar conta ADMIN desativada produz um 2º ADMIN ativo (mesma exposição de RISK-050-007/RISK-048-009/RISK-032-006) | diretriz operacional do Diretor; gate 9 só com conta descartável, nunca `admin2` real de dev | PLAN-051 |
-| TRISK-051-008 | Troca de botões de texto por controles de ícone tem histórico de re-gate de AA no slug (severidade alta) | só tokens/utilitários já provados (`surface-card`, `FOCUS_CLASS`); contraste medido nos dois temas no gate 11; teste de fonte confere o conjunto de pares de `night-palette-tokens.ts` | PLAN-051 |
 | TRISK-049-002 | Senha: `track:false` a mantém fora do estado, mas a ação Redux despachada carrega `meta.arg` e é visível ao Redux DevTools em desenvolvimento | teste de store real durante/depois do voo e no 401 com controle positivo; `devTools` desligado em produção; gate 8 | PLAN-049 |
 | TRISK-049-005 | AA e foco de tabela, painel de criação, `AccountConfirmDialog` e `PasswordField` (`night-pill`) dentro da área interna, nos dois temas | só pares de token já provados + teste de fonte; foco/Esc/trap por comportamento; prova em tela no gate 9/11 | PLAN-049 |
 | RISK-044-002 | Unificar o container de largura pode regredir as páginas públicas (BRIEF-037 absorvido) | AC-044-019 provado em tela nos dois temas | SPEC-044 |
@@ -470,6 +469,17 @@ fechado._
 
 ## Histórico recente
 
+- 2026-10-03 15:30: **DoD de PLAN-051 satisfeita, aguardando promoção manual de Status.**
+  Suíte completa 1x (Etapa 4): backend 49/49 suites (477/477 testes, +1 novo), frontend
+  92/92 suites (1286/1317 testes, 2 falhas pré-existentes conhecidas — `home-session-gate`,
+  `next-build-lock`, mesmas da baseline — e 29 skipped da quarentena RISK-050-001). Sem
+  pendência de deploy (`diff-facts.sh --deploy-pending`, exit 0 nos 2 repos — sem migração).
+  TRISK-051-008 (AA) fechado: gate 9 mediu contraste real nos 2 temas, todos ≥5:1. MAP
+  atualizado com o delta da entrega; memo de exploração removido. `map-check.sh` acusa
+  WARNING `map-forma` em ~80 entradas pré-existentes do arquivo inteiro (script assume
+  entrada em 1 linha física; a convenção real do arquivo usa prosa multi-linha desde sempre)
+  — confirmado não-específico desta entrega, declarado, não corrigido (WARNING nunca
+  bloqueia, per o próprio contrato).
 - 2026-10-03 15:03: **PLAN-051 implementado (2 TASKs, wave 1, KAN-225/KAN-226), aguardando
   promoção manual de Status.** Gates: code-reviewer REPROVADO→APROVADO (1 retry — quarentena
   do furo no plano removera a única prova viva da guarda "um diálogo por vez" em
