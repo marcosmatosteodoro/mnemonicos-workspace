@@ -162,7 +162,7 @@ fechado._
 | PLAN-041 | SPEC-040 | 16/16 FRs + 6/6 NFRs (decisão no navegador na própria home com `proxy.ts` intocado; pista local de sessão decide só se há conferência; estado neutro por script inline da página + teto de 3 s; `homeSessionCheck` RTK Query com renovação silenciosa extraída do `baseQueryWithReauth`; `router.replace` + reconferência em volta/bfcache) | 4/4 ✅ | Done (sugerido) |
 | PLAN-046 | SPEC-044 | 27/27 FRs + 4/4 NFRs (sidebar no ramo pronto da casca; lista declarada amarrada às rotas; breakpoint `xl` + container `max-w-7xl` com conta nas 5 larguras; container sai do `<main>` raiz para `PageContainer`; disclosure no fluxo com fechamento derivado da rota; `SiteLogo` por `meSilent` + pista no clique; sem token novo) | 5/5 ✅ | Approved — **mergeado em `main`** (PR #26, `5bce413`, 2026-09-30) |
 | PLAN-049 | SPEC-048 | 25/25 FRs + 5/5 NFRs (guarda ADMIN por mapa de papel na fonte única `internal-routes.ts`, shell único deriva do `usePathname()`; menu de 4 itens filtrado por papel vindo do shell, 0 chamadas novas; senha fora do store por `initiate(args, {track:false})`; paginação anterior/seguinte; busca com debounce de 300 ms; `AccountConfirmDialog` novo; `PasswordField` com prop de erro aditiva; só frontend) | 6/6 ✅ | Approved — **mergeado em `main`** (PR #27, `6adbdf8`, 2026-10-01) |
-| PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 0/? ⏸ | Approved |
+| PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 0/2 ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -468,6 +468,20 @@ fechado._
 
 ## Histórico recente
 
+- 2026-10-03 10:31: **PLAN-051 decomposto em 2 TASKs** (Wave 1, paralelizáveis — sem
+  arquivo em comum entre backend e frontend). TASK-051-001 (medium): fatia sensível de
+  backend — rota `PATCH /users/:id/enable` + `enableUser` + `UserAuditType` + censo de
+  rotas 48→49 (fundindo COMP-051-001/002/003/004, princípio 8 — rota ADMIN-only é fatia
+  sensível por si só). TASK-051-002 (medium): fatia completa de frontend — mutation +
+  `EnableAccountDialog` + reescrita da coluna de Ações (fundindo COMP-051-005/006/007,
+  princípios 2/4 — botão e diálogo não são fronteiras independentes). `graph.sh`/
+  `artifact-lint.sh` (modo diretório): 0 ERROR real (só o bug conhecido de
+  `plan-dec-irreversivel-enum`, LRN-021) + 1 WARNING `task-overlap-fr` esperado (FR-050-003/014
+  split legítimo backend×frontend, mesmo padrão de AC-050-013). Fixação manual dos critérios
+  de gate 1 (scribe sem Bash nesta instalação — degradação declarada): 6 comandos
+  verificados por execução real contra o código atual; achado 1 defeito real (`-t "duplicad"`
+  casava as 4 tests do describe inteiro em vez de isolar o alvo — corrigido para `-t "F8"`,
+  confirmado isolando exatamente 1).
 - 2026-10-03 10:03: **PLAN-051 criado e Approved** (SPEC-050, 14/14 FRs + 3/3 NFRs; 2 rodadas de `code-scout` — confirmou guarda de login só por `disabledAt` (A-050-007), logger pino existente sem tabela de auditoria). 8 COMPs (4 backend + 4 frontend), 14 DECs (9 herdadas + 5 novas, nenhuma irreversível), 9 TRISKs. DEC-051-010: ícone SVG próprio (sem biblioteca nova). DEC-051-011: log via tipo paralelo `UserAuditType` em `lib/audit.ts` (sem tabela/migração nova) — TRISK-051-001 registra a dependência da métrica no coletor de produção. DEC-051-013: coluna de Ações migra para 1 botão estável por linha (props computadas da Situação), permitindo o foco pós-ação voltar ao mesmo controle (AC-050-001). `plan-validator`: 5 ERROR mecânicos (`plan-dec-irreversivel-enum`) calibrados como falso-positivo do script (bug confirmado — `gsub` de byte octal não casa "ã" multibyte no gawk 5.0/UTF-8 desta máquina; reproduzido também contra as 11 DECs já `Approved`/mergeadas do PLAN-049) — `agile-coach` despachado, `PROPOSTA_PLUGIN` pendente para o relatório de fecho.
 - 2026-10-01 17:10: **SPEC-050 criada e Approved** via `/keelson:auto` (BRIEF-050, Jira KAN-219 em modo link — História pré-existente do épico KAN-218, filha do Diretor; tracker-sync gravou `**Jira Story**: KAN-219`, sem Epic-stub nem Stories por FEAT). 14 FRs, 3 NFRs, 14 ACs, 7 RISKs, 2 FEATs. spec-validator 0 ERROR (WARNINGs estilísticos aceitos, mesmo nível do slug). product-analyst REVISAR_ANTES_DE_APROVAR (9 achados: remoção de "Redefinir senha" sem realocação quebra o caminho de tela de quem esqueceu a senha; conflito aparente com a diretriz do Diretor sobre 2º ADMIN; emenda não declarada à SPEC-048; + 6 achados menores) → po APROVAR, 0 escalação (verificou as duas diretrizes citadas no INDEX e confirmou que não conflitam — o próprio card KAN-219 é a diretriz mais recente, e a liberação de 2º ADMIN já cobre a exposição equivalente). **Emenda a SPEC-048** (subseção §8): textos de reativação indisponível (FR-048-013/015) superados por FR-050-007/008; FEAT-048-004 (redefinir senha) perde o ponto de entrada na linha, comportamento continua especificado para quando for realocado.
 

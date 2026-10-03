@@ -135,3 +135,4 @@ da linha; (3) ajustar os dois textos que hoje dizem que reativar não está disp
 ## Cronologia
 - specify: 2026-10-01T17:10:37-0300 · correções: 1 · classes: spec-emenda-nao-declarada(1) · spec-escopo-sem-necessidade(1) · spec-conflito-diretriz-anterior(1) · spec-metrica-nao-falseavel(1) · spec-cenario-faltante(4)
 - plan: 2026-10-03T10:03:02-0300 · correções: 1 · classes: plan-citacao-id-inexistente(1)
+- tasks: 2026-10-03T10:31:51-0300 · correções: 1 · classes: task-criterio-alvo-nao-isolado(1)
