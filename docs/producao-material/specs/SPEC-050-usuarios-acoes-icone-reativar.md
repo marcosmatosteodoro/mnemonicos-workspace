@@ -59,6 +59,12 @@ Termos herdados do glossário consolidado do INDEX e da SPEC-048 (Tela Usuários
 ### FEAT-050-001: Reativar conta desativada
 > Do ponto de vista do QA: a partir de uma conta desativada, o ADMIN aciona "Ativar", confirma, a Situação muda para "Ativa" e a pessoa volta a autenticar; um EDITOR acionando a mesma rota diretamente no servidor é recusado; o log registra quem reativou e qual conta; os dois textos que diziam que reativar não existe foram atualizados.
 
+**Verificação (gate 9)**: 2026-10-03 — ambiente local (backend 3333 + frontend 3000, Postgres
+em container), sessões ADMIN/EDITOR reais via Playwright + curl direto no backend; roteiro
+completo da TASK-051-002 executado (contraste AA claro/escuro, tooltip hover/focus, nó DOM e
+foco estáveis nas 2 direções de transição Ativar↔Desativar, EDITOR recusado 403 no proxy e no
+backend direto). VERIFICADO.
+
 - **FR-050-001** [MUST] Quando o ADMIN aciona "Ativar" numa conta desativada, o sistema DEVE abrir uma confirmação curta que mostra o nome e o e-mail da conta-alvo e diz que a conta volta a autenticar, move o foco para dentro dela e devolve o foco ao acionador ao cancelar; cancelar NÃO DEVE alterar a conta.
 - **FR-050-002** [MUST] Quando o ADMIN confirma a reativação, o sistema DEVE refletir três estados observáveis: *em andamento* — os botões da confirmação ficam desabilitados, com indicador, sem duplo envio; *sucesso* — a confirmação fecha e a linha passa a mostrar a Situação "Ativa" em seguida, sem recarregar a página; *falha* — a mensagem em pt-BR fica visível na confirmação e a Situação exibida não muda.
 - **FR-050-003** [MUST] O sistema DEVE permitir reativar uma conta que já está ativa sem produzir erro (idempotência): a Situação permanece "Ativa" e nenhuma mensagem de falha aparece.
@@ -73,6 +79,10 @@ Termos herdados do glossário consolidado do INDEX e da SPEC-048 (Tela Usuários
 A coluna muda para controles compactos agora para abrir espaço visual aos controles futuros de Editar e Excluir (KAN-218) sem reescrever a coluna outra vez.
 
 > Do ponto de vista do QA: a coluna "Ações" mostra controles compactos que alternam conforme a Situação da conta, cada um com nome acessível e tooltip que identificam a pessoa e a ação; nenhum botão de texto "Redefinir senha" aparece na linha; nenhum controle de "Editar" ou "Excluir" aparece nesta entrega.
+
+**Verificação (gate 9)**: 2026-10-03 — mesmo exercício acima; AC-050-008/009 (1 controle por
+linha, tooltip ≡ aria-label) e AC-050-010 (contraste AA claro/escuro medido: ícone/foco/tooltip
+todos ≥5:1, acima do piso) confirmados em tela real. VERIFICADO.
 
 - **FR-050-009** [MUST] Enquanto uma conta está ativa, o sistema DEVE oferecer na linha um controle compacto de "Desativar"; enquanto está desativada, o sistema DEVE oferecer, no mesmo lugar, um controle compacto de "Ativar"; o sistema NÃO DEVE oferecer os dois controles ao mesmo tempo na mesma linha.
 - **FR-050-010** [MUST] Cada controle de ação da linha DEVE ter nome acessível que identifica a pessoa-alvo e a ação (ex.: "Desativar Evelin Ferreira", "Ativar Evelin Ferreira") e DEVE exibir uma dica (tooltip) com o mesmo texto ao focar ou passar o ponteiro sobre ele.
