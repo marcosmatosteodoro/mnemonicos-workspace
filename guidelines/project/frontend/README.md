@@ -104,6 +104,33 @@ nem "Salvando…" visível na tela.
 Testes do padrão: `src/components/progress-indicator.test.tsx`. Ao migrar um componente, o teste
 que procurava o texto visível com "…" passa a procurar o rótulo do botão ou o `role="status"`.
 
+## Campo obrigatório (KAN-216)
+
+Todo campo obrigatório mostra **"\*"** no rótulo, e nenhum campo opcional mostra. É padrão do
+projeto: formulário novo já nasce com ele.
+
+- **Rótulo** → `RequiredMark` (`src/components/required-mark.tsx`), logo depois do texto do
+  `<label>`. O asterisco é `aria-hidden`: não entra no nome acessível do campo.
+- **Controle** → `aria-required="true"` no `input`/`select`/`textarea`. Não usar o `required`
+  nativo em campo validado no envio: o balão do navegador mudaria o fluxo de erro atual. O
+  `required` nativo só se mantém onde já existe (login, data de fechamento legislativo).
+- **Obrigatoriedade condicional** (ex.: Citação do dispositivo só com Tipo selecionado) → o
+  asterisco e o `aria-required` aparecem só quando a condição vale.
+- **Legenda** → `RequiredLegend` ("\* campo obrigatório") uma vez em cada formulário com dois
+  ou mais campos obrigatórios. Bloco de um campo só (pegadinha, quadro novo da tira) não repete.
+
+```tsx
+<label className="flex flex-col gap-1 text-sm">
+  Pergunta
+  <RequiredMark />
+  <textarea aria-required="true" aria-invalid={…} … />
+</label>
+```
+
+Teste: buscar campo por nome acessível (`getByRole(..., { name: 'Pergunta' })`) e afirmar
+`aria-required`. Para `getByLabelText`, o texto do rótulo inclui o "\*": usar `requiredLabel`
+de `tests/support/required-label.ts`, que aceita o asterisco opcional.
+
 ## Comandos
 
 `npm run validate` = `format:check` + `lint` + `typecheck` + `test`. É o conjunto que o
