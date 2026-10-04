@@ -163,7 +163,7 @@ fechado._
 | PLAN-041 | SPEC-040 | 16/16 FRs + 6/6 NFRs (decisão no navegador na própria home com `proxy.ts` intocado; pista local de sessão decide só se há conferência; estado neutro por script inline da página + teto de 3 s; `homeSessionCheck` RTK Query com renovação silenciosa extraída do `baseQueryWithReauth`; `router.replace` + reconferência em volta/bfcache) | 4/4 ✅ | Done (sugerido) |
 | PLAN-046 | SPEC-044 | 27/27 FRs + 4/4 NFRs (sidebar no ramo pronto da casca; lista declarada amarrada às rotas; breakpoint `xl` + container `max-w-7xl` com conta nas 5 larguras; container sai do `<main>` raiz para `PageContainer`; disclosure no fluxo com fechamento derivado da rota; `SiteLogo` por `meSilent` + pista no clique; sem token novo) | 5/5 ✅ | Approved — **mergeado em `main`** (PR #26, `5bce413`, 2026-09-30) |
 | PLAN-049 | SPEC-048 | 25/25 FRs + 5/5 NFRs (guarda ADMIN por mapa de papel na fonte única `internal-routes.ts`, shell único deriva do `usePathname()`; menu de 4 itens filtrado por papel vindo do shell, 0 chamadas novas; senha fora do store por `initiate(args, {track:false})`; paginação anterior/seguinte; busca com debounce de 300 ms; `AccountConfirmDialog` novo; `PasswordField` com prop de erro aditiva; só frontend) | 6/6 ✅ | Approved — **mergeado em `main`** (PR #27, `6adbdf8`, 2026-10-01) |
-| PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 2/2 ✅ | Done (sugerido) |
+| PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 2/2 ✅ | Done — **mergeado em `main`** (backend PR #12 `811441c`, frontend PR #28 `058af3f`, 2026-10-03) |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -469,6 +469,13 @@ fechado._
 
 ## Histórico recente
 
+- 2026-10-03 22:56: **PR #12/#28 mergeados pelo Diretor** (`mnemonicos-backend` `811441c`,
+  `mnemonicos-frontend` `058af3f`). Jira reconciliado: KAN-219 Em andamento → Analise
+  pendente → Em análise → Concluído (ids 7/8/11, todos medidos agora pela 1ª vez — somados
+  ao mapa de transições); KAN-225/KAN-226 já estavam Concluído. Filhos do épico KAN-218
+  consultados por JQL: KAN-220 a KAN-224 (5) ainda em "Tarefas pendentes" — **épico
+  intocado**, conforme a doutrina (filho aberto não fecha o épico). PLAN-051 promovido a
+  `Done` no cabeçalho do arquivo.
 - 2026-10-03 21:28: **Branches de PLAN-051 pushadas, sem PR aberto (decisão do Diretor).**
   `feat/producao-material-usuarios-icones-reativar` no ar nos 2 repos: backend
   (`mnemonicos-backend`, HEAD `c51ca1d`, push com `--no-verify` autorizado — ~38 erros de

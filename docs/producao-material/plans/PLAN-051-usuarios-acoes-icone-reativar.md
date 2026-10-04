@@ -1,7 +1,7 @@
 # PLAN-051: Usuários — ações em ícone e reativação de conta
 
 **Slug**: producao-material
-**Status**: Approved
+**Status**: Done
 **Versão**: 0.1
 **Autor**: scribe (redação delegada pelo Tech Lead; reconhecimento técnico do `code-scout`, 2 rodadas)
 **Data**: 2026-10-03

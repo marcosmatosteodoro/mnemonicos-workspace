@@ -112,14 +112,22 @@ de origem**: o mesmo número leva a lugares diferentes conforme a origem.
 | Tarefas pendentes → Em andamento | `6` | Iniciar trabalho | KAN-219 (História) |
 | Backlog → Tarefas pendentes | `4` | Priorizando | KAN-193 (História) |
 | Concluído → Backlog | `3` | Despriorizar | KAN-185 (História), KAN-43 (Tarefa) |
-| Em andamento → … | — | **não medido** (nenhum card neste status) | — |
-| Analise pendente → … | — | **não medido** | — |
-| Em análise → … (inclui → Concluído) | — | **não medido** | — |
+| Em andamento → Tarefas pendentes | `2` | Parar de fazer | KAN-219 (História) |
+| Em andamento → Analise pendente | `7` | Entrega para o diretor | KAN-219 (História) |
+| Analise pendente → Em análise | `8` | Analise do diretor | KAN-219 (História) |
+| Analise pendente → Em andamento | `9` | Voltando para atuação | KAN-219 (História) |
+| Em análise → Analise pendente | `10` | Parar analise do diretor | KAN-219 (História) |
+| Em análise → Concluído | `11` | Concluid | KAN-219 (História) |
 
 Para a Tarefa só a origem Concluído foi observada. Ela bateu com a História (`3`), mas o par
 de Tarefas pendentes não se deduz disso: mede-se no primeiro uso. **Regra até a tabela fechar:
 antes de cada transição, `getTransitionsForJiraIssue` no card e uso do id devolvido para o
 status-alvo.** Cada par novo observado entra nesta tabela.
+
+**Fluxo completo de História agora medido de ponta a ponta** (2026-10-03, KAN-219, fecho
+pós-merge de PLAN-051): Backlog `4`→Tarefas pendentes `6`→Em andamento `7`→Analise pendente
+`8`→Em análise `11`→Concluído. Direcional confirmado: não há atalho de nenhum status para
+Concluído além de Em análise.
 
 **Cards de 2026-10-01 movidos para Backlog**: KAN-193…217 e KAN-219…224 (31 Histórias, via
 `5`). KAN-192 e KAN-218 (Epics) ficaram em Tarefas pendentes, porque o fluxo do Epic não tem
