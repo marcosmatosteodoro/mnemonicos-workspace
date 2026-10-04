@@ -75,6 +75,35 @@ Mudança de tela fecha com o gate `screenVerify` (skill `keelson:screen-verify`,
 MCP headless). Telas atrás de login usam o realm de `keelson.local.json` (molde em
 `keelson.local.example.json`).
 
+## Indicador de andamento (KAN-192)
+
+Andamento se mostra com **spinner, nunca com texto de reticências**. Não existe "Carregando…"
+nem "Salvando…" visível na tela.
+
+- **Carregamento de tela ou seção** → `LoadingArea` (`src/components/progress-indicator.tsx`):
+  spinner centralizado na área que vai receber o conteúdo, texto só em `sr-only` dentro de
+  `role="status"`. Quem usa leitor de tela continua ouvindo "Carregando".
+- **Ação em botão** → `BusyButton`: o próprio botão vira o gerúndio **sem reticências** com
+  spinner (`Salvar` → `Salvando`, `Remover` → `Removendo`), desabilitado e com `aria-busy`.
+  Não existe `<span>` solto ao lado com o gerúndio.
+- **Anúncio da ação** → `BusyAnnouncement`, região viva `sr-only` **sempre montada** (região
+  inserida já com texto não é anunciada de forma confiável). Fica fora de `<form aria-busy>`:
+  o `aria-busy` do form silenciaria o anúncio se a região fosse descendente dele.
+- **Proibido**: texto visível terminado em "…" como indicador de andamento. Placeholder de
+  campo ("Selecione…", "Filtrar por categoria…") não é indicador e fica de fora.
+
+```tsx
+{isLoading ? <LoadingArea label="Carregando flashcards" /> : <FlashcardTable … />}
+
+<form aria-busy={isSaving} onSubmit={…}>
+  <BusyButton type="submit" isBusy={isSaving} label="Salvar" busyLabel="Salvando" />
+</form>
+<BusyAnnouncement isBusy={isSaving} busyLabel="Salvando" />
+```
+
+Testes do padrão: `src/components/progress-indicator.test.tsx`. Ao migrar um componente, o teste
+que procurava o texto visível com "…" passa a procurar o rótulo do botão ou o `role="status"`.
+
 ## Comandos
 
 `npm run validate` = `format:check` + `lint` + `typecheck` + `test`. É o conjunto que o
