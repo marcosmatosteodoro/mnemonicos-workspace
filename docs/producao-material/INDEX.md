@@ -469,6 +469,18 @@ fechado._
 
 ## Histórico recente
 
+- 2026-10-03 21:28: **Branches de PLAN-051 pushadas, sem PR aberto (decisão do Diretor).**
+  `feat/producao-material-usuarios-icones-reativar` no ar nos 2 repos: backend
+  (`mnemonicos-backend`, HEAD `c51ca1d`, push com `--no-verify` autorizado — ~38 erros de
+  `typecheck` pré-existentes, fora do diff) e frontend (`mnemonicos-frontend`, HEAD
+  `c51ca1d`, push normal — 2 testes pré-existentes corrigidos nesta sessão, autorizado pelo
+  Diretor: `home-session-gate.integration.test.tsx` tinha separador de path `\` vs `/`
+  esperado; `next-build-lock.test.ts` tinha cenário EPERM que só se comporta como esperado
+  em POSIX, mockado para ficar determinístico). `gh pr create` falhou nos 2 repos por
+  permissão do token (PAT sem acesso/escopo de Pull Requests — "Resource not accessible"
+  no backend, "Could not resolve to a Repository" no frontend) — acionável só pelo
+  Diretor, nas configurações do token no GitHub. Pendente: abrir os 2 PRs (manualmente ou
+  após corrigir o token).
 - 2026-10-03 15:43: **Convergência de fecho verde** em backend `65d0b2e` / frontend
   `103eaa8` (dedup: aplicada — 3 achados de duplicação, pendências de consolidação para
   o KAN-218, nenhum bloqueante). 0 gap: cada FR/NFR/AC da SPEC-050 tem realização e prova
