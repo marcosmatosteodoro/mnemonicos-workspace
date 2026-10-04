@@ -1,7 +1,7 @@
 # BRIEF-050: Usuários — ações da linha em ícones e reativação de conta
 
 **Slug**: producao-material
-**Status**: Emitido
+**Status**: Aceito
 **Data**: 2026-10-01
 **Largada**: 2026-10-01T16:48:32-0300
 **SPEC**: SPEC-050
@@ -136,3 +136,8 @@ da linha; (3) ajustar os dois textos que hoje dizem que reativar não está disp
 - specify: 2026-10-01T17:10:37-0300 · correções: 1 · classes: spec-emenda-nao-declarada(1) · spec-escopo-sem-necessidade(1) · spec-conflito-diretriz-anterior(1) · spec-metrica-nao-falseavel(1) · spec-cenario-faltante(4)
 - plan: 2026-10-03T10:03:02-0300 · correções: 1 · classes: plan-citacao-id-inexistente(1)
 - tasks: 2026-10-03T10:31:51-0300 · correções: 1 · classes: task-criterio-alvo-nao-isolado(1)
+- implement: 2026-10-03T18:16:00-0300
+- entrega: 2026-10-03T21:41:54-0300 · po: ACEITA_COM_RESSALVAS (gate rodado fora de ordem —
+  depois do push, falha do Tech Lead, declarada; ressalvas: 2 testes pré-existentes
+  corrigidos fora do pedido original — home-session-gate/next-build-lock — e diretriz
+  RISK-050-007 a lembrar na Entrega)
