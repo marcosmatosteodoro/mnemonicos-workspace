@@ -469,6 +469,43 @@ fechado._
 
 ## Histórico recente
 
+- 2026-10-05: **BRIEF-055 a 059 abertos** (cards locais; Jira sem acesso, filas em
+  `tracker-local-BRIEF-05x.md`):
+  - **055** (Tarefa): as ações do rodapé da edição de Conteúdo bruto viram uma barra horizontal, com
+    o Remover isolado à direita.
+  - **056** (História, **candidata a ciclo**): reorganizar a edição de Conteúdo bruto, que empilha
+    5 assuntos numa coluna. As alternativas são abas, wizard, seções e hub; a recomendação inicial
+    é abas.
+  - **057** (Tarefa): nenhum link sublinhado na aplicação (29 usos em 13 arquivos). A lição
+    `link-discreto-…` deve ser reformulada.
+  - **058** (Tarefa, bug): a edição de conta não tem "Confirmar senha". O KAN-223 foi aplicado no
+    `ResetPasswordDialog`, sem uso em produção desde o KAN-220.
+  - **059** (Tarefa): Nova conta e Editar conta no molde dos formulários de Conteúdo bruto.
+- 2026-10-05: **BRIEF-054 aberto** (avulso, card local): o padrão de botão da aplicação passa a ser
+  ícone + rótulo curto, com um componente único e regra em `guidelines/project/frontend/`. Estreia
+  em `/content`: "Novo", "Editar" e "Ver" ou "Criar". O nome acessível continua completo.
+  - A troca nas outras telas fica para o card seguinte, a confirmar.
+  - Em aberto: as ações só-ícone de `/users` (KAN-219) seguem o padrão ou não?
+  - O 051 e o 053 nascem no padrão se o 054 vier antes.
+
+  Jira sem acesso: fila em `tracker-local-BRIEF-054.md`.
+- 2026-10-05: **BRIEF-053 aberto** (avulso, card local) no `ContentForm`, que é único para criação
+  e edição:
+  - o `RequiredLegend` ("* campo obrigatório") sai dos 7 formulários da aplicação, por ordem do
+    Diretor que reverte parte do KAN-216;
+  - o "Registrar" vira "Salvar" e ganha um "Cancelar" ao lado, no rodapé à direita;
+  - os 3 selects ficam lado a lado, o Texto normativo vai para baixo deles e "Fonte normativa"
+    vira cabeçalho de seção com linha divisória.
+
+  Colide com o BRIEF-052 em `content-form.tsx`, então o 052 vem antes ou os dois vão na mesma
+  branch. Jira sem acesso: fila em `tracker-local-BRIEF-053.md`.
+- 2026-10-05: **BRIEF-052 aberto** (avulso, bug, card local): o `RequiredMark` do KAN-216 quebra
+  linha nos labels `flex-col`, mostrando o rótulo, o `*` embaixo e depois o campo. O alvo é
+  "texto *" na mesma linha em toda a aplicação. Jira sem acesso: Tarefa única com link `Relates` ao
+  KAN-216, com a fila em `tracker-local-BRIEF-052.md`. Ainda sem implementação.
+- 2026-10-05: **BRIEF-051 aberto** (avulso, card local): na criação e na edição de Conteúdo
+  bruto, o link "Conteúdos brutos" do cabeçalho vira botão "Voltar". Jira sem acesso: Tarefa
+  única a criar, com a fila em `tracker-local-BRIEF-051.md`. Ainda sem implementação.
 - 2026-10-03 22:56: **PR #12/#28 mergeados pelo Diretor** (`mnemonicos-backend` `811441c`,
   `mnemonicos-frontend` `058af3f`). Jira reconciliado: KAN-219 Em andamento → Analise
   pendente → Em análise → Concluído (ids 7/8/11, todos medidos agora pela 1ª vez — somados
