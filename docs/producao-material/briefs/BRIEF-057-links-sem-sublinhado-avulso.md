@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Em revisão (PR aberto)
+**Status**: Concluído (PR #46 mergeado pelo Diretor, 2026-10-05)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão. O acesso ao Jira está retirado.
 **Jira**: KAN-233 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05)
@@ -84,4 +84,4 @@ security-engineer n/a · performance-engineer n/a.
 - Doutrina: `guidelines/project/frontend/link-sem-sublinhado.md`; lição reformulada
   `link-discreto-reduz-cor-e-tamanho-nunca-a-marca-de-link`; lição nova
   `cor-de-estado-derivada-atras-do-texto-mede-contraste-nas-duas-superficies`.
-- Jira KAN-233: Em andamento → Análise pendente.
+- Jira KAN-233: Em andamento → Análise pendente → Em análise → Concluído (após o merge).

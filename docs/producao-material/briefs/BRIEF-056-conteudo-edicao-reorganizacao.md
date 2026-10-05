@@ -3,10 +3,11 @@
 **Slug**: producao-material
 **Tipo**: candidato a ciclo (`/keelson:auto`). **Não é avulso**: exige escolher entre alternativas
 de organização da tela (régua do CLAUDE.md: decisão entre alternativas → ciclo)
-**Status**: Aberto (card local, aguardando sync com o Jira; sem SPEC ainda)
+**Status**: Emitido (2026-10-05, `/keelson:auto` a pedido do Diretor: "Implemente o jira KAN-232")
+**Largada**: 2026-10-05T16:38:55-0300
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, sobre `/content/<id>`. O acesso ao Jira está retirado.
-**Jira**: KAN-232 (História, status medido: Backlog; sincronizado em 2026-10-05)
+**Jira**: KAN-232 (História; Em andamento desde 2026-10-05)
 
 ## Pedido como dito
 "Outra coisa é que esssa tela ta muito grande e confusa, vc poderia ter dividio ela melhor, talverz
@@ -64,6 +65,19 @@ Diretor pode decidir antes.
 - As ações do conteúdo (Quebra, Tira, exportar, remover) ficam num lugar previsível e único.
 - Nenhuma regressão nos fluxos atuais: salvar conteúdo, contrastes, pegadinha, flashcards, fechar
   versão, exportar e remover.
+
+## Decisão da largada (Tech Lead, em nome do Diretor; veto na Entrega)
+- **Alternativa A (abas)** escolhida: é a recomendação do próprio brief e o Diretor mandou implementar
+  sem escolher outra. B (wizard) fica fora: a criação tem um passo só.
+- **Rota**: a escolha entre alternativas está resolvida e nada de contrato muda (P-056-001), então o que
+  resta é reorganização de interface em um repo: **TASK avulsa sobre este brief**, sem SPEC/PLAN, com
+  gates 1-7, 9 (comportamento) e 11 (design/UX). Gate 8: n/a (sem auth/dado novo); 10: n/a.
+- **Alterações não salvas**: a **alteração fica preservada** — os três painéis permanecem montados e a
+  aba inativa só é ocultada, então trocar de aba não perde digitação.
+- **Barra de ações** (Quebra da regra, **Tira mnemônica**, Exportar Tira, Exportar Resumo, Remover) sobe
+  para o cabeçalho, acima das abas, visível em qualquer aba; Tira ganha o acesso que faltava.
+- **Base**: o KAN-231 (barra de ações, PR #48) ainda não está mergeado e mexe na mesma tela; a branch
+  sai dele e o PR é empilhado (base `feat/kan-231-barra-de-acoes-edicao`).
 
 ## Próximo passo
 `/keelson:auto` a partir deste brief quando o Diretor priorizar (ou escolher a alternativa antes).
