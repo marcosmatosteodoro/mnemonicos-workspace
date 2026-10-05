@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso (bug)
-**Status**: Aberto (card local, aguardando sync com o Jira)
+**Status**: Entregue, PR #47 aguardando merge
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, com print de `/users/<id>/edit` (tema escuro; dados da conta no
 print não reproduzidos aqui). O acesso ao Jira está retirado.
@@ -77,4 +77,10 @@ testes e não chega ao usuário. Antes de mudar uma ação, ache o ponto de uso 
 <nenhuma — o brief é a unidade de execução>
 
 ## Execução
-<a preencher na implementação>
+- 2026-10-05: implementado em `mnemonicos-frontend`, branch `feat/kan-234-confirmar-senha-redefinicao` (commit `3046d95`). PR: https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/47
+- Campo "Confirmar senha" (obrigatório) em `ResetPasswordSection`; `ResetPasswordDialog` e os testes em quarentena removidos; `users-screen.reset.integration.test.tsx` virou `users-screen.notice.integration.test.tsx` (só cobre o aviso de desativação).
+- Gates: security-engineer aprovado (sem achados) · code-reviewer reprovou na 1ª rodada (faltava `required` e o teste só olhava o rótulo), corrigido · qa e product-designer **não rodados** (sem app no ar; o teste de integração intercepta a requisição) · performance n/a.
+- `lint`, `typecheck`, jest e `build` limpos; `format:check` global falha só por CRLF do checkout Windows, preexistente.
+- Lacuna apontada pelo reviewer: `ResetPasswordSection` não tem teste ativo de 422 remoto, redação de senha ecoada, 500/404, trava em voo nem auto-redefinição (os R6–R16c removidos já estavam em `describe.skip`).
+- Lições: `acao-corrigida-sem-achar-o-ponto-de-uso-em-producao-chega-so-ao-teste.md` e `ac-de-campo-obrigatorio-se-prova-com-aria-required-nao-com-o-rotulo.md`, em `guidelines/project/lessons/`.
+- Card: KAN-234 em Analise pendente, aguardando revisão e merge do Diretor.
