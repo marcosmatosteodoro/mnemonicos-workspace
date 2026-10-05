@@ -72,6 +72,12 @@ repo, leia o README do guideline correspondente:
 - **Escopo mínimo** nos dois repos: seguir as convenções do módulo tocado; sem refactor
   em massa sem pedido.
 
+## Guia de uso — documento vivo
+
+[docs/GUIA-DE-USO.md](docs/GUIA-DE-USO.md) explica como usar a aplicação. Toda entrega que
+altere tela, fluxo, papel, mensagem visível ou setup local **atualiza esse guia no mesmo
+ciclo** (e a data de "Última atualização"); faz parte da closure da TASK.
+
 ## Ambiente local — portas
 
 Padrão: **frontend `3000`** (`next dev`) e **backend `3333`** (`PORT`, default em
