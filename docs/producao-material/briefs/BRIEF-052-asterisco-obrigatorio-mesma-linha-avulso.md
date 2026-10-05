@@ -69,4 +69,11 @@ security-engineer n/a (só markup e estilo, sem superfície sensível) · perfor
 <nenhuma — o brief é a unidade de execução>
 
 ## Execução
-<a preencher na implementação>
+- 2026-10-05: implementado no frontend, branch `feat/producao-material-asterisco-mesma-linha`,
+  commit `9f4c93c` (developer). `RequiredLabelText` em `required-mark.tsx` aplicado nos 17 usos
+  em label `flex-col`; prova estática + de renderização em `required-mark.test.tsx`.
+- Guideline frontend (§Campo obrigatório) corrigido; lição em
+  `guidelines/project/lessons/elemento-inline-ao-lado-de-texto-e-verificado-no-layout-real-do-container.md`.
+- Gates: product-designer aprovado (leitura de código; Playwright indisponível). qa (gate 9,
+  360/768/1280px nos 2 temas) **não rodado — Playwright MCP falhou ao conectar**; fica ao Diretor
+  na revisão do PR.

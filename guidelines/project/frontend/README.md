@@ -109,20 +109,24 @@ que procurava o texto visível com "…" passa a procurar o rótulo do botão ou
 Todo campo obrigatório mostra **"\*"** no rótulo, e nenhum campo opcional mostra. É padrão do
 projeto: formulário novo já nasce com ele.
 
-- **Rótulo** → `RequiredMark` (`src/components/required-mark.tsx`), logo depois do texto do
-  `<label>`. O asterisco é `aria-hidden`: não entra no nome acessível do campo.
+- **Rótulo** (`src/components/required-mark.tsx`) → em `<label>` que envolve o controle
+  (`flex flex-col`), use `RequiredLabelText`: texto e `*` viram **um único item flex**, e o `*`
+  acompanha a última palavra. `RequiredMark` solto como irmão do texto nesse layout empilha o
+  asterisco em linha própria (KAN-228); ele só vale em `<label htmlFor>` separado do controle
+  (login, criar usuário, `password-field`). O asterisco é `aria-hidden`: não entra no nome
+  acessível do campo.
 - **Controle** → `aria-required="true"` no `input`/`select`/`textarea`. Não usar o `required`
   nativo em campo validado no envio: o balão do navegador mudaria o fluxo de erro atual. O
   `required` nativo só se mantém onde já existe (login, data de fechamento legislativo).
 - **Obrigatoriedade condicional** (ex.: Citação do dispositivo só com Tipo selecionado) → o
-  asterisco e o `aria-required` aparecem só quando a condição vale.
+  asterisco e o `aria-required` aparecem só quando a condição vale
+  (`<RequiredLabelText required={cond}>`).
 - **Legenda** → `RequiredLegend` ("\* campo obrigatório") uma vez em cada formulário com dois
   ou mais campos obrigatórios. Bloco de um campo só (pegadinha, quadro novo da tira) não repete.
 
 ```tsx
 <label className="flex flex-col gap-1 text-sm">
-  Pergunta
-  <RequiredMark />
+  <RequiredLabelText>Pergunta</RequiredLabelText>
   <textarea aria-required="true" aria-invalid={…} … />
 </label>
 ```
