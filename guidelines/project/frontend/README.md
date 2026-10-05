@@ -135,6 +135,11 @@ Teste: buscar campo por nome acessível (`getByRole(..., { name: 'Pergunta' })`)
 `aria-required`. Para `getByLabelText`, o texto do rótulo inclui o "\*": usar `requiredLabel`
 de `tests/support/required-label.ts`, que aceita o asterisco opcional.
 
+## Botão de ação (KAN-230)
+
+Botão = ícone à esquerda + rótulo curto, via `ActionButton`; nome acessível completo começando
+pelo rótulo. Regra completa em [botoes-acao.md](botoes-acao.md).
+
 ## Comandos
 
 `npm run validate` = `format:check` + `lint` + `typecheck` + `test`. É o conjunto que o
