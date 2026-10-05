@@ -139,4 +139,8 @@ mudança de dado, auth ou endpoint) · performance-engineer n/a.
 <nenhuma — o brief é a unidade de execução>
 
 ## Execução
-<a preencher na implementação>
+- 2026-10-05: implementado por Claude (Tech Lead, inline) na branch `feat/kan-229-content-form-layout`,
+  empilhada sobre o PR #41 (KAN-228). PR frontend #42. Card KAN-229: Em andamento → Análise pendente.
+- Gates: lint, typecheck e `jest src/components` limpos. **Não rodados**: code-reviewer, product-designer
+  (gate 11), qa (gate 9), verificação visual 360/768/1280px e `npm run build`. Suítes `home.integration` e
+  `not-found.integration` falham no ambiente da worktree (sem servidor); fecho **parcial**.
