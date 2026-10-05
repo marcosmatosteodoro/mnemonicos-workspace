@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Em revisão (PR aberto)
+**Status**: Concluído (PR #43 mergeado em 2026-10-05)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, com print de `/content` (tema escuro). O acesso ao Jira está retirado.
 **Jira**: KAN-230 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05)
@@ -102,4 +102,4 @@ security-engineer n/a · performance-engineer n/a (SVG inline pequeno, sem depen
 - Gates: code-reviewer aprovado · product-designer aprovado · qa parcial (comportamento provado por teste; verificação visual em temas e 360/768/1280px **não rodada**, Playwright MCP não conectou) · security-engineer e performance-engineer n/a.
 - `npm run validate` falha só no `format:check` global (CRLF do checkout Windows, preexistente); lint, typecheck, jest (1341) e build limpos.
 - Sugestões baixas não aplicadas: `type` do `<button>` sobrescrevível (decidir antes do BRIEF-053), cast de `rest`, envelope SVG duplicado com `internal-nav-icons.tsx`. Candidatos ao card de migração: `strategic-panel-board.tsx`, `content/new/page.tsx` e o "Tentar novamente".
-- Card: KAN-230 em Análise pendente. Concluído só após aviso de merge do Diretor.
+- Card: KAN-230 Concluído após aviso de merge do Diretor (2026-10-05).

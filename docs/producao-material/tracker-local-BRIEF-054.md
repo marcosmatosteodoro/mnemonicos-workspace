@@ -24,6 +24,7 @@
 
 ## Log (mais recente no topo)
 
+- 2026-10-05: PR #43 mergeado pelo Diretor; KAN-230 já em Em análise → Concluído (`11`). Tarefa avulsa, sem épico.
 - 2026-10-05 15:27 (-03): KAN-230 Backlog→Tarefas pendentes→Em andamento (`6`, ao despachar) → Análise pendente (`7`, finish-dev); comentário com PR #43 postado.
 - 2026-10-05 13:37 (-03): sync com o Jira. Busca anti-duplicata sem correspondência (resultados eram cards antigos e distintos); `createJiraIssue` → **KAN-230** (Tarefa), status medido no retorno: **Backlog**, sem mover.
 - 2026-10-05: BRIEF-054 e este arquivo criados localmente, com o conector Atlassian sem acesso.
