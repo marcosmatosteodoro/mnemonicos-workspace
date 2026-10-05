@@ -3,7 +3,7 @@
 **Slug**: producao-material
 **Tipo**: candidato a ciclo (`/keelson:auto`). **Não é avulso**: exige escolher entre alternativas
 de organização da tela (régua do CLAUDE.md: decisão entre alternativas → ciclo)
-**Status**: Aceito, PR aberto (2026-10-05, `/keelson:auto` a pedido do Diretor: "Implemente o jira KAN-232")
+**Status**: Concluído, PR #50 mergeado em 2026-10-05 (2026-10-05, `/keelson:auto` a pedido do Diretor: "Implemente o jira KAN-232")
 **Largada**: 2026-10-05T16:38:55-0300
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, sobre `/content/<id>`. O acesso ao Jira está retirado.
@@ -83,12 +83,11 @@ Diretor pode decidir antes.
 `/keelson:auto` a partir deste brief quando o Diretor priorizar (ou escolher a alternativa antes).
 
 ## Execução
-- 2026-10-05: KAN-232 implementado (alternativa A, abas). Frontend PR #49
-  (`feat/kan-232-conteudo-edicao-abas`, **empilhado** sobre o PR #48 / KAN-231; trocar a base para `main`
-  depois do merge do #48). Nenhuma mudança de backend, dado ou contrato.
+- 2026-10-05: KAN-232 implementado (alternativa A, abas). Frontend PR #49 (empilhado sobre o #48) foi mergeado na
+  branch do #48, não na `main`; o KAN-232 chegou à `main` pelo **PR #50**, mergeado pelo Diretor. Nenhuma mudança de backend, dado ou contrato.
 - Gates: 1-7 aprovado (code-reviewer); 11 reprovado 1x (`overflow-x-auto` no tablist cortava o anel de
   foco e criava rolagem de 1px) e aprovado no re-gate (product-designer); 8 e 10 n/a; **9 pendente de
   verificação de tela** (Playwright MCP não conectou; conferir abas, foco por teclado, 328px e tema escuro).
   Suíte 102/102 (1379), tsc e eslint limpos.
 - Lição: `guidelines/project/lessons/conteiner-com-overflow-corta-o-anel-de-foco-e-cria-rolagem-de-1px.md`.
-- Jira: KAN-232 em Análise pendente.
+- Jira: KAN-232 Concluído após o merge (sem épico pai nem filhos). Verificação de tela (gate 9) segue sem registro.
