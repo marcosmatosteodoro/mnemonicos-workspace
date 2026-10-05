@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Desenvolvimento concluído, PR #45 aberto (KAN-235), aguardando revisão e merge do Diretor
+**Status**: Concluído, PR #45 mergeado (KAN-235)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, com print de `/users/<id>/edit` (dados da conta no print não
 reproduzidos aqui). O acesso ao Jira está retirado.
@@ -84,6 +84,6 @@ senha ou de papel (se for só layout, n/a declarado) · performance-engineer n/a
 - Branch `feat/kan-235-conta-padrao-formularios`, PR https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/45.
 - Extraídos `PageHeader`, `FormFooter` e `FormSection` (src/components), usados na conta e no Conteúdo bruto.
 - Gates: code-reviewer e product-designer aprovados (developer ≠ revisores); security-engineer n/a (sem mudança de lógica de senha/papel); qa/screen-verify não rodado (verificação visual 360/768/1280 pendente).
-- "Confirmar senha" (BRIEF-058) não estava em `main`; a grade da seção já comporta o campo.
+- "Confirmar senha" entrou na seção após merge de `origin/main` (KAN-234), ao lado de "Nova senha".
 - Sugestões abertas: ícone no "Voltar" via ActionButton; `aria-label` repetido no form de senha; cabeçalhos de Quebra e Tira ainda inline.
-- Jira: KAN-235 em Análise pendente.
+- Jira: KAN-235 Concluído (2026-10-05, após merge do Diretor).
