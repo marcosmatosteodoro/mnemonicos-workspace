@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Aberto (card local, aguardando sync com o Jira)
+**Status**: Em revisão (PR aberto)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão. O acesso ao Jira está retirado.
 **Jira**: KAN-233 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05)
@@ -12,7 +12,7 @@
 
 ## Interpretação
 É uma regra de toda a aplicação: **nenhum link exibe sublinhado**, nem em repouso nem no hover. Na
-`origin/main`, em 2026-10-05, há 29 usos da classe `underline` em 13 arquivos:
+`origin/main`, em 2026-10-05, há 28 usos da classe `underline` em 12 arquivos (a contagem inicial, 29 em 13, incluía `content/[id]/page.tsx`, que não tinha):
 
 - páginas `content/[id]`, `content/[id]/breakdown` e `content/[id]/tira`, e `not-found`;
 - `content-form`, `contrast-list`, `flashcard-list`, `mnemonic-strip-board`,
@@ -72,4 +72,16 @@ security-engineer n/a · performance-engineer n/a.
 <nenhuma — o brief é a unidade de execução>
 
 ## Execução
-<a preencher na implementação>
+- 2026-10-05: implementado por developer-via-Tech Lead no worktree `.worktrees/fe-kan233`, PR
+  https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/46. 28 `underline` removidos em 12
+  arquivos; hover `link-hover` (fundo `color-mix(currentColor 8%)`); `no-underline.test.ts` (varredura
+  com controle positivo); contraste do hover provado em `globals-theme-contrast.test.ts`.
+- Gates: code-reviewer aprovado · product-designer reprovou 12% (4,31:1 sobre `--surface-raised`),
+  corrigido para 8% com prova · qa (gate 9): **não rodado** (sem caminhada visual nos 2 temas) ·
+  security/performance n/a.
+- Links em texto corrido: nenhum (P-057-002 não se aplica). `visual-library-board` "Conteúdo vinculado N"
+  ganhou `font-semibold` (não cromático).
+- Doutrina: `guidelines/project/frontend/link-sem-sublinhado.md`; lição reformulada
+  `link-discreto-reduz-cor-e-tamanho-nunca-a-marca-de-link`; lição nova
+  `cor-de-estado-derivada-atras-do-texto-mede-contraste-nas-duas-superficies`.
+- Jira KAN-233: Em andamento → Análise pendente.

@@ -3,7 +3,7 @@ area: Design
 estado: em-observacao
 validade: indeterminada
 confirmada: 0
-contestada: 1
+contestada: 2
 paths:
   - mnemonicos-frontend/src/app/**/*.tsx
   - mnemonicos-frontend/src/components/**/*.tsx
@@ -19,9 +19,8 @@ celular, alvo explícito do card, não existe hover, então a afordância era ze
 propriedade além da cor separava o link do status.
 **Solução:** link discreto pode baixar cor e tamanho, mas precisa de pelo menos uma marca que não
 dependa só de cor (WCAG 1.4.1) e que o separe do texto não interativo vizinho. Hover-only não conta,
-porque não existe no toque. O padrão canônico do produto é o sublinhado em repouso
-(`src/app/not-found.tsx:15`, `src/components/content-list.tsx:96`). Quando o Diretor pede o link sem
-sublinhado, a separação vem da posição: isolado e com alinhamento diferente do texto vizinho, como no
+porque não existe no toque. Desde o KAN-233 (2026-10-05) o produto **não sublinha link** (ver
+`guidelines/project/frontend/link-sem-sublinhado.md`): a separação vem da cor `text-link`, da posição: isolado e com alinhamento diferente do texto vizinho, como no
 `/login` centralizado (BRIEF-042). Confira em tela que os dois se distinguem sem cor e trave a marca
 escolhida no teste (a classe de sublinhado ou a de alinhamento). Quando a marca é só a posição,
 meça a folga pela extensão do TEXTO (`Range.getBoundingClientRect`), não pela caixa (em `flex-col` a
@@ -31,3 +30,7 @@ caixa do vizinho estica a largura toda e mostra sobreposição falsa), e na meno
 Diretor decidiu, no BRIEF-042, `/login` com o link centralizado e sem sublinhado. A regra de fundo
 (não ficar indistinguível do vizinho) se mantém, e o sublinhado passa a ser o default, não a única
 marca aceita.
+**Reformulada em 2026-10-05 (contestada 2):** o Diretor tirou o sublinhado de toda a aplicação
+(KAN-233). Aqui a premissa "sublinhado por default" deixa de valer; a regra de fundo permanece: o link
+precisa de marca além do texto vizinho (cor `text-link` + posição + hover `link-hover`), e link em
+texto corrido exige ≥3:1 contra o vizinho.

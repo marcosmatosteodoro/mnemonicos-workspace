@@ -140,6 +140,12 @@ de `tests/support/required-label.ts`, que aceita o asterisco opcional.
 Botão = ícone à esquerda + rótulo curto, via `ActionButton`; nome acessível completo começando
 pelo rótulo. Regra completa em [botoes-acao.md](botoes-acao.md).
 
+## Link sem sublinhado (KAN-233)
+
+Nenhum link é sublinhado, em repouso ou no hover; o hover usa `link-hover`. Teste de varredura
+trava a volta de `underline` em `src/`. Regra completa em
+[link-sem-sublinhado.md](link-sem-sublinhado.md).
+
 ## Comandos
 
 `npm run validate` = `format:check` + `lint` + `typecheck` + `test`. É o conjunto que o
