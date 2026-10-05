@@ -2,6 +2,10 @@
 mnemonicos-backend
 mnemonicos-frontend
 
+# Worktrees git dos repos de código (mnemonicos-frontend-kan-NNN, mnemonicos-backend-kan-NNN)
+mnemonicos-backend-*/
+mnemonicos-frontend-*/
+
 # Rascunho de sessão e artefatos de verificação visual
 thoughts/
 .playwright-mcp/
