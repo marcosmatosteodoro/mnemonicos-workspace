@@ -73,4 +73,7 @@ performance-engineer n/a (sem superfície de custo).
 <nenhuma — o brief é a unidade de execução>
 
 ## Execução
-<a preencher na implementação>
+- 2026-10-05: implementado pelo `developer` em `mnemonicos-frontend`, branch `feat/kan-227-voltar-conteudo-bruto` (commit `a2a9010`). PR: https://github.com/marcosmatosteodoro/mnemonicos-frontend/pull/40
+- Gates: code-reviewer aprovado · product-designer aprovado · qa parcial (comportamento provado por teste; verificação visual em temas, 360/768/1280px e foco **não rodada**, sem credencial) · security-engineer e performance-engineer n/a.
+- `npm run validate` falha só no `format:check` global (CRLF do checkout Windows, preexistente); lint, typecheck, jest (1334) e build limpos.
+- Card: KAN-227 em Análise pendente. Concluído só após aviso de merge do Diretor.
