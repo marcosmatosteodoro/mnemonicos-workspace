@@ -49,6 +49,9 @@ repo, leia o README do guideline correspondente:
 - **Branch (repos de código) — a base é a `main`.** Os dois repos são novos e têm só `main`;
   não há `master`, `release` nem trilho de release. Branch nova sai de `origin/main`, PR
   para `main`. Nome: `feat/<slug>-<descrição-curta>` (`git.branchNaming: "slug"` na ficha).
+  **PR**: o Tech Lead abre via `gh` sem pedir autorização — título em Conventional Commits,
+  corpo em pt-BR, com a linha de autoria do harness; entrega que cruza os dois repos →
+  um PR em cada, com links cruzados. **Merge só com autorização explícita do Diretor.**
   Trocar para `tracker-key` é decisão do Diretor (ver *Tracker*).
 - **Segredos**: nunca commitar (`.env*`) nem reproduzir valores de `.env` em respostas. Os
   dois repos têm `.env` no `.gitignore` e `.env.example` com placeholders — mantenha assim.
@@ -207,8 +210,10 @@ por contrato. Story em "Concluído" ao fim de um `/keelson:auto` é bug, não su
   performance-engineer, product-designer),
   sob o contrato Diretor–PO: o brief é emitido na largada (janela de veto — o fluxo
   segue sem esperar), o PO valida SPEC e entrega **contra o brief**, e a entrega fecha
-  com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, PR, merge para a
-  branch principal e deploy são seus — a autonomia termina no push da branch. Aprovação etapa a etapa é
+  com o **relatório de aceitação do PO**. Você é o **Diretor**: veto, merge para a
+  branch principal e deploy são seus. **Neste workspace o PR é do Tech Lead**: abre-se
+  sem pedir autorização, após o push da branch (decisão do Diretor, 2026-10-05); **merge
+  só com autorização explícita do Diretor** — nunca `gh pr merge` por iniciativa. Aprovação etapa a etapa é
   opt-in (`/keelson:guided`). Rigor **proporcional a complexidade × risco** (ver Charter).
 - **Mudança pontual = modo sob demanda** (decisão 4.75): ajuste localizado de código,
   sem decisão de produto, não precisa do ciclo. **Declaração de intenção pontual do
