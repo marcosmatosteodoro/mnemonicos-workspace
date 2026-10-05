@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso (bug)
-**Status**: Entregue, PR #47 aguardando merge
+**Status**: Concluído, PR #47 mergeado
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, com print de `/users/<id>/edit` (tema escuro; dados da conta no
 print não reproduzidos aqui). O acesso ao Jira está retirado.
@@ -83,4 +83,4 @@ testes e não chega ao usuário. Antes de mudar uma ação, ache o ponto de uso 
 - `lint`, `typecheck`, jest e `build` limpos; `format:check` global falha só por CRLF do checkout Windows, preexistente.
 - Lacuna apontada pelo reviewer: `ResetPasswordSection` não tem teste ativo de 422 remoto, redação de senha ecoada, 500/404, trava em voo nem auto-redefinição (os R6–R16c removidos já estavam em `describe.skip`).
 - Lições: `acao-corrigida-sem-achar-o-ponto-de-uso-em-producao-chega-so-ao-teste.md` e `ac-de-campo-obrigatorio-se-prova-com-aria-required-nao-com-o-rotulo.md`, em `guidelines/project/lessons/`.
-- Card: KAN-234 em Analise pendente, aguardando revisão e merge do Diretor.
+- Card: KAN-234 Concluído após aviso de merge do Diretor (2026-10-05).
