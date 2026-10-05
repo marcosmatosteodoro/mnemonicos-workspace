@@ -5,7 +5,7 @@
 **Status**: Aberto (card local, aguardando sync com o Jira)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, com print de `/content` (tema escuro). O acesso ao Jira está retirado.
-**Jira**: pendente de sync. Sem acesso ao conector em 2026-10-05; tipo pretendido **Tarefa** (`issueType.standalone`, `10008`), card único
+**Jira**: KAN-230 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05)
 
 ## Pedido como dito
 "Ainda me conteuodos, mude o padrão dos botões, pode ser novo editar e ver, tudo com ícone junto,

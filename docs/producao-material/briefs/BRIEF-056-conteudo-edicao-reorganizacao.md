@@ -6,7 +6,7 @@ de organização da tela (régua do CLAUDE.md: decisão entre alternativas → c
 **Status**: Aberto (card local, aguardando sync com o Jira; sem SPEC ainda)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, sobre `/content/<id>`. O acesso ao Jira está retirado.
-**Jira**: pendente de sync. Sem acesso ao conector em 2026-10-05; tipo pretendido **História** (`issueType.feature`, `10009`), sem épico
+**Jira**: KAN-232 (História, status medido: Backlog; sincronizado em 2026-10-05)
 
 ## Pedido como dito
 "Outra coisa é que esssa tela ta muito grande e confusa, vc poderia ter dividio ela melhor, talverz

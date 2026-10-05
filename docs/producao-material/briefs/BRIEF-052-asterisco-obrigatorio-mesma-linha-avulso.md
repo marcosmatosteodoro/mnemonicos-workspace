@@ -5,7 +5,7 @@
 **Status**: Aberto (card local, aguardando sync com o Jira)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, com print de `/content/new` (tema escuro). O acesso ao Jira está retirado.
-**Jira**: pendente de sync. Sem acesso ao conector em 2026-10-05; tipo pretendido **Tarefa** (`issueType.standalone`, `10008`), card único, com link `Relates` para o **KAN-216**, a origem do defeito
+**Jira**: KAN-228 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05); link `Relates` → KAN-216
 
 ## Pedido como dito
 "Todos os pontos da aplicação que estão com "*" estão qeubrando a linha como na imagem, isso ta

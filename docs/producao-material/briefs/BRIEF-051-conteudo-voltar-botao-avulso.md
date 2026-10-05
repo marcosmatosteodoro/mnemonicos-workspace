@@ -5,7 +5,7 @@
 **Status**: Aberto (card local, aguardando sync com o Jira)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, com o acesso ao Jira retirado
-**Jira**: pendente de sync. Sem acesso ao conector em 2026-10-05; tipo pretendido **Tarefa** (`issueType.standalone`, `10008`), card único
+**Jira**: KAN-227 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05)
 
 ## Pedido como dito
 "Em https://mnemonicos-frontend.vercel.app/content/new o botão que retorna a página anterior chamado de "Conteúdos brutos" pode e deve ser simplesmente Voltar

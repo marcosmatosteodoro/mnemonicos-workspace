@@ -469,6 +469,11 @@ fechado._
 
 ## Histórico recente
 
+- 2026-10-05: **BRIEF-051 a 059 sincronizados com o Jira** (9/9 criados, todos em Backlog, nenhum
+  movido, nenhuma falha): 051→KAN-227 · 052→KAN-228 · 053→KAN-229 · 054→KAN-230 · 055→KAN-231 ·
+  056→KAN-232 (História, candidata a ciclo) · 057→KAN-233 · 058→KAN-234 · 059→KAN-235. Os demais
+  são Tarefa. Links Relates: 052 e 053→KAN-216; 058→KAN-223 e KAN-220. Os `tracker-local-BRIEF-05x.md`
+  ficam como RECONCILIADO.
 - 2026-10-05: **BRIEF-055 a 059 abertos** (cards locais; Jira sem acesso, filas em
   `tracker-local-BRIEF-05x.md`):
   - **055** (Tarefa): as ações do rodapé da edição de Conteúdo bruto viram uma barra horizontal, com

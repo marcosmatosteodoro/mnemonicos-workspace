@@ -1,8 +1,6 @@
 # Tracker local — BRIEF-051 avulso (botão "Voltar" na criação e na edição de Conteúdo bruto)
 
-**PENDENTE**: o card ainda não existe no Jira. Foi criado localmente em 2026-10-05, com o acesso
-ao conector retirado pelo Diretor. Quando o acesso voltar, aplique a fila abaixo e grave a key no
-BRIEF-051 (linha `**Jira**:`).
+**RECONCILIADO em 2026-10-05**: card KAN-227 criado no Jira (Tarefa, Backlog). Histórico abaixo.
 
 ## Card a criar
 
@@ -27,4 +25,5 @@ BRIEF-051 (linha `**Jira**:`).
 
 ## Log (mais recente no topo)
 
+- 2026-10-05 13:37 (-03): sync com o Jira. Busca anti-duplicata sem correspondência (resultados eram cards antigos e distintos); `createJiraIssue` → **KAN-227** (Tarefa), status medido no retorno: **Backlog**, sem mover.
 - 2026-10-05: BRIEF-051 e este arquivo criados localmente, com o conector Atlassian sem acesso.

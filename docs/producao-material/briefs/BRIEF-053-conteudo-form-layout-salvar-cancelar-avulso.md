@@ -5,7 +5,7 @@
 **Status**: Aberto (card local, aguardando sync com o Jira)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, sobre `/content/new` e `/content/<id>`. O acesso ao Jira está retirado.
-**Jira**: pendente de sync. Sem acesso ao conector em 2026-10-05; tipo pretendido **Tarefa** (`issueType.standalone`, `10008`), card único (pedido do Diretor: "isso tudo é um jira só"), com link `Relates` para o **KAN-216** (origem da legenda)
+**Jira**: KAN-229 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05); link `Relates` → KAN-216
 
 ## Pedido como dito
 "Outra coisa que quero é na página https://mnemonicos-frontend.vercel.app/content/new, tanto na

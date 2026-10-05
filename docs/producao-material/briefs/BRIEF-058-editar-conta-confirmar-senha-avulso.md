@@ -6,7 +6,7 @@
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, com print de `/users/<id>/edit` (tema escuro; dados da conta no
 print não reproduzidos aqui). O acesso ao Jira está retirado.
-**Jira**: pendente de sync. Sem acesso ao conector em 2026-10-05; tipo pretendido **Tarefa** (`issueType.standalone`, `10008`), com links `Relates` para o **KAN-223** (a entrega que não chegou à tela) e o **KAN-220** (quem criou a seção sem confirmação)
+**Jira**: KAN-234 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05); links `Relates` → KAN-223 e KAN-220
 
 ## Pedido como dito
 "outra coisa que pedi e nã́o ta ai é o Nova senha com confirmar senha, cd o segundo?"

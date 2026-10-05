@@ -6,7 +6,7 @@
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, com print de `/users/<id>/edit` (dados da conta no print não
 reproduzidos aqui). O acesso ao Jira está retirado.
-**Jira**: pendente de sync. Sem acesso ao conector em 2026-10-05; tipo pretendido **Tarefa** (`issueType.standalone`, `10008`), card único
+**Jira**: KAN-235 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05)
 
 ## Pedido como dito
 "O Editar e criar conta ta completamente fora do padrão do resto dos formulários"
