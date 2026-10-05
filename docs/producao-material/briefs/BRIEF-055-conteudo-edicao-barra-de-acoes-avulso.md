@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Entregue em PR (aguardando revisão e merge do Diretor)
+**Status**: Concluído (PR #48 mergeado em 2026-10-05)
 **Data**: 2026-10-05
 **Origem**: Diretor, em sessão, sobre `/content/<id>`. O acesso ao Jira está retirado.
 **Jira**: KAN-231 (Tarefa, status medido: Backlog; sincronizado em 2026-10-05)
@@ -80,4 +80,4 @@ n/a.
 - Gates: code-reviewer (reprovou por CRLF em `action-icons.tsx`, corrigido) · product-designer (alta: 768px, resolvida; 3 sugestões aplicadas) · **qa (gate 9) não rodado — Playwright MCP não conectou**; falta verificação visual em 360/768/1280px e 2 temas, incluindo a tela da Tira · security/performance n/a.
 - Efeito colateral: `mnemonic-strip-board` usa o mesmo `PublicationExportControl`; os exports passam a ficar lado a lado, com ícone.
 - Lições roteadas: `guidelines/project/lessons/criterio-de-linha-unica-soma-os-botoes-contra-o-container-util.md` e `entrega-roda-format-check-nos-arquivos-tocados-alem-de-lint-e-jest.md`.
-- Jira: KAN-231 em Análise pendente.
+- Jira: KAN-231 em Concluído (merge do PR #48 avisado pelo Diretor, 2026-10-05).
