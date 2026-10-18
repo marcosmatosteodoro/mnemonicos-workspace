@@ -49,6 +49,8 @@ Um EDITOR ou ADMIN edita os metadados de um PDF do Acervo; só o autor ou um ADM
 - Definir ou antecipar `seedSalesPackage`/`seedPackageItem` (nascem na TASK-063-007, wave posterior): o arrange de Pacote e Item é feito aqui direto por `testPrisma`, sem helper local de semente.
 - `seedLibraryPdf` e `seedSession` (usa os da TASK-063-003; não redefine).
 - Alterar o contrato de envio da TASK-063-003 (`createUploadIntent`, `confirmUpload`, `listLibraryPdfs`, `getLibraryPdfDownloadLink`).
+**Inclui — herdado do gate 7 da wave 2 (pendência roteada, 2026-10-18):**
+- `mnemonicos-backend/src/modules/pdf-library/pdf-library.service.ts` — caminho do 504 da confirmação (envio E substituição) aguarda a limpeza da chave definitiva junto com a do `pending/`.
 
 ## Critérios de pronto
 
@@ -72,6 +74,8 @@ Um EDITOR ou ADMIN edita os metadados de um PDF do Acervo; só o autor ou um ADM
 - [ ] Pré-condição da integração: banco de teste sem outro runner — verificação executável: antes de cada execução de integração, `docker compose -f mnemonicos-backend/docker-compose.yml exec -T postgres psql -U postgres -d postgres -tAc "SELECT count(*) FROM pg_stat_activity WHERE datname = 'mnemonicos_test' AND pid <> pg_backend_pid()"` → `0` (lição `su-te-de-integra-o-com-ddl-truncate-em-banco-compartilhado-exige-exclusividade-real-entre-execu-es-concorrentes-n-o-s-runinband`; a prova de corrida acima só vale com o banco exclusivo).
 - [ ] Typecheck, format e suítes completas — verificação executável: `npm --prefix mnemonicos-backend run typecheck` e `npm --prefix mnemonicos-frontend run typecheck` → exit 0; `npm --prefix mnemonicos-backend run format:check` e `npm --prefix mnemonicos-frontend run format:check` → exit 0; `npm --prefix mnemonicos-backend test` e `npm --prefix mnemonicos-backend run test:integration` → `0 failed` e contagem de testes passando ≥ o baseline capturado pelo developer antes de começar.
 - [ ] Sem warnings/lints novos em todos os arquivos do diff, produção e teste — verificação executável: `npm --prefix mnemonicos-backend run lint` e `npm --prefix mnemonicos-frontend run lint` → exit 0, 0 warnings.
+### Critério herdado do gate 7 da wave 2 (pendência roteada a esta TASK — 4.140)
+- [ ] **Sem `library/` órfão no 504 (CONDIÇÃO: toda resposta 504 da confirmação — envio e substituição — só sai depois de a chave definitiva copiada e o `pending/` terem a remoção aguardada, limitada por `CLEANUP_GRACE_MS`)** — hoje a limpeza da cópia roda na continuação solta do job; numa função serverless congelada após a resposta sobra `library/<uuid>` sem registro. `runWithDeadline` expõe o job (ou sua promise assentada) e `confirmUpload`/confirmação da substituição o aguardam junto com `deleteBestEffort(pending)` dentro do `CLEANUP_GRACE_MS`. Par de provas em `pdf-library.service.deadline.test.ts`: storage fake cujo `delete` demora mais que um microtask e stream que goteja → no instante em que a confirmação rejeita com 504, `objectKeys()` é `[]` (envio) e, no caso da substituição, só a chave do arquivo ANTERIOR permanece; controle: fluxo normal intacto. Mutante (em worktree): voltar a não aguardar o job → o caso reprova.
 
 ## Riscos específicos
 

@@ -10,7 +10,7 @@
 - [x] TASK-063-002 ✅ Done
 
 ### Wave 2 (depende de Wave 1)
-- [ ] TASK-063-003 ⏸ Todo
+- [x] TASK-063-003 ✅ Done
 
 ### Wave 3 (depende de Wave 2)
 - [ ] TASK-063-004 ⏸ Todo

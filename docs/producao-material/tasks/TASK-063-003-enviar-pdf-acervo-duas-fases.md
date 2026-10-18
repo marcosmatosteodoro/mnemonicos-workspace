@@ -8,7 +8,7 @@
 **Wave**: 2
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -55,6 +55,10 @@ Um EDITOR ou ADMIN registra um PDF no Acervo em duas fases (a intenção valida 
 - AC-061-026 na faceta de expiração real no storage: é da TASK-063-002; na emissão para a exportação, da TASK-063-010.
 **Inclui — herdado do gate 10 da wave 1 (2026-10-18):**
 - `mnemonicos-backend/src/modules/pdf-library/pdf-library.service.ts` (confirmação de envio) — prazo total da operação de confirmação (HEAD + Range + stream SHA-256 + copy + delete + gravação), com `stream.destroy()` do `Readable` de `readStream` ao vencer e resposta por `AppError`.
+**Inclui — herdado dos gates da wave 2 (retry, 2026-10-18):**
+- `mnemonicos-backend/src/modules/pdf-library/pdf-library.service.ts` — promoção copy-first (gate 8, CWE-367), ponto de não-retorno do prazo (gate 7), `assertDisciplineExists` dentro do prazo (gate 10, sugestão), erro interno tipado no `assertWithinDeadline`.
+- `mnemonicos-backend/src/modules/pdf-library/pdf-library.schema.ts` — data por `z.iso.date()` (molde `content-versions.schema.ts:20`); sem a oração de proveniência "Molde: …".
+- `mnemonicos-backend/tests/integration/pdf-library.routes.integration.test.ts`, `tests/integration/pdf-library.service.integration.test.ts`, `tests/unit/pdf-library.service.deadline.test.ts` e o teste MinIO da corrida (arquivo de integração novo ou existente em `tests/integration/`).
 
 ## Critérios de pronto
 
@@ -85,6 +89,13 @@ Um EDITOR ou ADMIN registra um PDF no Acervo em duas fases (a intenção valida 
 - [ ] Sem warnings/lints novos em todos os arquivos do diff, produção e teste — verificação executável: `npm --prefix mnemonicos-backend run lint` e `npm --prefix mnemonicos-frontend run lint` → exit 0, 0 warnings.
 ### Critério herdado do gate 10 da wave 1 (pendência roteada a esta TASK — 4.140)
 - [ ] **Prazo total da confirmação (CONDIÇÃO: toda leitura do storage feita pela confirmação para dentro de um prazo total < 15 000 ms, inclusive corpo que chega em gotejamento)** — `socketTimeout` mede só inatividade: um storage que manda 1 byte/s nunca dispara (sonda "trickle" do gate 10 pendente > 30 s). A confirmação tem prazo total nomeado em constante (docblock com a conta < 15 000 ms, padrão `withDeadline` de `src/modules/publication/publication.service.ts:181`); ao vencer, `destroy()` no `Readable` (Promise.race sozinho não cancela o GET) e `AppError` 504/503 pt-BR, com o objeto `pending/` apagado (melhor esforço, falha logada). Par de provas: teste unitário com fake de storage cujo `readStream` goteja (1 chunk/intervalo, sem fim) e relógio/prazo injetado curto → a confirmação rejeita dentro do prazo, o stream recebeu `destroy` (spy) e nenhum `LibraryPdf` foi gravado; controle: stream normal → confirma. Mutante (em worktree): sem o prazo → o caso reprova por timeout do jest.
+### Critérios herdados dos gates da wave 2 (retry — régua dos achados de origem)
+- [ ] **Promoção copy-first (gate 8, CWE-367; CONDIÇÃO: toda validação de conteúdo e todo digest gravado são calculados sobre a chave definitiva `library/<uuid>`, que só o servidor escreve)** — a confirmação copia `pending/<userId>/<uuid>` → `library/<uuid>` PRIMEIRO e faz HEAD (tamanho), Range (`%PDF-`) e SHA-256 sobre a CÓPIA; recusa → apaga a cópia e o `pending/` e responde 400 sem gravar. Par de provas, integração contra MinIO (OBJECT_STORAGE_* na linha de comando): (a) com um dublê/gancho que faz um 2º PUT (corpo `<html>…`, outro tamanho ou mesmo tamanho) na MESMA `uploadUrl` logo depois da cópia, a confirmação termina com `sha256(objeto em library/) === registro.sha256` e o objeto armazenado começa com `%PDF-` (ou recusa sem gravar); (b) controle: fluxo normal → 201 e digest igual. Mutante (em worktree): voltar a validar `pending/` antes de copiar → (a) reprova.
+- [ ] **Sujeitos opcionais de FR-061-001 e guarda de disciplina (gate 1/7; CONDIÇÃO: todo sujeito opcional e toda guarda de existência têm caso que falha junto com o código)** — em `pdf-library.routes.integration.test.ts`: (i) intenção + PUT + confirmação com `examName` "PF 2026" e `disciplineId` de Disciplina semeada → 201 e `GET /pdf-library` devolve os dois valores; (ii) `disciplineId` uuid inexistente → 400 com a mensagem pt-BR da guarda tanto na intenção (nenhuma URL emitida) quanto na confirmação (`library_pdfs` = 0); (iii) `examName` "   " → gravado `null`. Mutantes (em worktree): guarda no-op, examName sempre null, disciplineId sempre null → cada um reprova seu caso.
+- [ ] **Data pelo primitivo da casa (gate 6/7, DRY)** — `pdf-library.schema.ts` troca `DATE_ONLY_PATTERN`/`isRealCalendarDay`/`refine` por `z.string(...).trim().min(1, …).pipe(z.iso.date(<mensagem>))` (molde `content-versions.schema.ts:20`). Prova: `tests/unit/pdf-library.schema.test.ts` segue 100% verde sem alterar asserção (inclui 2026-02-30, 2025-02-29, 2028-02-29); `git grep -n 'isRealCalendarDay' -- mnemonicos-backend/src` vazio.
+- [ ] **Ponto de não-retorno do prazo (gate 7; CONDIÇÃO: a confirmação só responde 504 se nenhum `LibraryPdf` foi gravado e nenhuma chave definitiva sobrou)** — `runWithDeadline`/`DeadlineState` ganham um commit (desarma o temporizador logo antes do `create`) ou compensação pós-`create` quando o prazo venceu. Prova em `pdf-library.service.deadline.test.ts`: `create` que resolve DEPOIS do prazo injetado → ou 201 com `create` chamado 1×, ou 504 com zero registros e `objectKeys()` vazio — nunca 504 com registro. Mutante (em worktree): remover o commit/compensação → o caso reprova.
+- [ ] **Caronas (não bloqueantes, mesmo despacho)** — (a) `assertDisciplineExists` dentro do prazo da confirmação (gate 10); (b) teste de integração de recusa por `Origin` alheio num POST de `/pdf-library` (403 pelo `verifyOrigin`, gate 8 nota 3); (c) `assertWithinDeadline` lança erro interno tipado (`AppError` ou o `timeoutError`), não `new Error` cru; (d) remover a oração de proveniência em `pdf-library.schema.ts:4`.
+- [ ] **Commit do retry** cita no corpo os gates e achados que fecha.
 
 ## Riscos específicos
 
@@ -97,17 +108,17 @@ Um EDITOR ou ADMIN registra um PDF no Acervo em duas fases (a intenção valida 
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T08:26:52-0300
+**Data conclusão**: 2026-10-18T09:04:29-03:00
+**Commit SHA**: 274828f (BE) · 5f687e8 (FE)
 **Jira**: KAN-250
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 2, após retry CWE-367)
+- [x] Comportamento (gate 9): consolidado (FEAT-061-001) — carregador: Roteiro do gate 9 da TASK-063-005 (envio/lista/download na tela)
