@@ -1828,7 +1828,8 @@ patológico nº 2").
 sobre trabalho que pode envolver decode/encode/processamento síncrono de terceiro, neste
 backend).
 **Estado:** ativa
-**Contadores:** confirmada 0 · contestada 0
+**Extensão (2026-10-18, PLAN-065/TASK-065-006, gates 10 e 2 da wave 2):** (1) o ramo CPU-bound mais caro do compositor final era a quebra de palavra sem espaço que media o prefixo da linha a cada caractere (O(n²) — 100k caracteres = 7–9 s num bloco só); largura em layout de PDF é **aditiva por code point, com cache**. (2) o teste de teto precisa do **pior caso de cada ramo CPU-bound** (texto sem espaço), não só volume; (3) `withDeadline` rejeita mas não cancela — a composição recebe deadline/`AbortSignal` checado por Quadro e antes do `save()`, e o teste aguarda a **promise real** do trabalho (spy) com timeout explícito, nunca espera fixa calibrada em máquina ociosa (sob carga ela invadiu o teste seguinte). (4) a folga do teste de teto (limite − teto) comporta o **maior bloco síncrono do caminho, setup fixo incluído** (no PDF final, `embedFinalFonts` + `PDFDocument.create` antes do 1º ponto de cessão: 45–143 ms ocioso, até ~1,5 s sob contenção), medido sob carga, mais ≥ 10 fatias do laço, e a composição inteira fica ≥ 2× acima do limite para o mutante sem cessão reprovar; e a estabilidade se prova com N rodadas enquanto outra suíte roda em paralelo — com poucas fatias longas a asserção mede a carga do host, não a cessão (~30% de falha sob os gates paralelos).
+**Contadores:** confirmada 2 · contestada 0 (reincidências 2026-10-18: PLAN-065 TASK-065-006 — retry e rodada extra do gate 2)
 
 ## [Testes] Critério de restauração de foco redigido pelo EVENTO de transição, não pelo ESTADO do alvo, deixa passar o produtor cujo alvo é desmontado
 
