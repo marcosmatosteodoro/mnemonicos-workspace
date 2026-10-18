@@ -757,7 +757,7 @@ síncrona pesada trava **todos** os requests, não só o seu.
   lib como `pdf-lib`) nunca alcança a fila de timers até terminar; medido: um
   `setTimeout(200ms)` atrasou 8318ms atrás de uma composição de PDF de 20 Quadros com
   imagem. Para trabalho CPU-bound em laço, cada iteração precisa de um ponto de cessão
-  explícito (`await new Promise((r) => setImmediate(r))`) — e mesmo assim um bloco
+  explícito — `await new Promise((r) => setTimeout(r, 0))` quando o objetivo é deixar um teto de `setTimeout` disparar (com `setImmediate`, a continuação que retoma após I/O roda a unidade seguinte na mesma volta, antes da fase de timers: o teto fica preso atrás de 2 unidades — medido no PLAN-065, lição `ponto-de-cessao-para-teto-de-settimeout-usa-settimeout-0`); no pdf-lib, `await image.embed()` logo após `embedPng`/`embedJpg` tira o deflate do `save()` (lição `pdf-lib-embed-ansioso-por-imagem-dentro-do-laco-que-cede`) — e mesmo assim um bloco
   síncrono MONOLÍTICO de biblioteca de terceiro (ex.: `doc.save()` do `pdf-lib`) não tem
   ponto de cessão possível; a folga do teto sob o limite duro externo (ex.: 15s da
   Vercel) precisa contar esse resíduo, ou `worker_threads`/fila é a única eliminação

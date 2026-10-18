@@ -30,6 +30,8 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 - mnemonicos-backend/tests/integration/publication.final-reduction.integration.test.ts (novo; fixtures JPEG e PNG 4000x3000 e 2000x1500 gerados com `sharp` no próprio teste).
 - mnemonicos-backend/tests/support/webp-fixtures.ts (novo): `buildValidWebpNxN(w, h)`, gerado com `sharp`, dono do helper (a TASK-065-010 o reusa).
 
+- `mnemonicos-backend/src/modules/publication/final-pdf-composer.ts`: só a troca do ponto de cessão (pendência herdada do gate 10 da wave 3).
+
 ### Não inclui
 - Rascunho: `pdf-composer.ts` continua pulando WEBP; isso é provado aqui, não alterado.
 - Aviso de resolução no upload (TASK-065-010).
@@ -54,6 +56,12 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 - [ ] Sem warnings/lints novos sobre todos os arquivos do diff (`git -C mnemonicos-backend diff --name-only main...HEAD`), produção e teste: `npm --prefix mnemonicos-backend run lint`, `npm --prefix mnemonicos-backend run typecheck` e `npm --prefix mnemonicos-backend run format:check` saem 0
 
 - [ ] (pendência herdada do gate 10 da wave 2 — lacuna da MEDICAO-065) Medir no caminho ADOTADO (decode JPEG/WEBP até `IMAGE_PIXEL_BUDGET_PX` → resize a `RECOMMENDED_LONG_SIDE_PX` → JPEG q85, conversões em sequência): pico de RSS e tempo para M = 8 imagens de 20 Mpx (WEBP 5000×4000 e JPEG 5000×4000), e acrescentar as linhas `^| rss-caminho-jpeg |` e `^| tempo-caminho-jpeg-m8 |` ao `docs/producao-material/medicoes/MEDICAO-065-sharp-pdf.md`; a linha `m-maximo` obsoleta (PNG) é marcada como tal; verificação: `grep -cE "^\| (rss-caminho-jpeg|tempo-caminho-jpeg-m8) \|" docs/producao-material/medicoes/MEDICAO-065-sharp-pdf.md` → `2`; tempo M=8 sob `PUBLICATION_PDF_TIMEOUT_MS` (12 s) e RSS sob 1024 MB, senão a TASK devolve o número e reabre DEC-065-004/010.
+
+- [ ] (pendência herdada do gate 8 da wave 3 — TRISK-065-005; medido: 10 PNGs de 4472×4472 sem redução → pico RSS 1004 MB e `save()` 13 s) Memória da soma de rasters: o `embedPng` do pdf-lib guarda o raster RGBA (~4 B/px) até o `save()`, então a memória cresce com a SOMA de pixels dos PNGs do documento; depois da redução desta TASK, medir o pico de RSS e o tempo de geração com N = 10 e N = 30 Quadros de PNG COM ALFA de 4472×4472 (o caso que continua PNG após a conversão) e registrar `^| rss-png-alfa-n10 |` e `^| rss-png-alfa-n30 |` na MEDICAO-065; verificação: `grep -cE "^\| rss-png-alfa-n(10|30) \|" docs/producao-material/medicoes/MEDICAO-065-sharp-pdf.md` → `2`; pico ≤ 700 MB e tempo ≤ teto de 12 s nos dois, senão a TASK devolve o número e reabre DEC-065-004/010 (ex.: orçamento de pixels decodificados por documento) antes de fechar.
+
+- [ ] (pendência herdada do gate 10 da wave 3, média) Ponto de cessão que deixa o teto disparar a cada Quadro: em `mnemonicos-backend/src/modules/publication/final-pdf-composer.ts` (laço de Quadros, ~:332) trocar `await` de `setImmediate` por `await new Promise((resolve) => setTimeout(resolve, 0))` (passa pela fase de timers — com `setImmediate` após I/O o timer do prazo fica preso atrás de 2 Quadros; lição `ponto-de-cessao-para-teto-de-settimeout-usa-settimeout-0`); verificação executável: com o teto ELEVADO (sem o atalho de tamanho), 8 PNG RGBA 4000×3000 → 503 ou sucesso antes de 15 s, com a maior fatia sem cessão ≤ 1 Quadro (heartbeat), medido e declarado; mutante que volta ao `setImmediate` deixa a maior fatia = 2 Quadros no teste de heartbeat.
+
+- [ ] (pendência herdada do gate 1 da wave 3) Um ranking só para `heaviestFrames`: depois da conversão WEBP/redução, o ranking da recusa incremental (`queryHeaviestFrames`, por binário armazenado) e o da rede final (por `byteSize` de origem das embutidas) passam a medir o mesmo conceito — decidir e documentar no código qual fonte vale (proposta: bytes embutidos da composição, `embeddedBytes`), sem dois rankings divergentes; verificação: teste com 1 WEBP grande convertido em JPEG pequeno + 1 PNG médio, acima do teto → `heaviestFrames` aponta primeiro o Quadro que mais pesa no PDF, nos dois caminhos (incremental e rede final).
 
 ## Riscos específicos
 

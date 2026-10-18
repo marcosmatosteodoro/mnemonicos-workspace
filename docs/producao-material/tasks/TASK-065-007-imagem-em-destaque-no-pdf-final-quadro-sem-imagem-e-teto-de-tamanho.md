@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -60,6 +60,17 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 
 - [ ] (pendência herdada do gate 10 da wave 2) `loadFinalExportInput` (`relationLoadStrategy: 'join'` sobre `strip.frames` com textos longos) ganha comentário com a medição `EXPLAIN (ANALYZE, BUFFERS)` join × query numa Tira de ≥ 8 Quadros longos com imagem vinculada (node-22 §10, relação de lista) — a escolha final (join ou query) segue o número medido; verificação: o comentário existe com os dois números e a estratégia escolhida é a mais barata medida (`git -C mnemonicos-backend grep -n "EXPLAIN" -- src/modules/publication/publication.service.ts` → ≥ 1 linha).
 
+- [ ] (retry pós-gate 1–7 wave 3, A1) Helpers de requisição de teste em `tests/support/`: `seedSession`/`withCookie`/`postPublication` (e `FINAL`, TTLs) saem de `tests/integration/publication.final.integration.test.ts` para `tests/support/` (ex.: `final-export-fixtures.ts` ou `publication-requests.ts`) e os dois arquivos de integração do PDF final os importam; `postAsAdmin` é substituído por `postPublication(id, body, 'ADMIN')`; verificação executável: `grep -c "accessTokenHash: hashToken" mnemonicos-backend/tests/integration/publication.final*.integration.test.ts` → `0` nos dois e exatamente 1 definição em `tests/support/`; as duas suítes verdes com o mesmo número de `it()` do baseline (lição `corre-o-de-duplica-o-dry-introduz-nova-re-deriva-o-do-can-nico-no-mesmo-diff`). Carona: `apngBuffer` de `tests/unit/final-image.test.ts` vai para `tests/support/png-fixtures.ts`.
+- [ ] (retry pós-gate 1–7 wave 3, A2) Docblock de `withExactArrayBuffer`/`prepareFrameImage` em `final-image.ts` nomeia a duplicação ("duplica `toExactArrayBufferBuffer`/`embedFrameImage` de `pdf-composer.ts` — DEC-065-022: rascunho intocado") e a condição de remoção ("remover quando o `JpegEmbedder` do pdf-lib respeitar `byteOffset`; pdf-lib@1.17.1"); verificação: `git -C mnemonicos-backend grep -n "DEC-065-022" -- src/modules/publication/final-image.ts` → ≥ 1 linha.
+- [ ] (retry pós-gates 1–7 e 11 wave 3, A3 — antecipado da TASK-065-012) Mensagem do 422 `FINAL_PDF_TOO_LARGE` em `errors.ts` = texto do PO, neutro entre exportar e publicar: "O PDF final ficou com X,X MB e o limite é Y,Y MB. Reduza as imagens dos Quadros A, B e C e tente de novo." — X = `ceil` e Y = `floor` em décimos de MB (lição `copy-de-limite-arredonda-valor-para-cima-e-limite-para-baixo`), lista unida por ", " e " e " antes do último; com `heaviestFrames` vazio, sem "desses Quadros": "O PDF final ficou com X,X MB e o limite é Y,Y MB. Reduza o tamanho do conteúdo e tente de novo."; verificação executável: unitário da mensagem (`tests/unit/` do erro) com `byteSize` = `maxBytes` + 1 (4 000 001 × 4 000 000 → "4,1 MB" e "4,0 MB"), lista de 1, 2 e 3 Quadros e lista vazia → `0 failed`; mutante `toFixed(1)` reprova a borda; mutante que mantém "desses Quadros" na lista vazia reprova.
+
+- [ ] (retry pós-gate 10 wave 3, P1 — alta) Embed ansioso: logo após `embedPng`/`embedJpg` em `prepareFrameImage`, `await image.embed()` (API pública `PDFImage.embed`), dentro do laço que cede o event loop — o deflate de cada imagem roda no Quadro e o raster é liberado, nunca acumulado para o `save()`; verificação executável: teste de integração de teto com carga CPU-bound REAL (8 Quadros de PNG RGBA 4000×3000 gerados no teste, teto reduzido por env) — a exportação responde 503/422 antes de `limite` com a maior fatia sem cessão ≤ 1 Quadro (heartbeat de event loop no teste ou medição declarada) → `0 failed`; mutante sem o `embed()` ansioso deixa o caso vermelho (fatia monolítica no save).
+- [ ] (retry pós-gate 10 wave 3, P2 — alta) Teto incremental: após cada embed, somar o tamanho do stream da imagem (`doc.context.lookup(ref)` → `getContentsSize()` ou equivalente) e lançar `FinalPdfTooLargeError` assim que a soma passar de `maxBytes`, sem compor o resto nem serializar; `heaviestFrames` vem de uma consulta de tamanhos (`octet_length("imageData")`) sem baixar binário, mantendo "até 3 mais pesados"; a verificação final de `assertFinalPdfWithinCap` sobre o PDF serializado continua (rede); verificação executável: integração com 20 Quadros JPEG de ~5 MB → 422 com `heaviestFrames` correto ANTES de carregar/compor todos (contagem de binários carregados < 20 e tempo medido declarado) → `0 failed`; mutante que só checa no fim reprova a contagem.
+- [ ] (retry pós-gate 10 wave 3, P3 — alta) Sem N+1 no load dos binários: `visualAssociation.findMany({ where: { id: { in: <ids distintos do lote> } }, select: { id, imageData } })` em lotes de tamanho declarado (k fixo, justificado no comentário), com `Map` por id (associação repetida em K Quadros é buscada 1 vez); verificação executável: contagem de consultas por log do Prisma em 2 volumes (4 e 16 Quadros com imagem) — o número de consultas de `imageData` é `ceil(distintos/k)`, não N (régua 4.178); mutante que volta ao `findUnique` por Quadro reprova a contagem.
+- [ ] (retry pós-gate 10 wave 3, P4 — sugestão adotada) Estratégia de `loadFinalExportInput` (`join` × `query`): refazer a medição declarando a composição (10 Quadros, texto 1,4 KB e 14 KB, aquecido, mediana de 30) e fixar a que vencer, com os números reproduzíveis no comentário (o atual "56 ms × 16 ms" não se reproduziu: o gate mediu empate, join levemente à frente).
+
+- [ ] (rodada extra pós-gate 1 wave 3, B1) O comentário de `relationLoadStrategy` em `loadFinalExportInput` traz também os números de banco do `EXPLAIN (ANALYZE, BUFFERS)` join × query da medição nova (mesma Tira), ao lado dos números ponta a ponta; `FinalPdfTooLargeDetails.byteSize` documenta que, na recusa incremental, é piso (soma dos streams até o Quadro que estourou) e só a rede final traz o tamanho real; nomes de `describe` sem "(P1)/(P2)/(P3)"/"mensagem do PO" e sem `process.stdout.write` de rastro; verificação: `git -C mnemonicos-backend grep -n "EXPLAIN" -- src/modules/publication/publication.service.ts` → ≥ 1 linha; `git -C mnemonicos-backend grep -nE "\((P1|P2|P3)\)|process\.stdout\.write" -- tests/unit/final-pdf-composer.test.ts tests/integration/publication.final-images.integration.test.ts` → vazio; testes verdes.
+
 ## Riscos específicos
 
 - TRISK-065-005: Quadros processados e liberados um a um é decisão de projeto; o custo de memória e tempo com tira real é medido no gate 10, não assertado aqui.
@@ -72,19 +83,19 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T10:04:51-0300
+**Data conclusão**: 2026-10-18T14:12:19-03:00
+**Commit SHA**: 7477d53
 **Jira**: KAN-267
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 3, delta do retry incluso)
+- [x] Comportamento (gate 9): consolidado (FEAT-064-002)
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
