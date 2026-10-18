@@ -1,7 +1,8 @@
 # Guia de uso — Material Mnemônico de Alta Retenção
 
 > **Documento vivo, escrito para o editor.** Explica como trabalhar na aplicação, sem
-> detalhes técnicos (setup, portas, configuração ficam nos READMEs dos repositórios).
+> detalhes técnicos (setup, portas, configuração ficam nos READMEs dos repositórios; a única
+> exceção é a seção [Armazenamento de arquivos](#armazenamento-de-arquivos)).
 > Toda mudança que altere tela, fluxo, papel, mensagem visível ou o jeito de trabalhar
 > atualiza este guia no mesmo ciclo (ver [Como manter](#como-manter-este-guia)).
 >
@@ -12,8 +13,9 @@
 ## O que é, e o que ainda não é
 
 Hoje a aplicação é uma ferramenta interna de produção de material: editores e
-administradores transformam um texto normativo em uma Tira mnemônica e exportam PDFs. O
-objetivo do produto é converter reconhecimento (achar familiar) em evocação (lembrar sem a
+administradores transformam um texto normativo em uma Tira mnemônica e exportam PDFs. Ela
+também guarda PDFs prontos num Acervo de PDFs e os reúne em Pacotes, que são exportados para
+venda em marketplace. O objetivo do produto é converter reconhecimento (achar familiar) em evocação (lembrar sem a
 dica).
 
 Você ainda não encontra nesta versão: tela de estudo e revisão para estudantes, cadastro de
@@ -27,8 +29,8 @@ R30), com caixa para marcar e "data: ___" para preencher à mão.
    administrador) passa os dados.
 2. Se aparecer "Sua sessão expirou. Entre novamente.", basta entrar de novo; o sistema leva
    você de volta à tela em que estava.
-3. No menu lateral ficam Painel, Conteúdos e Biblioteca visual (e Usuários, só para
-   administradores). Em tela pequena, use o botão Menu.
+3. No menu lateral ficam, nesta ordem, Painel, Conteúdos, Biblioteca visual, Usuários (só
+   para administradores), Acervo de PDFs e Pacotes. Em tela pequena, use o botão Menu.
 4. No topo ficam o botão de tema claro/escuro e o Sair.
 
 Editor vê e edita só os conteúdos que ele mesmo criou. Administrador vê tudo, cuida das
@@ -119,6 +121,63 @@ quadros, o sistema pede para adicionar ao menos um.
 4. Se você editar o conteúdo ou a Tira depois de fechar, a aprovação deixa de valer. Feche
    uma nova versão e peça nova aprovação.
 
+## Vendendo pacotes de PDF, passo a passo
+
+O Acervo de PDFs guarda os PDFs prontos; um Pacote reúne alguns deles, em ordem, com um preço
+de referência, e é exportado como um arquivo compactado para o marketplace. O sistema guarda
+e entrega o arquivo como foi enviado, sem olhar o conteúdo.
+O sistema não atesta a revisão jurídica do PDF enviado;
+o conteúdo é responsabilidade de Produtos.
+
+### 1. Envie os PDFs ao Acervo
+
+Em Acervo de PDFs, preencha o formulário de envio e clique em Enviar PDF:
+
+- **Título**, **Versão** e **Data de fechamento legislativo** são obrigatórios (esta é a data
+  declarada por quem envia, até quando a lei foi conferida). **Prova/concurso** e
+  **Disciplina** são opcionais.
+- **Arquivo PDF**: só PDF, não vazio e dentro do limite de tamanho (50 MB, salvo ajuste de quem
+  instala). Durante o envio o botão mostra "Enviando" e há uma barra de progresso.
+- Com o acervo vazio, a lista mostra "Nenhum PDF no acervo ainda." e o botão Enviar o primeiro
+  PDF leva ao formulário.
+
+Cada PDF da lista tem Baixar. Só o autor do PDF ou um administrador vê Editar, Substituir e
+Remover:
+
+- **Editar** muda Título, Versão, Data de fechamento legislativo e os opcionais, sem trocar o
+  arquivo (Salvar alterações).
+- **Substituir** troca o arquivo (Confirmar substituição). O arquivo anterior deixa de existir.
+- **Remover** pede Confirmar remoção; o arquivo deixa de existir e não pode ser recuperado. Um
+  PDF que está em um Pacote não é removido: tire-o do Pacote primeiro.
+
+### 2. Monte o Pacote
+
+1. Em Pacotes, clique em Cadastrar Pacote e informe o **Nome** e o **Preço de referência
+   (R$)** (em reais, como 49,90). Descrição, Prova/concurso e Disciplina são opcionais. Clique
+   em Salvar Pacote.
+2. Abra o Pacote (Abrir). Em PDFs do Pacote, clique em Adicionar PDF: o seletor lista o Acervo,
+   com busca por título (Buscar PDF por Título); o PDF que já está no Pacote aparece como "Já
+   no Pacote".
+3. Cada PDF no Pacote é um Item. Reordene com Mover para cima e Mover para baixo; tire um Item
+   com Remover do Pacote (o PDF continua no Acervo).
+4. Para mudar nome, preço ou descrição use Editar. Para apagar o Pacote use Remover e
+   Confirmar remoção: os PDFs dos Itens continuam no Acervo e o registro das exportações já
+   feitas fica guardado.
+
+### 3. Baixe a Ficha e exporte
+
+- A **Ficha do Pacote** resume o Pacote: nome, descrição, preço de referência, prova, disciplina, **Tamanho total** e,
+  por Item, posição, título, versão, Data de fechamento legislativo (declarada) e tamanho.
+  Baixar Ficha (.txt) salva o arquivo `ficha-<nome>.txt`.
+- **Exportar Pacote** gera um arquivo compactado só com os PDFs, com nomes prefixados pela
+  posição (por exemplo `01 - Título.pdf`). O botão mostra "Exportando" enquanto trabalha e o
+  arquivo baixado se chama `pacote-<código da exportação>.zip`. Pacote sem PDFs, ou com tamanho
+  total acima do teto de exportação, não exporta.
+- A exportação só conta depois que o download termina. Em Última exportação aparecem quem
+  exportou, quando e os PDFs incluídos (ou "Ainda não exportado").
+- Se algo falha, a tela diz para exportar de novo. Se aparecer "O arquivo baixado não vale;
+  exporte de novo.", apague o arquivo baixado e clique em Exportar Pacote outra vez.
+
 ## Acompanhando o trabalho no Painel
 
 O Painel mostra a fábrica inteira, e só tem dados depois que existem conteúdos. Use-o para
@@ -158,6 +217,52 @@ decidir o que fazer a seguir:
 | Não consigo aprovar: versão sem fonte normativa | Preencha a Fonte normativa do conteúdo e feche nova versão |
 | Não vejo um conteúdo de colega | Editor só vê os próprios; peça a um administrador |
 | "Você não tem permissão para ver esta página." | A tela é de administrador |
+| "Armazenamento de arquivos não configurado neste ambiente. Avise o administrador para configurá-lo." | Falta provisionar o armazenamento; veja [Armazenamento de arquivos](#armazenamento-de-arquivos) |
+| "Não foi possível enviar o arquivo ao armazenamento. Verifique a conexão e use "Enviar PDF" para tentar de novo; se persistir, avise a equipe técnica (a origem do site pode não estar liberada no armazenamento)." | Confira a conexão e tente de novo; se persistir, o CORS do bucket não libera o site (ver Pendências do Diretor). A mesma pista vale para baixar o PDF |
+| "O arquivo baixado não vale; exporte de novo." | Apague o arquivo baixado e clique em Exportar Pacote outra vez |
+
+## Armazenamento de arquivos
+
+Esta seção é para quem instala e mantém o ambiente. Os PDFs do Acervo ficam num armazenamento
+de arquivos compatível com S3; o navegador envia e baixa o arquivo direto nele, por endereço
+temporário assinado.
+
+### Ambiente local
+
+No `mnemonicos-backend`, `npm run db:up` sobe o Postgres e o MinIO locais juntos. As variáveis
+ficam no `.env` do backend (o `.env.example` traz os placeholders; nunca coloque credencial
+real no guia nem no repositório):
+
+| Variável | Para que serve |
+| --- | --- |
+| OBJECT_STORAGE_ENDPOINT | Endereço do armazenamento (opcional; o MinIO local exige, o S3 da AWS dispensa) |
+| OBJECT_STORAGE_REGION | Região do bucket |
+| OBJECT_STORAGE_BUCKET | Nome do bucket |
+| OBJECT_STORAGE_ACCESS_KEY_ID | Identificador da credencial de acesso |
+| OBJECT_STORAGE_SECRET_ACCESS_KEY | Segredo da credencial de acesso (nunca versionar) |
+| PDF_LIBRARY_MAX_FILE_SIZE_BYTES | Teto do PDF enviado ao Acervo, em bytes (padrão 52428800, 50 MB) |
+| SALES_PACKAGE_MAX_EXPORT_BYTES | Teto do arquivo de exportação de um Pacote, em bytes (padrão 524288000, 500 MB) |
+
+Sem região, bucket e as duas credenciais, as telas que usam arquivos mostram a mensagem de
+armazenamento não configurado (ver "Quando algo não funciona").
+
+### Pendências do Diretor
+
+O que falta provisionar fora do código:
+
+1. **Conta, bucket e credenciais** do armazenamento de produção.
+2. **CORS do bucket**: como o navegador envia (PUT) e baixa (GET) direto no bucket, ele precisa
+   liberar esses métodos para o site. Localmente o `docker-compose.yml` do backend libera
+   `http://localhost:3000` e `http://localhost:3001`; em produção as origens são as do frontend
+   publicado, em lista explícita, nunca curinga. Sem isso o envio e o download falham com a
+   mensagem de origem não liberada.
+3. **Variáveis no deploy**: as cinco `OBJECT_STORAGE_*` (e, se quiser mudar os tetos, as duas
+   de tamanho) no ambiente do backend publicado.
+4. **Regra de lifecycle do bucket** para o prefixo `pending/`: envios que começaram e não
+   foram confirmados ficam lá; recomenda-se expirá-los automaticamente.
+
+A versão online deste guia (link no topo) não é atualizada junto com este arquivo e
+fica pendente do Diretor.
 
 ## Glossário
 
@@ -172,6 +277,12 @@ decidir o que fazer a seguir:
 | Pegadinha | Erro comum de prova |
 | Versão | Foto fechada e numerada do material, que pode ser aprovada |
 | Módulo | Disciplina e tema |
+| Acervo de PDFs | Coleção de PDFs prontos, com título, versão e data de fechamento legislativo |
+| Pacote | Conjunto ordenado de PDFs do Acervo, com preço de referência, exportado para venda |
+| Item | Um PDF dentro de um Pacote, em uma posição |
+| Ficha do pacote | Resumo em texto (.txt) do Pacote e de seus Itens, com o tamanho total |
+| Exportação | Geração do arquivo compactado do Pacote; só vale depois que o download termina |
+| Data de fechamento legislativo (declarada) | Data informada por quem envia o PDF; o sistema não a confere |
 
 ## Como manter este guia
 
@@ -180,6 +291,7 @@ decidir o que fazer a seguir:
 - Mantenha o doc online igual a este arquivo.
 - Funcionalidade nova entra no lugar certo e sai da lista "ainda não é".
 - Escreva do ponto de vista de quem usa: o que clicar, o que esperar, o que fazer quando
-  falha. Nada de setup, porta, configuração ou nome de arquivo.
+  falha. Nada de setup, porta, configuração ou nome de arquivo, exceto na seção
+  Armazenamento de arquivos, a única que fala de ambiente.
 - Descreva só o que existe no código; na dúvida, confira no código, não na memória.
 - Este arquivo vive no workspace, na `main`.
