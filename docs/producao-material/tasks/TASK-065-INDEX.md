@@ -6,10 +6,10 @@
 ## Ordem de execução (waves)
 
 ### Wave 1 (paralelizável)
-- [ ] TASK-065-001 ⏸ Todo
-- [ ] TASK-065-002 ⏸ Todo
-- [ ] TASK-065-003 ⏸ Todo
-- [ ] TASK-065-004 ⏸ Todo
+- [x] TASK-065-001 ✅ Done
+- [x] TASK-065-002 ✅ Done
+- [x] TASK-065-003 ✅ Done
+- [x] TASK-065-004 ✅ Done
 
 ### Wave 2 (depende de Wave 1)
 - [ ] TASK-065-005 ⏸ Todo

@@ -55,6 +55,8 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 - [ ] Espelho no frontend compila: `npm --prefix mnemonicos-frontend run typecheck` → saída 0
 - [ ] Sem warnings/lints novos sobre todos os arquivos do diff (`git -C mnemonicos-backend diff --name-only main...HEAD` e `git -C mnemonicos-frontend diff --name-only main...HEAD`), produção e teste: `npm --prefix mnemonicos-backend run lint`, `npm --prefix mnemonicos-backend run typecheck` e `npm --prefix mnemonicos-backend run format:check` saem 0; `npm --prefix mnemonicos-frontend run lint` e `npm --prefix mnemonicos-frontend run format:check` saem 0
 
+- [ ] Exigências do gate 8 da wave 1 para as rotas de leitura (pendência herdada): (a) sessão ausente → 401 e papel sem direito (STUDENT) → 403 nas duas rotas GET; (b) Conteúdo removido (soft-delete) → 404 nas duas, e o binário não é servido; (c) download com `Content-Type` literal `application/pdf` (asserção de igualdade, não `toMatch`) e `Content-Disposition: attachment`; verificação executável: comando de integração desta TASK → `0 failed`; mutante que remove a checagem de remoção na leitura deixa (b) vermelho.
+
 ## Riscos específicos
 
 - Gate 8 (IDOR: leitura por id sem escopo de Conteúdo) e gate 10 (o download carrega o PDF inteiro, até 4.000.000 bytes, em memória por requisição).
