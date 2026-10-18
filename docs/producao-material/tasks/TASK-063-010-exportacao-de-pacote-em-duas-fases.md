@@ -83,6 +83,9 @@ Baseline antes de começar (o developer registra as contagens): `npm --prefix mn
 ### Critério herdado do gate 8 da wave 4 (pendência roteada — 4.140)
 - [ ] **CSRF isolado no `verifyOrigin` (CONDIÇÃO: toda rota de mutação nova desta TASK recusa `Referer` estrangeiro sem `Origin`)** — o CORS global (`src/app.ts:25-33`) já recusa `Origin` estrangeiro, então a prova "Origin estrangeiro → 403" não isola o `verifyOrigin`; o vetor exclusivo dele é o `Referer` sem `Origin`. Prova de integração: em cada rota de mutação nova (POST/PUT/DELETE desta TASK), requisição com sessão válida, `Referer: https://evil.example` e SEM `Origin` → 403 e nada muda no banco. Mutante (em worktree): tirar `verifyOrigin` de uma rota → o caso dela reprova.
 
+### Critério herdado das lições da wave 5 (4.140)
+- [ ] **Escopo por Pacote no caminho de SUCESSO (lição `prova-de-escopo-por-pai-cobre-a-escrita-bem-sucedida`)** — com 2 Pacotes A e B, cada um com um `PENDING` próprio do mesmo autor: `complete` do registro de A grava `COMPLETED` em A e deixa o registro de B `PENDING` com `completedAt` nulo; `createPackageExport` em A não cria nem altera registro de B. Mutante (worktree): tirar o filtro de Pacote do `update`/`updateMany` do `complete` → reprova.
+
 ## Riscos específicos
 
 - O corpo da resposta do `complete` (`{exportId, status, completedAt}`) e o texto das mensagens `[proposto]` são decisões desta fixação, não do PLAN; mudar o corpo exige ajustar a TASK-063-012.
