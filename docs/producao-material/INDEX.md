@@ -105,6 +105,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   → `/`, fora do `<form>` (FR-030-015/016, AC-030-015). O ajuste BRIEF-042 deixou o link centralizado e sem sublinhado, por decisão do Diretor.
 
 ### Especificadas, ainda não planejadas
+- PDF final da tira ilustrada (SPEC-064, épico KAN-237): modo final sem marcas internas só para Versão aprovada e válida (recusa pelo sistema), diagramado com capa (Disciplina, Tópico, Versão, data), Quadros com ilustração em destaque, numeração e fonte pt-BR; publicação imutável (registro novo a cada publicação, "atual" = mais recente) com histórico e download byte a byte; atalho do seletor vazio para a Biblioteca visual e indicador "N de M quadros com imagem". Branch `feat/producao-material-pdf-final-tira-ilustrada` (worktrees `*-kan237`).
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
 
@@ -141,6 +142,7 @@ fechado._
 | SPEC-048 | Gestão de usuários (ADMIN) — emenda a navegação da SPEC-044 | Approved | 2026-09-30 |
 | SPEC-050 | Usuários — ações em ícone e reativação de conta (emenda a SPEC-048) | Approved | 2026-10-01 |
 | SPEC-061 | Pacotes de PDF para marketplace (KAN-236: acervo de PDFs prontos + pacotes exportados) | Approved | 2026-10-18 |
+| SPEC-064 | PDF final da tira ilustrada (KAN-237: modo final, diagramação, publicação imutável, atalho da biblioteca) — emenda só no modo final AC-024-005, FR-024-008/011, NFR-024-004, FR-032-010/AC-032-009, FR-028-010 | Approved | 2026-10-18 |
 
 ## PLANs
 
@@ -296,6 +298,15 @@ fechado._
 | Registro de exportação | Quem, quando e a composição congelada (Título, Versão, data declarada, tamanho, digest por Item); sobrevive à remoção do Pacote | SPEC-061 |
 | Marketplace | Plataforma externa de venda (Hotmart, Kiwify, Eduzz) onde Produtos sobe o arquivo exportado à mão | SPEC-061 |
 | Produtos | Equipe interna que monta material para venda; usa os papéis EDITOR e ADMIN (não é papel novo) | SPEC-061 |
+| Modo de exportação | Rascunho (SPEC-024, inalterado) ou final (SPEC-064) | SPEC-064 |
+| PDF final | Tira gerada no modo final: sem "RASCUNHO", Variante ou "Gerado em"; capa e rodapé "Versão N — legislação verificada até DD/MM/AAAA"; só com Versão aprovada e válida | SPEC-064 |
+| Publicar (PDF final) / PDF publicado | Gravar o PDF final ligado ao Conteúdo bruto e à Versão aprovada; cada publicação é um registro novo e imutável, nunca sobrescrito | SPEC-064 |
+| PDF publicado atual | Registro de publicação mais recente de um Conteúdo bruto, marcado "atual" na lista; âncora para o KAN-236 | SPEC-064 |
+| Histórico de PDFs publicados | Lista por Conteúdo bruto com Versão, data, autor e N de M quadros com imagem | SPEC-064 |
+| Capa (PDF final) | 1ª página: Disciplina, Tópico, Versão e data de fechamento legislativo | SPEC-064 |
+| Aviso de exportação | Lista de Quadros sem imagem, com imagem que não entrou, e (informativo) com imagem abaixo da Resolução recomendada | SPEC-064 |
+| Resolução recomendada | Valor único para impressão, fixado com o layout (caixa de imagem a 300 dpi), citado no aviso de upload | SPEC-064 |
+| Indicador de cobertura da tira | "N de M quadros com imagem" na tela da Tira mnemônica | SPEC-064 |
 
 ## Decisões irreversíveis
 
@@ -486,10 +497,13 @@ fechado._
 | RISK-061-004 | Substituição sem histórico: arquivo substituído por engano não é recuperável | Confirmação explícita; só autor ou ADMIN; digest no registro de exportação | SPEC-061 §9 |
 | RISK-061-005 | PDF com assinatura válida e conteúdo corrompido entra no acervo | Produtos baixa e confere; digest identifica o arquivo exportado | SPEC-061 §9 |
 | TRISK-063-002 | CORS do bucket mal configurado faz upload/download falharem calados no navegador (paralelo à lição de `CORS_ORIGINS`) | MinIO local com CORS; doc exata da configuração; mensagem de erro de rede no PUT cita a causa provável | PLAN-063 §8 |
+| RISK-064-001 | Layout do PDF final proposto pelo time sem referência de Produtos; amostra impressa pode ser reprovada | product-designer no gate 11; amostra impressa pendente de Produtos | SPEC-064 §9 |
+| RISK-064-006 | Modo final e publicação exigem Versão aprovada, que exige 2 ADMINs reais (RISK-032-001/RISK-032-006); sem isso Produtos não publica em produção e a métrica é inconclusiva | dependência declarada; gate 9 com conta descartável; E-1 ao Diretor na Entrega | SPEC-064 §9 |
 | TRISK-063-003 | SHA-256 por streaming de até 50 MB dentro do `maxDuration` 15 s da função única `api/index.ts` | Medir no gate 10; elevar `maxDuration` da função; reabrir DEC-063-002 | PLAN-063 §8 |
 
 ## Histórico recente
 
+- 2026-10-18: **SPEC-064 criada e aprovada** via /keelson:auto (BRIEF-064, épico KAN-237; FEAT-064-001..004 ↔ KAN-244..247, Histórias existentes vinculadas). Renumerada de 063 → 064 por colisão com PLAN-063 (KAN-236). spec-validator 0 ERROR (3 auto-fixes); product-analyst REVISAR_ANTES_DE_APROVAR (11 pontos); PO ESCALAR com resoluções aplicadas (v0.2) e 1 escalação para a Entrega (E-1: conserto do RISK-032-006 dentro do épico? default fora). Porte 33 FRs mantido numa SPEC só (épico já decomposto em 4 Histórias, branch única por diretiva do Diretor).
 - 2026-10-18: **PLAN-063 criado e aprovado** via /keelson:plan (SPEC-061, 9 COMPs, 8 DECs novas + 1 herdada, nenhuma irreversível). plan-validator 0 ERROR (2 WARNING de alternativa única). Diretor autorizou a migração aditiva `add_sales_packages` nos bancos locais de dev e teste.
 - 2026-10-18: **SPEC-061 criada e aprovada** via /keelson:auto (BRIEF-061, épico KAN-236; Histórias KAN-241 → FEAT-061-001, KAN-240 → FEAT-061-002). Diretor decidiu venda em marketplace e upload primeiro (respostas à KAN-239). spec-validator 0 ERROR; product-analyst REVISAR_ANTES_DE_APROVAR; PO ESCALAR com 13 resoluções aplicadas (v0.2) e 2 escalações para a Entrega (gate jurídico do PDF enviado; conta de storage). Porte 35 FRs mantido numa SPEC só (capacidade única, 2 FEATs espelham as Histórias).
 - 2026-10-18: **BRIEF-062 (avulso, KAN-238)**: texto de ajuda visível nos 3 campos obrigatórios de
