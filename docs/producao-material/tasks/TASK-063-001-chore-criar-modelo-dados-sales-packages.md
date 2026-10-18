@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -43,6 +43,10 @@ Cria as quatro tabelas do domínio de Pacotes de PDF (migração aditiva `add_sa
 - CHECK de preço ≥ 0 no banco: a validação é Zod + service na TASK-063-007, sem SQL manual na migração.
 - Reescrever as quatro cópias antigas de `extractInterfaceFields` (escopo mínimo).
 - Executar a migração em produção.
+**Inclui — herdado dos gates da wave 1 (retry, 2026-10-18):**
+- `mnemonicos-backend/prisma/schema.prisma` (`@@index([pdfId])` em `SalesPackageItem`) + migração NOVA `mnemonicos-backend/prisma/migrations/<YYYYMMDDHHMMSS>_add_sales_package_item_pdf_index/migration.sql` (só `CREATE INDEX`) — gate 10; **autorizada pelo Diretor em 2026-10-18** para os bancos locais de dev e teste. A migração `20261018052625_add_sales_packages` NÃO é editada.
+- `mnemonicos-backend/tests/support/interface-parity.ts` (+ `tests/unit/interface-parity.test.ts`) — paridade passa a comparar NOME e TEXTO DE TIPO de cada campo (decisão do Tech Lead, achado fora de escopo do gate 1).
+- `mnemonicos-frontend/src/types/domain.ts` (docblock que aponta para si mesmo) e `mnemonicos-backend/tests/integration/sales-packages.model.integration.test.ts:8` (proveniência).
 
 ## Critérios de pronto
 
@@ -61,7 +65,7 @@ Cria as quatro tabelas do domínio de Pacotes de PDF (migração aditiva `add_sa
   - `items Json` volta igual ao semeado (os sete campos de `ExportItemSnapshot`, `position` ≥ 1).
 - [ ] `legislativeClosureDate` não sofre deslocamento de fuso — verificação executável: `TZ=America/Sao_Paulo npm --prefix mnemonicos-backend run test:integration -- tests/integration/sales-packages.model.integration.test.ts` e `TZ=Pacific/Auckland npm --prefix mnemonicos-backend run test:integration -- tests/integration/sales-packages.model.integration.test.ts` → ambos `N passed`, 0 failed; o caso de round-trip grava `'2026-10-18'` e `'2026-12-31'` e relê `'2026-10-18'` e `'2026-12-31'` (inclusive por `SELECT "legislativeClosureDate"::text` via `$queryRaw`). Falha se a escrita ou a leitura passar por conversão em hora local.
 - [ ] Os enums e a forma espelhada estão idênticos nos dois repositórios — verificação executável: `npm --prefix mnemonicos-backend test -- tests/unit/domain-types-parity.test.ts` → `N passed`, N > 0, com `EXPORT_STATUSES` igual a `['PENDING', 'COMPLETED']` nas três fontes (valor literal um a um, não só "contém") e `ExportItemSnapshot` com exatamente `['position', 'title', 'version', 'legislativeClosureDate', 'sizeBytes', 'sha256', 'storageKey']` nos dois lados, lidos pelo teste (lição `coment-rio-que-afirma-paridade-entre-os-dois-repos-s-vale-se-o-teste-ler-as-duas-fontes`: o teste lê as duas fontes, nunca um fixture montado de um lado só).
-- [ ] Mutantes de paridade e de política de FK, em worktrees — verificação executável: monte um par de worktrees com os mesmos nomes de pasta dos repos, `git -C mnemonicos-backend worktree add <TMP>/mnemonicos-backend HEAD` e `git -C mnemonicos-frontend worktree add <TMP>/mnemonicos-frontend HEAD`, com `node_modules` ligado por symlink (os testes leem `../mnemonicos-frontend` pelo `__dirname`, então os nomes de pasta precisam bater); nunca edite a árvore principal. (a) acrescentar `'FAILED'` a `EXPORT_STATUSES` só no worktree do frontend → `npm --prefix <TMP>/mnemonicos-backend test -- tests/unit/domain-types-parity.test.ts` sai vermelho; (b) renomear `sha256` para `digest` em `ExportItemSnapshot` só no backend → o mesmo comando sai vermelho; (c) trocar `ON DELETE RESTRICT` por `ON DELETE CASCADE` na FK `pdfId` de `sales_package_items` no `migration.sql` do worktree do backend → `npm --prefix <TMP>/mnemonicos-backend run test:integration -- tests/integration/sales-packages.model.integration.test.ts` sai vermelho. O global-setup só roda `migrate deploy` num `mnemonicos_test` persistente, então o mutante (c) sobreviveria a um banco já migrado: **antes** de rodar o mutante, com o banco exclusivo (pré-condição acima), execute `docker compose -f mnemonicos-backend/docker-compose.yml exec -T postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS mnemonicos_test"` para o global-setup recriar o banco do `migration.sql` mutado, e exija o vermelho; **depois** do mutante, repita o `DROP DATABASE` (via `-d postgres`) e confirme que a execução seguinte, no `migration.sql` original, recria o banco limpo e sai verde. Remova os worktrees ao final.
+- [ ] Mutantes de paridade e de política de FK, em worktrees — verificação executável: monte um par de worktrees com os mesmos nomes de pasta dos repos, `git -C mnemonicos-backend worktree add <TMP>/mnemonicos-backend HEAD` e `git -C mnemonicos-frontend worktree add <TMP>/mnemonicos-frontend HEAD`, com `node_modules` ligado por symlink (os testes leem `../mnemonicos-frontend` pelo `__dirname`, então os nomes de pasta precisam bater); nunca edite a árvore principal. (a) acrescentar `'FAILED'` a `EXPORT_STATUSES` só no worktree do frontend → `npm --prefix <TMP>/mnemonicos-backend test -- tests/unit/domain-types-parity.test.ts` sai vermelho; (b) renomear `sha256` para `digest` em `ExportItemSnapshot` só no backend → o mesmo comando sai vermelho; (c) trocar `ON DELETE RESTRICT` por `ON DELETE CASCADE` na FK `pdfId` de `sales_package_items` no `migration.sql` do worktree do backend → `npm --prefix <TMP>/mnemonicos-backend run test:integration -- tests/integration/sales-packages.model.integration.test.ts` sai vermelho. O global-setup só roda `migrate deploy` num `mnemonicos_test` persistente — e esse banco é **compartilhado** com outra sessão (KAN-237), então ele nunca é dropado nem recriado (ajuste do Tech Lead, 2026-10-18, após o classificador negar o `DROP DATABASE`): o mutante (c) roda num **banco descartável próprio**. No worktree do backend (harness de mutação, nunca a árvore principal), troque o nome-alvo `mnemonicos_test` por `mnemonicos_test_mut063` em `tests/integration/db-url.ts` (default e guarda fail-closed) e em `tests/integration/global-setup.ts` (`TEST_DB_NAME`), aplique o mutante RESTRICT→CASCADE no `migration.sql` do worktree e rode `npm --prefix <TMP>/mnemonicos-backend run test:integration -- tests/integration/sales-packages.model.integration.test.ts` → exija o vermelho no caso "apagar um LibraryPdf com Item é rejeitado" (o global-setup cria `mnemonicos_test_mut063` do zero a partir do `migration.sql` mutado). Controle positivo: no mesmo worktree, com o `migration.sql` original e o alvo `mnemonicos_test_mut063b`, o mesmo comando sai verde. Ao final, `docker compose -f mnemonicos-backend/docker-compose.yml exec -T postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS mnemonicos_test_mut063"` (e `_mut063b`) — se o harness negar o drop desses bancos descartáveis, deixe-os e declare no report (limpeza vira pendência do Diretor); o `mnemonicos_test` compartilhado não é tocado em nenhum passo. Remova os worktrees ao final.
 - [ ] O helper de paridade tem controle positivo e negativo obrigatórios — verificação executável: `npm --prefix mnemonicos-backend test -- tests/unit/interface-parity.test.ts` → `N passed`, N > 0, com estes casos (lição `extrator-textual-de-c-digo-para-prova-estrutural-precisa-de-controle-positivo-obrigat-rio-e-o-conserto-precisa-varrer-a-classe-ast-n-o-s-a-inst-ncia-que-quebrou`): (1) interface existente devolve a lista exata de campos, com valores não vazios; (2) interface ausente lança; (3) interface com campo extra num lado é detectada por diferença de conjuntos; (4) interface com campo de tipo objeto inline aninhado **lança** com mensagem que cita o contrato flat, em vez de devolver o corpo errado; (5) `readSourceFile` lança para caminho inexistente. Mutante em worktree: `extractInterfaceFields` devolvendo `[]` → o caso (1) sai vermelho; remover a checagem de aninhamento → o caso (4) sai vermelho.
 - [ ] Nenhum export especulativo no helper — verificação executável: `git -C mnemonicos-backend grep -ch -E '^export ' -- tests/support/interface-parity.ts` → `2` (`readSourceFile` e `extractInterfaceFields`; lição `lista-de-interface-p-blica-do-plan-contrato-m-nimo-n-o-gabarito-de-transcri-o`: os símbolos do manifesto são contrato mínimo, e o arquivo é comparado com o irmão canônico `visual-associations-frontend-contract.test.ts` antes do commit).
 - [ ] O extrator não é redefinido por nenhum arquivo novo ou alterado em `tests/` (lição `corre-o-de-duplica-o-dry-introduz-nova-re-deriva-o-do-can-nico-no-mesmo-diff`) — verificação executável: `cd mnemonicos-backend && git diff --name-only --diff-filter=AM <SHA-pai-da-TASK>..HEAD -- tests | xargs grep -l -E '^(export )?function extractInterfaceFields'` → exatamente `tests/support/interface-parity.ts`, e nenhum outro (condição sobre o universo real do diff, controle positivo incluso).
@@ -69,6 +73,11 @@ Cria as quatro tabelas do domínio de Pacotes de PDF (migração aditiva `add_sa
 - [ ] Os dois repos compilam e passam format — verificação executável: `npm --prefix mnemonicos-backend run typecheck` e `npm --prefix mnemonicos-frontend run typecheck` → exit 0 (o `tsconfig.json` do backend inclui `tests/**/*.ts` e `prisma/**/*.ts`, então os arquivos novos estão no alcance); `npm --prefix mnemonicos-backend run format:check` e `npm --prefix mnemonicos-frontend run format:check` → exit 0 (lição `entrega-roda-format-check-nos-arquivos-tocados-alem-de-lint-e-jest`, em observação, aplicada como critério).
 - [ ] Sem regressão nas suítes completas — verificação executável: `npm --prefix mnemonicos-backend test` e `npm --prefix mnemonicos-backend run test:integration` → `0 failed` em ambos e contagem de testes passando ≥ o baseline capturado pelo developer antes de começar (a matriz de autorização de rotas segue em 53 pares: esta TASK não cria rota).
 - [ ] Sem warnings/lints novos em todos os arquivos do diff, produção e teste — verificação executável: `npm --prefix mnemonicos-backend run lint` e `npm --prefix mnemonicos-frontend run lint` → exit 0, 0 warnings (o `eslint .` cobre `tests/` e `prisma/`).
+### Critérios herdados dos gates da wave 1 (retry)
+- [ ] **Índice em `sales_package_items.pdfId` (gate 10)** — `@@index([pdfId])` em `SalesPackageItem`; migração nova gerada por `npm --prefix mnemonicos-backend exec prisma migrate dev -- --name add_sales_package_item_pdf_index` (autorizada). Verificação: `git -C mnemonicos-backend diff --name-only <SHA-pai-do-retry>..HEAD -- prisma/migrations` lista exatamente 1 arquivo novo `…_add_sales_package_item_pdf_index/migration.sql`; `grep -c '^CREATE INDEX' <esse arquivo>` → `1` e `grep -cE '^(DROP|ALTER)' <esse arquivo>` → `0`; a migração `20261018052625_add_sales_packages/migration.sql` sem diff (`git -C mnemonicos-backend diff --quiet <SHA-pai-do-retry>..HEAD -- prisma/migrations/20261018052625_add_sales_packages` exit 0); teste de integração (em `sales-packages.model.integration.test.ts`) consulta `pg_indexes` e acha um índice em `sales_package_items` cuja `indexdef` cobre só `("pdfId")` → verde; mutante (em worktree, banco descartável próprio como no item (c)) sem o `CREATE INDEX` → esse caso reprova.
+- [ ] **Paridade por nome E tipo (CONDIÇÃO: todo par de interfaces espelhadas comparado pelo helper confere o texto de tipo normalizado de cada campo)** — `extractInterfaceFields` (ou função irmã no mesmo arquivo, mantendo o teto de exports declarado na TASK ou atualizando-o aqui) devolve `nome: tipo` normalizado (espaços colapsados, `;`/`,` finais removidos). Verificação: `tests/unit/interface-parity.test.ts` ganha o caso "mesmos nomes, tipo diferente (`sizeBytes: number` × `sizeBytes: string`) → divergência reportada" e o caso "Date × string → divergência"; `domain-types-parity.test.ts` segue verde com o par real `ExportItemSnapshot`. Mutante (em worktree): comparação voltando a só-nome → os 2 casos novos reprovam.
+- [ ] **Higiene** — docblock do espelho FE (`src/types/domain.ts`, ~:539) aponta para `mnemonicos-backend/src/domain/types.ts` (convenção do arquivo); `sales-packages.model.integration.test.ts:8` sem `TASK-063-001 /` (mantém DEC-063-004).
+- [ ] **Commit do retry** cita no corpo os gates e achados que fecha (gate 10 índice; gate 1 paridade por tipo; gate 7 comentários).
 
 ## Riscos específicos
 
@@ -81,17 +90,17 @@ Cria as quatro tabelas do domínio de Pacotes de PDF (migração aditiva `add_sa
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T02:19:39-0300
+**Data conclusão**: 2026-10-18T08:12:11-03:00
+**Commit SHA**: 09ac538 (BE) · 28170c9 (FE)
 **Jira**: KAN-248
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1; delta do retry aprovado)
+- [x] Comportamento (gate 9): n/a — chore de fundação sem efeito observável (FEAT-061-001 verificada no fecho da TASK-063-006)

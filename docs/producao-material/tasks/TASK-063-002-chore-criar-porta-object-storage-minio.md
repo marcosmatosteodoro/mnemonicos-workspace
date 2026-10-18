@@ -7,7 +7,7 @@
 **Wave**: 1
 **Tamanho estimado**: medium
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -50,6 +50,11 @@ Nenhum byte de PDF atravessa a função serverless (DEC-063-001/002): esta TASK 
 - CORS do bucket de produção (pendência do Diretor, documentada na TASK-063-013).
 - Elevar o `maxDuration` por rota: a configuração é da função única `api/index.ts` e vale para todas as rotas.
 - AC-061-026 na faceta de emissão (só sessão EDITOR/ADMIN recebe o endereço): é das TASKs TASK-063-003 e TASK-063-010.
+**Inclui — herdado dos gates da wave 1 (retry, 2026-10-18; sem AC novo — oráculo é o contrato do item):**
+- `mnemonicos-backend/src/modules/object-storage/object-storage.service.ts` — timeouts de rede e `maxAttempts` explícitos no `S3Client` (gate 10).
+- `mnemonicos-backend/src/modules/object-storage/s3-object-storage.ts` — `presignGet` impõe `ResponseContentType: 'application/pdf'` e `ResponseContentDisposition` `attachment` SEMPRE; `copy` com `MetadataDirective: 'REPLACE'` e `ContentType: 'application/pdf'`; teto de TTL na porta (gate 8).
+- `mnemonicos-backend/src/lib/logger.ts` — redação de `OBJECT_STORAGE_SECRET_ACCESS_KEY` (gate 8, nota 2).
+- `mnemonicos-backend/tests/unit/env.test.ts` e `tests/unit/object-storage.service.test.ts` — neutralizar `dotenv/config` sob `jest.isolateModules` (gate 1/6).
 
 ## Critérios de pronto
 
@@ -72,6 +77,14 @@ Nenhum byte de PDF atravessa a função serverless (DEC-063-001/002): esta TASK 
 - [ ] Os arquivos de erro não foram tocados — verificação executável: `git -C mnemonicos-backend diff --name-only <SHA-pai-da-TASK>..HEAD -- src/http/errors.ts src/http/middlewares/error-handler.ts` → saída vazia (ancorado no commit-pai; os dois arquivos existem lá, conferido por Glob na fixação).
 - [ ] Typecheck, format e suítes completas — verificação executável: `npm --prefix mnemonicos-backend run typecheck` → exit 0 (o `tsconfig.json` inclui `src/**`, `tests/**` e `jest*.ts`); `npm --prefix mnemonicos-backend run format:check` → exit 0; `npm --prefix mnemonicos-backend test` e `npm --prefix mnemonicos-backend run test:integration` → `0 failed` e contagem de testes passando ≥ o baseline capturado pelo developer antes de começar (pré-condição de exclusividade do banco de teste conferida antes de cada execução de integração: `docker compose -f mnemonicos-backend/docker-compose.yml exec -T postgres psql -U postgres -d postgres -tAc "SELECT count(*) FROM pg_stat_activity WHERE datname = 'mnemonicos_test' AND pid <> pg_backend_pid()"` → `0`; lição `su-te-de-integra-o-com-ddl-truncate-em-banco-compartilhado-exige-exclusividade-real-entre-execu-es-concorrentes-n-o-s-runinband`).
 - [ ] Sem warnings/lints novos em todos os arquivos do diff, produção e teste — verificação executável: `npm --prefix mnemonicos-backend run lint` → exit 0, 0 warnings.
+### Critérios herdados dos gates da wave 1 (retry — mesma régua dos achados de origem)
+- [ ] **Timeout de rede (gate 10, CONDIÇÃO: toda chamada do `S3Client` à rede rejeita dentro do orçamento)** — `new S3Client` declara `requestHandler` com `connectionTimeout` e `socketTimeout` (ou `requestTimeout` + `throwOnRequestTimeout: true`) e `maxAttempts` explícito, em constantes nomeadas com docblock da conta `maxAttempts × timeout + backoff < 15 000 ms` (maxDuration da função única). Verificação: teste unitário com `net.Server` que aceita a conexão e nunca responde → `head()` rejeita com erro de timeout em < 12 000 ms (relógio medido no teste) → `npm --prefix mnemonicos-backend test -- tests/unit/object-storage.service.test.ts` com o caso verde. Par de provas: mutante removendo o `requestHandler` (em `git worktree`) → o caso reprova (timeout do jest ou pendente > orçamento); controle: com servidor que responde 200 rápido, `head()` resolve.
+- [ ] **Content-Type imposto no GET (gate 8, CWE-79; CONDIÇÃO: todo endereço de download emitido pela porta força PDF e attachment)** — `presignGet` sempre põe `response-content-type=application/pdf` e `response-content-disposition` começando por `attachment` (com `filename*=UTF-8''…` quando há nome; `attachment` puro sem nome). Verificação unit: decodificar a URL de `presignGet` COM e SEM `downloadFileName` e asserir os dois parâmetros (4 asserções); mutante que remove cada um (2 mutantes, em worktree) → reprova cada qual a sua asserção. Verificação MinIO (`object-storage.minio.integration.test.ts`, com OBJECT_STORAGE_* na linha de comando): PUT pela URL pré-assinada com `Content-Type: text/html` e corpo começando por `%PDF-` → `copy` → `head` da chave definitiva = `application/pdf` (MetadataDirective REPLACE) e GET pelo `presignGet` sem nome → `content-type: application/pdf` e `content-disposition` começando por `attachment`. Controle: o mesmo fluxo com `text/html` no PUT original NÃO vaza `text/html` no GET.
+- [ ] **Teto de TTL na porta (gate 8, nota 1)** — `presignGet`/`presignPut` limitam `expiresInSeconds` a no máximo `DOWNLOAD_URL_TTL_SECONDS`/`UPLOAD_URL_TTL_SECONDS` (valor maior é truncado ou recusado — declare qual). Verificação unit: pedir 3600 → `X-Amz-Expires` ≤ 300 no GET; mutante sem o teto → reprova.
+- [ ] **Redação do segredo no logger (gate 8, nota 2)** — `src/lib/logger.ts` redige `OBJECT_STORAGE_SECRET_ACCESS_KEY` e `*.OBJECT_STORAGE_SECRET_ACCESS_KEY` no mesmo padrão de `JWT_SECRET`. Verificação: teste unitário que loga um objeto com essa chave e confere o valor redigido na saída; mutante removendo a entrada → reprova.
+- [ ] **Testes de env ausente independem do `.env` local (gate 1/6, node-22 §7 "nenhum teste lê .env"; CONDIÇÃO: todo `require` de `src/config/env` sob `jest.isolateModules` em teste de ausência neutraliza `dotenv/config`)** — `jest.doMock('dotenv/config', () => ({}))` dentro do isolateModules em `loadEnvModule()` (env.test.ts) e `loadReal()` (object-storage.service.test.ts). Par de provas: em `git worktree` com `cp .env.example .env` → `npx jest tests/unit/env.test.ts tests/unit/object-storage.service.test.ts` todos verdes; o mesmo sem `.env` → todos verdes. Grep de fechamento: `git grep -n "isolateModules" -- tests/unit/env.test.ts tests/unit/object-storage.service.test.ts` — cada ocorrência que faz `require` de `config/env` tem o `doMock` de `dotenv/config` no mesmo bloco.
+- [ ] **Higiene apontada pelo revisor** — (a) remover a proveniência `(TASK-063-001)` em `src/config/env.ts` (trocar pela âncora durável `LibraryPdf.sizeBytes Int` em schema.prisma) e `(TASK-063-002)` em `tests/support/fake-object-storage.ts`; (b) `object-storage.minio.integration.test.ts`: o caso do SHA-256 envia o próprio objeto (ou `beforeAll`), sem depender da ordem do caso de 50 MiB — verificação: rodar só esse caso com `-t` isolado verde; (c) `readRange`/`head`: resposta sem `ContentLength` não vira 0 byte silencioso — declare o tratamento (erro previsto ou valor ausente) com 1 teste.
+- [ ] **Commit do retry** cita no corpo os gates e achados que fecha (gate 10 timeout; gate 8 CWE-79 content-type, TTL, logger; gate 1/6 dotenv).
 
 ## Riscos específicos
 
@@ -85,17 +98,17 @@ Nenhum byte de PDF atravessa a função serverless (DEC-063-001/002): esta TASK 
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T02:31:46-0300
+**Data conclusão**: 2026-10-18T08:22:08-03:00
+**Commit SHA**: 1f18604
 **Jira**: KAN-249
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 1, após retry CWE-79)
+- [x] Comportamento (gate 9): n/a — chore de fundação sem efeito observável de tela

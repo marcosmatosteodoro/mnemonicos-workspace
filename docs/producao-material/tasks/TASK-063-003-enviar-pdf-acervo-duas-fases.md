@@ -53,6 +53,8 @@ Um EDITOR ou ADMIN registra um PDF no Acervo em duas fases (a intenção valida 
 - Reescrever as cópias locais de `seedSession` dos testes existentes (escopo mínimo).
 - AC-061-001 na faceta de renderização (autor e data na linha da lista): é do gate 9 da TASK-063-005.
 - AC-061-026 na faceta de expiração real no storage: é da TASK-063-002; na emissão para a exportação, da TASK-063-010.
+**Inclui — herdado do gate 10 da wave 1 (2026-10-18):**
+- `mnemonicos-backend/src/modules/pdf-library/pdf-library.service.ts` (confirmação de envio) — prazo total da operação de confirmação (HEAD + Range + stream SHA-256 + copy + delete + gravação), com `stream.destroy()` do `Readable` de `readStream` ao vencer e resposta por `AppError`.
 
 ## Critérios de pronto
 
@@ -81,6 +83,8 @@ Um EDITOR ou ADMIN registra um PDF no Acervo em duas fases (a intenção valida 
 - [ ] Pré-condição da integração: banco de teste sem outro runner — verificação executável: antes de cada execução de integração, `docker compose -f mnemonicos-backend/docker-compose.yml exec -T postgres psql -U postgres -d postgres -tAc "SELECT count(*) FROM pg_stat_activity WHERE datname = 'mnemonicos_test' AND pid <> pg_backend_pid()"` → `0` (lição `su-te-de-integra-o-com-ddl-truncate-em-banco-compartilhado-exige-exclusividade-real-entre-execu-es-concorrentes-n-o-s-runinband`).
 - [ ] Typecheck, format e suítes completas dos dois repos — verificação executável: `npm --prefix mnemonicos-backend run typecheck` e `npm --prefix mnemonicos-frontend run typecheck` → exit 0; `npm --prefix mnemonicos-backend run format:check` e `npm --prefix mnemonicos-frontend run format:check` → exit 0; `npm --prefix mnemonicos-backend test` e `npm --prefix mnemonicos-backend run test:integration` → `0 failed` e contagem de testes passando ≥ o baseline capturado pelo developer antes de começar.
 - [ ] Sem warnings/lints novos em todos os arquivos do diff, produção e teste — verificação executável: `npm --prefix mnemonicos-backend run lint` e `npm --prefix mnemonicos-frontend run lint` → exit 0, 0 warnings.
+### Critério herdado do gate 10 da wave 1 (pendência roteada a esta TASK — 4.140)
+- [ ] **Prazo total da confirmação (CONDIÇÃO: toda leitura do storage feita pela confirmação para dentro de um prazo total < 15 000 ms, inclusive corpo que chega em gotejamento)** — `socketTimeout` mede só inatividade: um storage que manda 1 byte/s nunca dispara (sonda "trickle" do gate 10 pendente > 30 s). A confirmação tem prazo total nomeado em constante (docblock com a conta < 15 000 ms, padrão `withDeadline` de `src/modules/publication/publication.service.ts:181`); ao vencer, `destroy()` no `Readable` (Promise.race sozinho não cancela o GET) e `AppError` 504/503 pt-BR, com o objeto `pending/` apagado (melhor esforço, falha logada). Par de provas: teste unitário com fake de storage cujo `readStream` goteja (1 chunk/intervalo, sem fim) e relógio/prazo injetado curto → a confirmação rejeita dentro do prazo, o stream recebeu `destroy` (spy) e nenhum `LibraryPdf` foi gravado; controle: stream normal → confirma. Mutante (em worktree): sem o prazo → o caso reprova por timeout do jest.
 
 ## Riscos específicos
 
