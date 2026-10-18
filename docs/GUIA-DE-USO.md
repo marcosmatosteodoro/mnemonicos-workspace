@@ -162,7 +162,8 @@ Remover:
    com Remover do Pacote (o PDF continua no Acervo).
 4. Para mudar nome, preço ou descrição use Editar. Para apagar o Pacote use Remover e
    Confirmar remoção: os PDFs dos Itens continuam no Acervo e o registro das exportações já
-   feitas fica guardado.
+   feitas fica guardado. Só o autor do Pacote ou um administrador remove o Pacote; editar e
+   compor fica aberto a qualquer editor.
 
 ### 3. Baixe a Ficha e exporte
 
@@ -218,7 +219,8 @@ decidir o que fazer a seguir:
 | Não vejo um conteúdo de colega | Editor só vê os próprios; peça a um administrador |
 | "Você não tem permissão para ver esta página." | A tela é de administrador |
 | "Armazenamento de arquivos não configurado neste ambiente. Avise o administrador para configurá-lo." | Falta provisionar o armazenamento; veja [Armazenamento de arquivos](#armazenamento-de-arquivos) |
-| "Não foi possível enviar o arquivo ao armazenamento. Verifique a conexão e use "Enviar PDF" para tentar de novo; se persistir, avise a equipe técnica (a origem do site pode não estar liberada no armazenamento)." | Confira a conexão e tente de novo; se persistir, o CORS do bucket não libera o site (ver Pendências do Diretor). A mesma pista vale para baixar o PDF |
+| "Não foi possível enviar o arquivo ao armazenamento. Verifique a conexão e use "Enviar PDF" para tentar de novo; se persistir, avise a equipe técnica (a origem do site pode não estar liberada no armazenamento)." | Confira a conexão e tente de novo; se persistir, avise a equipe técnica (o CORS do bucket pode não liberar o site — ver Pendências do Diretor). Ao substituir, a mesma mensagem cita "Confirmar substituição" |
+| "Não foi possível gerar o arquivo. Clique em "Exportar Pacote" para exportar de novo." | Exporte de novo; se persistir, avise a equipe técnica (o CORS do bucket pode não liberar o site — ver Pendências do Diretor) |
 | "O arquivo baixado não vale; exporte de novo." | Apague o arquivo baixado e clique em Exportar Pacote outra vez |
 
 ## Armazenamento de arquivos
@@ -254,15 +256,13 @@ O que falta provisionar fora do código:
 2. **CORS do bucket**: como o navegador envia (PUT) e baixa (GET) direto no bucket, ele precisa
    liberar esses métodos para o site. Localmente o `docker-compose.yml` do backend libera
    `http://localhost:3000` e `http://localhost:3001`; em produção as origens são as do frontend
-   publicado, em lista explícita, nunca curinga. Sem isso o envio e o download falham com a
-   mensagem de origem não liberada.
+   publicado, em lista explícita, nunca curinga. Sem isso o envio e a substituição falham com a
+   mensagem de origem não liberada, e a exportação do Pacote falha com "Não foi possível gerar
+   o arquivo".
 3. **Variáveis no deploy**: as cinco `OBJECT_STORAGE_*` (e, se quiser mudar os tetos, as duas
    de tamanho) no ambiente do backend publicado.
 4. **Regra de lifecycle do bucket** para o prefixo `pending/`: envios que começaram e não
    foram confirmados ficam lá; recomenda-se expirá-los automaticamente.
-
-A versão online deste guia (link no topo) não é atualizada junto com este arquivo e
-fica pendente do Diretor.
 
 ## Glossário
 
