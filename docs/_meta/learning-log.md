@@ -1652,3 +1652,73 @@ artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) �
 patch: bullet novo logo após o existente: ajuste que resolve o furo quarentenando (`.skip`/remoção) bloco de teste por remoção de ponto de entrada confere, antes de prescrever, se algum caso do bloco é a ÚNICA prova de um invariante de produção que permanece no código (grep da guarda/condição no código-fonte, nunca do nome do teste); achando, o caso migra para um ponto de entrada vivo antes do skip — nunca é pulado junto com o resto. Saldo +1 linha longa (implement.md: 332 linhas)
 reincidencia: 0
 estado: ativa
+
+## LRN-073: o próprio exemplo de `commands/tasks.md` (item h, bullet "Extrair ou duplicar") prescreve `git diff --name-only … | grep` — prova de "não introduz X" que acusa definição antiga de arquivo apenas tocado
+data: 2026-10-18
+gatilho: gate_reprovado
+origem: PLAN-063 (producao-material), TASK-063-004 (wave 3) — o critério herdado fechou com `git diff --name-only 274828f..HEAD -- tests | xargs grep -nE '^(async )?function seed'`; lista helper pré-existente em arquivo só tocado. Code-reviewer sinalizou licao_candidata processo (wave 3)
+causa_raiz: instrucao_ambigua — a instrução do plugin (tasks.md, bullet "Extrair ou duplicar", 0.224.1) modela a condição como `git diff --name-only <base>..HEAD -- <raiz de testes>` sobre "arquivo novo ou alterado": universo = arquivos, não linhas; o scribe copiou o molde. Grep 0.224.1 de `-U0`/`linhas adicionadas` em tasks.md: ausente
+artefato_patchado: proposta_plugin (modo consumidor; ver relatório) — `commands/tasks.md`, bullet "Extrair ou duplicar" (item h)
+patch: trocar o oráculo por linhas adicionadas (`git diff -U0 <base>..HEAD -- <raiz> | grep -E '^\+.*<definição>'`) + arquivo novo coberto por `--diff-filter=A`; saldo 0
+reincidencia: 0
+estado: ativa
+
+## LRN-074: item (h) de `commands/tasks.md` confronta o molde com lições, não com as guidelines de projeto vigentes; e "Não inclui" de módulo irmão não confere exports
+data: 2026-10-18
+gatilho: gate_reprovado
+origem: PLAN-063, wave 4A (TASK-063-006: PLAN indicou `visual-library-board.tsx`, anterior a `botoes-acao.md`/KAN-230, como molde visual) e wave 4B (TASK-063-007: "Não inclui" do módulo `pdf-library` sem conferir exports; `assertDisciplineExists` copiado)
+causa_raiz: instrucao_ausente — (h) manda `lessons.sh match` no molde, não o cruza com `guidelines/project/**` do eixo; e o bullet "Extrair ou duplicar" manda Grep do canônico mas não manda ler se o símbolo a reusar é exportável (módulo irmão no "Não inclui" torna cópia inevitável). Mesma família de LRN-070
+artefato_patchado: proposta_plugin (ver relatório) — `commands/tasks.md`, item (h) + bullet "Extrair ou duplicar" (uma frase em cada ponto de decisão, mesma checagem: o molde/canônico é lido no eixo)
+patch: (h) += guideline de projeto do eixo (data do molde × data da guideline); "Extrair ou duplicar" += símbolo não exportado de módulo no "Não inclui" → autorizar o export mínimo no Inclui. Saldo +2
+reincidencia: 0
+estado: ativa
+
+## LRN-075: catálogo "resistir a contorno" de `commands/tasks.md` não cobre escrita set-based com WHERE composto nem "cada X" sobre coleção (fixture ≥2, alvo fora da 1ª posição)
+data: 2026-10-18
+gatilho: gate_reprovado
+origem: PLAN-063, wave 6B (code-reviewer); 3 reincidências da lição de projeto "Predicado de conjunto composto" no mesmo dia (confirmada 7×)
+causa_raiz: instrucao_ausente — item (c) fecha predicado de ESCOPO por contagem de métodos e (f) um mutante por sujeito, mas nenhum manda listar cada condição do WHERE (PK-implicada = equivalente) com mutante nas demais, nem fixture com alvo fora da 1ª posição. Família LRN-015/046/066 (escada 4.149: reincidência ≥2 → check mecânico, abaixo)
+artefato_patchado: proposta_plugin (ver relatório) — `commands/tasks.md`, item (c) (frase única) + autocheck em `scripts/diff-facts.sh`
+patch: frase em (c); autocheck: `diff-facts.sh` lista, nas linhas adicionadas com `updateMany|deleteMany|where:`, as chaves de condição; code-reviewer confronta nº de condições não-PK × mutantes mortos no report
+reincidencia: 2 (família; sem Grep positivo no plugin 0.224.1 de `fora da 1ª`/`implicad` em commands/agents/core)
+estado: ativa
+
+## LRN-076: item (a) de `commands/tasks.md` não nomeia copy de interface recorrente nem afirmação de MECANISMO (navegação×fetch) como literal/fato a conferir no código
+data: 2026-10-18
+gatilho: gate_reprovado
+origem: PLAN-063, TASK-063-011/012 ("Tentar de novo" fixado; canônico `RETRY_LABEL` = "Tentar novamente") e TASK-063-013 (doc afirmou CORS no Baixar; Baixar é navegação, só a exportação usa fetch) — autoria: scribe/Tech Lead
+causa_raiz: instrucao_ambigua — (a) lista "nome de serviço, credencial, símbolo/constante" e payload externo; copy/rótulo de ação e comportamento de mecanismo de dependência não estão na lista, então a conferência por Grep não é disparada
+artefato_patchado: proposta_plugin (ver relatório) — `commands/tasks.md`, item (a)
+patch: acrescentar "rótulo/copy de ação recorrente (grep da constante canônica) e mecanismo de dependência que a TASK de doc descreve (ler o HEAD do código)" à lista; saldo +1
+reincidencia: 0
+estado: ativa
+
+## LRN-077: retry cujo critério herdado nomeia UM exemplo corrige só o exemplo ("Condição, não lista" de `commands/implement.md` §3.3 limita-se aos gates 8/9/10/11)
+data: 2026-10-18
+gatilho: retry
+origem: PLAN-063, TASK-063-011 e 063-012 (reincidências "fake espelha o servidor" e "correção de carona num retry")
+causa_raiz: instrucao_ambigua — implement.md l.144 (0.224.1) restringe "item que consolida achados dos gates 8/9/10/11"; achados dos gates 1/7 (code-reviewer) chegam ao despacho como instância
+artefato_patchado: proposta_plugin (ver relatório) — `commands/implement.md` §3.3, bullet "Condição, não lista"
+patch: trocar "gates 8/9/10/11" por "qualquer gate"; saldo 0. Complementa LRN-060 (carona)
+reincidencia: 1 (LRN-060: proposta nunca aplicada no 0.224.1 — Grep `Sem carona`/`carona` em implement.md: ausente)
+estado: ativa
+
+## LRN-078: nenhuma TASK do PLAN-063 (13/13) passou sem retry — causa comum: critérios fixados na `/keelson:tasks` sobre código que ainda não existe
+data: 2026-10-18
+gatilho: retry
+origem: PLAN-063 inteiro (13 TASKs, 4 rodadas extras)
+causa_raiz: instrucao_ausente — `tasks.md` exige conferir contra a fonte real, mas as TASKs de waves 3-7 são todas fixadas antes da wave 1 existir: exports, helpers, molde e mecanismo do código-irmão da MESMA branch não são conferíveis na fixação, e nenhum passo reconfere a TASK contra o HEAD no despacho da wave
+artefato_patchado: proposta_plugin (ver relatório) — `commands/implement.md` §3.3 (despacho de wave ≥2)
+patch: ver relatório (reconferência de "Não inclui"/molde/literais contra o HEAD da wave, pelo Tech Lead, antes de despachar)
+reincidencia: 0
+estado: ativa
+
+## LRN-079: PLAN fixa TTL de URL pré-assinada e teto de volume em TASKs separadas, sem relacionar TTL × teto ÷ vazão mínima
+data: 2026-10-18
+gatilho: gate_reprovado
+origem: PLAN-063, TASK-063-012 (wave 7) — performance-engineer REPROVADO: fetch em série com URLs de 300 s emitidas em lote; medido (TTL escalado 3 s, 10x5 MiB a 10 MiB/s) o 9º pedido chega vencido (403). TTL (TASK-063-002) e teto de volume (TASK-063-010/012) fixados em TASKs distintas; "na ordem do plano" lido como série. Pendência de TTL × vazão estacionada ao Diretor. Lição de projeto correlata: `guidelines/project/lessons/url-de-curta-validade-emitida-em-lote-dimensiona-ttl-contra-volume.md`
+causa_raiz: instrucao_ausente — `commands/plan.md` não manda relacionar, numa única DEC, limites que atravessam TASKs (TTL, teto de volume, timeout) com a conta do pior caso; cada limite nasceu correto isolado. Grep 0.224.1 de `TTL|vazão` em commands/agents/skills/templates: sem regra pertinente
+artefato_patchado: proposta_plugin (modo consumidor; ver relatório) — `commands/plan.md`, Etapa 4, item 3 (Trade-offs documentados); texto do item 3 não lido por mim, conferir antes de aplicar
+patch: +1 linha: limites que atravessam TASKs relacionados numa DEC com a conta do pior caso (teto ÷ vazão mínima declarada ≤ TTL; declarar se os passos correm em paralelo ou em série). Saldo +1
+reincidencia: 0
+estado: ativa
