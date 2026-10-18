@@ -8,7 +8,7 @@
 **Wave**: 6
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -93,6 +93,9 @@ Baseline antes de começar (o developer registra as contagens): `npm --prefix mn
 - [ ] **Mensagem de 404 de Pacote com dono único (gate 7 c)** — exportar a constante de `src/modules/sales-packages/sales-packages.service.ts` (`NOT_FOUND_MESSAGE` → `SALES_PACKAGE_NOT_FOUND_MESSAGE`, renomeando os usos) e importá-la em `sales-package-exports.service.ts` no lugar do literal. Prova: `grep -rc 'O Pacote não existe mais' mnemonicos-backend/src | awk -F: '{s+=$2} END {print s}'` → `1`; testes de 404 com literal seguem verdes.
 - [ ] **Nome de entrada sem C1 e sem controles de direção (nota do gate 8 da wave 6)** — `entry-name.ts`: além de U+0000–U+001F e U+007F, viram `-` os C1 U+0080–U+009F e os controles bidi U+061C, U+200E, U+200F, U+202A–U+202E, U+2066–U+2069 (mesma classe do `oneLine` de `datasheet.ts`). Prova unit em `tests/unit/entry-name.test.ts`: um caso por faixa nova (U+0085, U+202E, U+2066) virando `-`. Mutante: remover a faixa C1 ou a bidi da regex → reprova.
 
+### Critério da rodada extra (gate 7, re-review do retry — 4.460)
+- [ ] **Cada membro avulso e os dois limites de cada faixa da classe C1/bidi têm caso** — em `tests/unit/entry-name.test.ts` (it.each do bloco C1/bidi), acrescentar `['C1 U+0080', '\u0080']`, `['bidi U+200F', '\u200F']` e `['bidi U+202A', '\u202A']`. Prova: `npm --prefix mnemonicos-backend test -- tests/unit/entry-name.test.ts` → `N passed, 0 failed`; mutantes (worktree), um por vez, cada um reprova: tirar `\u200F` da regex; `\u202A-\u202E` → `\u202B-\u202E`; `\u007f-\u009f` → `\u007f\u0081-\u009f`. Só teste; produção intocada.
+
 ## Riscos específicos
 
 - O corpo da resposta do `complete` (`{exportId, status, completedAt}`) e o texto das mensagens `[proposto]` são decisões desta fixação, não do PLAN; mudar o corpo exige ajustar a TASK-063-012.
@@ -105,17 +108,17 @@ Baseline antes de começar (o developer registra as contagens): `npm --prefix mn
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: KAN-257
+**Data início**: 2026-10-18T14:37:56-0300
+**Data conclusão**: 2026-10-18T15:26:26-0300
+**Commit SHA**: 7e05d6e
+**Jira**: KAN-257 (Subtask) — Concluído (41)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): APROVADO 2026-10-18 (security-engineer, wave 6B cf23300 e re-review do retry 1367686: authz por rota + matriz 72, complete escopado por autor/Pacote com 404 indistinguível, verifyOrigin com Referer, payload sem storageKey/sha256, entryName saneado com classe Cc/Bidi_Control fechada por varredura, filename* RFC5987, TOCTOU fechado)
+- [x] Comportamento (gate 9): pendente — por FEAT (FEAT-061-002 completa na wave 7)

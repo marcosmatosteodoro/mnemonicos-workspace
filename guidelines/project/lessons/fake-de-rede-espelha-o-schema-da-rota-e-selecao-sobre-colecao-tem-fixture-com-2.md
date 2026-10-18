@@ -2,7 +2,7 @@
 area: Testes
 estado: ativa
 validade: indeterminada
-confirmada: 1
+confirmada: 2
 contestada: 0
 paths:
   - mnemonicos-frontend/src/components/**/*.test.tsx
@@ -28,3 +28,11 @@ que lia `currentVersion` (restrição estrutural) para dentro do `versions.map`,
 mutante que troca o filtro por `true` sobreviveu. Todo refactor que troca "renderizar a partir do
 sujeito" por "renderizar por item com filtro" ganha 1 caso com ≥2 itens, em que o não-alvo satisfaz
 as outras condições do ramo, com contagem exata ou ausência.
+
+**Reincidência (2026-10-18, PLAN-063 TASK-063-011 retry, KAN-258):** o critério do retry nomeou UM exemplo
+("409 de ordem pelo estado do fake, não por override") e o developer corrigiu só esse teste; no mesmo commit
+nasceram 5 testes de recusa (404/409) por `fake.overrides.* = () => errorResponse(...)`, um com literal
+inventado que só passava por comparação de substring. Corolário: recusa prevista (404/409) se provoca pelo
+ESTADO do fake (mutar `fake.packages`/`fake.pdfs` depois de montar) e se afirma com a constante exportada pelo
+fake; override só para o que nenhum estado produz (500, falha de rede, represa). O critério nomeia a CLASSE e
+o grep que a fecha (`git grep -nE "overrides\.(…) = \(\) => errorResponse\((409|404)"` → vazio).
