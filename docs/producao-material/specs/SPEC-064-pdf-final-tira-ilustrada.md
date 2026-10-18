@@ -2,11 +2,12 @@
 
 **Slug**: producao-material
 **Status**: Approved
-**Versão**: 0.2
+**Versão**: 0.3
 **Autor**: keelson (scribe)
 **Data**: 2026-10-18
 **Jira**: KAN-237
 **Brief**: BRIEF-064
+**Changelog**: v0.3 (2026-10-18) — AC-064-007 passa a exigir Disciplina, Tópico, Versão e data de fechamento na capa (cobre FR-064-008 e FR-064-010); NFR-064-005 admite, só no modo final, a redução de imagens acima da Resolução recomendada; A-064-003 estendida à redução (DEC-065-010); cada Quadro começa em página nova e texto longo continua em página(s) de continuação.
 
 ## 1. Contexto e objetivo
 
@@ -25,7 +26,7 @@ não é descobrível: o seletor de associação visual vazio é um beco sem saí
 ### 1.2 Outcome esperado
 
 Um EDITOR ou ADMIN gera, para um Conteúdo bruto com Versão aprovada e válida, um **PDF
-final** da Variante "tira": sem marcas internas, com capa, um Quadro por página com a
+final** da Variante "tira": sem marcas internas, com capa, cada Quadro em página nova (texto longo continua em página(s) de continuação) com a
 ilustração em destaque, numeração de página e fonte que cobre o português completo, e
 rodapé "Versão N — legislação verificada até DD/MM/AAAA". O sistema avisa quando um Quadro
 sai sem imagem. O EDITOR **publica** esse PDF: ele fica guardado, imutável por Versão
@@ -153,7 +154,8 @@ Fechamento legislativo, Papel.
   no Conteúdo bruto.
 - **FR-064-009** [MUST] O sistema deve compor cada Quadro do PDF final, na ordem da Tira
   mnemônica, com a Associação visual vinculada em destaque (a imagem é o elemento dominante
-  da página) e o texto do Quadro.
+  da página) e o texto do Quadro. Cada Quadro começa em página nova; texto longo continua em
+  página(s) de continuação.
 - **FR-064-010** [MUST] O sistema deve numerar as páginas do PDF final.
 - **FR-064-011** [MUST] O sistema deve compor o PDF final com fonte embutida que cobre o
   português completo — acentos, travessão e aspas curvas — sem falhar nem substituir
@@ -260,8 +262,10 @@ Fechamento legislativo, Papel.
 - **NFR-064-004** [MUST] A geração do PDF final DEVE manter as garantias de NFR-024-001 (sem
   conexão de rede a partir de conteúdo do usuário) e NFR-024-002 (texto do usuário tratado
   como dado), e a falha segura de FR-024-009/FR-024-015.
-- **NFR-064-005** [SHOULD] O PDF final DEVE ser legível em impressão (imagens usadas sem
-  perda adicional além da conversão estritamente necessária de WEBP, A-064-003).
+- **NFR-064-005** [SHOULD] O PDF final DEVE ser legível em impressão: as imagens entram sem
+  perda adicional, exceto a conversão estritamente necessária de WEBP e, só no modo final, a
+  redução das imagens de lado maior acima da Resolução recomendada até ela, sem perda visível
+  na impressão do tamanho da caixa (A-064-003).
 
 ## 7. Critérios de aceitação (Given-When-Then)
 
@@ -297,8 +301,8 @@ Fechamento legislativo, Papel.
   modo final, então o sistema recusa a operação.
 
 - **AC-064-007** (cobre FR-064-008, FR-064-010)
-  Dado um PDF final, quando é aberto, então a primeira página é a capa com o Conteúdo, a
-  prova e a Versão, e as páginas são numeradas.
+  Dado um PDF final, quando é aberto, então a primeira página é a Capa com a Disciplina, o
+  Tópico, a Versão e a data de fechamento legislativo, e as páginas são numeradas.
 
 - **AC-064-008** (cobre FR-064-009, NFR-064-005)
   Dado uma Tira com Quadros ilustrados, quando o PDF final é aberto, então cada Quadro
@@ -424,7 +428,9 @@ Fechamento legislativo, Papel.
   resumo final.
 - **A-064-003** [assumido] [evidência: crença] Conversão de WEBP na geração, se o PLAN a
   escolher, é aceitável como exceção ao NFR-024-004 só no modo final; o PLAN registra a
-  decisão e o impacto em qualidade.
+  decisão e o impacto em qualidade. Estende-se, só no modo final, à redução de imagens acima
+  da Resolução recomendada para caber no teto de tamanho (DEC-065-010). A imagem da
+  Biblioteca visual não é alterada.
 - **A-064-004** [assumido] [evidência: entrevistas] O layout (capa, Quadro com ilustração em
   destaque, numeração, fonte) é proposto pelo time (decidido pelo Diretor no BRIEF-064),
   sem referência de Produtos, revisado pelo gate de design. A amostra impressa aprovada por Produtos é critério externo,

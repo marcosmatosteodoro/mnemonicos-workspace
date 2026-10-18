@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Status**: Approved
-**Versão**: 0.1
+**Versão**: 0.2
 **Autor**: scribe (redação delegada pelo Tech Lead; reconhecimento técnico do `code-scout`)
 **Data**: 2026-10-18
 **Jira**: KAN-237
@@ -384,7 +384,7 @@ model PublishedPdf {
 
 ### DEC-065-002: Compositor final separado do rascunho, com layout proposto sob gate 11
 **Contexto**: o rascunho tem cabeçalho de 4 linhas em toda página, Helvetica (WinAnsi) e caixa de imagem de 300 × 300 pt; o final exige capa, imagem dominante, fonte pt-BR, rodapé e numeração. O layout é proposta do time (A-064-004), revisada pelo `product-designer`.
-**Decisão**: novo módulo `final-pdf-composer.ts` (`buildFinalStripPdf`); `pdf-composer.ts` intocado. Layout A4: capa na página 1; um Quadro por página; caixa de imagem **480 × 400 pt** (a largura útil da página, margem lateral ≈ 57,6 pt), centralizada, só reduz, proporção preservada; texto do Quadro abaixo (Noto Sans Regular ≈ 14 pt); rodapé "Versão N — legislação verificada até DD/MM/AAAA" e "página X de Y" em toda página. Constantes de layout num único bloco no topo do módulo; o `product-designer` confirma ou ajusta no gate 11, e a Resolução recomendada (DEC-065-005) deriva da caixa.
+**Decisão**: novo módulo `final-pdf-composer.ts` (`buildFinalStripPdf`); `pdf-composer.ts` intocado. Layout A4: capa na página 1; cada Quadro começa em página nova e, se o texto excede a página, continua em página(s) de continuação identificada(s) com o número do mesmo Quadro e sem imagem ("página X de Y" conta as páginas reais, com Y calculado após o layout; a quebra de linha parte também palavra sem espaço mais larga que a coluna, por caractere); o PDF final não inclui as páginas suplementares do rascunho (contrastes, flashcards, pegadinha), só capa e Quadros; caixa de imagem **480 × 400 pt** (a largura útil da página, margem lateral ≈ 57,6 pt), centralizada, só reduz, proporção preservada; texto do Quadro abaixo (Noto Sans Regular ≈ 14 pt); rodapé "Versão N — legislação verificada até DD/MM/AAAA" e "página X de Y" em toda página. Constantes de layout num único bloco no topo do módulo; o `product-designer` confirma ou ajusta no gate 11, e a Resolução recomendada (DEC-065-005) deriva da caixa.
 **Alternativas consideradas**:
 - Parametrizar o compositor existente por modo (cabeçalho e fonte condicionais), descartada porque acopla o final ao rascunho: cada ajuste de layout final toca o código que deve ficar byte a byte igual, e a prova de "rascunho idêntico" perde força.
 - Gerar o final por HTML/headless browser, descartada porque quebra o teto de 15 s / 1024 MB da função e reabre a superfície de SSRF/injeção que DEC-025-001 eliminou.
@@ -475,12 +475,12 @@ model PublishedPdf {
 
 ### DEC-065-010: Teto de tamanho do PDF final com recusa explícita
 **Contexto**: a Vercel limita o corpo de resposta de função em ~4,5 MB (sem declaração no repositório), e imagens até 5 MB cada, mais PNG convertido de WEBP, podem passar disso numa tira de vários Quadros. Um PDF publicado que não pode ser baixado violaria FR-064-021; erro genérico da plataforma violaria FR-064-031.
-**Decisão**: `PUBLICATION_FINAL_PDF_MAX_BYTES` (default 4.000.000, `env.ts`). Excedido, a exportação final **e** a publicação são recusadas com 422 `FINAL_PDF_TOO_LARGE` (`details.byteSize`, `details.maxBytes`), sem gravar. A recusa vale antes do `INSERT`: nunca se grava o que não se consegue baixar.
+**Decisão**: (1) **no modo final, reduzir as imagens de lado maior acima da Resolução recomendada (`RECOMMENDED_LONG_SIDE_PX`) até ela**, com proporção preservada, sem perda visível na impressão do tamanho da caixa; imagem igual ou abaixo da Resolução recomendada entra byte a byte (sem recodificar) e a imagem da Biblioteca visual não é alterada; o rascunho segue embutindo os originais. (2) O teto segue como rede de segurança: `PUBLICATION_FINAL_PDF_MAX_BYTES` (default 4.000.000, `env.ts`). Excedido mesmo após a redução, a exportação final **e** a publicação são recusadas com 422 `FINAL_PDF_TOO_LARGE` (`details.byteSize`, `details.maxBytes` e `details.heaviestFrames`: até 3 posições de Quadro, em ordem decrescente de bytes de imagem), sem gravar. A recusa vale antes do `INSERT`: nunca se grava o que não se consegue baixar.
 **Alternativas consideradas**:
 - Sem teto (deixar a plataforma recusar), descartada porque o usuário recebe erro genérico de plataforma e, na publicação, pode-se gravar um PDF que nenhum download entrega.
-- Recomprimir imagens para caber, descartada porque contraria NFR-064-005 (legibilidade de impressão) e exige decisão de qualidade que a SPEC não deu.
+- Só recusar acima do teto, sem reduzir imagens (decisão anterior, v0.1), descartada porque foto de 5 MB e 4000 px é o caso comum e recusaria tiras reais; a redução ao lado maior recomendado não perde nitidez visível na caixa de impressão (NFR-064-005, A-064-003).
 - Servir o PDF por URL pré-assinada de storage externo, descartada porque storage externo está fora de escopo (SPEC §4.2); é a rota de saída caso o teto seja atingido (ver Reabrir se).
-**Consequências**: tiras com imagens pesadas não publicam até as imagens serem reduzidas pelo EDITOR (a mensagem informa o tamanho e o teto); valor ajustável por env sem deploy de código.
+**Consequências**: a maioria das tiras com fotos grandes cabe sem ação do EDITOR; as que ainda passam do teto não publicam até as imagens serem reduzidas (a mensagem informa o tamanho, o teto e os Quadros mais pesados); a redução usa `sharp` (já presente por DEC-065-004) e a TASK-065-005 mede tamanho e tempo com o parâmetro adotado; valor do teto ajustável por env sem deploy de código.
 **Reabrir se**: uma tira real de produção exceder o teto (então: storage externo com URL pré-assinada, alinhado ao KAN-236), ou a medição do gate 10 mostrar que o limite real da plataforma é diferente do assumido.
 **Irreversível**: não
 **Aderência à ficha/perfil**: nova

@@ -90,3 +90,4 @@ tira.
 ## Cronologia
 - specify: 2026-10-18T01:31:25-0300 · correções: 1 · classes: spec-secao-ausente(1) · spec-ac-fora-gwt(7) · spec-ears-nao-casa(1) · janelas: redação 2min/480l · correção 3min/480l
 - plan: 2026-10-18T01:39:49-0300 · correções: 1 · classes: plan-dec-irreversivel(8) · janelas: redação 6min/527l
+- tasks: 2026-10-18T02:44:10-0300 · correções: 2 · classes: criterio-esperado-inatingivel(2) · task-wave-overlap-arquivo(1) · dependencia-contrato-divergente(1) · contrato-harness-divergente(1) · criterio-ausencia-vacuo(1) · criterio-raiz-execucao(2) · janelas: redação 40min/1613l · correção 5min/1613l
