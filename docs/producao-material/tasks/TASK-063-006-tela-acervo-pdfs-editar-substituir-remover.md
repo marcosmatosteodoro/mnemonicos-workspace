@@ -8,7 +8,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -38,6 +38,7 @@ Na tela do Acervo (TASK-063-005), qualquer EDITOR ou ADMIN edita os metadados de
 - Atualizar `docs/GUIA-DE-USO.md`: TASK-063-013.
 - Busca ou filtro com debounce: esta TASK não tem campo de busca (busca sem debounce).
 **Inclui — herdado dos gates da wave 3 (2026-10-18):** contrato de rótulos e metadados fixado pelo Tech Lead.
+**Inclui — herdado dos gates da wave 4 (retry, 2026-10-18):** `src/components/pdf-library-board.tsx`, `src/components/pdf-upload-form.tsx` (passa a usar `PdfMetadataFields`), `src/components/pdf-metadata-fields.tsx`, `src/components/action-icons.tsx` (ícone novo de substituir), `src/components/pdf-replace-dialog.tsx`, `src/components/pdf-edit-form.tsx`, `tests/support/pdf-library-api-fake.ts` e os testes correspondentes. NÃO tocar `src/types/domain.ts` (em edição pela TASK-063-007).
 
 ## Critérios de pronto
 
@@ -77,6 +78,11 @@ Carregador real, MinIO local e o servidor decidindo a aceitação (item k).
 - [ ] **Substituição reenvia todos os metadados** — `confirmReplacement` grava os metadados recebidos e ZERA `examName`/`disciplineId` omitidos; o formulário de substituição envia sempre os 5 campos (com os valores atuais pré-preenchidos). Prova: RTL confere o corpo enviado com os 5 campos mesmo sem o usuário tocar em Prova/Disciplina.
 - [ ] **Edição pode limpar opcionais** — escolher "Sem disciplina" (ou apagar Prova/concurso) envia `null` e o PATCH limpa (backend aceita `null` — TASK-063-004 retry). Prova: RTL confere `disciplineId: null` no corpo.
 - [ ] **Mesmos padrões da wave 3 (gate 11)** — erros via `getEnvelopeMessage` (500 nunca ecoa), botões de retry/ação no padrão canônico, estados em andamento com `BusyButton`/`BusyAnnouncement`, nenhuma mutation desta TASK invalida o tipo `'LibraryPdf'` de modo a re-emitir links de download (contagem de GET `/download` inalterada após editar/substituir/remover).
+### Critérios herdados dos gates da wave 4 (retry)
+- [ ] **Edição não trava quando o item some (gate 11 alta; CONDIÇÃO: todo estado de UI guardado por id de item da lista — edição, lock — se limpa ou se deriva da presença do item em `data`)** — efeito no board: com `data !== undefined` e `!data.some(p => p.id === editingPdfId)`, `setEditingPdfId(null)`, foco em `rootRef` e alerta (`role="alert"`) "O PDF que você editava não existe mais no Acervo de PDFs; as alterações não foram salvas."; ou `actionsLocked` derivado da presença do item (declare a escolha). Prova: no override de 404 do PATCH, o fake TAMBÉM remove o item da coleção; o teste afirma que as ações dos outros itens voltam a habilitar, que o alerta aparece e que o foco não fica no `body`; sucesso de salvar NÃO mostra o alerta. Mutante: sem o efeito/derivação → reprova.
+- [ ] **Uma definição dos metadados do PDF (gate 7, DRY; CONDIÇÃO: nenhum arquivo de `src/components` redefine os 5 campos nem suas constantes)** — `pdf-upload-form.tsx` renderiza `<PdfMetadataFields idPrefix="pdf-upload" …>` no lugar dos 5 campos e do bloco de disciplinas, usa `validateMetadata`/`serverFieldErrors` e remove `REQUIRED_MESSAGES` (exceto arquivo), `SERVER_FIELDS`, `DISCIPLINES_ERROR_MESSAGE`, `FIELD_CLASS`/`SELECT_CLASS`, o laço de `getFieldMessage` e o `useListDisciplinesQuery` local. Prova: `git grep -nE "DISCIPLINES_ERROR_MESSAGE =|SERVER_FIELDS\b.*=|<RequiredLabelText[^>]*>Prova/concurso" -- mnemonicos-frontend/src/components` → 1 ocorrência de cada, só em `pdf-metadata-fields.tsx`; `pdf-upload-form.test.tsx` e `pdf-library-board.test.tsx` verdes SEM editar asserções; mutante isFetching em `pdf-metadata-fields.tsx` morre no caso do formulário de envio.
+- [ ] **Ações de item pelo componente canônico (gate 6; `guidelines/project/frontend/botoes-acao.md`, KAN-230)** — Editar/Substituir/Remover viram `ActionButton` (`accessibleName={nameOf(LABEL)}`, `disabled={locked}`, `ref` no Editar); ícones: Editar `pencil`, Remover `trash` com `tone="danger"`, Substituir ícone novo em `src/components/action-icons.tsx`; `ACTION_BUTTON_CLASS` removida. Os botões "Salvar alterações"/"Cancelar" do formulário inline seguem o padrão de formulário da casa (julgue contra `botoes-acao.md`). Prova: board e personas verdes (nomes acessíveis inalterados) + asserção de `svg[aria-hidden="true"]` em cada uma das 3 ações (padrão `content-list.action-links.test.tsx`).
+- [ ] **Caronas** — reescrever o comentário falso de `pdf-replace-dialog.tsx:~89` ("Reenvia os metadados pré-preenchidos; Prova/Disciplina vazias são omitidas e a confirmação as zera."); o teste "remover e editar não pedem endereço de download novo" executa de fato a remoção e a edição e conta GET `/download` com N=1 e N≥3 (gate 10); remover os `setFormError(null)`/`setError(null)` redundantes; status de sucesso acima da lista, junto da contagem (molde `contrast-list.tsx:124-128`, gate 11 sugestão).
 
 ## Riscos específicos
 
@@ -90,17 +96,17 @@ Carregador real, MinIO local e o servidor decidindo a aceitação (item k).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T10:03:20-0300
+**Data conclusão**: 2026-10-18T10:29:36-03:00
+**Commit SHA**: 5c0ae45
 **Jira**: KAN-253
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 4)
+- [x] Comportamento (gate 9): verificado (FEAT-061-001, qa 2026-10-18, login real; Roteiros 005+006)

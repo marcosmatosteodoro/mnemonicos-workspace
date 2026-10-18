@@ -843,7 +843,7 @@ uma definição só, em `tests/support/` (ex.: `tests/support/approvable-raw-con
 **Validade:** geral (qualquer predicado derivado de configuração/env, e helper/fixture de
 teste).
 **Estado:** ativa
-**Contadores:** confirmada 7 · contestada 0
+**Contadores:** confirmada 8 · contestada 0 (reincidência 2026-10-18: PLAN-065 TASK-065-007 — `postAsAdmin` refez `seedSession`/`postPublication` que a TASK-065-006 deixou local; helper de integração usado por 2+ TASKs do mesmo PLAN nasce em `tests/support/` desde a 1ª TASK)
 **Reincidência (2026-09-13, PLAN-023/TASK-023-008, Wave 3)**: o retry que consolidou 3
 fixtures duplicadas de `VisualAssociation` em `tests/support/visual-association-fixtures.ts`
 (achado de gate 7) re-derivou, no MESMO diff, **duas** ocorrências de bloco
@@ -896,6 +896,14 @@ mas a checagem não foi rodada contra o slug inteiro da branch, só contra a mem
 da TASK. Achado pelo `code-reviewer`, fechado em 1 retry (extração para
 `tests/support/material-reforco-fixtures.ts`).
 
+**Reincidência (PLAN-063, 2026-10-18 — waves 3 e 4)**: (1) TASK-063-004: `partialMetadataColumns`
+re-derivou no MESMO arquivo as conversões de `metadataColumns` (dia civil, `examName` vazio → null);
+(2) TASK-063-006: extraiu `pdf-metadata-fields.tsx` como canônico dos 5 campos e deixou
+`pdf-upload-form.tsx` (o consumidor de origem) com a cópia viva — a carona seguinte teve de ser
+aplicada e provada 2×. Faceta nova: **ao extrair um canônico de um componente existente, o mesmo diff
+migra o consumidor de origem**; a sanção de escopo da extração nomeia TODOS os consumidores achados
+por grep do bloco extraído, não só os novos.
+**Contadores:** confirmada 9 · contestada 0
 ## [Design] Cor semântica de texto (erro/sucesso/link) vem de token do tema, nunca de literal da paleta
 
 **Erro:** `internal-shell.tsx` e `login-form.tsx` (F1/PLAN-003, já mergeados/Done) usam

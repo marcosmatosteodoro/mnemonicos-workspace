@@ -2,7 +2,7 @@
 area: Design
 estado: ativa
 validade: indeterminada
-confirmada: 2
+confirmada: 3
 contestada: 0
 paths:
   - mnemonicos-backend/src/modules/**/*.service.ts
@@ -40,3 +40,10 @@ do texto entre os dois fluxos. Regra: mensagem compartilhada por fluxos com aç�
 contexto (`refusalMessages(context)`) e cita a ação daquele fluxo; reúso se prova pela definição única e
 pelo efeito no estado, nunca pela igualdade do texto exibido. Exceção de copy atribuída a um AC cita o
 texto do AC.
+
+**Confirmação (PLAN-063, TASK-063-007, 2026-10-18):** o 404 de Pacote dizia "Atualize a lista e tente de
+novo" para um estado definitivo (remoção sem `deletedAt` nem restauro), e a mesma constante seria reusada
+por Itens e exportação. Regra: em 404 de entidade com remoção definitiva, a mensagem constata o estado ("O
+Pacote não existe mais; ele pode ter sido removido.") e manda para a lista — nunca "tente de novo". Antes de
+escrever "tente de novo", confira no produtor se o estado é reversível. Recusa de limite cita o limite
+("Informe um preço de referência de até R$ 21.474.836,47."), nunca uma regra que o valor já cumpre.

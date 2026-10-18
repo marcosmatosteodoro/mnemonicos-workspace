@@ -2,7 +2,7 @@
 area: Performance
 estado: em-observacao
 validade: indeterminada
-confirmada: 0
+confirmada: 1
 contestada: 0
 paths:
   - mnemonicos-backend/src/modules/**/*.service.ts
@@ -20,3 +20,14 @@ critério de custo; o `IN` resolveu a contagem, não o volume.
 contagem constante. Não usar `distinct` do Prisma sem `nativeDistinct` como atalho (deduplica
 em memória depois de buscar tudo). Referência: core/PERFORMANCE.md "Traga só o necessário";
 node-22.md §10 "select explícito".
+
+**Refinamento (PLAN-063, TASK-063-007, KAN-254, 2026-10-18 — medido):** no Prisma 7 com `relationJoins`,
+`distinct: ['packageId']` vira `SELECT DISTINCT ON` nativo (não deduplica em memória) — mas sobre um IN que
+cobre o acervo inteiro ele ainda lê e ordena TODO o histórico do grupo: com 60 mil exportações, Seq Scan e
+sort em disco, ~360 ms por GET, com a contagem de statements fixa em 2 escondendo o custo. Tirar a coluna
+larga da projeção resolve a largura, não o volume. Regra: "mais recente por grupo" sobre tabela append-only
+se lê com **top-1 por grupo apoiado em índice** — relação com `take: 1` + `orderBy` (vira `LEFT JOIN LATERAL
+… LIMIT 1` com Index Scan Backward; medido 9–22 ms com 60k–180k linhas, plano constante) —, nunca com
+`distinct`/DISTINCT ON sobre IN. O teste de custo semeia K > 1 linhas por grupo em dois volumes e afirma o SQL
+sem `DISTINCT ON`. Referência: `mnemonicos-backend/src/modules/sales-packages/sales-packages.service.ts`
+(`listSalesPackages`).

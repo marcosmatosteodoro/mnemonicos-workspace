@@ -76,6 +76,7 @@ Produtos monta e exporta ao menos 1 Pacote sem sair do sistema em até 30 dias a
 > Produtos envia um PDF pronto com seus metadados, vê o PDF na lista do acervo, baixa, edita os metadados, substitui o arquivo e remove; arquivos que não são PDF ou acima do limite são recusados e quem não é EDITOR/ADMIN não acessa nada.
 
 **Jira**: KAN-241
+**Verificação (gate 9)**: 2026-10-18 — qa, ponta a ponta com login real (usuários de teste do seed, apagados ao fim) sobre backend c3c473b + frontend 01480ae: AC-061-001..013, 026 (emissão; vencimento de 300 s não exercido), 027, 029 e autor-ou-ADMIN no servidor verificados; retry posterior da TASK-063-006 (5c0ae45) coberto por gate 1 (RTL) e gate 11.
 
 - **FR-061-001** [MUST] Quando um usuário com papel EDITOR ou ADMIN envia um PDF informando Título, Versão e Data de fechamento legislativo (obrigatórios), e opcionalmente Prova/concurso (texto livre) e Disciplina (do cadastro existente), o sistema deve guardar o PDF no Acervo de PDFs registrando o autor e a data do envio.
 - **FR-061-002** [MUST] Se o arquivo enviado não tiver o conteúdo de um PDF válido (verificação pela assinatura de PDF no conteúdo, nunca pela extensão ou pelo tipo declarado), então o sistema deve recusar o envio ou a substituição com mensagem clara, mesmo que o arquivo tenha extensão .pdf.
