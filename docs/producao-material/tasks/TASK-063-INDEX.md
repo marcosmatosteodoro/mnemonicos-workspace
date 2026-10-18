@@ -32,4 +32,4 @@
 - [ ] TASK-063-012 ⏸ Todo
 
 ### Wave 8 (depende de Wave 7)
-- [ ] TASK-063-013 ⏸ Todo
+- [x] TASK-063-013 ✅ Done

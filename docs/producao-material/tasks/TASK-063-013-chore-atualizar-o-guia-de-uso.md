@@ -7,7 +7,7 @@
 **Wave**: 8
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -70,17 +70,17 @@ Baseline antes de começar: `git grep -nE '^## ' -- docs/GUIA-DE-USO.md` e `grep
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: KAN-260
+**Data início**: 2026-10-18T16:25:22-0300
+**Data conclusão**: 2026-10-18T16:32:28-0300
+**Commit SHA**: 41f8d3c
+**Jira**: KAN-260 (Subtask) — Concluído (41)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — só docs/GUIA-DE-USO.md, sem código nem segredo (só nomes de env do .env.example, conferido pelo gate 7)
+- [x] Comportamento (gate 9): n/a — documentação; comportamento verificado no gate 9 da FEAT-061-002
