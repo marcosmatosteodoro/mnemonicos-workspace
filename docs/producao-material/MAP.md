@@ -650,6 +650,42 @@
   outras 3 ações (criar/desativar/redefinir senha) continuam sem log — a mitigação é pontual,
   não generaliza. — mnemonicos-backend/src/lib/audit.ts:49
 
+## Acervo de PDFs e Pacotes de venda (PLAN-063 · KAN-236)
+
+`B:` = mnemonicos-backend · `F:` = mnemonicos-frontend. Binário no storage S3-compatível; o navegador faz PUT/GET direto no bucket por URL assinada, e a função só lê cabeçalho/hash para validar (`B:src/modules/object-storage/object-storage.ts:17-19`). Contratos de saída nunca trazem `storageKey`/`sha256` (`B:src/modules/pdf-library/pdf-library.service.ts:38-41`); tipos espelhados em `F:src/types/domain.ts`.
+
+**Modelo de dados** (`B:prisma/schema.prisma`; migrações `20261018052625_add_sales_packages` e `20261018110911_add_sales_package_item_pdf_index`)
+- `LibraryPdf` (660-694): `storageKey @unique`, `sizeBytes Int`, `sha256 Char(64)`, `legislativeClosureDate @db.Date`; `disciplineId` SetNull; `authorId` Restrict; `replacedById/At` marcam substituição; `@@index([createdAt])`.
+- `SalesPackage` (698-723): `referencePriceCents Int` (≥0 só em Zod+service, sem CHECK); `disciplineId` SetNull; `authorId` Restrict; o nome evita a palavra reservada `package`.
+- `SalesPackageItem` (725-743): `@@unique([packageId,pdfId])`, `@@unique([packageId,position])`, `@@index([pdfId])` (2ª migração); `package` Cascade, `pdf` Restrict.
+- `SalesPackageExport` (747-769): `packageId` SetNull, `packageName` congelado, `items Json` (snapshot `ExportItemSnapshot`), `status` PENDING|COMPLETED (112-115), `@@index([packageId,status,completedAt])`.
+
+**Rotas** (todas EDITOR/ADMIN; `verifyOrigin` antes de `requireRole` nas mutantes)
+- `/pdf-library`: GET lista (`pdf-library.routes.ts:38`), POST `/uploads` (46), POST `/uploads/confirm` (56), GET `/:id/download` (66), PATCH `/:id` (75), POST `/:id/replacement` (86), POST `/:id/replacement/confirm` (97), DELETE `/:id` (108).
+- `/sales-packages`: GET (`sales-packages.routes.ts:39`), POST (47), GET/PATCH/DELETE `/:id` (57/67/78), POST `/:id/items` (90), PUT `/:id/items/order` (101), DELETE `/:id/items/:pdfId` (112), GET `/:id/datasheet` (123; texto, nome fixo `ficha-do-pacote.txt`).
+- Exportação: POST `/:id/exports` (201) e POST `/:id/exports/:exportId/complete` (`sales-package-exports.routes.ts:23,33`).
+- Autoria: substituir/remover PDF e remover Pacote exigem autor ou ADMIN (`pdf-library.service.ts:151-158`, `sales-packages.service.ts:153-160`); editar metadados, compor e ordenar Itens são abertos a EDITOR/ADMIN.
+- Censo `route-authz-matrix`: 72 pares (tripwire em `B:tests/integration/route-authz-matrix.integration.test.ts:154`).
+
+**Fluxos**
+- Upload em 2 fases: a intenção valida teto e Disciplina e devolve PUT para `pending/<userId>/<uuid>` com `Content-Length` assinado (`pdf-library.service.ts:209-226`); a confirmação (`finalizePendingObject`, 275-321) só aceita `pending/` do próprio usuário, COPIA para `library/<uuid>` e valida a cópia (`%PDF`, tamanho, SHA-256) — TOCTOU (CWE-367). Prazo 10 s + 2 s de limpeza → 504 (363-390); `deadline.commit()` antes de gravar (435); falha após a cópia compensa (449-452).
+- Substituição: confirmação troca o registro sob `FOR UPDATE` e apaga o objeto antigo após o commit, em melhor esforço (576-640). Remoção: lock + 409 se algum Pacote contém o PDF (656-687).
+- Exportação em 2 fases: `createPackageExport` numa transação: 404 → 409 sem Itens → 400 acima do teto → grava `PENDING` com snapshot → presignGet por item com `entryName = NN - Título.pdf` (`sales-package-exports.service.ts:74-152`; saneamento em `entry-name.ts`). `completePackageExport` (160-198): 404 indistinguível (inexistente/outro Pacote/outro autor); COMPLETED idempotente; `head` de cada objeto do snapshot (ausente = 409); `updateMany` condicionado a `PENDING`. Só COMPLETED conta como "última exportação" (`sales-packages.service.ts:206-225`).
+- Montagem do ZIP no navegador: `SalesPackageExportControl` cria o plano, `exportPackageArchive(plan)` baixa os PDFs e monta o ZIP (client-zip, import dinâmico), `triggerDownload(blob, 'pacote-<exportId>.zip')` entrega e só então `complete` confirma (`F:src/components/sales-package-export-control.tsx:58-87`); `triggerDownload` revoga a URL num tick posterior (`F:src/lib/trigger-download.ts`). Mensagens via `getEnvelopeMessage` (`F:src/lib/user-admin-errors.ts:23`; nunca o 500).
+- Itens: inclusão como último sob trava Pacote → PDF (`sales-packages.service.ts:354-395`); remoção re-compacta 1..N (401-433); reordenação por conjunto exato (439-480).
+
+**Configuração**
+- Env `OBJECT_STORAGE_ENDPOINT|REGION|BUCKET|ACCESS_KEY_ID|SECRET_ACCESS_KEY` opcionais; ausência vira 503 `STORAGE_NOT_CONFIGURED` na rota, não queda do boot (`B:src/config/env.ts:85-92`). Tetos: `PDF_LIBRARY_MAX_FILE_SIZE_BYTES` (50 MiB default, 96-101); `SALES_PACKAGE_MAX_EXPORT_BYTES` (500 MiB, 104). Timeouts do cliente S3 em `object-storage.service.ts:20-24`. TTLs: PUT 900 s, GET 300 s (`object-storage.ts:7,14`). Teto de leitura das listagens: 200.
+- CORS do bucket: em dev, MinIO em `B:docker-compose.yml:32-46` (localhost:3000 e :3001). Produção: pendência do Diretor (ver GUIA-DE-USO § Armazenamento de arquivos). Frontend em porta nova exige também ajustar esse CORS.
+
+**Telas**: `F:src/app/(interno)/pdf-library/page.tsx`, `packages/page.tsx`, `packages/[id]/page.tsx`; nav em `F:src/lib/internal-nav.ts:24-25`. Acervo: `pdf-library-board` (+ `pdf-upload-form`, `pdf-edit-form`, `pdf-replace-dialog`, `pdf-remove-dialog`, `pdf-metadata-fields`). Pacotes: `sales-package-list`, `-detail` (compõe form, items, datasheet, export-control, last-export, remove-dialog), `-pdf-picker`. Formatadores em `F:src/lib/format-library.ts`.
+
+**Armadilhas**
+- TTL 300 s × volume: todas as URLs de leitura nascem na criação do plano (`sales-package-exports.service.ts:134-143`) e o teto é 500 MiB. O download no navegador dispara todos os pedidos no início (retry da TASK-063-012); o resíduo — 6 conexões por host em HTTP/1.1 e vazão baixa num Pacote perto do teto — é decisão pendente do Diretor (TTL proporcional, re-assinatura ou storage HTTP/2).
+- Reindexação em 2 fases sob `@@unique([packageId,position])`: remover/reordenar passam por posições NEGATIVAS (`sales-packages.service.ts:416-424, 464-471`) e conferem a contagem (425-429, 472-476), sob `lockSalesPackage`; ordem de trava Pacote → PDF.
+- Tags RTK (`F:src/store/api.ts`): `getPdfDownloadLink` sem `providesTags` e `keepUnusedDataFor: 0`; mutations do Acervo invalidam também `SalesPackage`/`SalesPackageList`; `removeSalesPackage` não invalida o detalhe; `createSalesPackageExport` não invalida nada, só `complete` sem erro; mutations de Itens usam `error ? [] : [...]` (o RTK invalida também em falha com corpo).
+- A chave `pending/` do cliente nunca é confiável (copiar antes de validar).
+
 ## Tamanho do código (linha de base do épico)
 
 - [2026-08-27 · epico] 13 arquivos de produção + 3 de teste no backend, 12 + 2 no frontend, uma única página (`/`), nenhuma tela de estudo; `study-slice` existe e não é consumido por ninguém — contagem via ferramentas de busca, sem arquivo único âncora
