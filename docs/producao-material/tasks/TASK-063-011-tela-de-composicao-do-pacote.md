@@ -8,7 +8,7 @@
 **Wave**: 6
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -115,17 +115,17 @@ Cada passo cobre um AC cuja aceitação o servidor decide (backend real, sem int
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: KAN-258
+**Data início**: 2026-10-18T14:37:56-0300
+**Data conclusão**: 2026-10-18T16:14:24-0300
+**Commit SHA**: 6f5a6d9
+**Jira**: KAN-258 (Subtask) — Concluído (41)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): APROVADO 2026-10-18 (security-engineer, wave 6A d94f40a: Ficha/Títulos como texto, ids com encodeURIComponent, nome do .txt saneado, getEnvelopeMessage nos 3 pontos); retries só de UI/teste, sem superfície sensível nova
+- [x] Comportamento (gate 9): pendente — por FEAT (FEAT-061-002 completa na wave 7)

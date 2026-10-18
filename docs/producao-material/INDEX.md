@@ -4,7 +4,7 @@
 > Para alterar conteúdo, use /keelson:specify, /keelson:plan, /keelson:tasks ou /keelson:implement.
 
 **Slug**: producao-material
-**Última atualização**: 2026-10-18T15:26:26-0300
+**Última atualização**: 2026-10-18T16:14:24-0300
 `main` e fechadas no Jira — PLAN-036/KAN-77: gate 9 PARCIAL, handoff pendente. PLAN-035/F10
 KAN-165: 8/8 TASKs Done, FEAT-034-001/002 VERIFICADAS, épico fechado; pendência de deploy
 em DEPLOY-035-001)
@@ -168,7 +168,7 @@ fechado._
 | PLAN-046 | SPEC-044 | 27/27 FRs + 4/4 NFRs (sidebar no ramo pronto da casca; lista declarada amarrada às rotas; breakpoint `xl` + container `max-w-7xl` com conta nas 5 larguras; container sai do `<main>` raiz para `PageContainer`; disclosure no fluxo com fechamento derivado da rota; `SiteLogo` por `meSilent` + pista no clique; sem token novo) | 5/5 ✅ | Approved — **mergeado em `main`** (PR #26, `5bce413`, 2026-09-30) |
 | PLAN-049 | SPEC-048 | 25/25 FRs + 5/5 NFRs (guarda ADMIN por mapa de papel na fonte única `internal-routes.ts`, shell único deriva do `usePathname()`; menu de 4 itens filtrado por papel vindo do shell, 0 chamadas novas; senha fora do store por `initiate(args, {track:false})`; paginação anterior/seguinte; busca com debounce de 300 ms; `AccountConfirmDialog` novo; `PasswordField` com prop de erro aditiva; só frontend) | 6/6 ✅ | Approved — **mergeado em `main`** (PR #27, `6adbdf8`, 2026-10-01) |
 | PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 2/2 ✅ | Done — **mergeado em `main`** (backend PR #12 `811441c`, frontend PR #28 `058af3f`, 2026-10-03) |
-| PLAN-063 | SPEC-061 | 35/35 FRs + 6/6 NFRs (storage S3-compatível atrás de porta `ObjectStorage`; upload/download diretos por URL pré-assinada; exportação montada no navegador em 2 fases com composição congelada; migração aditiva `add_sales_packages` autorizada pelo Diretor) | 10/13 🟡 | Approved |
+| PLAN-063 | SPEC-061 | 35/35 FRs + 6/6 NFRs (storage S3-compatível atrás de porta `ObjectStorage`; upload/download diretos por URL pré-assinada; exportação montada no navegador em 2 fases com composição congelada; migração aditiva `add_sales_packages` autorizada pelo Diretor) | 11/13 🟡 | Approved |
 | PLAN-065 | SPEC-064 | 33/33 FRs + 5/5 NFRs (modo `mode` FINAL na rota existente; compositor final separado com capa e fonte Noto Sans embutida; WEBP→PNG via `sharp` só no final; preview + confirmações no servidor; `published_pdfs` imutável atrás de `PublishedPdfStore`; migração aditiva autorizada pelo Diretor; `returnTo` seguro) | 7/17 🟡 | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
