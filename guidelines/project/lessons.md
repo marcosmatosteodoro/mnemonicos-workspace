@@ -145,7 +145,7 @@ não alinhado: a closure confere os **dois** estados e aplica o remédio de cada
 para reconciliar tudo de uma vez) — **antes** do próximo commit nos mesmos arquivos.
 **Validade:** projeto (toolchain do `mnemonicos-backend`/`-frontend`).
 **Estado:** ativa
-**Contadores:** confirmada 2 · contestada 0
+**Contadores:** confirmada 3 · contestada 0
 
 ## [Testes] Sonda de investigação não nasce em `tests/**`; contagem de teste declara a árvore
 
@@ -1188,6 +1188,7 @@ integration.test.ts:467`) prova esses throws com `.toThrow()`; primitiva com cli
 injetável prova-se com stub em teste unitário, sem precisar de banco real.
 **Reincidência (2026-09-30, TASK-041-001, PLAN-041):** o Tech Lead ofereceu no despacho do retry um ajuste "opcional" (reordenar a guarda de forma do `classifyMe`, `src/store/api.ts:442`) sem exigir prova; o reorder tornou `|| result.data === null` o único termo que segura o corpo `null`, e o mutante que o remove sobreviveu (M24). Ajuste de carona oferecido como "opcional" herda a régua do mesmo jeito: ou vem com caso + mutante, ou não entra.
 **Reincidência (2026-10-18, TASK-063-008, PLAN-063):** o retry trocou o UPDATE por Item por statements por conjunto e acrescentou 2 guardas de `count` (`sales-packages.service.ts` — reordenação e re-compactação); nenhum caso as discriminou — neutralizar cada `throw` sobreviveu a 66/66. O critério herdado do Tech Lead dizia "count conferido … senão erro de invariante → rollback", mas sem nomear o mutante da guarda: critério que exige uma guarda nomeia também o mutante que a remove.
+**Reincidência (2026-10-18, TASK-063-012 retry, PLAN-063):** o retry acrescentou sem pedido o cancelamento dos corpos não consumidos na falha (`export-package-archive.ts`); nenhum caso o discriminou (mutante que neutraliza o laço sobreviveu 9/9). Limpeza de recurso (cancel/abort/close) no caminho de erro é comportamento: prova com um stream que conta `cancel` e o mutante que remove o laço.
 **Validade:** todo retry que consolida mais de um achado ou pedido de correção no mesmo
 despacho, neste projeto.
 **Estado:** ativa

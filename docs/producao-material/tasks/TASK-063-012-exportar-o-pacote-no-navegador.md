@@ -8,7 +8,7 @@
 **Wave**: 7
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -100,6 +100,9 @@ Backend e MinIO reais; a aceitação do nome, do conteúdo e do registro é deci
 - [ ] **Valores distintos por Item em todos os campos da composição (gate 7; lição `fixture-discrimina-o-eixo-que-a-assercao-prova`)** — em `sales-package-last-export.test.tsx`, "Tira B" com `version: 'v3'` e asserção `Versão: v3` na 2ª linha; todo campo que o critério declara distinto por Item (posição, Título, Versão, data, tamanho, digest) tem valores distintos no fixture. Mutante `Versão: {items[0]!.version}` reprova.
 - [ ] **`jest.config.ts` só acrescenta `client-zip` às exceções do next/jest (gates 4 e 7)** — trocar o map por `pattern.replace(/^\/node_modules\//, '/node_modules/(?!client-zip/)')` (preserva as exceções do next/jest: geist, next/dist/client, next/dist/shared/lib, next/src) e corrigir o comentário (client-zip é ESM puro e entra nas exceções de transformação; nada mais muda). Prova: `npx jest --showConfig` lista os padrões do Next preservados com o prefixo do client-zip; suíte completa verde, incluindo as 2 suítes de integração que rodam `next build` (rodar na árvore principal).
 
+### Critério da rodada extra (gate 7, re-review do retry — 4.460)
+- [ ] **Cancelamento dos corpos na falha provado (lição legada "Correção acrescentada de carona num retry…", reincidência)** — em `src/lib/export-package-archive.test.ts` (describe "downloads antecipados e em streaming"): caso com 4 entradas, cada corpo um `new ReadableStream({ pull, cancel })` que conta `cancel` por índice; o objeto 2 responde 403. Afirma: a exportação rejeita com `403`; `cancel` chamado exatamente 1 vez nos corpos 2, 3 e 4; `unhandledRejection` não disparou (listener registrado/removido em `try/finally`). Mutantes (worktree), um por vez, cada um reprova: laço de cancel neutralizado (catch só com `throw error`); sem o `.catch` em `response.then(r => r.body?.cancel())`. Carona: no caso "fetch que rejeita antes de ser alcançado…" (~:199) mover `process.off('unhandledRejection', …)` e `release()` para `finally`.
+
 ## Riscos específicos
 
 - O nome `pacote-<exportId>.zip` e os textos de sucesso e de falha são decisões desta fixação (o PLAN fixa o fluxo, não os textos nem o nome do arquivo); mudar o nome exige ajustar o teste do controle e o Roteiro.
@@ -113,17 +116,17 @@ Backend e MinIO reais; a aceitação do nome, do conteúdo e do registro é deci
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: KAN-259
+**Data início**: 2026-10-18T16:09:44-0300
+**Data conclusão**: 2026-10-18T20:04:44-0300
+**Commit SHA**: 96cf08b
+**Jira**: KAN-259 (Subtask) — Concluído (41)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): APROVADO 2026-10-18 (security-engineer, wave 7 31da868: client-zip 2.5.1 exato e conferido, fetch sem cookie, fail-closed, 500 não ecoa, nome pacote-<exportId>.zip; retry/rodada extra sem superfície sensível nova)
+- [x] Comportamento (gate 9): consolidado FEAT-061-002 — verificado 2026-10-18 (qa, login real, backend 7e05d6e + frontend 211fe17)

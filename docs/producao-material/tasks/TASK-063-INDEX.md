@@ -29,7 +29,7 @@
 - [x] TASK-063-011 ✅ Done
 
 ### Wave 7 (depende de Wave 6)
-- [ ] TASK-063-012 ⏸ Todo
+- [x] TASK-063-012 ✅ Done
 
 ### Wave 8 (depende de Wave 7)
 - [x] TASK-063-013 ✅ Done
