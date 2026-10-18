@@ -104,6 +104,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   → `/`, fora do `<form>` (FR-030-015/016, AC-030-015). O ajuste BRIEF-042 deixou o link centralizado e sem sublinhado, por decisão do Diretor.
 
 ### Especificadas, ainda não planejadas
+- Acervo de PDFs prontos (envio validado pela assinatura, metadados declarados, substituição e remoção com autoria) e Pacotes ordenados, exportados em arquivo compactado só com os PDFs, com Ficha baixável à parte, tamanho total e composição congelada (digest) por exportação, para Produtos subir no Marketplace. Sem checkout nem área do aluno (SPEC-061, BRIEF-061, épico KAN-236).
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
 
@@ -139,6 +140,7 @@ fechado._
 | SPEC-044 | Sidebar de navegação da área interna | Approved | 2026-09-30 |
 | SPEC-048 | Gestão de usuários (ADMIN) — emenda a navegação da SPEC-044 | Approved | 2026-09-30 |
 | SPEC-050 | Usuários — ações em ícone e reativação de conta (emenda a SPEC-048) | Approved | 2026-10-01 |
+| SPEC-061 | Pacotes de PDF para marketplace (KAN-236: acervo de PDFs prontos + pacotes exportados) | Approved | 2026-10-18 |
 
 ## PLANs
 
@@ -281,6 +283,18 @@ fechado._
 | Ação sobre a própria conta | Desativar a própria conta ou redefinir a própria senha pela Tela Usuários; encerra a sessão do ADMIN | SPEC-048 |
 | Ativar | Ação oposta de "Desativar": move a Situação da conta de "Desativada" para "Ativa", liberando a pessoa para autenticar de novo. Mesmo par de estado de "Situação (da conta)" | SPEC-050 |
 | Controle de ação (coluna Ações) | Elemento interativo da coluna "Ações" na linha de uma conta: visualmente compacto, sem rótulo de texto permanente ao lado, disponível/indisponível conforme a Situação, com nome acessível identificando a pessoa-alvo e a ação | SPEC-050 |
+| Acervo de PDFs / PDF do acervo | PDFs prontos, diagramados fora do sistema, enviados por Produtos com Título, Versão e Data de fechamento legislativo (declarada) | SPEC-061 |
+| Versão (do PDF enviado) | Texto curto informado à mão; distinta da Versão editorial (SPEC-028) | SPEC-061 |
+| Data de fechamento legislativo (declarada) | Data informada por Produtos no PDF enviado, não verificada pelo sistema; distinta do ato "Fechar uma Versão" (SPEC-028) | SPEC-061 |
+| Substituição (de PDF do acervo) | Troca do arquivo mantendo o registro; o arquivo anterior deixa de existir; só autor ou ADMIN | SPEC-061 |
+| Pacote | Produto montado por Produtos: nome, descrição, Preço de referência, prova/concurso, disciplina e Itens ordenados de PDFs do acervo | SPEC-061 |
+| Item (do Pacote) | Referência a um PDF do acervo dentro de um Pacote, com posição | SPEC-061 |
+| Preço de referência | Valor em reais (≥ 0), informativo para o cadastro no marketplace; o sistema não cobra | SPEC-061 |
+| Exportação de Pacote | Arquivo único compactado só com os PDFs do Pacote na ordem; distinta da Exportação de PDF da Tira (SPEC-024) | SPEC-061 |
+| Ficha do pacote | Texto com os dados do Pacote e a lista dos PDFs, exibido na tela e baixado à parte (fora do compactado) | SPEC-061 |
+| Registro de exportação | Quem, quando e a composição congelada (Título, Versão, data declarada, tamanho, digest por Item); sobrevive à remoção do Pacote | SPEC-061 |
+| Marketplace | Plataforma externa de venda (Hotmart, Kiwify, Eduzz) onde Produtos sobe o arquivo exportado à mão | SPEC-061 |
+| Produtos | Equipe interna que monta material para venda; usa os papéis EDITOR e ADMIN (não é papel novo) | SPEC-061 |
 
 ## Decisões irreversíveis
 
@@ -466,9 +480,14 @@ fechado._
 | — | Dívida de design não-bloqueante (gate 11, Wave 3): (1) estado neutro do `AuthControl` (`return null`) causa layout shift quando resolve para Entrar/Sair, o `ThemeToggle` ao lado salta; (2) mensagem de erro do logout (`flex-col`, abaixo do botão) pode empurrar o header verticalmente; (3) `ThemeToggle` (`h-9 rounded-full`) e os botões de `AuthControl` (`px-4 py-2 surface-card`) não têm altura/forma idênticas; (4) "Entrar" é `<button onClick={router.push}>` em vez de `next/link` (produto usa `next/link` em outros pontos de navegação) | Nenhuma ação nesta entrega — 4 ajustes opcionais de composição, nenhum fura piso de acessibilidade; candidatos a diff de limpeza futuro ou brief avulso | product-designer, gate 11 Wave 3 de PLAN-036 |
 | — | Verificação de tela pendente — HANDOFF-PLAN-036 (`docs/producao-material/handoffs/HANDOFF-PLAN-036.md`) — 8 ACs (AC-036-002/004/006/014/015/016/017/018) dependem de login real (realm `editor`); backend indisponível neste ambiente (Docker Desktop não sobe, Postgres fora do ar) — 11/19 ACs já VERIFICADOS por execução real (Playwright, sem sessão) | roteiro completo no handoff; exercitar com backend saudável (outra máquina/CI, ou este ambiente reparado) | HANDOFF-PLAN-036 |
 | TRISK-036-004 | `data-theme` setado pelo script de bootstrap (fora do React) pode divergir do estado interno de `ThemeToggle` se o componente assumir um tema default fixo no 1º render em vez de ler o atributo já aplicado no `<html>`/a escolha salva — risco de hidratação ou de o alternador "nascer" com rótulo/estado errado | `ThemeToggle` deve ler `document.documentElement.dataset.theme`, nunca assumir default hardcoded — item de verificação da TASK/gate 1 | PLAN-036 §8 |
+| RISK-061-001 | PDF enviado sem aprovação jurídica no sistema (A-061-001, default provisório) pode sair desatualizado | Aviso explícito no Acervo, na Ficha e no Guia; Versão e data declaradas congeladas por exportação; decisão do Diretor pendente (Entrega) | SPEC-061 §9 |
+| RISK-061-003 | PDFs grandes e exportações com muitos itens contra o teto de tempo e corpo (~4,5 MB) da função serverless (ver RISK-025-007) | PLAN decide transferência direta ao storage e teto cumulativo medido | SPEC-061 §9 |
+| RISK-061-004 | Substituição sem histórico: arquivo substituído por engano não é recuperável | Confirmação explícita; só autor ou ADMIN; digest no registro de exportação | SPEC-061 §9 |
+| RISK-061-005 | PDF com assinatura válida e conteúdo corrompido entra no acervo | Produtos baixa e confere; digest identifica o arquivo exportado | SPEC-061 §9 |
 
 ## Histórico recente
 
+- 2026-10-18: **SPEC-061 criada e aprovada** via /keelson:auto (BRIEF-061, épico KAN-236; Histórias KAN-241 → FEAT-061-001, KAN-240 → FEAT-061-002). Diretor decidiu venda em marketplace e upload primeiro (respostas à KAN-239). spec-validator 0 ERROR; product-analyst REVISAR_ANTES_DE_APROVAR; PO ESCALAR com 13 resoluções aplicadas (v0.2) e 2 escalações para a Entrega (gate jurídico do PDF enviado; conta de storage). Porte 35 FRs mantido numa SPEC só (capacidade única, 2 FEATs espelham as Histórias).
 - 2026-10-18: **BRIEF-062 (avulso, KAN-238)**: texto de ajuda visível nos 3 campos obrigatórios de
   "Criar associação visual" + componente `FieldHint` reaproveitável. PR frontend #52; KAN-238 em Análise
   pendente. Sem legenda "* campo obrigatório" (P-053-006 mantida, a confirmar com o Diretor); copy
