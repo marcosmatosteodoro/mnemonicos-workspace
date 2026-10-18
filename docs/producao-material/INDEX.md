@@ -20,6 +20,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ## Capacidades
 
 ### Em desenvolvimento
+- Acervo de PDFs prontos e Pacotes de PDFs para marketplace (PLAN-063 / SPEC-061, épico KAN-236; branch `feat/producao-material-pacotes-marketplace` nos dois repos).
 
 ### Implementadas
 - Reativar conta desativada (SPEC-050/FEAT-050-001, PLAN-051, ✅ 2026-10-03) — rota `PATCH /users/:id/enable` (ADMIN, idempotente, sem migração), log de auditoria pontual (`UserAuditType`/`recordUserAuditEvent`), `EnableAccountDialog` reusando `AccountConfirmDialog`, textos revisados. Gate 8 aprovado sem achados; gate 9 consolidado — ver linha de FEAT abaixo.
@@ -104,7 +105,6 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   → `/`, fora do `<form>` (FR-030-015/016, AC-030-015). O ajuste BRIEF-042 deixou o link centralizado e sem sublinhado, por decisão do Diretor.
 
 ### Especificadas, ainda não planejadas
-- Acervo de PDFs prontos (envio validado pela assinatura, metadados declarados, substituição e remoção com autoria) e Pacotes ordenados, exportados em arquivo compactado só com os PDFs, com Ficha baixável à parte, tamanho total e composição congelada (digest) por exportação, para Produtos subir no Marketplace. Sem checkout nem área do aluno (SPEC-061, BRIEF-061, épico KAN-236).
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
 
@@ -166,6 +166,7 @@ fechado._
 | PLAN-046 | SPEC-044 | 27/27 FRs + 4/4 NFRs (sidebar no ramo pronto da casca; lista declarada amarrada às rotas; breakpoint `xl` + container `max-w-7xl` com conta nas 5 larguras; container sai do `<main>` raiz para `PageContainer`; disclosure no fluxo com fechamento derivado da rota; `SiteLogo` por `meSilent` + pista no clique; sem token novo) | 5/5 ✅ | Approved — **mergeado em `main`** (PR #26, `5bce413`, 2026-09-30) |
 | PLAN-049 | SPEC-048 | 25/25 FRs + 5/5 NFRs (guarda ADMIN por mapa de papel na fonte única `internal-routes.ts`, shell único deriva do `usePathname()`; menu de 4 itens filtrado por papel vindo do shell, 0 chamadas novas; senha fora do store por `initiate(args, {track:false})`; paginação anterior/seguinte; busca com debounce de 300 ms; `AccountConfirmDialog` novo; `PasswordField` com prop de erro aditiva; só frontend) | 6/6 ✅ | Approved — **mergeado em `main`** (PR #27, `6adbdf8`, 2026-10-01) |
 | PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 2/2 ✅ | Done — **mergeado em `main`** (backend PR #12 `811441c`, frontend PR #28 `058af3f`, 2026-10-03) |
+| PLAN-063 | SPEC-061 | 35/35 FRs + 6/6 NFRs (storage S3-compatível atrás de porta `ObjectStorage`; upload/download diretos por URL pré-assinada; exportação montada no navegador em 2 fases com composição congelada; migração aditiva `add_sales_packages` autorizada pelo Diretor) | 0/? ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -484,9 +485,12 @@ fechado._
 | RISK-061-003 | PDFs grandes e exportações com muitos itens contra o teto de tempo e corpo (~4,5 MB) da função serverless (ver RISK-025-007) | PLAN decide transferência direta ao storage e teto cumulativo medido | SPEC-061 §9 |
 | RISK-061-004 | Substituição sem histórico: arquivo substituído por engano não é recuperável | Confirmação explícita; só autor ou ADMIN; digest no registro de exportação | SPEC-061 §9 |
 | RISK-061-005 | PDF com assinatura válida e conteúdo corrompido entra no acervo | Produtos baixa e confere; digest identifica o arquivo exportado | SPEC-061 §9 |
+| TRISK-063-002 | CORS do bucket mal configurado faz upload/download falharem calados no navegador (paralelo à lição de `CORS_ORIGINS`) | MinIO local com CORS; doc exata da configuração; mensagem de erro de rede no PUT cita a causa provável | PLAN-063 §8 |
+| TRISK-063-003 | SHA-256 por streaming de até 50 MB dentro do `maxDuration` 15 s da função única `api/index.ts` | Medir no gate 10; elevar `maxDuration` da função; reabrir DEC-063-002 | PLAN-063 §8 |
 
 ## Histórico recente
 
+- 2026-10-18: **PLAN-063 criado e aprovado** via /keelson:plan (SPEC-061, 9 COMPs, 8 DECs novas + 1 herdada, nenhuma irreversível). plan-validator 0 ERROR (2 WARNING de alternativa única). Diretor autorizou a migração aditiva `add_sales_packages` nos bancos locais de dev e teste.
 - 2026-10-18: **SPEC-061 criada e aprovada** via /keelson:auto (BRIEF-061, épico KAN-236; Histórias KAN-241 → FEAT-061-001, KAN-240 → FEAT-061-002). Diretor decidiu venda em marketplace e upload primeiro (respostas à KAN-239). spec-validator 0 ERROR; product-analyst REVISAR_ANTES_DE_APROVAR; PO ESCALAR com 13 resoluções aplicadas (v0.2) e 2 escalações para a Entrega (gate jurídico do PDF enviado; conta de storage). Porte 35 FRs mantido numa SPEC só (capacidade única, 2 FEATs espelham as Histórias).
 - 2026-10-18: **BRIEF-062 (avulso, KAN-238)**: texto de ajuda visível nos 3 campos obrigatórios de
   "Criar associação visual" + componente `FieldHint` reaproveitável. PR frontend #52 mergeado (`33a94d9`); KAN-238
