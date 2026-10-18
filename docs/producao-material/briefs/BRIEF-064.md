@@ -89,3 +89,4 @@ tira.
 
 ## Cronologia
 - specify: 2026-10-18T01:31:25-0300 · correções: 1 · classes: spec-secao-ausente(1) · spec-ac-fora-gwt(7) · spec-ears-nao-casa(1) · janelas: redação 2min/480l · correção 3min/480l
+- plan: 2026-10-18T01:39:49-0300 · correções: 1 · classes: plan-dec-irreversivel(8) · janelas: redação 6min/527l

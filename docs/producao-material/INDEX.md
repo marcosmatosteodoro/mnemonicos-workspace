@@ -20,6 +20,7 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
 ## Capacidades
 
 ### Em desenvolvimento
+- PDF final da tira ilustrada (PLAN-065 / SPEC-064, épico KAN-237; Histórias KAN-244..247; branch `feat/producao-material-pdf-final-tira-ilustrada` nos dois repos, worktrees `*-kan237`).
 - Acervo de PDFs prontos e Pacotes de PDFs para marketplace (PLAN-063 / SPEC-061, épico KAN-236; branch `feat/producao-material-pacotes-marketplace` nos dois repos).
 
 ### Implementadas
@@ -105,7 +106,6 @@ compra é o PDF. A régua de valor é tempo de produção por página, instrumen
   → `/`, fora do `<form>` (FR-030-015/016, AC-030-015). O ajuste BRIEF-042 deixou o link centralizado e sem sublinhado, por decisão do Diretor.
 
 ### Especificadas, ainda não planejadas
-- PDF final da tira ilustrada (SPEC-064, épico KAN-237): modo final sem marcas internas só para Versão aprovada e válida (recusa pelo sistema), diagramado com capa (Disciplina, Tópico, Versão, data), Quadros com ilustração em destaque, numeração e fonte pt-BR; publicação imutável (registro novo a cada publicação, "atual" = mais recente) com histórico e download byte a byte; atalho do seletor vazio para a Biblioteca visual e indicador "N de M quadros com imagem". Branch `feat/producao-material-pdf-final-tira-ilustrada` (worktrees `*-kan237`).
 - Cadastro de tema/assunto novo pelo EDITOR, dentro de disciplina existente (E-01/Q-005-004, respondido pelo Diretor na Entrega de PLAN-006 — reabre A-005-007 de SPEC-005). Fora do escopo de PLAN-006, que foi implementado e entregue sob o comportamento anterior (seleção restrita ao acervo semeado). Precisa de PLAN/brief próprio para decidir a forma (endpoint de criação, validação/dedup, UI).
 - Pipeline de publicação — geração sob demanda de PDF rascunho em duas variantes (tira/resumo) a partir de Conteúdo bruto com Quebra salva, reusando Tira (F4) e Biblioteca visual (F5), com postura de segurança agnóstica de motor (sem rede a partir de conteúdo do usuário, sem template executável) — SPEC-024, F6 do épico MNEMORA STUDIO, `Approved` 2026-09-14, **mergeada em `main`**.
 
@@ -169,6 +169,7 @@ fechado._
 | PLAN-049 | SPEC-048 | 25/25 FRs + 5/5 NFRs (guarda ADMIN por mapa de papel na fonte única `internal-routes.ts`, shell único deriva do `usePathname()`; menu de 4 itens filtrado por papel vindo do shell, 0 chamadas novas; senha fora do store por `initiate(args, {track:false})`; paginação anterior/seguinte; busca com debounce de 300 ms; `AccountConfirmDialog` novo; `PasswordField` com prop de erro aditiva; só frontend) | 6/6 ✅ | Approved — **mergeado em `main`** (PR #27, `6adbdf8`, 2026-10-01) |
 | PLAN-051 | SPEC-050 | 14/14 FRs + 3/3 NFRs (rota `PATCH /users/:id/enable` espelhando `disableUser`, sem migração; log de auditoria pontual via tipo paralelo `UserAuditType`/`recordUserAuditEvent` em `lib/audit.ts`, sem tabela nova; coluna de Ações migra a célula de "render condicional por ação" para "1 botão só, props computadas da Situação" — ícone SVG inline + tooltip CSS, foco pós-ação estável na mesma linha; remove "Redefinir senha" da linha) | 2/2 ✅ | Done — **mergeado em `main`** (backend PR #12 `811441c`, frontend PR #28 `058af3f`, 2026-10-03) |
 | PLAN-063 | SPEC-061 | 35/35 FRs + 6/6 NFRs (storage S3-compatível atrás de porta `ObjectStorage`; upload/download diretos por URL pré-assinada; exportação montada no navegador em 2 fases com composição congelada; migração aditiva `add_sales_packages` autorizada pelo Diretor) | 0/? ⏸ | Approved |
+| PLAN-065 | SPEC-064 | 33/33 FRs + 5/5 NFRs (modo `mode` FINAL na rota existente; compositor final separado com capa e fonte Noto Sans embutida; WEBP→PNG via `sharp` só no final; preview + confirmações no servidor; `published_pdfs` imutável atrás de `PublishedPdfStore`; migração aditiva autorizada pelo Diretor; `returnTo` seguro) | 0/? ⏸ | Approved |
 
 > **Métrica §1.3 da SPEC-002** (`Fonte de medição: externa`): a fonte é a suíte de conformidade
 > `mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts` (TASK-003-011).
@@ -499,10 +500,13 @@ fechado._
 | TRISK-063-002 | CORS do bucket mal configurado faz upload/download falharem calados no navegador (paralelo à lição de `CORS_ORIGINS`) | MinIO local com CORS; doc exata da configuração; mensagem de erro de rede no PUT cita a causa provável | PLAN-063 §8 |
 | RISK-064-001 | Layout do PDF final proposto pelo time sem referência de Produtos; amostra impressa pode ser reprovada | product-designer no gate 11; amostra impressa pendente de Produtos | SPEC-064 §9 |
 | RISK-064-006 | Modo final e publicação exigem Versão aprovada, que exige 2 ADMINs reais (RISK-032-001/RISK-032-006); sem isso Produtos não publica em produção e a métrica é inconclusiva | dependência declarada; gate 9 com conta descartável; E-1 ao Diretor na Entrega | SPEC-064 §9 |
+| TRISK-065-001 | PDF final com ilustrações pode passar do corpo de resposta ~4,5 MB da função serverless (download do exportado e do publicado) | teto `PUBLICATION_FINAL_PDF_MAX_BYTES` (4 MB) com recusa explícita; fonte em subset; medição no gate 10 | PLAN-065 §8 |
+| TRISK-065-002 | `sharp` (binário nativo) pode estourar tamanho/cold start ou não ser empacotado pela Vercel | precedente `@node-rs/argon2`; medição no gate 10; DEC-065-004 reabre | PLAN-065 §8 |
 | TRISK-063-003 | SHA-256 por streaming de até 50 MB dentro do `maxDuration` 15 s da função única `api/index.ts` | Medir no gate 10; elevar `maxDuration` da função; reabrir DEC-063-002 | PLAN-063 §8 |
 
 ## Histórico recente
 
+- 2026-10-18: **PLAN-065 criado e aprovado** via /keelson:plan (SPEC-064, 19 COMPs, 10 DECs novas + 14 herdadas, nenhuma irreversível — o scribe marcou 8 como `sim` por leitura errada do briefing, corrigido pelo Tech Lead; 13 TRISKs). plan-validator 0 ERROR (WARNING: DEC-065-008 alternativa única; COMP-065-010 com 10 FRs). Migração aditiva `published_pdfs` autorizada pelo Diretor na última chamada.
 - 2026-10-18: **SPEC-064 criada e aprovada** via /keelson:auto (BRIEF-064, épico KAN-237; FEAT-064-001..004 ↔ KAN-244..247, Histórias existentes vinculadas). Renumerada de 063 → 064 por colisão com PLAN-063 (KAN-236). spec-validator 0 ERROR (3 auto-fixes); product-analyst REVISAR_ANTES_DE_APROVAR (11 pontos); PO ESCALAR com resoluções aplicadas (v0.2) e 1 escalação para a Entrega (E-1: conserto do RISK-032-006 dentro do épico? default fora). Porte 33 FRs mantido numa SPEC só (épico já decomposto em 4 Histórias, branch única por diretiva do Diretor).
 - 2026-10-18: **PLAN-063 criado e aprovado** via /keelson:plan (SPEC-061, 9 COMPs, 8 DECs novas + 1 herdada, nenhuma irreversível). plan-validator 0 ERROR (2 WARNING de alternativa única). Diretor autorizou a migração aditiva `add_sales_packages` nos bancos locais de dev e teste.
 - 2026-10-18: **SPEC-061 criada e aprovada** via /keelson:auto (BRIEF-061, épico KAN-236; Histórias KAN-241 → FEAT-061-001, KAN-240 → FEAT-061-002). Diretor decidiu venda em marketplace e upload primeiro (respostas à KAN-239). spec-validator 0 ERROR; product-analyst REVISAR_ANTES_DE_APROVAR; PO ESCALAR com 13 resoluções aplicadas (v0.2) e 2 escalações para a Entrega (gate jurídico do PDF enviado; conta de storage). Porte 35 FRs mantido numa SPEC só (capacidade única, 2 FEATs espelham as Histórias).
