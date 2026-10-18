@@ -2,7 +2,7 @@
 area: Design
 estado: ativa
 validade: indeterminada
-confirmada: 1
+confirmada: 2
 contestada: 0
 paths:
   - mnemonicos-backend/src/modules/**/*.service.ts
@@ -32,3 +32,11 @@ fecha vira autor e a segregação de funções (`producerIds` em `approveContent
 autoaprovação. Se o passo não serve a todos os leitores da frase, use uma formulação impessoal e
 verdadeira em todas as combinações ("Uma nova versão precisa ser fechada e aprovada por um ADMIN
 que não a produziu").
+
+**Confirmação (PLAN-063, TASK-063-004, 2026-10-18):** a mesma função de finalização servia o envio e a
+substituição, e a recusa "não é PDF" da substituição mandava usar "Enviar PDF" — que cria um registro
+NOVO em vez de substituir. A exceção nasceu de um critério que provava o reúso do código pela igualdade
+do texto entre os dois fluxos. Regra: mensagem compartilhada por fluxos com ações diferentes recebe o
+contexto (`refusalMessages(context)`) e cita a ação daquele fluxo; reúso se prova pela definição única e
+pelo efeito no estado, nunca pela igualdade do texto exibido. Exceção de copy atribuída a um AC cita o
+texto do AC.

@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -51,6 +51,8 @@ Um EDITOR ou ADMIN edita os metadados de um PDF do Acervo; só o autor ou um ADM
 - Alterar o contrato de envio da TASK-063-003 (`createUploadIntent`, `confirmUpload`, `listLibraryPdfs`, `getLibraryPdfDownloadLink`).
 **Inclui — herdado do gate 7 da wave 2 (pendência roteada, 2026-10-18):**
 - `mnemonicos-backend/src/modules/pdf-library/pdf-library.service.ts` — caminho do 504 da confirmação (envio E substituição) aguarda a limpeza da chave definitiva junto com a do `pending/`.
+**Inclui — herdado dos gates da wave 3 (retry, 2026-10-18):**
+- `pdf-library.service.ts` (helpers únicos de coluna; mensagens por contexto; 404 antes da validação de disciplina no PATCH; PATCH aceita `null` para limpar), `pdf-library.schema.ts` (`updateLibraryPdfBodySchema` aceita `null` em `disciplineId` e `examName`), `tests/support/library-pdf-fixtures.ts` (definição única de semente com bytes armazenados; `minimalPdfBytes` com tamanho parametrizável), `tests/integration/pdf-library.{routes,service}.integration.test.ts`.
 
 ## Critérios de pronto
 
@@ -76,6 +78,13 @@ Um EDITOR ou ADMIN edita os metadados de um PDF do Acervo; só o autor ou um ADM
 - [ ] Sem warnings/lints novos em todos os arquivos do diff, produção e teste — verificação executável: `npm --prefix mnemonicos-backend run lint` e `npm --prefix mnemonicos-frontend run lint` → exit 0, 0 warnings.
 ### Critério herdado do gate 7 da wave 2 (pendência roteada a esta TASK — 4.140)
 - [ ] **Sem `library/` órfão no 504 (CONDIÇÃO: toda resposta 504 da confirmação — envio e substituição — só sai depois de a chave definitiva copiada e o `pending/` terem a remoção aguardada, limitada por `CLEANUP_GRACE_MS`)** — hoje a limpeza da cópia roda na continuação solta do job; numa função serverless congelada após a resposta sobra `library/<uuid>` sem registro. `runWithDeadline` expõe o job (ou sua promise assentada) e `confirmUpload`/confirmação da substituição o aguardam junto com `deleteBestEffort(pending)` dentro do `CLEANUP_GRACE_MS`. Par de provas em `pdf-library.service.deadline.test.ts`: storage fake cujo `delete` demora mais que um microtask e stream que goteja → no instante em que a confirmação rejeita com 504, `objectKeys()` é `[]` (envio) e, no caso da substituição, só a chave do arquivo ANTERIOR permanece; controle: fluxo normal intacto. Mutante (em worktree): voltar a não aguardar o job → o caso reprova.
+### Critérios herdados dos gates da wave 3 (retry)
+- [ ] **Rodada extra (4.460) — copy por contexto em toda recusa (gate 11)** — `notAPdf` passa por `refusalMessages(context)`: envio "O arquivo enviado não é um PDF válido. Escolha um arquivo PDF e use \"Enviar PDF\" novamente." (byte a byte igual ao atual); substituição "… use \"Confirmar substituição\" novamente."; a const solta `NOT_A_PDF_MESSAGE` sai; 504 da substituição "A confirmação da substituição demorou demais. Use \"Confirmar substituição\" novamente."; conflito da remoção termina em "… e use \"Remover\" novamente."; docstring que parafraseia `examNameColumn` removido. Prova: teste de rotas da substituição com não-PDF afirma o literal de "Confirmar substituição" e estado inalterado; teste de timeout da substituição afirma o literal novo; envio segue com o literal atual.
+- [ ] **Troca de arquivo discrimina tamanho e digest (gate 1; CONDIÇÃO: toda prova de troca de arquivo usa fixture em que ANTES ≠ DEPOIS em tamanho e em digest e afirma a desigualdade)** — `pdf-library.routes.integration.test.ts` (AC-061-007/047): bytes novos com comprimento diferente do semeado (ex.: `minimalPdfBytes(row.sizeBytes + 512)`), afirmando `newBytes.length !== row.sizeBytes`, `after.sizeBytes === newBytes.length` e `res.body.sizeBytes === newBytes.length`. Mutante (em worktree): sem `sizeBytes: finalized.sizeBytes` no update de `confirmReplacement` → reprova.
+- [ ] **Uma definição por conversão de coluna (gate 7, DRY)** — helpers únicos (ex.: `closureDateColumn`, `examNameColumn`) usados por `metadataColumns` e `partialMetadataColumns`. Prova: `grep -c 'T00:00:00.000Z' mnemonicos-backend/src/modules/pdf-library/pdf-library.service.ts` → `1`; AC-061-006 e os testes de envio seguem verdes.
+- [ ] **Sem helper local de semente duplicado (gate 4+7; "Não inclui")** — remover `seedPackageWith`/`seedPackage` (arrange de Pacote/Item inline por `testPrisma`) e unificar `seedStoredPdf`/`seedStored` numa definição em `tests/support/library-pdf-fixtures.ts`. Fechamento: `git -C mnemonicos-backend diff --name-only 274828f..HEAD -- tests | xargs grep -nE '^(async )?function seed'` não lista helper local de semente.
+- [ ] **Mensagem da ação certa por contexto (gate 11 + lição ativa `mensagem-de-recusa-recuperavel-diz-o-proximo-passo-com-o-nome-da-acao-da-tela`; CONDIÇÃO: toda recusa recuperável do PATCH cita "Salvar alterações", toda recusa da substituição cita "Confirmar substituição", nenhuma das duas cita "Enviar PDF")** — inclusive `NOT_A_PDF` e o 504 da substituição (correção do Tech Lead na rodada extra, 2026-10-18: o AC-061-008 pede só "mensagem clara", não literal igual ao do envio; a exceção anterior mandava o usuário a "Enviar PDF", que cria registro novo) — inclui `DISCIPLINE_NOT_FOUND` no PATCH e na confirmação da substituição, `tooLarge`/`SIZE_MISMATCH`/`UPLOAD_NOT_FOUND` na substituição. 404 de PDF inexistente (PATCH, download, substituição, remoção) unificado: "O PDF não existe mais. Atualize o Acervo de PDFs." Prova: teste de integração por contexto com o literal; `git grep -n 'Enviar PDF' -- mnemonicos-backend/src/modules/pdf-library` lista só as mensagens do fluxo de envio (incluindo o `notAPdf` do contexto `upload`). Reúso de `finalizePendingObject` provado pela definição única (`^export (async )?function finalizePendingObject` → 1) e pelo estado inalterado, não por igualdade de texto entre contextos.
+- [ ] **PATCH limpa opcionais e responde 404 primeiro** — `disciplineId: null` e `examName: null` limpam os campos (caso de integração: PDF com disciplina → PATCH `{disciplineId: null}` → GET devolve `null`); PATCH com id inexistente e disciplina inválida → 404 (não 400). Mutantes: schema sem `.nullable()` → caso de limpar reprova.
 
 ## Riscos específicos
 
@@ -88,17 +97,17 @@ Um EDITOR ou ADMIN edita os metadados de um PDF do Acervo; só o autor ou um ADM
 
 ## Histórico de execução (preenchido pelo /keelson:implement)
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T09:12:01-0300
+**Data conclusão**: 2026-10-18T10:00:48-03:00
+**Commit SHA**: c3c473b
 **Jira**: KAN-251
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 3; delta do retry aprovado)
+- [x] Comportamento (gate 9): consolidado (FEAT-061-001) — carregador: Roteiro do gate 9 da TASK-063-006 (editar/substituir/remover na tela)

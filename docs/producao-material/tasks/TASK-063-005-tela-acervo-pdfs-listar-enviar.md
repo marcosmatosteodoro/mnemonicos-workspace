@@ -8,7 +8,7 @@
 **Wave**: 3
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -51,6 +51,8 @@ EDITOR e ADMIN passam a ter a rota `/pdf-library`, no menu, no prefixo interno e
 - Busca ou filtro com debounce: esta TASK não tem campo de busca (busca sem debounce; a busca por Título é da TASK-063-011).
 - Formatter de moeda (BRL): nasce na TASK-063-009 no mesmo `format-library.ts`.
 - FR-061-011 (recusa de STUDENT e visitante): é do servidor (TASK-063-003); a tela só herda a barreira da casca interna.
+**Inclui — herdado dos gates da wave 3 (retry, 2026-10-18):**
+- `src/lib/user-admin-errors.ts` (novo export `getEnvelopeMessage`), remoção de `src/lib/library-errors.ts`, `src/store/api.ts` (tags), `src/components/pdf-upload-form.tsx`, `src/components/pdf-library-board.tsx` e seus testes.
 
 ## Critérios de pronto
 
@@ -104,6 +106,15 @@ Carregador real, com MinIO local e o servidor decidindo a aceitação (item k). 
 3. AC-061-003 (parte tela; o servidor decide): enviar `grande.pdf` (51 MiB). Esperado: recusa informando o limite de 50 MB, sem nenhum `PUT` ao storage no painel de rede (a recusa vem da intenção) e a lista inalterada.
 4. AC-061-005 (parte tela): clicar "Baixar" na linha de "Tira Direito Penal 063-005". Esperado: o painel de rede mostra `GET .../download` à API e depois o `GET` ao host de `OBJECT_STORAGE_ENDPOINT` (com CORS, sem erro); o arquivo baixado tem o mesmo `sha256sum` do passo 3 da receita. A captura do download é por `page.waitForEvent('download')` seguido de `download.saveAs('<scratchpad>/tira-baixada.pdf')`, via `browser_run_code_unsafe`, e o `sha256sum` roda nesse caminho (`sha256sum <scratchpad>/tira-baixada.pdf`), não numa "pasta de downloads".
 5. AC-061-013 (progresso e falha reais; o servidor e o storage decidem): gerar na receita um PDF válido grande (~40 MiB: `{ printf '%%PDF-1.4\n'; head -c 41943040 /dev/zero; } > "$d/grande-valido.pdf"`) e enviá-lo com os três campos preenchidos, com o `PUT` atrasado por `page.route` (via `browser_run_code_unsafe`). Esperado: durante o `PUT` existe `progressbar` com `aria-valuenow` crescente e o botão "Enviar PDF" fica desabilitado. Depois, num segundo envio, `route.abort` no `PUT`: aparece a mensagem de falha e os campos preenchidos são preservados, sem linha nova na lista.
+### Critérios herdados dos gates da wave 3 (retry — gates 7, 10, 11 e notas do 8)
+- [ ] **Sem refetch de link por invalidação (gate 10/7; CONDIÇÃO: nenhuma mutation re-emite endereço de download de linha já baixada)** — `getPdfDownloadLink` sem `providesTags`; `confirmPdfUpload` invalida só `'LibraryPdfList'`; comentário de `api.ts` corrigido. Prova: board montado, N linhas clicadas em "Baixar" (N=1 e N=3), `confirmPdfUpload` bem-sucedido → contagem de GET `/download` continua N; o teste "2 cliques → 2 GETs" segue verde. Mutante: devolver a tag → reprova.
+- [ ] **Um leitor de envelope, e o 500 genérico nunca ecoa (gate 7 DRY + gate 11 alta; CONDIÇÃO: todo ponto que exibe mensagem do servidor usa `getEnvelopeMessage`, que devolve `undefined` para status 500 / code `INTERNAL_SERVER_ERROR` e a `message` para os demais, inclusive 504 declarado)** — `src/lib/library-errors.ts` apagado; `getEnvelopeMessage` exportado de `user-admin-errors.ts` sobre o `envelopeOf` existente, e `getServerMessage` delega a ela. Prova: 1 caso unit por valor (500 + "Erro interno." → `undefined`; 504 declarado → message); nos 3 pontos de exibição (formulário de envio, lista, download), 500 + "Erro interno." → aparece o fallback acionável e "Erro interno." NÃO aparece; `grep -rn 'const isRecord' mnemonicos-frontend/src/lib` → 1. Testes de `user-admin-errors` seguem verdes.
+- [ ] **Barra de progresso com contraste (gate 11 alta)** — trilho `h-2 w-full overflow-hidden rounded-full bar-track`, preenchimento `h-full bar-fill` (molde `strategic-panel-board.tsx:296-303`); `role="progressbar"` e `aria-value*` mantidos. Prova: teste confere as classes `bar-track`/`bar-fill` e ausência de `bg-(--border-subtle)`/`bg-(--link)` na barra.
+- [ ] **"Tentar novamente" com retorno (gate 11 alta)** — `if (isLoading || (data === undefined && isFetching))` mostra o `LoadingArea`. Prova: lista falha (503) → clique em "Tentar novamente" com o 2º GET pendente → `LoadingArea` (role status) visível e alert ausente; 2ª falha → alert remontado.
+- [ ] **Arquivo de 0 byte diz o que corrigir (gate 11, AC-061-029)** — validação no cliente: `file.size === 0` → erro junto do campo "O arquivo selecionado está vazio. Escolha outro arquivo PDF." sem requisição; rede de segurança: path `sizeBytes` do 422 mapeado para o campo Arquivo. Prova: 2 casos (cliente sem fetch; servidor com details `sizeBytes`).
+- [ ] **Select e disciplinas (gate 11 médias)** — select com `select-field surface-card py-2 text-sm`; disciplinas com `LoadingArea compact` ao carregar e, no erro, "Não foi possível carregar as disciplinas agora." com "Tentar novamente" (envio segue liberado; molde `content-form.tsx:299-318`). Prova: 2 casos RTL (carregando; erro).
+- [ ] **"Baixar" com estado em andamento (gate 11 média)** — `BusyButton` + `BusyAnnouncement` (molde `publication-export-control.tsx:129-149`), `busyLabel` "Baixando" por linha; duplo clique durante o pedido não dispara 2º GET. Prova: caso RTL com GET pendente.
+- [ ] **Caronas (não bloqueantes)** — botão "Tentar novamente" no estilo `surface-card px-4 py-2 text-sm font-medium` (molde `content-list.tsx:52-59`); contagem "Mostrando os 200 PDFs mais recentes" quando `data.length` atinge o teto; mensagem de rede sem jargão de CORS (pista vai ao console); `encodeURIComponent` no `:id` do path do download; `anchor.href` só com protocolo `https:`/`http:`; remover a paráfrase no docblock de `ConfirmPdfUploadArgs`. Ordem aviso → lista → formulário: avaliar e declarar a escolha.
 
 ## Riscos específicos
 
@@ -118,17 +129,17 @@ Carregador real, com MinIO local e o servidor decidindo a aceitação (item k). 
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T09:25:53-0300
+**Data conclusão**: 2026-10-18T09:52:02-03:00
+**Commit SHA**: 8678b4c
 **Jira**: KAN-252
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 3)
+- [x] Comportamento (gate 9): consolidado (FEAT-061-001) — Roteiro do gate 9 desta TASK executado pelo qa no fecho da FEAT (após TASK-063-006)
