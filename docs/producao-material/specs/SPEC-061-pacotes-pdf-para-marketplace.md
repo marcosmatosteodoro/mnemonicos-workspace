@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Status**: Approved
-**Versão**: 0.2
+**Versão**: 0.3
 **Autor**: scribe (sob o Tech Lead)
 **Data**: 2026-10-18
 **Jira**: KAN-236
@@ -120,7 +120,7 @@ Produtos monta e exporta ao menos 1 Pacote sem sair do sistema em até 30 dias a
 - **FR-061-035** [MUST] O sistema deve informar na Ficha do pacote que não atesta revisão jurídica do PDF enviado e deve rotular a data como "Data de fechamento legislativo (declarada)".
 
 ## 6. Requisitos não-funcionais
-- **NFR-061-001** [MUST] O PDF do acervo e o arquivo de exportação não devem ficar em endereço público permanente: apenas usuário interno autenticado com papel EDITOR ou ADMIN os baixa, e o endereço de download concedido deve expirar em até 5 minutos.
+- **NFR-061-001** [MUST] O PDF do acervo e o arquivo de exportação não devem ficar em endereço público permanente: o endereço de download só deve ser emitido a usuário interno autenticado com papel EDITOR ou ADMIN e deve expirar em até 5 minutos.
 - **NFR-061-002** [MUST] O sistema deve registrar e exibir autor e data do envio, da substituição e de cada exportação de Pacote (quem fez o quê, quando), de modo que o registro de exportações sustente a métrica da §1.3.
 - **NFR-061-003** [SHOULD] O Guia de uso (docs/GUIA-DE-USO.md) deve ser atualizado na mesma entrega para descrever o Acervo de PDFs, os Pacotes, a exportação e o aviso de que o sistema não atesta revisão jurídica de PDF enviado, com a data de "Última atualização".
 - **NFR-061-004** [MUST] Os textos de interface devem estar em pt-BR, com mensagens de recusa que digam ao usuário o que corrigir.
@@ -179,7 +179,7 @@ Produtos monta e exporta ao menos 1 Pacote sem sair do sistema em até 30 dias a
 - **AC-061-025** (cobre FR-061-022)
   Dado um Pacote em exportação, quando o arquivo está sendo gerado, então o botão fica desabilitado com indicador; ao concluir o download inicia; ao falhar aparece mensagem de erro clara e nenhuma exportação é registrada. Salvar e remover Pacote seguem os mesmos três estados.
 - **AC-061-026** (cobre NFR-061-001)
-  Dado um endereço de download de PDF ou de exportação concedido a um usuário autenticado, quando ele é usado após 5 minutos ou por quem não tem sessão EDITOR/ADMIN, então o download é recusado.
+  Dado um PDF do acervo ou um Pacote a exportar, quando um usuário autenticado com papel EDITOR ou ADMIN pede o download, então recebe um endereço que expira em até 5 minutos e que, usado depois disso, é recusado; e quando o pedido vem de usuário STUDENT ou de visitante sem sessão, nenhum endereço é emitido.
 - **AC-061-027** (cobre NFR-061-002)
   Dado um PDF enviado, substituído e incluído em um Pacote exportado, quando Produtos consulta o acervo e o Pacote, então vê o autor e a data do envio, o autor e a data da substituição e o autor e a data da última exportação.
 - **AC-061-028** (cobre NFR-061-003)
@@ -205,7 +205,7 @@ Produtos monta e exporta ao menos 1 Pacote sem sair do sistema em até 30 dias a
 - **AC-061-038** (cobre FR-061-010)
   Dado um PDF que não pertence a nenhum Pacote, quando a remoção dele e a inclusão dele em um Pacote chegam ao mesmo tempo, então a remoção conclui e a inclusão é recusada com mensagem de que o PDF não existe mais, ou a inclusão conclui e a remoção é recusada nomeando o Pacote; nunca fica Item sem arquivo.
 - **AC-061-039** (cobre FR-061-030)
-  Dado uma exportação em curso e a substituição simultânea de um PDF do Pacote, quando ambas concluem, então o arquivo compactado traz inteira a versão anterior ou a nova desse PDF, nunca uma mistura, e Versão e digest do registro congelado descrevem exatamente o arquivo que entrou.
+  Dado uma exportação em curso e a substituição simultânea de um PDF do Pacote, quando ambas terminam, então ou o arquivo compactado traz inteira a versão desse PDF que a composição congelada registrou, com Versão e digest do registro descrevendo exatamente o arquivo que entrou, ou a exportação falha sem ser registrada e a mensagem orienta exportar de novo; nunca há mistura de versões.
 - **AC-061-040** (cobre FR-061-013)
   Dado um cadastro de Pacote com Nome preenchido, quando o usuário informa Preço de referência R$ 0,00, então o sistema aceita e grava o Pacote.
 - **AC-061-041** (cobre FR-061-024)

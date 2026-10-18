@@ -88,11 +88,11 @@ Dependências **novas**:
 - Frontend: `client-zip` (montagem do arquivo compactado no navegador, modo store, streaming). Sem dependência de ZIP no backend.
 - Infra de desenvolvimento: serviço MinIO no `docker-compose` do backend; `.env.example` com placeholders das envs de storage (nunca valores reais; nada `NEXT_PUBLIC_`).
 
-Reúso: `requireRole`, `verifyOrigin`, `AppError`/error handler central, padrão de autor-ou-ADMIN de F5/F7/F8, correção de TOCTOU por `SELECT ... FOR UPDATE` de F5, reindexação em 2 fases da Tira (DEC-012-003), `image-signature.ts` como molde, `visual-library-board.tsx`, `triggerDownload` de `publication-export-control.tsx`, `internal-routes.ts`/`internal-nav.ts`/`proxy.ts`.
+Reúso: `requireRole`, `verifyOrigin`, `AppError`/error handler central, padrão de autor-ou-ADMIN de F5/F7/F8, correção de TOCTOU por `SELECT ... FOR UPDATE` de F5, reindexação em 2 fases da Tira (DEC-012-003), `image-signature.ts` como molde, `visual-library-board.tsx`, o padrão de `triggerDownload` de `publication-export-control.tsx` (função privada ali — duplicada em `src/lib/trigger-download.ts` pela TASK-063-011, sem tocar o componente da Tira: NFR-061-005), `internal-routes.ts`/`internal-nav.ts`/`proxy.ts`.
 
 Arquivos tocados (inventário, relativos a cada repositório):
 - Backend: `prisma/schema.prisma` + migração `YYYYMMDDHHMMSS_add_sales_packages`; `src/domain/types.ts`; `src/config/env.ts`; `src/http/routes.ts`; `src/http/middlewares/error-handler.ts` (somente se o 503 de storage ausente pedir tipo de erro; preferir `AppError`); `src/modules/{object-storage,pdf-library,sales-packages}/`; `vercel.json` (`maxDuration` da função única `api/index.ts`, que vale para todas as rotas); `docker-compose.yml`; `.env.example`; `tests/` (unit, integração, fake de storage em `tests/support`); `tests/integration/route-authz-matrix.integration.test.ts` (53 → 53+N).
-- Frontend: `src/types/domain.ts`; `src/store/api.ts`; `src/lib/internal-routes.ts`, `src/lib/internal-nav.ts`, `src/lib/internal-nav-icons.tsx`, `src/proxy.ts`; `src/app/(interno)/pdf-library/`, `src/app/(interno)/packages/` e `packages/[id]/`; componentes novos; `package.json`.
+- Frontend: `src/types/domain.ts`; `src/store/api.ts`; `src/lib/internal-routes.ts`, `src/lib/internal-nav.ts`, `src/components/internal-nav-icons.tsx`, `src/proxy.ts`; `src/app/(interno)/pdf-library/`, `src/app/(interno)/packages/` e `packages/[id]/`; componentes novos; `package.json`.
 - Workspace: `docs/GUIA-DE-USO.md`.
 
 ## 3. Componentes

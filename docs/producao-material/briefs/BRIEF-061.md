@@ -68,3 +68,4 @@ esses PDFs; (3) **exporta o pacote** num arquivo único para subir no marketplac
 ## Cronologia
 - specify: 2026-10-18T01:14:42-0300 · correções: 1 · classes: spec-fr-palavras(12) · spec-glossario-nao-usado(2) · spec-nfr-sem-numero(2) · spec-must-ratio(1) · spec-sem-should-may(1) · janelas: redação 1min/256l · correção 4min/256l
 - plan: 2026-10-18T01:23:22-0300 · correções: 1 · classes: plan-dec-alternativa-unica(2) · janelas: redação 2min/303l
+- tasks: 2026-10-18T02:18:27-0300 · correções: 1 · classes: criterio-pre-condicao-nunca-converge(4) · ac-do-fr-fora-dos-criterios(8) · ac-visivel-sem-carregador(5) · isolamento-db-ambiguo(3) · task-criterio-grep-nao-ancorado(2) · literal-inconsistente(1) · criterio-ambiguo(1) · ausencia-por-padrao-fraco(1) · ancora-de-repo-ambigua(1) · divergencia-do-plan(1) · task-nome-tipo(1) · janelas: redação 39min/1361l · correção 5min/1361l
