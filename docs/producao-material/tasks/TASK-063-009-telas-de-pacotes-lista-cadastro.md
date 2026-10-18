@@ -8,7 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -46,6 +46,7 @@ Decisões fixadas:
 - Busca ou filtro com debounce: esta TASK não tem campo de busca (busca sem debounce; a busca por Título é da TASK-063-011).
 - Paginação (DEC-063-008): a lista é um array de até 200 Pacotes.
 - Atualizar `docs/GUIA-DE-USO.md`: TASK-063-013.
+**Inclui — herdado dos gates da wave 5 (retry, 2026-10-18):** `src/app/(interno)/packages/page.tsx` (lê `searchParams`), `src/components/sales-package-{list,detail,form,remove-dialog}.tsx` e testes, `tests/support/sales-packages-api-fake.ts`, `src/store/api.ts` (só comentário); `src/components/page-header.tsx` (prop opcional `backLabel`, default "Voltar" — necessária ao PageHeader canônico com "Voltar para Pacotes"; julgada pelo gate 7) e `src/app/(interno)/packages/page.test.tsx`.
 
 ## Critérios de pronto
 
@@ -84,6 +85,17 @@ Carregador real; o servidor decide a aceitação do cadastro (item k).
 **Passos** (um por AC e por exemplo nomeado):
 1. AC-061-015 (parte tela): em `/packages`, "Cadastrar Pacote"; preencher Nome "Pacote 063-009", Preço de referência "49,90", Prova/concurso "OAB 2026" e uma Disciplina existente; salvar. Esperado: a lista mostra o Pacote com "R$ 49,90"; abrir o detalhe, alterar a Descrição para "Descrição 063-009" e salvar; recarregar a página (F5) na lista e no detalhe e conferir "R$ 49,90" e a Descrição; no `db:psql`, `SELECT "referencePriceCents", description FROM sales_packages WHERE name = 'Pacote 063-009';` devolve `4990` e `Descrição 063-009`.
 2. AC-061-016 (parte tela; o servidor decide): no formulário de cadastro, preencher Nome "Pacote 063-009 B" com Preço "-5" e salvar: a recusa do servidor (a resposta de validação aparece no painel de rede, observável porque é chamada do próprio navegador) surge junto ao campo Preço e o Nome digitado é mantido. Em seguida, com Nome vazio e Preço "49,90", salvar: a recusa do servidor surge junto ao campo Nome e o Preço digitado é mantido. Por fim, com Nome "Pacote 063-009 B" preenchido e Preço vazio, salvar: a recusa do servidor surge junto ao campo Preço e o Nome digitado é mantido. Nos três casos `SELECT count(*) FROM sales_packages WHERE name = 'Pacote 063-009 B';` segue 0.
+### Critérios herdados dos gates da wave 5 (retry — gates 7 e 11)
+- [ ] **Confirmação de remoção na página de destino (gate 11, AC-061-025)** — remover navega para `/packages?removido=1`; `(interno)/packages/page.tsx` lê `searchParams` (Promise no Next 16) e passa `justRemoved` à lista; a lista grava "Pacote removido." no seu `role="status"` sempre montado POR EFEITO após a montagem (região inserida já com texto não é anunciada — README KAN-192); molde `users/page.tsx:10-15` + `users-screen.tsx:15-25`. Prova: lista montada com `justRemoved` → "Pacote removido." em role=status; teste do detalhe afirma a URL com `removido=1`.
+- [ ] **404 vence o cache (gate 7 A, AC-061-042)** — o detalhe decide carregando/erro/dados por `currentData` (canônico `users-list.tsx:156,219`). Prova: remover pelo diálogo, desmontar e remontar `<SalesPackageDetail id="pkg-1"/>` na MESMA store → role=alert com a mensagem do servidor, link "Voltar para Pacotes" e nenhum botão Editar; idem após `invalidateTags(['SalesPackage'])` com o Pacote removido do fake. Mutante: voltar a `data` → os casos reprovam.
+- [ ] **Um caso por conjunto do predicado do formulário (gate 7 B, lição `predicado-de-conjunto-composto…`)** — `sales-package-form.tsx:~64-69`: (i) edição com `disciplineId` preenchido e PATCH 404 (ou 409) → mensagem no alert do formulário e combobox Disciplina SEM `aria-invalid`; (ii) 400 com message e Disciplina vazia → alert do formulário; (iii) 400 sem envelope com Disciplina escolhida → mensagem genérica com "Salvar Pacote", nunca falha calada. Mutantes: remover cada conjunto, um por vez → seu caso reprova.
+- [ ] **Teto da lista (gate 7 C)** — caso com 200 Pacotes → "Mostrando os 200 Pacotes mais recentes" por valor (espelho de `pdf-library-board.test.tsx:485`). Mutante `count >= LIST_CEILING → false` → reprova.
+- [ ] **Fake espelha o schema da rota (gate 7 D, lição `fake-de-rede-espelha-o-schema-da-rota`)** — create/patch do `sales-packages-api-fake.ts` devolvem 422 VALIDATION_ERROR com `details[{path,message}]` e as mensagens literais de `mnemonicos-backend/src/modules/sales-packages/sales-packages.schema.ts` para nome vazio após trim, preço ausente no POST, não inteiro, < 0 ou > 2147483647; os testes de recusa usam o fake padrão (sem override que olha só `body.name`).
+- [ ] **Caronas (gate 7/11)** — comentários: `api.ts:~1076` e `sales-package-remove-dialog.test.tsx:~152` (justificativa falsa — reescrever com o motivo real), `sales-package-form.tsx:~122` (paráfrase — remover), `sales-package-detail.test.tsx:~193` (comparação temporal — remover); `FieldHint` no Preço ("Ex.: 49,90", padrão KAN-238, aria-describedby com a ajuda antes do erro); cabeçalho do detalhe com o `PageHeader` canônico (`backHref="/packages"`) mantendo o texto literal "Voltar para Pacotes" exigido pelo AC.
+
+### Critério da rodada extra (gate 7, re-review do retry — 4.460)
+- [ ] **A ordem "região vazia → texto" é provada (gate 7, lição `aviso-por-efeito-apos-montagem-prova-a-regiao-vazia-antes-do-texto`)** — em `src/components/sales-package-list.test.tsx` (caso `justRemoved`), logo após `render()` e SEM `await`: `expect(view.container.querySelector('p[role="status"]')).toBeEmptyDOMElement()`; depois, `findByText('Pacote removido.')`. Prova: `TZ=America/Sao_Paulo npx jest src/components/sales-package-list.test.tsx -t justRemoved` verde; mutante `useState(justRemoved ? REMOVED_NOTICE : '')` em `sales-package-list.tsx` com o efeito anulado → vermelho.
+- [ ] **Caronas** — remover o comentário-paráfrase em `sales-package-detail.test.tsx:~228` ("A sonda lê o mesmo endpoint…"); atualizar o docblock de `page-header.tsx:~16` (serve formulário e detalhe; rótulo configurável por `backLabel`).
 
 ## Riscos específicos
 
@@ -97,17 +109,17 @@ Carregador real; o servidor decide a aceitação do cadastro (item k).
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: KAN-256
+**Data início**: 2026-10-18T13:37:51-0300
+**Data conclusão**: 2026-10-18T14:23:55-0300
+**Commit SHA**: 8d1021a
+**Jira**: KAN-256 (Subtask) — Concluído (41)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): APROVADO 2026-10-18 (security-engineer, wave 5A: encode no path/href, saída escapada, menu por papel, 500 não ecoa, sem open redirect); retry/rodada extra sem superfície sensível nova (searchParams comparado a literal '1', sem redirect)
+- [x] Comportamento (gate 9): pendente — por FEAT (FEAT-061-002 completa na wave 7)
