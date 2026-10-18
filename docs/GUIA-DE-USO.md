@@ -7,7 +7,7 @@
 >
 > Versão online (manter igual): https://claude.ai/code/artifact/23d88ef4-3e31-45a0-8749-229080ea2543
 >
-> Última atualização: 2026-10-05
+> Última atualização: 2026-10-18
 
 ## O que é, e o que ainda não é
 
@@ -80,8 +80,16 @@ evocação:
 
 Aqui ficam as imagens reutilizáveis. Para criar uma associação visual, informe a categoria,
 descreva a função cognitiva (por que essa imagem ajuda a lembrar) e envie a imagem (PNG,
-JPEG ou WebP, até 5 MB). Use o filtro por categoria para achar o que já existe antes de criar
+JPEG ou WebP, até 5 MB). Abaixo do nome de cada campo há uma explicação curta, com exemplo,
+do que preencher. Use o filtro por categoria para achar o que já existe antes de criar
 outra. Uma imagem que já está em uso numa Tira não pode ser removida.
+
+- **Categoria**: um nome curto que agrupa imagens do mesmo tipo (ex.: Prazo, Competência,
+  Sanção). Se aparecer uma categoria sugerida que sirva, escolha-a: é ela que o filtro usa.
+- **Descrição da função cognitiva**: por que esta imagem ajuda a lembrar a regra sem a dica
+  na frente. Se tirar a imagem não fizer falta para lembrar, ela é só decoração.
+- **Imagem**: para a imagem sair no PDF da tira, use PNG ou JPEG. Uma imagem em WebP é aceita
+  na biblioteca, mas ainda não aparece no PDF.
 
 ### 5. Complete o material de reforço
 

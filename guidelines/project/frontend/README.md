@@ -121,8 +121,31 @@ projeto: formulário novo já nasce com ele.
 - **Obrigatoriedade condicional** (ex.: Citação do dispositivo só com Tipo selecionado) → o
   asterisco e o `aria-required` aparecem só quando a condição vale
   (`<RequiredLabelText required={cond}>`).
-- **Legenda** → `RequiredLegend` ("\* campo obrigatório") uma vez em cada formulário com dois
-  ou mais campos obrigatórios. Bloco de um campo só (pegadinha, quadro novo da tira) não repete.
+- **Legenda** → não há. O BRIEF-053 (P-053-006) removeu a legenda "\* campo obrigatório" da
+  aplicação: o asterisco sozinho sinaliza a obrigatoriedade. Não reintroduza sem ordem do Diretor.
+- **Texto de ajuda** (`src/components/field-hint.tsx`, KAN-238) → `<FieldHint id=…>` mostra uma
+  explicação visível e permanente (`max-w-2xl text-xs text-muted`) **entre o rótulo e o controle**. Use
+  `<label htmlFor>` + `FieldHint` + controle com `id`, dentro de um wrapper `flex flex-col gap-1`:
+  a ajuda fica **fora do `<label>`**, então não entra no nome acessível do campo. O controle liga
+  a ajuda por `aria-describedby="<id-ajuda>"` e, com erro, `"<id-ajuda> <id-erro>"` (ajuda
+  primeiro). A mensagem de erro continua abaixo do campo. Primeiro uso: formulário de criação de
+  `visual-library-board.tsx`.
+
+```tsx
+<div className="flex flex-col gap-1 text-sm">
+  <label htmlFor="x-category" className="flex flex-col">
+    <RequiredLabelText>Categoria</RequiredLabelText>
+  </label>
+  <FieldHint id="x-category-hint">Explicação do que escrever. Ex.: Prazo.</FieldHint>
+  <input id="x-category" aria-required="true" aria-invalid={…}
+    aria-describedby={error ? 'x-category-hint x-category-error' : 'x-category-hint'} … />
+</div>
+{error ? <p id="x-category-error" role="alert" …>…</p> : null}
+```
+
+Legado: o `rule-breakdown-form` tem uma ajuda antiga ("(deixe vazio se não se aplica)") abaixo do
+controle, na ordem erro→ajuda. É o próximo a convergir para este padrão quando for tocado; não é
+precedente.
 
 ```tsx
 <label className="flex flex-col gap-1 text-sm">

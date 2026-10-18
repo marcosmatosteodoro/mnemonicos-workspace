@@ -469,6 +469,10 @@ fechado._
 
 ## Histórico recente
 
+- 2026-10-18: **BRIEF-062 (avulso, KAN-238)**: texto de ajuda visível nos 3 campos obrigatórios de
+  "Criar associação visual" + componente `FieldHint` reaproveitável. PR frontend #52; KAN-238 em Análise
+  pendente. Sem legenda "* campo obrigatório" (P-053-006 mantida, a confirmar com o Diretor); copy
+  pendente de Produtos; gate 9 parcial (login local bloqueado).
 - 2026-10-05: **BRIEF-051 a 059 sincronizados com o Jira** (9/9 criados, todos em Backlog, nenhum
   movido, nenhuma falha): 051→KAN-227 · 052→KAN-228 · 053→KAN-229 · 054→KAN-230 · 055→KAN-231 ·
   056→KAN-232 (História, candidata a ciclo) · 057→KAN-233 · 058→KAN-234 · 059→KAN-235. Os demais

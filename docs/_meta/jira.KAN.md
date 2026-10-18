@@ -119,8 +119,11 @@ de origem**: o mesmo número leva a lugares diferentes conforme a origem.
 | Em análise → Analise pendente | `10` | Parar analise do diretor | KAN-219 (História) |
 | Em análise → Concluído | `11` | Concluid | KAN-219 (História) |
 
-Para a Tarefa só a origem Concluído foi observada. Ela bateu com a História (`3`), mas o par
-de Tarefas pendentes não se deduz disso: mede-se no primeiro uso. **Regra até a tabela fechar:
+Na Tarefa foram observadas as origens Concluído (`3`, igual à História) e, em 2026-10-18 no
+KAN-238, Backlog → Tarefas pendentes `4` (Priorizando) e Tarefas pendentes → Em andamento `6`
+(Iniciar trabalho; a outra saída medida ali é `5` Despriorizar → Backlog), e Em andamento →
+Analise pendente `7` (Entrega para o diretor; a outra saída é `2` Parar de fazer). Todos batem com a
+História, mas os pares ainda não observados na Tarefa não se deduzem disso: medem-se no primeiro uso. **Regra até a tabela fechar:
 antes de cada transição, `getTransitionsForJiraIssue` no card e uso do id devolvido para o
 status-alvo.** Cada par novo observado entra nesta tabela.
 
