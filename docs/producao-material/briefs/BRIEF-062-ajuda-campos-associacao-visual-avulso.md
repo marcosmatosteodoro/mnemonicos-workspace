@@ -2,7 +2,7 @@
 
 **Slug**: producao-material
 **Tipo**: avulso
-**Status**: Em análise, PR #52 aberto (KAN-238 em Análise pendente)
+**Status**: Concluído, PR #52 mergeado (KAN-238)
 **Data**: 2026-10-18
 **Origem**: Revisão de Produtos de 14/10/2026 (`thoughts/implementacoes/SITE MNEMÔNICO.pdf`, item 4),
 registrada no card. Diretor, em sessão: "Implemente o jira KAN-238".
@@ -106,3 +106,5 @@ performance-engineer n/a (sem consulta, laço nem bundle novo relevante).
 - Docs: `GUIA-DE-USO.md` (seção 4 + data) e o doc online sincronizado; guideline frontend §Campo obrigatório
   (bullet "Texto de ajuda" + legenda corrigida); `docs/_meta/jira.KAN.md` com os pares `4`/`6`/`7` medidos na Tarefa.
 - Jira: KAN-238 Backlog `4` → Tarefas pendentes `6` → Em andamento `7` → Análise pendente (2026-10-18).
+- Merge do Diretor: PR #52 em 2026-10-18 (`33a94d9`). KAN-238 Análise pendente `8` → Em análise `11` →
+  Concluído. Sem épico pai.

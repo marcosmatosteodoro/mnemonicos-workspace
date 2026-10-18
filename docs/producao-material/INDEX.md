@@ -489,8 +489,8 @@ fechado._
 
 - 2026-10-18: **SPEC-061 criada e aprovada** via /keelson:auto (BRIEF-061, épico KAN-236; Histórias KAN-241 → FEAT-061-001, KAN-240 → FEAT-061-002). Diretor decidiu venda em marketplace e upload primeiro (respostas à KAN-239). spec-validator 0 ERROR; product-analyst REVISAR_ANTES_DE_APROVAR; PO ESCALAR com 13 resoluções aplicadas (v0.2) e 2 escalações para a Entrega (gate jurídico do PDF enviado; conta de storage). Porte 35 FRs mantido numa SPEC só (capacidade única, 2 FEATs espelham as Histórias).
 - 2026-10-18: **BRIEF-062 (avulso, KAN-238)**: texto de ajuda visível nos 3 campos obrigatórios de
-  "Criar associação visual" + componente `FieldHint` reaproveitável. PR frontend #52; KAN-238 em Análise
-  pendente. Sem legenda "* campo obrigatório" (P-053-006 mantida, a confirmar com o Diretor); copy
+  "Criar associação visual" + componente `FieldHint` reaproveitável. PR frontend #52 mergeado (`33a94d9`); KAN-238
+  Concluído. Sem legenda "* campo obrigatório" (P-053-006 mantida, a confirmar com o Diretor); copy
   pendente de Produtos; gate 9 parcial (login local bloqueado).
 - 2026-10-05: **BRIEF-051 a 059 sincronizados com o Jira** (9/9 criados, todos em Backlog, nenhum
   movido, nenhuma falha): 051→KAN-227 · 052→KAN-228 · 053→KAN-229 · 054→KAN-230 · 055→KAN-231 ·
