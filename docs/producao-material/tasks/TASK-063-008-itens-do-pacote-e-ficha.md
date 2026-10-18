@@ -8,7 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -93,17 +93,17 @@ Decisões fixadas:
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
-**Jira**: KAN-255
+**Data início**: 2026-10-18T13:37:51-0300
+**Data conclusão**: 2026-10-18T14:36:51-0300
+**Commit SHA**: 8de956a
+**Jira**: KAN-255 (Subtask) — Concluído (41)
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): APROVADO 2026-10-18 (security-engineer, wave 5B e re-review do retry+rodada extra 067eff9..8de956a: SQL cru só por template tag, escopo por packageId, trava antes da escrita, guardas de count fail-closed, classe bidi fechada; notas: order sem .max, \p{Cf} cosmético)
+- [x] Comportamento (gate 9): pendente — por FEAT (FEAT-061-002 completa na wave 7)
