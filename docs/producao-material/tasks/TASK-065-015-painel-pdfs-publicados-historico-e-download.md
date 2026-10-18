@@ -83,6 +83,8 @@ Carregador real da parte "baixar" da AC-064-017: backend real servindo a lista e
 3. AC-064-017, sucesso sem interceptar nada: clicar "Baixar" outra vez: o arquivo salvo tem o mesmo `sha256sum` do passo 2 e a mensagem de sucesso é anunciada de novo.
 4. AC-064-017, falha com o motivo (INJETADA, não real): `route.fulfill` devolvendo 500 JSON no mesmo `GET`: aparece em `role="alert"` "Não foi possível baixar o PDF da versão 1 agora. Tente novamente.", o botão volta a habilitar e nenhum arquivo é salvo.
 
+- [ ] (pendência herdada do gate 11 da wave 4) O motivo `NO_STRIP` ("Esta Tira ainda não tem Quadros…") não é renderizado enquanto o board ainda está abrindo a Tira (`isOpening`/1ª visita de conteúdo aprovado sem Tira — o fechamento da Versão não depende da Tira); verificação executável: teste do componente montado com o fake de rede na abertura automática → durante a abertura o texto de NO_STRIP está ausente e, depois do refetch com Quadros, o painel normal aparece → `0 failed`; mutante que renderiza NO_STRIP sem o gate de abertura reprova.
+
 ## Riscos específicos
 
 - Estado de download no nível do painel (não do item): o `invalidatesTags` da 016 refaz a lista logo depois de publicar, e um item desmontado perderia o "Baixando" em voo; o critério de refetch durante o download cobre isso.

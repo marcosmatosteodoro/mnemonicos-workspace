@@ -265,7 +265,7 @@ Resultado literal da execução da sonda (linhas-resumo com o identificador como
 | detalhe-m-maximo-M2 | 2754 | PDF 29738332 B |
 | detalhe-m-maximo-M3 | 5492 | PDF 44605197 B |
 | detalhe-m-maximo-M4 | 8044 | PDF 59472020 B |
-| m-maximo | 3 Quadros 3000x2000 em ≤ 6000 ms (teto 12 s com margem 2x) | conversão+embed+save, foto WEBP q80; 1:1745ms/14.2MB 2:2754ms/28.4MB 3:5492ms/42.5MB 4:8044ms/56.7MB |
+| m-maximo | OBSOLETA (medida com saída PNG; superada pela emenda da DEC-065-004: WEBP opaco sai em JPEG, ver `tempo-caminho-jpeg-m8`) — 3 Quadros 3000x2000 em ≤ 6000 ms (teto 12 s com margem 2x) | conversão+embed+save, foto WEBP q80; 1:1745ms/14.2MB 2:2754ms/28.4MB 3:5492ms/42.5MB 4:8044ms/56.7MB |
 | detalhe-pdf-final-fonte | 8 JPEG 4000x3000 | q95, grão ±15; 5.5/5.5/5.4/5.5/5.5/5.4/5.5/5.5 MB; soma 45729905 B |
 | pdf-final-reduzido | 3738354 B em 962 ms | M=8; fotos JPEG 4000x3000 (~5.5 MB cada) reduzidas a 2000 px; imagens reduzidas somam 3731131 B; teto 4000000: cabe |
 | detalhe-pdf-final-sem-reducao | 45733298 B | mesmos 8 JPEG embutidos sem redução (referência do teto) |
@@ -308,4 +308,40 @@ Commit da dependência no backend: `a4792d8` (pai `4c134b4`). `git -C mnemonicos
 ```
 $ git -C mnemonicos-backend status --porcelain
 (vazio)
+```
+
+## Medidas do caminho adotado (TASK-065-008)
+
+**Medido em**: 2026-10-18 · mesmo ambiente acima (Node v26.8.2, sharp 0.35.5, 12 threads), com o host sob carga de outras sessões (load average 6 a 16): valem como ordem de grandeza. Caminho medido: `buildFinalStripPdf` real (`final-image.ts`: decode com `limitInputPixels = IMAGE_PIXEL_BUDGET_PX`, redução a `RECOMMENDED_LONG_SIDE_PX`, saída JPEG q85 4:2:0 sem alfa e PNG `compressionLevel 9` com alfa, `sharp.cache({memory:50,files:0,items:100})`, `concurrency 1`, conversões em sequência), em processo filho por cenário; pico = `process.resourceUsage().maxRSS` do filho depois do aquecimento (fontes e `sharp`), base ≈ 150-180 MB. O mesmo `Buffer` de origem serve a todos os Quadros (equivale a uma Associação repetida; a carga real traz até 4 binários distintos por lote). Teto de tamanho `PUBLICATION_FINAL_PDF_MAX_BYTES` = 4 000 000 (produção) ou 1 000 000 000 (elevado, sem o atalho de tamanho).
+
+| medida | valor | observação |
+| --- | --- | --- |
+| rss-caminho-jpeg | WEBP 5000x4000: 334 / 354 / 334 MB; JPEG 5000x4000: 267 / 283 / 264 MB (3 rodadas cada) | M = 8 × 20 Mpx, teto de produção; limite 1024 MB: máx 354 MB (35%) |
+| tempo-caminho-jpeg-m8 | WEBP 5000x4000: 886 / 855 / 1019 ms; JPEG 5000x4000: 1378 / 1690 / 1434 ms | M = 8 Quadros (compõe e serializa o PDF); limite `PUBLICATION_PDF_TIMEOUT_MS` 12 000 ms: máx 1690 ms; PDF de 1 459 553 B (WEBP) e 1 563 259 B (JPEG) |
+| detalhe-origem-caminho-jpeg | webp 808 832 B · jpeg 1 975 916 B | foto sintética 5000x4000 (ondas + grão ±6), WEBP q80, JPEG q85 |
+| rss-png-alfa-n10 | teto de produção (4 MB): 335 MB e 422 no Quadro 4 em 6 366 ms (alfa em gradiente); 336 MB e 3 564 ms (alfa uniforme, cabe). Teto elevado: 442 MB e 22 197 ms (alfa com ondas), 378 MB e 13 925 ms (gradiente) | N = 10 PNG com alfa 4472x4472; limites 700 MB e 12 s: RSS cumprido em todos; tempo estourado só com o teto de tamanho elevado (22,2 s e 13,9 s) |
+| rss-png-alfa-n30 | teto de produção (4 MB): 338 MB e 422 no Quadro 4 em 4 069 ms (gradiente); 363 MB e 12 007 ms (alfa uniforme, cabe). Teto elevado: 728 MB e 82 521 ms (alfa com ondas), 401 MB e 24 465 ms (gradiente) | N = 30 PNG com alfa 4472x4472; limites 700 MB e 12 s: **728 MB e 82,5 s só com o teto elevado**; no teto de produção o RSS fica ≤ 363 MB, e o N = 30 que cabe no teto leva 12,0 s, na borda do teto de duração (503 por prazo) |
+| detalhe-png-alfa-origens | alfa com ondas 12 653 293 B (reduz a ~4,5 MB por Quadro) · gradiente 2 354 255 B (~1,04 MB) · uniforme 86 673 B (~15,6 KB) | as três origens têm 4472x4472 RGBA; só a uniforme cabe em 30 Quadros sob 4 MB |
+| detalhe-png-alfa-liso-teto-producao | 253 MB e 422 no Quadro 1 em ~1,4 s (N = 10 e N = 30) | alfa com ondas: o 1º Quadro reduzido (~4,5 MB) já passa de 4 MB |
+| detalhe-ponto-de-cessao | 8 PNG RGBA 4000x3000 (~2 MB cada), teto elevado, `PUBLICATION_PDF_TIMEOUT_MS` 12 000: sucesso em 5228-5643 ms; maior intervalo entre disparos do batimento do event loop 621-893 ms (3 rodadas) | contra 12,3 s de bloqueio medido no gate 10 da wave 3 (sem redução, `setImmediate`) |
+
+Leitura:
+
+- O caminho JPEG (WEBP/JPEG de 20 Mpx → 2000 px → JPEG q85) custa 0,1 a 0,2 s por Quadro e ~350 MB de pico para M = 8: a memória não cresce com a soma dos rasters porque o `sharp` decodifica um Quadro por vez e o pdf-lib solta o raster no `embed()` ansioso.
+- A soma de rasters de PNG com alfa deixou de ser o vetor: o pico de RSS em N = 30 só passa de 700 MB (728 MB) com o teto de tamanho elevado, quando o PDF acumula 135 MB de streams de PNG reduzido na memória; sob o teto de produção a soma embutida é limitada a 4 MB e o RSS fica em 335-363 MB. O tempo de N = 10 e N = 30 só fica ≤ 12 s porque o teto de tamanho (422) ou o de duração (503) encerram antes: PNG com alfa que cabe nos 4 MB nos 30 Quadros (alfa uniforme) leva 12,0 s e vive na borda do teto de duração.
+
+Roteiro (sonda de processo filho; as origens foram geradas com `sharp` e gravadas em arquivo antes, para não entrar no RSS medido):
+
+```ts
+// BACKEND=<.../mnemonicos-backend>; NODE_PATH=$BACKEND/node_modules DATABASE_URL=... JWT_SECRET=... $BACKEND/node_modules/.bin/tsx run.ts <origem> <N> [<teto>]
+import { readFileSync } from 'node:fs';
+import { buildFinalStripPdf } from '<BACKEND>/src/modules/publication/final-pdf-composer';
+const [file, N, cap] = [process.argv[2]!, Number(process.argv[3]), process.argv[4] ? Number(process.argv[4]) : undefined];
+const bin = readFileSync(file);
+const META = { disciplineName: 'Direito', topicName: 'Tópico', version: { number: 1, legislativeClosureDate: new Date('2026-09-01') } };
+await buildFinalStripPdf([{ position: 1, text: 'a', binary: null }], META); // aquece fontes e sharp
+const frames = Array.from({ length: N }, (_, i) => ({ position: i + 1, text: `Quadro ${i + 1}`, binary: bin }));
+const t0 = performance.now();
+const r = await buildFinalStripPdf(frames, META, undefined, cap).catch((e) => ({ err: e.constructor.name, position: e.position }));
+console.log(JSON.stringify({ ms: Math.round(performance.now() - t0), peakMB: Math.round(process.resourceUsage().maxRSS / 1024), r: 'err' in r ? r : r.buffer.length }));
 ```

@@ -19,8 +19,8 @@
 - [x] TASK-065-007 ✅ Done
 
 ### Wave 4 (depende de Wave 3)
-- [ ] TASK-065-008 ⏸ Todo
-- [ ] TASK-065-009 ⏸ Todo
+- [x] TASK-065-008 ✅ Done
+- [x] TASK-065-009 ✅ Done
 
 ### Wave 5 (depende de Wave 4)
 - [ ] TASK-065-010 ⏸ Todo

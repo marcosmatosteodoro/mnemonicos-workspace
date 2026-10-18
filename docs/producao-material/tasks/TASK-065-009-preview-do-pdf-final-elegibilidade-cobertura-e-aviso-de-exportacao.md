@@ -8,7 +8,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -55,6 +55,19 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 - [ ] Espelho no frontend compila: `npm --prefix mnemonicos-frontend run typecheck` → saída 0
 - [ ] Sem warnings/lints novos sobre todos os arquivos do diff (`git -C mnemonicos-backend diff --name-only main...HEAD` e `git -C mnemonicos-frontend diff --name-only main...HEAD`), produção e teste: `npm --prefix mnemonicos-backend run lint`, `npm --prefix mnemonicos-backend run typecheck` e `npm --prefix mnemonicos-backend run format:check` saem 0; `npm --prefix mnemonicos-frontend run lint` e `npm --prefix mnemonicos-frontend run format:check` saem 0
 
+- [ ] (retry pós-gate 10 wave 4, alta — emenda DEC-065-006) Preview barato e com teto: (a) classificação de cada Quadro só pelo cabeçalho — assinatura, dimensões (`readImageDimensions`/`readWebpDimensions`), APNG, orçamento de pixels e `RECOMMENDED_LONG_SIDE_PX` — sem sharp decode, sem `embedPng/embedJpg`, sem `embed()`; (b) `withDeadline` com `PUBLICATION_PDF_TIMEOUT_MS`, `AbortController` e `await new Promise(r => setTimeout(r, 0))` + `signal.throwIfAborted()` por Quadro, estouro → 503 `GENERATION_TIMEOUT`; (c) só a projeção `{status, widthPx, heightPx}` é retida; (d) memo por `visualAssociationId` (mesma Associação em K Quadros classificada 1 vez); verificação executável: integração com 20 Quadros WEBP com alfa 5000×4000 e 20 PNG RGBA 4000×3000 → preview responde em < 3 s (medido e declarado) com as mesmas `warnings` por cabeçalho; unit: espião em `sharp`/`embedPng` com 0 chamadas no preview e ≥ 1 na exportação (controle positivo); teto reduzido por env + carga → 503; mutante que volta a chamar `prepareFrameImage` no preview reprova o espião; mutante sem memo reprova a contagem de classificações (1 por Associação distinta).
+- [ ] (retry pós-gate 10 wave 4, média 3b) Exportação reusa o mesmo `PDFImage` para a mesma `visualAssociationId` em vários Quadros (memo no compositor; `drawImage` aceita o mesmo objeto) e não soma bytes repetidos contra o teto; verificação: integração com 6 Quadros e 2 Associações distintas → `embedPng/embedJpg` chamados 2 vezes e o PDF tem 2 XObjects de imagem (`pdfimages -list` ou leitor `pdf-images.ts`); mutante sem memo reprova a contagem.
+- [ ] (retry, sugestão do gate 10) `loadStripFrameRows` registra no comentário a medição join × query (régua já usada em `loadFinalExportInput`) e a escolha.
+- [ ] (retry, gate 8 wave 4 — lacunas de mutação na TASK-065-008) Teste de JPEG 4000×3000 TRUNCADO no caminho de redução → `decode-failed` (prova do `failOn: 'error'`; mutante `failOn: 'none'` reprova) e teste que fixa a 2ª camada do orçamento (dimensão subdeclarada no cabeçalho com corpo grande → recusa pelo `limitInputPixels`; mutante `limitInputPixels: false` reprova).
+
+- [ ] (retry pós-gate 1–7 wave 4) Ramo "sem Quebra da regra" provado: em `tests/integration/publication.final-preview.integration.test.ts` (describe "razões e precedência"), `createRawContent(editor.id, topic)` sem `seedRuleBreakdown` → HTTP 200 com `{ eligible: false, reason: 'NO_APPROVED_VERSION', framesTotal: 0, framesWithImage: 0, warnings: [] }`; mutante "ramo `breakdown === null` → `throw NotFoundError`" reprova; corrigir o título do caso "(Versão nunca fechada, com Tira)" para o fixture real.
+- [ ] (retry pós-gate 7 wave 4, DRY) Uma só leitura dos Quadros "sem autogerar": o preview obtém os Quadros pelo canônico (`loadFinalExportInput` com `NothingToExportError` → `NO_STRIP`, ou um `select` de frames único compartilhado); verificação: `grep -c "select: { position: true, text: true, visualAssociationId: true }" mnemonicos-backend/src/modules/publication/publication.service.ts` → `1`; casos NO_STRIP (sem Tira; Tira com 0 Quadros) verdes.
+- [ ] (retry pós-gate 7 wave 4, comentário falso) O docblock de `getFinalPreview` descreve a memória que o código de fato usa (com a classificação por cabeçalho do critério acima, nenhum `PDFDocument` nem `PDFImage` é criado no preview); verificação: leitura no re-gate + testes de equivalência e AC-064-011/025 verdes.
+
+- [ ] (rodada extra pós-gate 1 wave 4 — AC-064-011 integral) Cobertura autoritativa da exportação: o `POST /contents/:id/publication` com `mode: 'FINAL'` bem-sucedido devolve o cabeçalho `X-Final-Pdf-Coverage` com `{"framesTotal":M,"framesWithImage":N,"warnings":[{position,kind}]}` calculado do PDF COMPOSTO (corpo corrompido → `IMAGE_NOT_EMBEDDABLE`); o rascunho não ganha o cabeçalho; tipo espelhado no frontend; verificação executável: integração com um Quadro cuja imagem tem cabeçalho íntegro e corpo corrompido → o preview pode dizer `ok`/`BELOW`, mas o cabeçalho da exportação lista `{position, kind: 'IMAGE_NOT_EMBEDDABLE'}` (caso literal do AC-064-011: "imagem indecodificável" restaurado no teste do AC; o APNG fica como caso ADICIONAL, nunca substituto); mutante que omite o cabeçalho ou o calcula do preview reprova.
+- [ ] (rodada extra, sugestão) `queryHeaviestFrames`: Quadro ainda não composto que reusa Associação já vista (em `composed` ou repetida em `rows`) entra com 0 bytes, não com o `octet_length`; o docblock não diz "exata" para repetidos; verificação: unit com 2 Associações e repetição → o repetido não aparece em `heaviestFrames`.
+- [ ] (contestação registrada) O item "2ª camada do orçamento (mutante `limitInputPixels: false` reprova)" é EQUIVALENTE — a 1ª camada (`exceedsPixelBudget`) lê o mesmo cabeçalho que o decoder; dimensão subdeclarada é recusada pelo próprio libwebp/libpng; confirmado pelo code-reviewer e pelo security-engineer no re-gate da wave 4 (teste-evidência em `final-image-header.test.ts`).
+
 ## Riscos específicos
 
 - Gate 8 (rota nova de leitura, alcance comum) e gate 10 (o preview lê todos os binários de imagem da Tira a cada chamada; custo medido em tira real).
@@ -67,19 +80,19 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T14:19:18-0300
+**Data conclusão**: 2026-10-18T20:37:33-03:00
+**Commit SHA**: f1442ac
 **Jira**: KAN-269
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 4, deltas dos retries inclusos)
+- [x] Comportamento (gate 9): consolidado (FEAT-064-002)
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

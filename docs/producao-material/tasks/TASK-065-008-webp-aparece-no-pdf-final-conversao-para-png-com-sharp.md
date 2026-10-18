@@ -8,7 +8,7 @@
 **Wave**: 4
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -63,6 +63,9 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 
 - [ ] (pendência herdada do gate 1 da wave 3) Um ranking só para `heaviestFrames`: depois da conversão WEBP/redução, o ranking da recusa incremental (`queryHeaviestFrames`, por binário armazenado) e o da rede final (por `byteSize` de origem das embutidas) passam a medir o mesmo conceito — decidir e documentar no código qual fonte vale (proposta: bytes embutidos da composição, `embeddedBytes`), sem dois rankings divergentes; verificação: teste com 1 WEBP grande convertido em JPEG pequeno + 1 PNG médio, acima do teto → `heaviestFrames` aponta primeiro o Quadro que mais pesa no PDF, nos dois caminhos (incremental e rede final).
 
+- [ ] (retry pós-gates 1–7 e 8 wave 4) `failOn` provado no decoder que ele governa: em `tests/unit/final-image-webp.test.ts` (describe "um caso por ramo de falha"), JPEG 4000×3000 truncado em N bytes literais (assinatura e SOF intactos) no caminho de redução → `{ status: 'failed', reason: 'decode-failed' }` (e PNG > 2000 truncado, se também decodificar parcial); mutante `failOn: 'none'` (em worktree) reprova; tirar o prefixo "Registrado no baseline:" do comentário (Art. 7).
+- [ ] (retry, preparo do preview por cabeçalho e da TASK-065-010) `readWebpDimensions` sai de `publication/final-image.ts` para `visual-associations/image-signature.ts` (canônico dos leitores de dimensão; nenhum import de `publication` a partir de `visual-associations`); verificação: `git -C mnemonicos-backend grep -n "export function readWebpDimensions" -- src` → 1 linha, em `image-signature.ts`; testes de dimensão verdes.
+
 ## Riscos específicos
 
 - Gate 8 (supply chain de `sharp`/libvips) e gate 10 (tempo e memória de conversão em tira real): a medição local é da TASK-065-005; o comportamento do binário na Vercel só se prova em deploy de preview.
@@ -74,19 +77,19 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T14:19:18-0300
+**Data conclusão**: 2026-10-18T20:01:38-03:00
+**Commit SHA**: 5b41c01
 **Jira**: KAN-268
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 4, delta do retry incluso)
+- [x] Comportamento (gate 9): consolidado (FEAT-064-002)
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
