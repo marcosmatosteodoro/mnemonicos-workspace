@@ -90,9 +90,9 @@ outra. Uma imagem que já está em uso numa Tira não pode ser removida.
   Sanção). Se aparecer uma categoria sugerida que sirva, escolha-a: é ela que o filtro usa.
 - **Descrição da função cognitiva**: por que esta imagem ajuda a lembrar a regra sem a dica
   na frente. Se tirar a imagem não fizer falta para lembrar, ela é só decoração.
-- **Imagem**: PNG, JPEG ou WebP. O WebP é aceito na biblioteca; no rascunho não aparece, no PDF
-  final aparece. Se a imagem tiver o lado maior abaixo de 2000 px, o envio mostra um aviso de
-  Resolução recomendada (“Imagem com L × A px; recomendado: lado maior de 2000 px para boa
+- **Imagem**: PNG, JPEG ou WebP. O WebP é aceito na biblioteca; no rascunho não aparece, no
+  PDF final aparece. Se a imagem tiver o lado maior abaixo de 2000 px, o envio mostra um aviso
+  de Resolução recomendada (“Imagem com L × A px; recomendado: lado maior de 2000 px para boa
   impressão”), só informativo (ver
   [Como ilustrar uma tira e gerar o PDF](#como-ilustrar-uma-tira-e-gerar-o-pdf)).
 
