@@ -8,7 +8,7 @@
 **Wave**: 10
 **Tamanho estimado**: small
 **Tipo**: chore
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -67,6 +67,8 @@ O Guia de uso (`docs/GUIA-DE-USO.md`) ganha a seção que ensina o editor a ilus
   → `[true,true,true,true]` (trechos da abertura aos passos 1 a 3, passo 5, passo 7 e do Painel ao fim idênticos ao commit-pai; a seção nova, os passos 4 e 6 e a data são as únicas mudanças).
 - [ ] Só documento — `git -C docs diff --name-only <commit-pai>..HEAD | grep -v '^docs/'` → saída vazia, e `git -C docs diff --name-only <commit-pai>..HEAD | grep -c '^docs/GUIA-DE-USO.md$'` → 1 (o 2º comando é o controle positivo do 1º: o diff não está vazio).
 
+- [ ] (retry gate 7 da wave 10; lição `afirmacao-do-guia-sobre-modo-ou-tela-leva-ancora-no-codigo-do-destino`) O guia só afirma o que o código faz, com âncora por afirmação: (1) BLOQUEANTE — o PDF final é descrito como capa (Disciplina, Tópico, Versão e data), um quadro por página com a imagem e rodapé com a Versão e a data de verificação da legislação (`final-pdf-composer.ts`); "contrastes, pegadinha, flashcards e protocolo de revisão" voltam a ser do rascunho (`pdf-composer.ts`); (2) BLOQUEANTE — o rascunho sai marcado RASCUNHO só até existir uma versão aprovada (`resolveHeaderLabel` em `pdf-composer.ts`), nos dois trechos que o citam, sem contradizer o passo 7; (3) o rascunho existe na tela do conteúdo e na da Tira; "Exportar PDF final", "Publicar PDF final" e "PDFs publicados" só na tela da Tira, abaixo dos quadros (`mnemonic-strip-board.tsx`); (4) o motivo do botão desabilitado aparece logo abaixo dele, o "Histórico de Versões" é indicado só quando o motivo é a versão, e "se a tela disser que não foi possível verificar ou carregar, clique em “Tentar novamente”"; (5) o Aviso de exportação aparece depois de "Exportar PDF final" na Tira e, antes de publicar, dentro da janela de publicar com a nota de verificação prévia; sugestões: frase do WebP "aceito na biblioteca; no rascunho não aparece, no PDF final aparece" e o aviso do envio citado pelo texto da tela; verificação executável: os 7 oráculos acima seguem com o mesmo resultado (rodar e colar) e o report traz a tabela "afirmação → arquivo:linha" para cada frase nova ou movida entre modos/telas; o code-reviewer confere a tabela por leitura.
+
 ## Riscos específicos
 
 - Os rótulos congelados vêm das TASKs de tela: se alguma sair com texto diferente, o guia segue o código (o segundo comando acusa) e a TASK não inventa rótulo.
@@ -79,17 +81,17 @@ O Guia de uso (`docs/GUIA-DE-USO.md`) ganha a seção que ensina o editor a ilus
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-19T08:16:57-0300
+**Data conclusão**: 2026-10-19T08:26:19-0300
+**Commit SHA**: 11ef0f2 (workspace)
 **Jira**: KAN-277
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): n/a — só documento
+- [x] Comportamento (gate 9): consolidado (FEAT-064-004)

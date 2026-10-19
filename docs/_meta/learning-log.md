@@ -1494,8 +1494,9 @@ origem: SPEC-040/PLAN-041, TASK-041-001, re-review do `code-reviewer` — o Tech
 causa_raiz: instrucao_ausente — o "Princípio do despacho de retry" exige par de provas por item, mas não diz que o item "opcional" também o exige; a palavra "opcional" é saída de fato do par. Reincide a lição de projeto `corre-o-acrescentada-de-carona-num-retry-passa-pela-mesma-r-gua-do-achado-original` (já ativa) — a lição de projeto cobre o developer; o despacho é do processo
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/implement.md` §3.3, "Princípio do despacho de retry" (após o bullet "Pai declarado", l.143)
 patch: bullet novo "Sem carona": item do despacho, inclusive marcado opcional, nasce com caso+mutante ou fica fora. Saldo +1 linha (implement.md: 332 linhas)
-reincidencia: 0 (Grep `opcional` no plugin 0.192.0: só no item de comentário Art. 7; nada sobre carona no despacho)
+reincidencia: 2 (LRN-077 em PLAN-063; PLAN-065 wave 9, TASK-065-016: carona (f) do retry indicou como "molde" um componente com o mesmo defeito — controle que dispara troca de conteúdo desmontando em voo, lição de projeto `controle-que-dispara-a-troca-de-conteudo-fica-montado-durante-o-carregamento` já ativa; correção nasceu errada e custou rodada extra (gates 7 e 11). Grep 0.224.1 de `carona` em implement.md: ausente — proposta nunca aplicada; só developer.md l.121/code-reviewer.md l.126 usam "carona" no sentido de remoção de comentário. Escada 4.149: a proposta soma o check mecânico `lessons.sh . match --paths <molde>` no despacho, sai 0 e hits lidos declarados)
 estado: ativa
+patch_reincidencia: bullet "Sem carona" (implement.md §3.3, após "Pai declarado") ganha: molde indicado no despacho passa o item (h) de `/keelson:tasks` — `lessons.sh . match --paths <molde>` + grep do invariante que o achado ataca, lidos NO molde; "molde que carrega o defeito não é molde". Saldo +1 sobre o patch original
 
 ## LRN-061: `commands/tasks.md` não diz de onde vem o N de "contagem de testes" — scribe (sem shell) fixou por Grep de `it(` e errou com `it.each`
 data: 2026-09-30
@@ -1568,7 +1569,7 @@ origem: SPEC-044/PLAN-046, TASK-046-004 (K1) — o critério previa que uma 2ª 
 causa_raiz: instrucao_ausente — a fixação manda o par "que estado faz este comando FALHAR?" (l.188) mas o mutante é aplicado a código que ainda não existe; nada manda raciocinar se o mutante tem efeito no canal que o teste observa
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, mesma frase de LRN-064 (l.214)
 patch: mutante prescrito precisa poder morrer: efeito observável no canal lido (NFR de rede → refetch/fetch/`initiate` forçado). Saldo +1 linha (mesma frase de LRN-064)
-reincidencia: 1 (PLAN-049, TASK-049-002, ver atualização; Grep 0.192.0 por `poder morrer|fora do alcance|controle` em tasks.md: ausente)
+reincidencia: 3 (PLAN-049 + 2 em PLAN-065, ver atualização final; Grep 0.192.0 por `poder morrer|fora do alcance|controle` em tasks.md: ausente; Grep 0.224.1 idem: ausente — proposta nunca aplicada)
 estado: ativa
 
 **Atualização 2026-09-30 (reincidência 1, PLAN-049 — slug producao-material, TASK-049-002, re-review
@@ -1581,6 +1582,9 @@ reformulada (mesma da pendente, +1 cláusula): "…e todo caso declarado verde s
 fica fora do alcance do predicado mutado — releia o predicado contra cada caso; sem caso fora do alcance,
 declare 'controle = negativo (sem mutante, verde)'". Reincidência 1 < 2: sem check novo exigido.
 
+**Atualização 2026-10-19 (reincidência 3, PLAN-065, KAN-237 — 2 ocorrências, ambas do `code-reviewer`/gate 1)**:
+(wave 4) mutante de opção com default: remover/omitir a opção reproduz o default e sobrevive — o mutante troca para o valor OPOSTO e o fixture discrimina no decoder que governa a opção; (wave 6, TASK-065-011) base com deny-by-default verificado na montagem (`assertDenyByDefault`, `src/http/routes.ts`): o mutante de autorização prescrito REMOVIA a guarda, o código morre no boot e prova o registro, nunca o caso 403; o mutante certo AMPLIA o papel (`requireRole(..., STUDENT)`, um por rota). Mesma causa: mutante prescrito sem conferir o que o faz morrer, e onde. Grep 0.224.1: ausente → proposta única do dono consolidada (LRN-065 + LRN-066 + estes dois eixos) no parágrafo do mutante de `tasks.md` (l.225). Escada 4.149: autocheck mecânico — o `morreu (<teste>)` de `mutantes:` do report do developer (já existe, `agents/developer.md` l.254-255) tem de ser o caso que o critério nomeia; boot/registro no lugar do caso = mutante inerte, volta como `duvidas`.
+
 ## LRN-066: critério multi-sujeito (item f de `commands/tasks.md`) aplicado com 1 mutante para 3 sujeitos, e o helper de teste não expunha o dado
 data: 2026-09-30
 gatilho: gate_reprovado
@@ -1588,8 +1592,9 @@ origem: SPEC-044/PLAN-046, TASK-046-005 — o critério pedia remoção de 3 lis
 causa_raiz: instrucao_ausente — o item (f) já exige "mutante por sujeito" (Grep 0.192.0 confirma), mas não cobre o caso em que o sujeito vive num helper de teste que não expõe o dado: sem observação possível, o mutante por sujeito é inatingível (irmã de 4.109 e da lição de projeto `helper-de-teste-que-nao-expoe-o-dado-se-estende-nunca-se-copia`)
 artefato_patchado: proposta_plugin (modo consumidor; ver mensagem_mantenedor) — `commands/tasks.md`, item (f) (l.210)
 patch: frase no fim do item (f): sujeito que vive em helper exige que o critério mande o helper expor o dado; helper que não expõe se estende na TASK. Saldo +1 linha longa
-reincidencia: 2 (2026-10-01, PLAN-049 Wave 3, ambos achados do `code-reviewer`: (i) TASK-049-004 exigia `redactSecret` em "qualquer mensagem de recusa" e prescreveu 1 mutante para 3 canais de exibição (alerta geral, 422 por campo, 409 junto ao e-mail) — 2 mutantes sobreviveram com 26/26 verde; (ii) TASK-049-005 Q9 descreveu o repasse de `onNotice` até `UsersScreen`, o mutante cobria só `UsersList` e o diálogo; prop opcional sempre fornecida em produção desligou o typecheck como guarda e "apagar onNotice={setNotice}" sobreviveu. Mesma causa: sujeito contado pelo texto do critério, não pelas instâncias no código. Grep 0.192.0 de `commands/tasks.md` (item f, l.210): regra base presente, sem "canal"/"elo"/prop obrigatória — proposta de LRN-066 e esta ainda não aplicadas. Escada 4.149: autocheck desenhado na proposta, abaixo)
+reincidencia: 3 (2026-10-01 ×2 em PLAN-049 Wave 3 + 2026-10-18 PLAN-065, ver reincidencia_adicional; 1ª: ambos achados do `code-reviewer`: (i) TASK-049-004 exigia `redactSecret` em "qualquer mensagem de recusa" e prescreveu 1 mutante para 3 canais de exibição (alerta geral, 422 por campo, 409 junto ao e-mail) — 2 mutantes sobreviveram com 26/26 verde; (ii) TASK-049-005 Q9 descreveu o repasse de `onNotice` até `UsersScreen`, o mutante cobria só `UsersList` e o diálogo; prop opcional sempre fornecida em produção desligou o typecheck como guarda e "apagar onNotice={setNotice}" sobreviveu. Mesma causa: sujeito contado pelo texto do critério, não pelas instâncias no código. Grep 0.192.0 de `commands/tasks.md` (item f, l.210): regra base presente, sem "canal"/"elo"/prop obrigatória — proposta de LRN-066 e esta ainda não aplicadas. Escada 4.149: autocheck desenhado na proposta, abaixo)
 estado: ativa
+reincidencia_adicional: 2026-10-18, PLAN-065 wave 1, TASK-065-002 — critério com 3 cláusulas (path do comando, classes do link, posição do link) sem asserção para a posição: M2/M3 sobreviveram, 2ª reprova; Grep 0.224.1 do item (f) (l.217): "predicados unidos por conjunção" presente, sem "cláusula"/"enumeração"/"instância varrida" — a regra existe mas o escopo literal ("conjunção") não alcança lista por vírgula. Contagem passa a 3; proposta de LRN-066 reformulada abaixo (+ cláusula "conjunção, vírgula ou enumeração"), saldo 0
 patch_reincidencia: item (f) ganha frase que define sujeito = instância varrida no código (canais de exibição = chamadas do sanitizador; elos = componentes do repasse), 1 caso + 1 mutante por sujeito ou prop obrigatória com typecheck declarado oráculo; autocheck: nº de sujeitos varridos no diff = nº de mutantes mortos (confronto no fecho). Saldo +1 linha longa (tasks.md: 283 linhas)
 
 ## LRN-067: `screen-verify` manda preencher o login com o valor da senha mas não diz o que fazer quando o sandbox do browser não lê o arquivo — o qa tentou rotas de materialização da credencial
@@ -1721,4 +1726,34 @@ causa_raiz: instrucao_ausente — `commands/plan.md` não manda relacionar, numa
 artefato_patchado: proposta_plugin (modo consumidor; ver relatório) — `commands/plan.md`, Etapa 4, item 3 (Trade-offs documentados); texto do item 3 não lido por mim, conferir antes de aplicar
 patch: +1 linha: limites que atravessam TASKs relacionados numa DEC com a conta do pior caso (teto ÷ vazão mínima declarada ≤ TTL; declarar se os passos correm em paralelo ou em série). Saldo +1
 reincidencia: 0
+estado: ativa
+
+## LRN-080: retry não re-roda as verificações dos Critérios cujos arquivos o delta toca; limpeza de comentário apagou o conteúdo que um critério herdado cobrava
+data: 2026-10-19
+gatilho: gate_reprovado
+origem: PLAN-065 (slug producao-material, KAN-237), wave 3, TASK-065-007 — re-gate gates 1-7 reprovou por B1: o retry (item P4, limpeza) apagou do comentário os números de EXPLAIN que o critério herdado busca; 2ª reprova com correção nomeada → rodada extra (4.460)
+causa_raiz: instrucao_ausente — `commands/implement.md` §3.3 (princípio do despacho de retry, l.142-148) manda par de provas, condição, pai e "quem cita este texto?", mas nenhum bullet liga o delta do retry aos Critérios de pronto que verificam os arquivos tocados; o bullet "Remoção de comentário" (l.148) trata toda remoção como inerte, sem a exceção de conteúdo que um critério cobra; `agents/developer.md` etapa 6 manda rodar a rodada filtrada "uma vez", que não inclui verificações não-teste (grep, comentário exigido)
+artefato_patchado: proposta_plugin (modo consumidor; ver relatório) — `commands/implement.md` §3.3, após o bullet "Quem cita este texto?" (l.147)
+patch: bullet novo "Critérios do arquivo tocado": despacho lista por arquivo do delta os Critérios que o alcançam; developer roda cada um uma vez no pós-correção; remoção que apaga conteúdo cobrado por critério é conflito (critério vence ou é emendado), não "remoção de comentário". Saldo +2
+reincidencia: 0 (Grep 0.224.1 por `Critérios do arquivo tocado`/`arquivo tocado` em implement.md e developer.md: ausente)
+estado: ativa
+
+## LRN-081: função pesada compartilhada ganha chamador novo sem herdar o teto de custo do chamador existente
+data: 2026-10-19
+gatilho: gate_reprovado
+origem: PLAN-065, wave 4, TASK-065-009 — gate 10 REPROVADO: o preview (chamador novo da conversão de imagem) preparava todas as imagens sem teto (15-58 s pior caso, até 10x a exportação que já tinha teto); DEC-065-006 reaberta
+causa_raiz: instrucao_ausente — `guidelines/core/PERFORMANCE.md` (Backend, "Sem N+1", l.21-24, 4.178) cobre composição só para o N+1 (colaborador que consulta, chamado em laço); não cobre função pesada compartilhada que ganha chamador novo. O gate 10 pegou na mesma wave (verificador funcionou; o custo foi 1 retry + emenda de DEC). Dono é doutrina humana
+artefato_patchado: proposta_doutrina (não aplicado) — `guidelines/core/PERFORMANCE.md`, após l.24
+patch: 2 linhas: chamador novo de função pesada compartilhada (conversão, I/O, CPU) herda teto/cessão/memo dos chamadores existentes; grep dos chamadores antes de fixar. Saldo +2
+reincidencia: 0
+estado: ativa
+
+## LRN-082: anexar critério herdado a TASK em voo é append-only — cláusulas irmãs (Inclui/Não inclui, verificações, fixtures, exemplares) não são relidas no mesmo ato
+data: 2026-10-19
+gatilho: gate_reprovado
+origem: PLAN-065 (slug producao-material, KAN-237), waves 7 e 8 — code-reviewer apontou 7+ contradições nas TASKs 012/013/014/015/016 (critério herdado exigia mudar arquivo que o Não inclui proibia; exemplar citado no Inclui já não existia; verificação mecânica de ausência contradita pelo critério novo); critério com semântica temporal do RTK Query (invalidação/refetch) fixado de memória, sem premissa executada. Autoria: do orquestrador (Tech Lead anexou os critérios)
+causa_raiz: instrucao_ausente — `commands/implement.md` §3.2 (l.111, 4.140/4.258) manda o critério herdado nascer "no mesmo Edit" com verificação executável, mas só regula o item NOVO; nada manda reler as cláusulas irmãs que o critério novo contradiz. O item (e) de `commands/tasks.md` (l.216, "sem contradição interna") vale na GERAÇÃO e fala de "dois critérios", não do anexo em voo nem de Inclui/Não inclui/Riscos/exemplares. Família de LRN-059 (PLAN×TASK no pacote) e LRN-078 (reconferência no despacho), causa distinta
+artefato_patchado: proposta_plugin (modo consumidor; ver relatório) — `commands/implement.md` §3.2, fim do parágrafo "Pendência herdada…" (l.111)
+patch: "Anexar é reconciliar": no mesmo Edit, Grep na TASK de cada arquivo/fixture/símbolo/API que o critério novo nomeia, ler todo hit fora dele e reescrever/riscar o que contradiz; declarar `N hits lidos · M reescritos`; API de semântica temporal cita premissa executada. Saldo +1 linha longa (≈+5 em 100 col)
+reincidencia: 1 (wave 7 → wave 8, mesmo ciclo; Grep 0.224.1 por `reconciliar`/`hits lidos`/`hit` em implement.md: ausente — proposta nova, não reincide como proposta; o que voltou foi o gesto de anexar sem varrer). Escada 4.149: desenho mecânico na proposta (contagem declarada + lint candidato `task-criterio-contradicao-irma`: caminho no Não inclui que é alvo de edição/mutante num Critério); a contradição semântica é imecanizável
 estado: ativa

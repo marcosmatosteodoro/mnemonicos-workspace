@@ -242,6 +242,8 @@ Fechamento legislativo, Papel.
 
 **Jira Story**: KAN-247
 
+**Verificação (gate 9)**: 2026-10-19 — PARCIAL / pendente_handoff (Tech Lead, declarado). AC-064-022 (Guia de uso) verificado por leitura contra o código pelo code-reviewer (cada afirmação com âncora `arquivo:linha`; 7 oráculos verdes em 11ef0f2). AC-064-020 (atalho do seletor vazio para a Biblioteca visual e volta segura) tem prova de gate 1 (Server Component e board com `returnTo` validado nas duas camadas), mas a caminhada de tela do Roteiro da TASK-065-002 não foi exercitada: mesmo bloqueio de credencial do harness da FEAT-064-001 (sem login no formulário). Handoff: Roteiro da TASK-065-002, executado pelo Diretor ou com a leitura dos seeds liberada ao QA; subir o backend com `npm run dev:no-db`.
+
 - **FR-064-025** [MUST] Enquanto a Biblioteca visual está vazia, o estado vazio do seletor
   "Vincular associação visual" deve oferecer um link que leva à Biblioteca visual em 1
   clique.
