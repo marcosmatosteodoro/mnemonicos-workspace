@@ -2,7 +2,7 @@
 area: Design
 estado: em-observacao
 validade: indeterminada
-confirmada: 0
+confirmada: 1
 contestada: 0
 paths:
   - mnemonicos-backend/src/modules/**/*.ts
@@ -22,3 +22,5 @@ seguinte certo é diferente em cada um.
 literal de cada um; quando o próximo passo diverge, a mensagem sai do estado de quem produz o dado
 (carimbo/máquina de versão). Complementa a lição
 `mensagem-de-recusa-recuperavel-diz-o-proximo-passo-com-o-nome-da-acao-da-tela`.
+
+**Reincidência (confirmada 1):** wave 7 do PLAN-065 (TASK-065-012, 2026-10-18), no caminho de publicar — apontada pelo code-reviewer.
