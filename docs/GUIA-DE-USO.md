@@ -90,9 +90,10 @@ outra. Uma imagem que já está em uso numa Tira não pode ser removida.
   Sanção). Se aparecer uma categoria sugerida que sirva, escolha-a: é ela que o filtro usa.
 - **Descrição da função cognitiva**: por que esta imagem ajuda a lembrar a regra sem a dica
   na frente. Se tirar a imagem não fizer falta para lembrar, ela é só decoração.
-- **Imagem**: PNG, JPEG ou WebP. No rascunho da tira, o WebP é aceito na biblioteca mas segue
-  sem aparecer; no PDF final ele aparece. Se a imagem tiver o lado maior abaixo de 2000 px, o
-  envio mostra um aviso de Resolução recomendada, só informativo (ver
+- **Imagem**: PNG, JPEG ou WebP. O WebP é aceito na biblioteca; no rascunho não aparece, no PDF
+  final aparece. Se a imagem tiver o lado maior abaixo de 2000 px, o envio mostra um aviso de
+  Resolução recomendada (“Imagem com L × A px; recomendado: lado maior de 2000 px para boa
+  impressão”), só informativo (ver
   [Como ilustrar uma tira e gerar o PDF](#como-ilustrar-uma-tira-e-gerar-o-pdf)).
 
 ### 5. Complete o material de reforço
@@ -108,12 +109,15 @@ geração do PDF. Escreva "leva a" ou "diferente de".
 
 ### 6. Exporte o PDF
 
-Na tela do conteúdo ou da Tira, há dois modos de exportar:
+Há dois modos de exportar:
 
-- **Modo rascunho**: Exportar Tira mnemônica (um quadro por página) ou Exportar Resumo. O PDF sai
-  marcado como RASCUNHO e serve para conferir o material.
-- **Modo PDF final**: Exportar PDF final. Exige uma versão aprovada (ver o passo 7) e traz a Tira
-  com as imagens, os contrastes, a pegadinha, os flashcards e o protocolo de revisão.
+- **Modo rascunho**, nas telas do conteúdo e da Tira: Exportar Tira mnemônica (um quadro por
+  página) ou Exportar Resumo. O PDF traz a Tira, os contrastes, a pegadinha, os flashcards e o
+  protocolo de revisão. Ele sai marcado como RASCUNHO até existir uma versão aprovada.
+- **Modo PDF final**, só na tela da Tira, abaixo dos quadros: Exportar PDF final. Exige uma
+  versão aprovada (ver o passo 7). O PDF tem uma capa com Disciplina, Tópico, Versão e a data
+  até a qual a legislação foi verificada, um quadro por página com a imagem, e rodapé com a
+  Versão e essa data. Contrastes, pegadinha, flashcards e protocolo de revisão não entram nele.
 
 Se a Tira não tem quadros, o sistema pede para adicionar ao menos um. Para ilustrar a Tira e
 publicar o PDF final, veja [Como ilustrar uma tira e gerar o PDF](#como-ilustrar-uma-tira-e-gerar-o-pdf).
@@ -195,23 +199,32 @@ Remover:
    "Voltar para a tira".
 2. Acompanhe o indicador "N de M quadros com imagem": ele diz quantos quadros já têm imagem.
 3. Ao enviar uma imagem, o ideal é que o lado maior tenha 2000 px. Abaixo disso o formulário
-   mostra um aviso de Resolução recomendada; é só informativo e o envio continua.
+   mostra “Imagem com L × A px; recomendado: lado maior de 2000 px para boa impressão”
+   (Resolução recomendada); é só informativo e o envio continua.
 4. O PDF final ajusta as imagens maiores que 2000 px no próprio PDF. A imagem guardada na
    Biblioteca visual não muda.
 
 ### Rascunho ou PDF final
 
-- O **rascunho** (Exportar Tira mnemônica) sai marcado como RASCUNHO e não exige versão
-  aprovada. Nele, imagens WebP seguem sem aparecer.
-- O **PDF final** (Exportar PDF final) exige uma versão aprovada e válida, e nele o WebP
-  aparece. Com o botão desabilitado, abra "Histórico de Versões": feche a versão (se ainda não
-  fechou) e peça a um administrador que não a produziu para aprová-la. Se o conteúdo ou a Tira
-  foram alterados depois do fechamento, feche e aprove uma nova versão. Se o PDF ficar grande
-  demais, reduza o tamanho das imagens dos quadros e exporte de novo.
+- O **rascunho** (Exportar Tira mnemônica, nas telas do conteúdo e da Tira) não exige versão
+  aprovada e sai marcado como RASCUNHO até existir uma versão aprovada. Nele, imagens WebP
+  seguem sem aparecer.
+- O **PDF final** (Exportar PDF final, só na tela da Tira, abaixo dos quadros) exige uma versão
+  aprovada e válida, e nele o WebP aparece. Com o botão desabilitado, leia o motivo logo abaixo
+  dele:
+  - se for a versão (não aprovada, ou alterada depois do fechamento), abra "Histórico de
+    Versões": feche a versão (se ainda não fechou) e peça a um administrador que não a produziu
+    para aprová-la; se o conteúdo ou a Tira foram alterados depois do fechamento, feche e
+    aprove uma nova versão;
+  - se a Tira não tem quadros, adicione ao menos um;
+  - se a tela disser que não foi possível verificar ou carregar, clique em “Tentar novamente”.
+- Se o PDF ficar grande demais, reduza o tamanho das imagens dos quadros e exporte de novo.
 
 ### Ler o Aviso de exportação
 
-Antes e depois de exportar, o "Aviso de exportação" lista os quadros com problema, um por linha:
+O "Aviso de exportação" lista os quadros com problema, um por linha. Na tela da Tira aparece
+depois de "Exportar PDF final"; antes de publicar, aparece dentro da janela de publicar, com a
+nota "Verificação prévia — a exportação confirma as imagens":
 
 - **Sem imagem**: o quadro não tem imagem. Vincule uma pelo seletor.
 - **Imagem que não entrou no PDF**: use "Trocar associação visual" no quadro.
@@ -219,12 +232,12 @@ Antes e depois de exportar, o "Aviso de exportação" lista os quadros com probl
 
 ### Publicar e baixar
 
-1. Com a versão aprovada, clique em "Publicar PDF final" e, na janela, em
+1. Na tela da Tira, com a versão aprovada, clique em "Publicar PDF final" e, na janela, em
    "Confirmar publicação".
 2. Se faltam imagens (quadros sem imagem ou com imagem que não entrou), a janela pede para
    marcar que você quer publicar mesmo assim.
 3. Se a versão já tem PDF publicado, a janela mostra a data e pergunta se quer publicar outro.
-4. O painel "PDFs publicados" lista o que já foi publicado; o mais recente traz a marca
+4. O painel "PDFs publicados" (também na tela da Tira) lista o que já foi publicado; o mais recente traz a marca
    “atual”. Use “Baixar” para salvar o PDF.
 5. Se publicar ou baixar falhar, tente de novo. Se a janela avisar que a cobertura de imagens
    mudou ou que a versão ganhou um PDF enquanto ela estava aberta, confira o resumo e confirme
