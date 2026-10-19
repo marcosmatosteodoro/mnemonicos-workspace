@@ -709,7 +709,7 @@ comparava só NOMES de campo (molde `extractInterfaceFields`); tipo mais largo (
 divergente ficavam verdes, com o docblock afirmando "NOMES e a FORMA". Quando o critério afirma TIPO ou o
 consumidor ramifica por literal de união, a paridade compara o texto de tipo normalizado por campo, com
 mapa explícito de nomes de tipo e os conjuntos de literais; mutante de tipo e mutante de literal vermelhos.
-**Contadores:** confirmada 6 · contestada 0
+**Contadores:** confirmada 7 · contestada 0 (reincidência 2026-10-18: PLAN-065 TASK-065-010 — chave de serialização `warnings` do 201 de POST /visual-associations sem teste que lesse as duas fontes; renomear só no frontend deixava tudo verde)
 
 ## [Segurança] Guarda de curto-circuito com estado de módulo + janela temporal exige três oráculos
 
@@ -843,7 +843,8 @@ uma definição só, em `tests/support/` (ex.: `tests/support/approvable-raw-con
 **Validade:** geral (qualquer predicado derivado de configuração/env, e helper/fixture de
 teste).
 **Estado:** ativa
-**Contadores:** confirmada 8 · contestada 0 (reincidência 2026-10-18: PLAN-065 TASK-065-007 — `postAsAdmin` refez `seedSession`/`postPublication` que a TASK-065-006 deixou local; helper de integração usado por 2+ TASKs do mesmo PLAN nasce em `tests/support/` desde a 1ª TASK)
+**Extensão (2026-10-18, PLAN-065/TASK-065-010, gate 7 da wave 5 — faceta "canônico privado"):** reúso conferido pelo símbolo EXPORTADO (a constante) deixa invisível o critério de domínio que a wave anterior escreveu privado (`warningKindOf` em `strip-coverage.ts`); ao consumir uma constante de domínio de outro módulo, faça grep da EXPRESSÃO que a compara (`Math.max(...) <|>= CONST`) no acumulado da branch — se o critério já existe privado, exporte-o como predicado e migre o consumidor de origem no mesmo diff; critério de TASK "sem re-literal" ganha o par "sem re-derivação do predicado", com o mutante de operador no predicado compartilhado reprovando os dois consumidores.
+**Contadores:** confirmada 9 · contestada 0 (reincidências 2026-10-18: PLAN-065 TASK-065-007 helper de integração; TASK-065-010 predicado de resolução re-derivado)
 **Reincidência (2026-09-13, PLAN-023/TASK-023-008, Wave 3)**: o retry que consolidou 3
 fixtures duplicadas de `VisualAssociation` em `tests/support/visual-association-fixtures.ts`
 (achado de gate 7) re-derivou, no MESMO diff, **duas** ocorrências de bloco

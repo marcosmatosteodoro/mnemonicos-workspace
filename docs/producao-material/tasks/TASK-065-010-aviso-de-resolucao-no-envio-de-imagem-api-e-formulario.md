@@ -8,7 +8,7 @@
 **Wave**: 5
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -50,6 +50,11 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 - [ ] Sem classe CSS nova e sem mexer no item de lista (lições `utility-escrito-m-o-no-tailwind-4-nunca-referencia-var-tw-a-custom-property-s-existe-quando-um-utilit-rio-nativo-a-registra` e `item-de-lista-que-renderiza-a-mesma-entidade-em-2-componentes-nascidos-na-mesma-wave-herda-a-corre-o-de-acessibilidade-j-aplicada-no-irm-o-can-nico-n-o-s-a-estrutura`): `git -C mnemonicos-frontend diff --stat <commit-pai-da-TASK>..HEAD -- src/app/globals.css src/components/visual-association-picker.tsx` → saída sem linhas; o aviso usa só classes utilitárias já presentes no arquivo do formulário
 - [ ] Sem warnings/lints novos sobre todos os arquivos do diff (`git -C mnemonicos-backend diff --name-only main...HEAD` e `git -C mnemonicos-frontend diff --name-only main...HEAD`), produção e teste: `npm --prefix mnemonicos-backend run lint`, `npm --prefix mnemonicos-backend run typecheck`, `npm --prefix mnemonicos-backend run format:check`, `npm --prefix mnemonicos-frontend run lint`, `npm --prefix mnemonicos-frontend run typecheck` e `npm --prefix mnemonicos-frontend run format:check` saem 0
 
+- [ ] (retry pós-gate 7 wave 5, achado 1 — sanção do Tech Lead para tocar `mnemonicos-backend/src/modules/publication/strip-coverage.ts`) Predicado único: exportar de `strip-coverage.ts` `isBelowRecommendedResolution(widthPx, heightPx): boolean`, consumido por `warningKindOf` (strip-coverage.ts) e por `computeUploadWarnings` (upload-warnings.ts); verificação: `grep -rnP 'Math\.max\([^)]*\)\s*(<|>=)\s*RECOMMENDED_LONG_SIDE_PX' mnemonicos-backend/src` → só a definição do predicado (controle positivo: hoje casa 2); exclusão declarada: `final-image.ts` usa a constante para REDUÇÃO, não para o aviso; mutante `<`→`<=` no predicado compartilhado reprova as fronteiras 2000 de `strip-coverage.test.ts` E de `upload-warnings.test.ts`.
+- [ ] (retry pós-gate 7 wave 5, achado 2 — lição `coment-rio-que-afirma-paridade-entre-os-dois-repos-s-vale-se-o-teste-ler-as-duas-fontes`) Chave `warnings` provada nas duas fontes: `tests/unit/visual-associations-frontend-contract.test.ts` lê `visual-associations.routes.ts` e afirma que o 201 do POST serializa `warnings` (regex sobre `res.status(201).json({ ...created, warnings:`) e lê `mnemonicos-frontend/src/types/domain.ts` e afirma `CreatedVisualAssociation` com `warnings: UploadWarning[]`; cada regex com controle positivo (match não-nulo); mutante que renomeia a chave só no frontend (domain.ts + board + mocks, em worktree) reprova o contract test.
+- [ ] (retry, robustez de ordem de deploy) `visual-library-board.tsx` usa `created.warnings ?? []` (frontend publicado antes do backend não quebra o render); e o aviso é limpo também quando a validação do formulário retorna antes do envio (sugestão do gate 11 wave 5); verificação: teste do board — resposta 201 sem `warnings` → sem aviso e sem erro; envio com aviso seguido de envio inválido (descrição vazia) → aviso ausente; carona: remover o JSDoc redundante de `visual-library-board.tsx:39`.
+- [ ] (contestação registrada) Critério 9 (debounce com `delay`+`advanceTimers`): finalidade cumprida — o debounce não foi tocado e os casos de debounce existentes seguem verdes; os casos novos seguem o exemplar `fillCreateForm` dos 18 casos do arquivo (aceito pelo Tech Lead, code-reviewer wave 5).
+
 ## Riscos específicos
 
 - O resultado de `.unwrap()` em `visual-library-board.tsx:674` hoje é descartado; a TASK passa a consumi-lo, e o estado do aviso precisa sobreviver ao `reset` já existente sem vazar para o próximo envio.
@@ -63,19 +68,19 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T20:56:13-0300
+**Data conclusão**: 2026-10-18T21:28:50-0300
+**Commit SHA**: adfdb57 (backend) · 44f1384 (frontend)
 **Jira**: KAN-270
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 5, 0 achados)
+- [x] Comportamento (gate 9): consolidado (FEAT-064-002)
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->

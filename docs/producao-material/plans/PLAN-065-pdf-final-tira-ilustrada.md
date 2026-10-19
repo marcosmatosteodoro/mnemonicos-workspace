@@ -143,7 +143,7 @@ export async function prepareFrameImage(
   input: { buffer: Buffer } | null,
 ): Promise<PreparedImageResult>;
 
-export async function readWebpDimensions(buffer: Buffer): Promise<{ width: number; height: number } | null>; // sharp.metadata, usado também no upload
+export function readWebpDimensions(buffer: Buffer): { width: number; height: number } | null; // leitura de cabeçalho VP8/VP8L/VP8X (image-signature.ts), usado no upload, no preview e na exportação
 ```
 **Dependências**: nenhuma
 
@@ -407,7 +407,7 @@ model PublishedPdf {
 
 ### DEC-065-004: WEBP convertido para PNG com `sharp` na geração do PDF final
 **Contexto**: o `pdf-lib` só embute PNG/JPEG; o rascunho pula WEBP (NFR-024-004 proíbe recodificar). O final precisa exibir todo vínculo (FR-064-012, Q-064-001), inclusive WEBP já existente no acervo, e a Resolução recomendada exige dimensões também de WEBP (hoje `readImageDimensions` só lê PNG/JPEG). Acervo de dev: 0 WEBP; produção não medível.
-**Decisão**: dependência `sharp`: no modo final, WEBP é decodificado e reencodado em PNG (sem perda além da decodificação do WEBP de origem — NFR-064-005); `sharp.metadata()` fornece as dimensões de WEBP para o upload e o preview. Exceção ao NFR-024-004 **só no modo final** (A-064-003); o rascunho continua pulando WEBP. Falha de conversão → `IMAGE_NOT_EMBEDDABLE` (Quadro só com texto, aviso). Dependência nativa com precedente em produção (`@node-rs/argon2`).
+**Decisão**: dependência `sharp`: no modo final, WEBP é decodificado e reencodado em PNG (sem perda além da decodificação do WEBP de origem — NFR-064-005); `readWebpDimensions` (cabeçalho, `image-signature.ts`) fornece as dimensões de WEBP para o upload e o preview. Exceção ao NFR-024-004 **só no modo final** (A-064-003); o rascunho continua pulando WEBP. Falha de conversão → `IMAGE_NOT_EMBEDDABLE` (Quadro só com texto, aviso). Dependência nativa com precedente em produção (`@node-rs/argon2`).
 **Emenda (2026-10-18, Tech Lead, após a medição da TASK-065-005 — MEDICAO-065)**: PNG de WEBP fotográfico ficou 21–39× maior (~7 MB por Quadro 2000×1333; um Quadro estoura o teto de DEC-065-010). A saída da conversão passa a depender do canal alfa: WEBP **opaco** → JPEG q85 (4:2:0, sem mozjpeg); WEBP **com alfa** → PNG sem perda. A mesma regra vale para a imagem PNG/JPEG reduzida por exceder `RECOMMENDED_LONG_SIDE_PX` (opaca → JPEG q85; com alfa → PNG). PNG/JPEG de até o limiar seguem com os bytes originais (NFR-024-004). Dentro do limite (iv) da resolução Q3 do PO ("sem perda visível na impressão do tamanho da caixa"), confirmado na amostra pelo gate 11. `sharp`: cache `{ memory: 50, files: 0, items: 100 }`, `concurrency(1)`, conversões em sequência (pico RSS 283 MB × 497 MB em paralelo).
 **Alternativas consideradas**:
 - Saída sempre PNG (decisão original), descartada pela medição: um Quadro fotográfico sozinho passa de 4 MB e a tira não cabe no teto de resposta.
@@ -421,7 +421,7 @@ model PublishedPdf {
 
 ### DEC-065-005: Resolução recomendada única de 2000 px no lado maior e aviso no upload
 **Contexto**: FR-064-014/FR-064-029 pedem um valor único fixado com o layout (caixa a 300 dpi). A Associação visual não guarda dimensões.
-**Decisão**: a caixa de imagem tem 480 pt de largura (DEC-065-002); 480 pt ÷ 72 × 300 dpi = **2000 px**. **Resolução recomendada = lado maior ≥ 2000 px** (`RECOMMENDED_LONG_SIDE_PX`, constante única). No upload, `POST /visual-associations` devolve `warnings[{ code: 'BELOW_RECOMMENDED_RESOLUTION', recommendedLongSidePx, widthPx, heightPx }]` sem bloquear; dimensões vêm de `readImageDimensions` (PNG/JPEG) e `sharp.metadata` (WEBP). Para o acervo antigo, o mesmo limiar gera a 3ª categoria do Aviso de exportação no preview. O `product-designer` confirma o valor no gate 11 e o valor muda num só lugar.
+**Decisão**: a caixa de imagem tem 480 pt de largura (DEC-065-002); 480 pt ÷ 72 × 300 dpi = **2000 px**. **Resolução recomendada = lado maior ≥ 2000 px** (`RECOMMENDED_LONG_SIDE_PX`, constante única). No upload, `POST /visual-associations` devolve `warnings[{ code: 'BELOW_RECOMMENDED_RESOLUTION', recommendedLongSidePx, widthPx, heightPx }]` sem bloquear; dimensões vêm de `readImageDimensions` (PNG/JPEG) e `readWebpDimensions` (WEBP), ambos por cabeçalho; o critério "abaixo da Resolução recomendada" é um predicado único exportado de `strip-coverage.ts` (`isBelowRecommendedResolution`), usado pelo upload e pela cobertura. Para o acervo antigo, o mesmo limiar gera a 3ª categoria do Aviso de exportação no preview. O `product-designer` confirma o valor no gate 11 e o valor muda num só lugar.
 **Alternativas consideradas**:
 - Calcular dimensões na hora só no PDF e não avisar no upload, descartada porque FR-064-014 exige o aviso no envio, onde o EDITOR ainda pode trocar a imagem.
 - Persistir largura/altura em coluna nova de `visual_associations`, descartada porque exige migração em tabela existente e *backfill* do acervo, sem benefício que o cálculo no ato não dê (a SPEC pede só aviso informativo).
