@@ -691,8 +691,8 @@
 
 `B:` = mnemonicos-backend · `F:` = mnemonicos-frontend. Âncoras lidas em 2026-10-19 nos worktrees da branch do épico (B: `7bf89b2`, F: `f8eb7db`), ainda não na `main` — se a linha divergir, re-ancore pelo nome. Modo FINAL é módulo à parte: o rascunho (`pdf-composer.ts`) não foi editado e segue pulando WEBP e embutindo o original. Só a Variante TIRA tem final (RESUMO → 422 `FINAL_MODE_TIRA_ONLY`, `B:src/http/errors.ts:77-83`).
 
-**Modelo de dados** (`B:prisma/schema.prisma`; migração `20261018055318_add_published_pdf`, só `CREATE TABLE`)
-- `PublishedPdf` (654-680, `@@map("published_pdfs")`): `pdfData Bytes` (o PDF mora no Postgres, não no S3 do PLAN-063), `sha256`, `byteSize`, `pageCount`, `framesTotal` (M), `framesWithImage` (N), `versionNumber` + `contentVersionId`; as 3 FKs (`rawContent`, `contentVersion`, `publishedBy`) são `Restrict`; `@@index([rawContentId, publishedAt desc])`; id `uuid(7)`. Relações inversas nas linhas 149, 367 e 643.
+**Modelo de dados** (`B:prisma/schema.prisma`; migração `20261019134030_add_published_pdf` (renomeada no merge com a main do KAN-236 para ficar depois das migrações dele), só `CREATE TABLE`)
+- `PublishedPdf` (669-695, `@@map("published_pdfs")`): `pdfData Bytes` (o PDF mora no Postgres, não no S3 do PLAN-063), `sha256`, `byteSize`, `pageCount`, `framesTotal` (M), `framesWithImage` (N), `versionNumber` + `contentVersionId`; as 3 FKs (`rawContent`, `contentVersion`, `publishedBy`) são `Restrict`; `@@index([rawContentId, publishedAt desc])`; id `uuid(7)`. Relações inversas nas linhas 161, 382 e 658.
 - `PublishedPdfStore` (`B:src/modules/publication/published-pdf.store.ts:48-63`) só expõe `insert`/`list`/`getBytes`/`findNewestId`/`findLatestForVersion` — nenhum `update`/`delete` (imutável por construção). `list` nunca seleciona `pdfData` (66-79). `getBytes` exige `rawContentId` junto do id (127-131, anti-IDOR). "Atual" = `publishedAt desc, id desc` (84-87).
 - `findLatestForVersion` casa por `versionNumber`, não por `contentVersionId` (147-153) — o "esta Versão já tem PDF" do 409 de republicação usa o número.
 
