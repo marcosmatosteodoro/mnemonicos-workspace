@@ -119,6 +119,8 @@ Fechamento legislativo, Papel.
 
 **Jira Story**: KAN-244
 
+**Verificação (gate 9)**: 2026-10-18 — PARCIAL / pendente_handoff (qa). Ambiente e identidade provados (backend 3333 e frontend 3000 servidos dos worktrees `kan237`, branch do épico, HEADs 5428b64/08dfac8); o login do Roteiro foi negado pelo classificador do harness (leitura das credenciais de seed), então os passos 1–6 do Roteiro da TASK-065-014 e a leitura do PDF final (AC-064-001..006) não foram exercitados na tela. Os ACs têm prova de gate 1 (integração com Postgres real e leitura do texto do PDF). Handoff: Roteiro da TASK-065-014, executado pelo Diretor ou com a leitura dos seeds liberada ao QA; subir o backend com `npm run dev:no-db`.
+
 - **FR-064-001** [MUST] Quando um EDITOR ou ADMIN aciona a Exportação da Variante "tira" no
   Modo de exportação "final" de um Conteúdo bruto com Versão aprovada e válida, o sistema deve gerar o PDF
   final sem nenhuma marca de rascunho, sem a Variante estampada e sem "Gerado em".

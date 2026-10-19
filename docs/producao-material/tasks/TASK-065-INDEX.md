@@ -33,8 +33,8 @@
 - [x] TASK-065-014 ✅ Done
 
 ### Wave 8 (depende de Wave 7)
-- [ ] TASK-065-013 ⏸ Todo
-- [ ] TASK-065-015 ⏸ Todo
+- [x] TASK-065-013 ✅ Done
+- [x] TASK-065-015 ✅ Done
 
 ### Wave 9 (depende de Wave 8)
 - [ ] TASK-065-016 ⏸ Todo

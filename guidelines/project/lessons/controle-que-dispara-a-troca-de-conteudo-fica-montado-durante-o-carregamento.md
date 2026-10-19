@@ -2,7 +2,7 @@
 area: Design
 estado: ativa
 validade: indeterminada
-confirmada: 1
+confirmada: 2
 contestada: 0
 paths:
   - mnemonicos-frontend/src/components/**/*.tsx
@@ -40,3 +40,5 @@ redigitado; no sucesso, um alvo estável — aplicado depois do commit (ref + `u
 erros) para o leitor de tela ler `aria-invalid`/`aria-describedby` novos. Prova:
 `document.activeElement` após cada desfecho. Referência: `mnemonicos-frontend/src/components/create-user-form.tsx`
 (`pendingFocusRef`), commit `8522792`; molde correto do diálogo: `account-confirm-dialog.tsx` (efeito de `busy`).
+
+**Reincidência (confirmada 2):** PLAN-065, TASK-065-015 (painel "PDFs publicados", 2026-10-19). O "Tentar novamente" após erro deixava o painel só com o título durante o refetch: `isLoading` do RTK fica falso depois de um resultado rejeitado e `isError` volta a falso em pending. Decida o ramo de carregamento por `data === undefined && isFetching`.

@@ -8,7 +8,7 @@
 **Wave**: 8
 **Tamanho estimado**: small
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -30,14 +30,14 @@ A publicação (TASK-065-012) passa a recusar, com 409 e nada gravado, a Tira co
 - `mnemonicos-backend/src/http/errors.ts`: `IncompleteCoverageAckRequiredError` e `RepublishAckRequiredError`, ambas estendendo `AppError(message, statusCode, code, details)` (`errors.ts:8`) com 409 e `details`; `ConflictError` (`errors.ts:41-45`) fixa o code `CONFLICT` e `UnprocessableEntityError` (`errors.ts:48-52`) não aceita `details`, por isso nenhuma serve. O `error-handler` já repassa `code` e `details` (`mnemonicos-backend/src/http/middlewares/error-handler.ts:64-80`).
 - `mnemonicos-backend/src/domain/types.ts`: os dois códigos em `PUBLICATION_FINAL_ERROR_CODES` (objeto const criado na TASK-065-006 e ampliado na 007): `INCOMPLETE_COVERAGE_ACK_REQUIRED` e `REPUBLISH_ACK_REQUIRED`; as classes novas usam a constante, nunca a grafia solta.
 - `mnemonicos-frontend/src/types/domain.ts`: espelho dos dois códigos e dos `details` tipados (`{ framesTotal, framesWithImage, warnings }` e `{ versionNumber, lastPublishedAt }`), no mesmo diff.
-- `mnemonicos-backend/tests/integration/published-pdf.confirmations.integration.test.ts` (novo; molde de sessão/POST/fixtures: `tests/integration/published-pdf.publish.integration.test.ts` da 012; fixtures: `seedApprovedStrip` da 006, `seedPublishedPdf` da 004, `buildValidPng1x1` de `tests/support/png-fixtures.ts:42` e `pngHeaderWithDimensions` de `tests/support/png-fixtures.ts:65` para o Quadro com imagem que não entra).
+- `mnemonicos-backend/tests/integration/published-pdf.confirmations.integration.test.ts` (novo; molde de sessão/POST/fixtures: `tests/integration/published-pdf.publish.integration.test.ts` da 012; fixtures: `seedApprovedStrip` da 006, `seedPublishedPdf` da 004, ~~`buildValidPng1x1` de `tests/support/png-fixtures.ts:42`~~ um PNG com lado maior ≥ 2000 px (ex.: `buildValidPngNxN(2400, 20)`) para o Quadro com imagem que entra — 1×1 gera `BELOW_RECOMMENDED_RESOLUTION` e contradiz a lista exata de avisos do AC-064-026 (reconciliado no fecho da wave 8, 1ª rodada), e `pngHeaderWithDimensions` de `tests/support/png-fixtures.ts:65` para o Quadro com imagem que não entra).
 - `mnemonicos-backend/tests/unit/published-pdf.schema.test.ts` (novo).
 - `mnemonicos-backend/tests/unit/published-pdf-frontend-contract.test.ts` (EDIÇÃO: a 011 o criou para `PublicationListItem`; aqui acrescenta os dois códigos e os `details`, lendo as duas fontes).
 
 ### Não inclui
 - A tela de confirmação e o diálogo: TASK-065-016.
 - Serializar publicações concorrentes: a checagem "mesma Versão" não é atômica por desenho (A-064-005 aceita dois registros), e o teste de concorrência da 012 segue valendo como está.
-- Editar testes ou comportamento da 012 além do exigido: a 012 não afirma nada sobre republicar sem flag, então nenhum teste dela deve reprovar; se algum reprovar, o developer relata (o arquivo da 012 não está neste Inclui) e não o edita.
+- ~~Editar testes ou comportamento da 012 além do exigido: a 012 não afirma nada sobre republicar sem flag, então nenhum teste dela deve reprovar; se algum reprovar, o developer relata (o arquivo da 012 não está neste Inclui) e não o edita.~~ (reconciliado no fecho da wave 8, 1ª rodada): a edição do arquivo da 012 está autorizada nos limites do critério "Não regressão da 012" (fixtures N=M, flags explícitas por caso, o caso reescrito sem corpo, os 2 casos do `.strict()` e o call-site da assinatura nova de `publishFinalPdf`); comportamento da 012 continua fora.
 - Mudar a conta de N/M (vem de `FinalPdfResult.coverage`, TASK-065-006/007) ou o teto de tamanho (007/012).
 - Atualizar `docs/GUIA-DE-USO.md`: TASK-065-017.
 
@@ -51,14 +51,16 @@ A publicação (TASK-065-012) passa a recusar, com 409 e nada gravado, a Tira co
 - [ ] AC-064-015, o que é "mesma Versão" (L-conjunto: dois eixos) — mesmo comando → `OK (N tests)`: (fixtures com Tira N=M — todos os Quadros com PNG válido — nos casos (a) e (b)) (a) o Conteúdo tem a Versão 1 publicada e a Versão 2 aprovada e válida: `POST` sem flag → 201 (outra Versão não é republicação); (b) outro Conteúdo tem publicação da sua Versão 1 e este Conteúdo não tem nenhuma: `POST` sem flag → 201 (publicação de outro Conteúdo não conta). Mutante em worktree: o predicado de "já publicada" deixar de comparar a Versão (ou o Conteúdo) → vermelho no caso (a) (ou (b)).
 - [ ] Precedência, um caso por par de ramos (L-precedencia, o nome do teste enuncia quem vence) — mesmo comando → `OK (N tests)`: Tira N<M ∧ Versão já publicada, sem nenhuma flag → `INCOMPLETE_COVERAGE_ACK_REQUIRED` vence `REPUBLISH_ACK_REQUIRED`; só `acknowledgeIncomplete: true` → `REPUBLISH_ACK_REQUIRED`; só `acknowledgeRepublish: true` → `INCOMPLETE_COVERAGE_ACK_REQUIRED`; as duas → 201. Conteúdo removido ∧ sem flags → 404 (o 404 de `assertRawContentExportable` vence as duas confirmações). Mutante em worktree: inverter a ordem das duas checagens → vermelho no teste "faltando as duas".
 - [ ] `*OrThrow` só depois da guarda (lição `orthrow-so-depois-da-guarda-que-torna-a-ausencia-impossivel`) — mesmo comando → `OK (N tests)`: Conteúdo removido (soft delete) e Conteúdo sem Versão aprovada recusam com 404 e 409 `FINAL_EXPORT_NOT_ELIGIBLE` previstos (nunca 500 genérico), com e sem flags; o caso previsto "Versão inexistente" usa `find*` + `AppError`, não `*OrThrow`.
-- [ ] Ordem das guardas inalterada — mesmo comando → `OK (N tests)`: sem sessão com corpo inválido → 401; STUDENT com corpo inválido (`{ framesWithImage: 99 }`) → 403 (a guarda de papel vem antes do schema); EDITOR com corpo inválido → 422. Mutante em worktree: mover o `parse` do corpo para antes de `requireRole` → vermelho no caso STUDENT.
+- [ ] Ordem das guardas inalterada — mesmo comando → `OK (N tests)`: sem sessão com corpo inválido → 401; STUDENT com corpo inválido (`{ framesWithImage: 99 }`) → 403 (a guarda de papel vem antes do schema); EDITOR com corpo inválido → 422. ~~Mutante em worktree: mover o `parse` do corpo para antes de `requireRole` → vermelho no caso STUDENT.~~ (riscado no fecho da wave 8, 1ª rodada: o `requireAuth` do app nega STUDENT pelo registro `declareRouteRoles` antes de qualquer handler da rota, então a ordem interna `parse`×`requireRole` não é observável por HTTP — o mutante é equivalente; os 3 casos 401/403/422 seguem como prova da ordem observável. Equivalência confirmada por execução pelo code-reviewer e pelo security-engineer na wave 8.)
 - [ ] Mensagens de recusa dizem o próximo passo com o nome da ação da tela (lição `mensagem-de-recusa-recuperavel-diz-o-proximo-passo-com-o-nome-da-acao-da-tela`) e os `details` são seguros — mesmo comando → `OK (N tests)`: a `message` de cada 409 contém `Publicar PDF final`, diz o que fazer ("confirme" a publicação com quadros sem imagem / "confirme" que quer publicar outro PDF desta versão) e não contém `acknowledge`, ids nem termos técnicos; `details` sem `pdfData`, sem id de usuário e sem caminho.
 - [ ] Classes e códigos (L-dry, nome por constante) — `npm --prefix mnemonicos-backend run typecheck` → saída 0, e `npm --prefix mnemonicos-backend run test:integration -- tests/integration/published-pdf.confirmations.integration.test.ts` → `OK (N tests)` asserta `error.code` com `PUBLICATION_FINAL_ERROR_CODES.<NOME>` importado de `src/domain/types.ts` (nenhuma grafia solta nos testes novos).
 - [ ] Paridade com o frontend (L-paridade, o teste lê as duas fontes) — `npm --prefix mnemonicos-backend test -- tests/unit/published-pdf-frontend-contract.test.ts` → `OK (N tests)`: os dois códigos têm o mesmo valor em `mnemonicos-backend/src/domain/types.ts` e `mnemonicos-frontend/src/types/domain.ts`, e os `details` têm os mesmos nomes de campo nas duas fontes; falha alto se o arquivo do outro repositório não existir (molde: `tests/unit/domain-types-parity.test.ts`). Mutante em worktree: renomear um código só no frontend → vermelho.
-- [ ] Não regressão da 012 — `npm --prefix mnemonicos-backend run test:integration -- tests/integration/published-pdf.publish.integration.test.ts` → mesmo `OK (N tests)` da baseline capturada antes de começar (nenhum teste da 012 editado ou removido, com UMA exceção reconciliada no retry da wave 7: o caso da 012 "a Versão gravada pertence ao Conteúdo", que envia `{ contentVersionId, versionNumber }` e espera 201, é reescrito — o `.strict()` desta TASK o torna 422 —, mantendo o invariante por um caso SEM corpo que grava a Versão do Conteúdo da rota (id literal); `git -C mnemonicos-backend diff <commit-pai>..HEAD -- tests/integration/published-pdf.publish.integration.test.ts` → só os hunks desse caso e os 2 casos novos do critério herdado do `.strict()`).
+- [ ] Não regressão da 012 — `npm --prefix mnemonicos-backend run test:integration -- tests/integration/published-pdf.publish.integration.test.ts` → mesmo `OK (N tests)` da baseline capturada antes de começar (furo no plano reconciliado na wave 8, decisão do Tech Lead em nome do Diretor: a "Não inclui" da TASK-065-012 declarava fixtures com N = M, mas eles usam Quadros só-texto (N < M) e republicam a mesma Versão sem flag — 11 dos 28 casos passam a 409 com a regra desta TASK. Edição AUTORIZADA da 012: os fixtures passam a Quadros com imagem PNG que entra (N = M, como a 012 declarou), e os casos que republicam a mesma Versão ou que provam N < M de propósito enviam a flag correspondente EXPLÍCITA no próprio caso; PROIBIDO o helper `publish` mandar as duas flags por padrão (esconderia a regra); cada caso editado mantém a asserção que tinha. Fora isso, nenhum teste da 012 editado ou removido, com UMA exceção reconciliada no retry da wave 7: o caso da 012 "a Versão gravada pertence ao Conteúdo", que envia `{ contentVersionId, versionNumber }` e espera 201, é reescrito — o `.strict()` desta TASK o torna 422 —, mantendo o invariante por um caso SEM corpo que grava a Versão do Conteúdo da rota (id literal); `git -C mnemonicos-backend diff <commit-pai>..HEAD -- tests/integration/published-pdf.publish.integration.test.ts` → ~~só os hunks desse caso e os 2 casos novos do critério herdado do `.strict()`~~ só hunks das classes autorizadas acima, conferidos por leitura no relatório (nenhuma asserção antiga removida ou afrouxada), não por contagem de hunks (reconciliado no fecho da wave 8, 1ª rodada)).
 - [ ] Sem warnings/lints novos sobre TODOS os arquivos do diff, produção e teste — `npm --prefix mnemonicos-backend run lint`, `npm --prefix mnemonicos-backend run typecheck`, `npm --prefix mnemonicos-backend run format:check`, `npm --prefix mnemonicos-frontend run typecheck` e `npm --prefix mnemonicos-frontend run lint` → saída 0 nos cinco.
 
 - [ ] (pendência herdada da TASK-065-012, cláusula que ela não podia cumprir sem ler o corpo) O corpo do `POST /contents/:id/publications` não aceita `contentVersionId` nem `versionNumber`: na app real, POST com `{ contentVersionId: <id de outra Versão> }` e POST com `{ versionNumber: 1 }` respondem 422 `VALIDATION_ERROR` (pelo `.strict()` do `publishFinalPdfBodySchema`) e a contagem de linhas de `published_pdfs` não muda; verificação executável: `npm --prefix mnemonicos-backend run test:integration -- tests/integration/published-pdf.publish.integration.test.ts` → `0 failed` (2 casos); mutante (em worktree) que tira o `.strict()` reprova os 2 casos.
+
+- [ ] (retry gate 6 da wave 8; lição `db-injetavel-e-sempre-o-ultimo-parametro-do-service`) Nada de Prisma na rota: a assinatura passa a `publishFinalPdf(rawContentId, actor, acknowledgements = { acknowledgeIncomplete: false, acknowledgeRepublish: false }, db = prisma)` (entrada de domínio antes do `db`, como `exportPublication(rawContentId, input, actor, db)`), a rota chama `publishFinalPdf(id, actor, acknowledgements)` sem importar `prisma`, e o único outro chamador (`published-pdf.publish.integration.test.ts`, caso da transação que falha) passa o objeto de flags antes do cliente com falha (edição de call-site autorizada); verificação executável: `rg -n "lib/prisma" mnemonicos-backend/src/modules/*/*.routes.ts` → só `health.routes.ts` (controle positivo em 6b1c674 → também `published-pdf.routes.ts`); `npm --prefix mnemonicos-backend run typecheck` → 0; publish 30/30 e confirmations 28/28 → `0 failed`.
 
 ## Riscos específicos
 
@@ -72,17 +74,17 @@ A publicação (TASK-065-012) passa a recusar, com 409 e nada gravado, a Tira co
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T23:38:34-0300
+**Data conclusão**: 2026-10-19T07:34:39-0300
+**Commit SHA**: 7bf89b2 (backend) · e1c6072 (frontend)
 **Jira**: KAN-273
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 8, 0 achados)
+- [x] Comportamento (gate 9): consolidado (FEAT-064-003)
