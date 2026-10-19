@@ -151,6 +151,8 @@ Fechamento legislativo, Papel.
 
 **Jira Story**: KAN-245
 
+**Verificação (gate 9)**: 2026-10-19 — PARCIAL / pendente_handoff (Tech Lead, declarado). O QA não foi redespachado nesta FEAT: o bloqueio é o mesmo da FEAT-064-001 (o classificador do harness nega ao QA a leitura das credenciais de seed, então não há login no formulário), e repetir o despacho só repetiria a negação. Os ACs têm prova de gate 1 (integração com Postgres real; componentes montados contra a `api` real com fetch falso; foco com *focus fixup* simulado). Handoff: executado pelo Diretor ou com a leitura dos seeds liberada ao QA; subir o backend com `npm run dev:no-db` (nunca `npm run dev` em worktree). Roteiro: Roteiro consolidado da TASK-065-016 (passos de envio com aviso de resolução, indicador de cobertura e Aviso "imagem que não entrou") e Roteiro da TASK-065-014 (Aviso após exportar).
+
 - **FR-064-008** [MUST] O sistema deve compor o PDF final com uma Capa que identifica a
   Disciplina, o Tópico, a Versão e a data de fechamento legislativo, sem exigir campo novo
   no Conteúdo bruto.
@@ -186,6 +188,8 @@ Fechamento legislativo, Papel.
 > confirma que é idêntico a cada download; aprova nova versão e confirma que há novo arquivo.
 
 **Jira Story**: KAN-246
+
+**Verificação (gate 9)**: 2026-10-19 — PARCIAL / pendente_handoff (Tech Lead, declarado). O QA não foi redespachado nesta FEAT: o bloqueio é o mesmo da FEAT-064-001 (o classificador do harness nega ao QA a leitura das credenciais de seed, então não há login no formulário), e repetir o despacho só repetiria a negação. Os ACs têm prova de gate 1 (integração com Postgres real; componentes montados contra a `api` real com fetch falso; foco com *focus fixup* simulado). Handoff: executado pelo Diretor ou com a leitura dos seeds liberada ao QA; subir o backend com `npm run dev:no-db` (nunca `npm run dev` em worktree). Roteiro: Roteiros das TASK-065-015 (listar e baixar) e TASK-065-016 (publicar, confirmações, recusa 409 real).
 
 - **FR-064-016** [MUST] Quando um EDITOR ou ADMIN aciona "Publicar PDF final" para um
   Conteúdo bruto com Versão aprovada e válida, o sistema deve gerar o PDF final e gravá-lo

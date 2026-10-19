@@ -2,7 +2,7 @@
 area: Design
 estado: ativa
 validade: indeterminada
-confirmada: 2
+confirmada: 3
 contestada: 0
 paths:
   - mnemonicos-frontend/src/components/**/*.tsx
@@ -42,3 +42,5 @@ erros) para o leitor de tela ler `aria-invalid`/`aria-describedby` novos. Prova:
 (`pendingFocusRef`), commit `8522792`; molde correto do diálogo: `account-confirm-dialog.tsx` (efeito de `busy`).
 
 **Reincidência (confirmada 2):** PLAN-065, TASK-065-015 (painel "PDFs publicados", 2026-10-19). O "Tentar novamente" após erro deixava o painel só com o título durante o refetch: `isLoading` do RTK fica falso depois de um resultado rejeitado e `isError` volta a falso em pending. Decida o ramo de carregamento por `data === undefined && isFetching`.
+
+**Reincidência (confirmada 3):** PLAN-065, TASK-065-016 (2026-10-19), no mesmo painel da confirmação 2: o "Tentar novamente" do preview, acrescentado de carona num retry, desmontava em voo (`isError` falso em pending) e o foco caía no `<body>`. Todo retry condicionado a `isError` de RTK Query move o foco a um alvo estável ANTES do refetch, e o teste segura a resposta e confere `document.activeElement`. Causa raiz desta reincidência: a carona apontou como molde um componente com o mesmo defeito (`publication-export-control.tsx`). Antes de copiar um molde citado, procure com `grep refetch()` o equivalente que já está no próprio módulo (aqui, `handleRetry` em `published-pdfs-panel.tsx`).

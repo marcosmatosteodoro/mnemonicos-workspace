@@ -1193,7 +1193,9 @@ injetável prova-se com stub em teste unitário, sem precisar de banco real.
 **Validade:** todo retry que consolida mais de um achado ou pedido de correção no mesmo
 despacho, neste projeto.
 **Estado:** ativa
-**Contadores:** confirmada 2 · contestada 0
+**Reincidência (2026-10-19, PLAN-065 TASK-065-016):** a carona (f) do retry, um "Tentar novamente" do preview, entrou sem a régua da lição de controle montado durante o carregamento e foi reprovada no re-gate 11.
+
+**Contadores:** confirmada 3 · contestada 0
 
 ## [Testes] Prova de ausência por leitura de texto-fonte precisa declarar o universo lido, derivado do quantificador do critério
 
