@@ -8,7 +8,7 @@
 **Wave**: 6
 **Tamanho estimado**: medium
 **Tipo**: feature
-**Status**: Todo
+**Status**: Done
 
 ## Dependências
 
@@ -30,6 +30,8 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 - mnemonicos-backend/src/modules/publication/publication.service.ts: `getFinalPreview` ganha `latestPublication` (via `findLatestForVersion(rawContentId, versionNumber, db = prisma)`, que devolve `{ id, publishedAt, versionNumber } | null`, da Versão corrente).
 - Testes: mnemonicos-backend/tests/integration/route-authz-matrix.integration.test.ts (censo de rotas), mnemonicos-backend/tests/integration/published-pdf.routes.integration.test.ts (novo; semeia por `seedPublishedPdf` da TASK-065-004), mnemonicos-backend/tests/unit/published-pdf-frontend-contract.test.ts (novo), mnemonicos-backend/tests/unit/publication-final-frontend-contract.test.ts (edição declarada: o contrato do preview passa a cobrir `latestPublication` nas duas fontes; decisão D12).
 - mnemonicos-frontend/src/types/domain.ts: espelho de `PublicationListItem` e de `latestPublication` em `FinalPreview` (campo que a TASK-065-009 deixou de fora), no mesmo diff.
+- (retry do gate 7 da wave 6) mnemonicos-backend/src/modules/publication/publication.schema.ts: recebe o schema de params `{ id, publicationId }` das rotas novas (sai de `published-pdf.routes.ts`).
+- (retry do gate 7 da wave 6, só tipo) mnemonicos-backend/src/modules/publication/published-pdf.store.ts: `StoreClient` passa a `Pick<PrismaClient, 'publishedPdf'>`; nenhuma consulta muda.
 
 ### Não inclui
 - Publicar (TASK-065-012), confirmações de cobertura incompleta e de republicar (TASK-065-013), UI (TASK-065-015, TASK-065-016).
@@ -56,6 +58,12 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 - [ ] Sem warnings/lints novos sobre todos os arquivos do diff (`git -C mnemonicos-backend diff --name-only main...HEAD` e `git -C mnemonicos-frontend diff --name-only main...HEAD`), produção e teste: `npm --prefix mnemonicos-backend run lint`, `npm --prefix mnemonicos-backend run typecheck` e `npm --prefix mnemonicos-backend run format:check` saem 0; `npm --prefix mnemonicos-frontend run lint` e `npm --prefix mnemonicos-frontend run format:check` saem 0
 
 - [ ] Exigências do gate 8 da wave 1 para as rotas de leitura (pendência herdada): (a) sessão ausente → 401 e papel sem direito (STUDENT) → 403 nas duas rotas GET; (b) Conteúdo removido (soft-delete) → 404 nas duas, e o binário não é servido; (c) download com `Content-Type` literal `application/pdf` (asserção de igualdade, não `toMatch`) e `Content-Disposition: attachment`; verificação executável: comando de integração desta TASK → `0 failed`; mutante que remove a checagem de remoção na leitura deixa (b) vermelho.
+- [ ] Todo campo que o serviço MAPEIA (não copia) tem asserção de VALOR na saída integrada (pendência herdada, lição `campo-mapeado-pelo-servico-tem-assercao-na-saida-integrada`, wave 3 desta sessão): na resposta de `GET /contents/:id/publications`, `publishedBy.id` e `publishedBy.name` são iguais aos do usuário semeado como publicador (dois publicadores distintos no fixture, cada item com o seu), `framesTotal`/`framesWithImage`/`byteSize`/`versionNumber` iguais aos do registro semeado (valores distintos entre registros) e `publishedAt` igual ao ISO do registro; verificação executável: comando de integração desta TASK → `0 failed`; mutante que mapeia `publishedBy.name` a partir de outro campo (ex.: `email`) e mutante que troca `framesWithImage` por `framesTotal` reprovam (2 mutantes, 2 vermelhos).
+
+- [ ] (retry R1, gates 5/6 da wave 6) Schema fora da rota (DEC-065-011, guidelines/project/backend/README.md "Camadas"): o schema de params das duas rotas vive em `src/modules/publication/publication.schema.ts`, derivado de `rawContentIdParamSchema` por `.extend({ publicationId: z.uuid('Identificador de PDF publicado inválido.') })` (node-22 §9), e `published-pdf.routes.ts` não importa `zod`; verificação executável: `grep -c "from 'zod'" mnemonicos-backend/src/modules/publication/published-pdf.routes.ts` → `0` (controle positivo: o mesmo grep no commit 6fbef62 → `1`) e `grep -lE "from 'zod'" mnemonicos-backend/src/modules/*/*.routes.ts` → vazio; os 3 casos 422 de `published-pdf.routes.integration.test.ts` seguem verdes (`0 failed`).
+- [ ] (retry R2, gate 6 da wave 6) Sem cast entre tipos de cliente Prisma (node-22 §1; lição `porta-que-le-um-delegate-tipa-o-cliente-como-pick-do-delegate`): `StoreClient` em `published-pdf.store.ts` é `Pick<PrismaClient, 'publishedPdf'>`, `publication.service.ts` passa `db` direto ao store, `StoreReadClient` e o comentário do workaround somem, e imports que ficarem sem uso saem; verificação executável: `grep -nE "as (StoreReadClient|PrismaClient|PrismaTx)\b|StoreReadClient" mnemonicos-backend/src/modules/publication/*.ts` → vazio (controle positivo no commit 6fbef62 → ≥ 2 linhas) e `npm --prefix mnemonicos-backend run typecheck` → saída 0; suítes do store e das rotas → `0 failed`.
+- [ ] (retry, carona do gate 8/7 da wave 6) Escopo por Conteúdo provado na ponta integrada: em `published-pdf.routes.integration.test.ts`, um caso com 2 Conteúdos X e Y, ambos com a Versão 1 publicada (registros distintos): o `latestPublication` do preview de X tem o `id` do registro de X, e `GET /contents/X/publications` não contém o `id` do registro de Y; verificação executável: comando de integração desta TASK (arquivo inteiro) → `0 failed`; mutante (em worktree) que tira `rawContentId` do `where` de `findLatestForVersion` reprova esse caso, e mutante que tira `rawContentId` do `where` do `list` também reprova (2 mutantes, 2 vermelhos NESTE arquivo, não só na suíte do store).
+- [ ] (retry, régua do mutante de autorização) A prova "mutante que remove `requireRole` reprova o caso 403" é cumprida pelo mutante que AMPLIA os papéis (`'STUDENT'` acrescentado ao `requireRole` de cada rota, um por rota): remover a guarda morre no boot (`assertDenyByDefault`) e não executa o caso; verificação executável: os 2 mutantes de ampliação, em worktree, deixam vermelho o caso 403 da própria rota em `published-pdf.routes.integration.test.ts`.
 
 ## Riscos específicos
 
@@ -70,19 +78,19 @@ Ambiente de execução: os comandos rodam a partir da raiz `Mnemonico/kan237/` (
 
 <!-- /keelson:implement preenche durante closure. Não editar manualmente. -->
 
-**Data início**: 
-**Data conclusão**: 
-**Commit SHA**: 
+**Data início**: 2026-10-18T21:29:53-0300
+**Data conclusão**: 2026-10-18T22:27:53-0300
+**Commit SHA**: c140131 (backend) · e439900 (frontend)
 **Jira**: KAN-271
 
 **Quality gates**:
-- [ ] Implementação completa
-- [ ] Testes passando
-- [ ] Lint limpo
-- [ ] Aderência à ficha/perfil
-- [ ] Code review aprovado
-- [ ] ACs verificados
-- [ ] Segurança (gate 8): aprovado | n/a — <security-engineer ou motivo do n/a>
-- [ ] Comportamento (gate 9): consolidado <FEAT-NNN-XXX | DoD, Etapa 4> | verificado | pendente_handoff | n/a — <qa, consolidação ou motivo do n/a; enum, forma preenchida e régua do "verificado": implement.md §3.4.1 (4.291)>
+- [x] Implementação completa
+- [x] Testes passando
+- [x] Lint limpo
+- [x] Aderência à ficha/perfil
+- [x] Code review aprovado
+- [x] ACs verificados
+- [x] Segurança (gate 8): aprovado (wave 6, 0 achados)
+- [x] Comportamento (gate 9): consolidado (FEAT-064-003)
 <!-- Branch, tentativas, arquivos, revisores e narrativa (retries, escalações) vivem no
 ledger da sessão e no commit da closure (4.76) — não se repetem aqui (4.409). -->
