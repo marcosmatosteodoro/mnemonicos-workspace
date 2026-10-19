@@ -8,7 +8,7 @@
 >
 > Versão online (manter igual): https://claude.ai/code/artifact/23d88ef4-3e31-45a0-8749-229080ea2543
 >
-> Última atualização: 2026-10-18
+> Última atualização: 2026-10-19
 
 ## O que é, e o que ainda não é
 
@@ -90,8 +90,10 @@ outra. Uma imagem que já está em uso numa Tira não pode ser removida.
   Sanção). Se aparecer uma categoria sugerida que sirva, escolha-a: é ela que o filtro usa.
 - **Descrição da função cognitiva**: por que esta imagem ajuda a lembrar a regra sem a dica
   na frente. Se tirar a imagem não fizer falta para lembrar, ela é só decoração.
-- **Imagem**: para a imagem sair no PDF da tira, use PNG ou JPEG. Uma imagem em WebP é aceita
-  na biblioteca, mas ainda não aparece no PDF.
+- **Imagem**: PNG, JPEG ou WebP. No rascunho da tira, o WebP é aceito na biblioteca mas segue
+  sem aparecer; no PDF final ele aparece. Se a imagem tiver o lado maior abaixo de 2000 px, o
+  envio mostra um aviso de Resolução recomendada, só informativo (ver
+  [Como ilustrar uma tira e gerar o PDF](#como-ilustrar-uma-tira-e-gerar-o-pdf)).
 
 ### 5. Complete o material de reforço
 
@@ -106,10 +108,15 @@ geração do PDF. Escreva "leva a" ou "diferente de".
 
 ### 6. Exporte o PDF
 
-Na tela do conteúdo ou da Tira, escolha Exportar Tira mnemônica (um quadro por página) ou
-Exportar Resumo. O PDF traz a Tira, os contrastes, a pegadinha, os flashcards e o protocolo
-de revisão. Ele sai marcado como RASCUNHO até existir uma versão aprovada. Se a Tira não tem
-quadros, o sistema pede para adicionar ao menos um.
+Na tela do conteúdo ou da Tira, há dois modos de exportar:
+
+- **Modo rascunho**: Exportar Tira mnemônica (um quadro por página) ou Exportar Resumo. O PDF sai
+  marcado como RASCUNHO e serve para conferir o material.
+- **Modo PDF final**: Exportar PDF final. Exige uma versão aprovada (ver o passo 7) e traz a Tira
+  com as imagens, os contrastes, a pegadinha, os flashcards e o protocolo de revisão.
+
+Se a Tira não tem quadros, o sistema pede para adicionar ao menos um. Para ilustrar a Tira e
+publicar o PDF final, veja [Como ilustrar uma tira e gerar o PDF](#como-ilustrar-uma-tira-e-gerar-o-pdf).
 
 ### 7. Feche a versão e peça a aprovação
 
@@ -178,6 +185,51 @@ Remover:
   exportou, quando e os PDFs incluídos (ou "Ainda não exportado").
 - Se algo falha, a tela diz para exportar de novo. Se aparecer "O arquivo baixado não vale;
   exporte de novo.", apague o arquivo baixado e clique em Exportar Pacote outra vez.
+
+## Como ilustrar uma tira e gerar o PDF
+
+### Ilustrar a tira
+
+1. Na Tira mnemônica, escolha a associação visual de cada quadro no seletor. Se o seletor
+   estiver vazio, use o link "Ir para a Biblioteca visual", cadastre a imagem e volte pelo link
+   "Voltar para a tira".
+2. Acompanhe o indicador "N de M quadros com imagem": ele diz quantos quadros já têm imagem.
+3. Ao enviar uma imagem, o ideal é que o lado maior tenha 2000 px. Abaixo disso o formulário
+   mostra um aviso de Resolução recomendada; é só informativo e o envio continua.
+4. O PDF final ajusta as imagens maiores que 2000 px no próprio PDF. A imagem guardada na
+   Biblioteca visual não muda.
+
+### Rascunho ou PDF final
+
+- O **rascunho** (Exportar Tira mnemônica) sai marcado como RASCUNHO e não exige versão
+  aprovada. Nele, imagens WebP seguem sem aparecer.
+- O **PDF final** (Exportar PDF final) exige uma versão aprovada e válida, e nele o WebP
+  aparece. Com o botão desabilitado, abra "Histórico de Versões": feche a versão (se ainda não
+  fechou) e peça a um administrador que não a produziu para aprová-la. Se o conteúdo ou a Tira
+  foram alterados depois do fechamento, feche e aprove uma nova versão. Se o PDF ficar grande
+  demais, reduza o tamanho das imagens dos quadros e exporte de novo.
+
+### Ler o Aviso de exportação
+
+Antes e depois de exportar, o "Aviso de exportação" lista os quadros com problema, um por linha:
+
+- **Sem imagem**: o quadro não tem imagem. Vincule uma pelo seletor.
+- **Imagem que não entrou no PDF**: use "Trocar associação visual" no quadro.
+- **Imagem abaixo da resolução recomendada**: só informativo; o PDF sai normalmente.
+
+### Publicar e baixar
+
+1. Com a versão aprovada, clique em "Publicar PDF final" e, na janela, em
+   "Confirmar publicação".
+2. Se faltam imagens (quadros sem imagem ou com imagem que não entrou), a janela pede para
+   marcar que você quer publicar mesmo assim.
+3. Se a versão já tem PDF publicado, a janela mostra a data e pergunta se quer publicar outro.
+4. O painel "PDFs publicados" lista o que já foi publicado; o mais recente traz a marca
+   “atual”. Use “Baixar” para salvar o PDF.
+5. Se publicar ou baixar falhar, tente de novo. Se a janela avisar que a cobertura de imagens
+   mudou ou que a versão ganhou um PDF enquanto ela estava aberta, confira o resumo e confirme
+   de novo. Se a publicação disser que não é possível agora, confira em "Histórico de Versões"
+   se há uma versão aprovada.
 
 ## Acompanhando o trabalho no Painel
 
